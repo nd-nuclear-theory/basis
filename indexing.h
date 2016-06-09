@@ -195,7 +195,7 @@ namespace basis {
 
     // state index lookup by labels
     #ifdef INDEXING_HASH
-    std::unordered_map<StateLabelsType,int,boost::hash<typename StateLabelsType>> lookup_;
+    std::unordered_map<StateLabelsType,int,boost::hash<StateLabelsType>> lookup_;
     #else
     std::map<StateLabelsType,int> lookup_;
     #endif
