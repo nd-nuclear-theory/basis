@@ -373,25 +373,28 @@ namespace basis {
       int LookUpSubspaceIndex(const typename SubspaceType::SubspaceLabelsType& subspace_labels) const
       {
 	
-	// diagnostic output for failed lookup
-	if (!lookup_.count(subspace_labels))
-	  {
+        // trap failed lookup with assert for easier debugging
+        assert(lookup_.count(subspace_labels));
 
-	    // std::cout << "Space lookup: label not found " << subspace_labels << std::endl;
-	    std::cout << "Map size: " << lookup_.size() << std::endl;
-	    // for (auto& elem : lookup_) // doesn't work
-	    //for (auto iter =lookup_.begin(); iter != lookup_.end(); ++iter)
-	    //  {
-	    //	const auto& ikey = (*iter).first;
-	    //	std::cout << std::get<0>(ikey) << "," << std::get<1>(ikey) << "," << std::get<2>(ikey) << "," << std::get<3>(ikey);
-	    //	std::cout << " : ";
-	    //	std::cout << (*iter).second;
-	    //	std::cout << " match ";
-	    //	std::cout << (subspace_labels == ikey);
-	    //	std::cout << std::endl;
-	    //  }
-	    std::cout << std::endl;
-	  }
+	// diagnostic output for failed lookup
+	// if (!lookup_.count(subspace_labels))
+	//   {
+        // 
+	//     // std::cout << "Space lookup: label not found " << subspace_labels << std::endl;
+	//     std::cout << "Map size: " << lookup_.size() << std::endl;
+	//     // for (auto& elem : lookup_) // doesn't work
+	//     //for (auto iter =lookup_.begin(); iter != lookup_.end(); ++iter)
+	//     //  {
+	//     //	const auto& ikey = (*iter).first;
+	//     //	std::cout << std::get<0>(ikey) << "," << std::get<1>(ikey) << "," << std::get<2>(ikey) << "," << std::get<3>(ikey);
+	//     //	std::cout << " : ";
+	//     //	std::cout << (*iter).second;
+	//     //	std::cout << " match ";
+	//     //	std::cout << (subspace_labels == ikey);
+	//     //	std::cout << std::endl;
+	//     //  }
+	//     std::cout << std::endl;
+	//   }
 
 	return lookup_.at(subspace_labels);
       };
