@@ -75,6 +75,7 @@
     - Systematize switching between map and unordered_map via INDEXING_HASH 
       directive.
     - Remove deprecated subspace method Dimension().
+  6/16/16 (mac): Fix missing typename qualifier.
 
 ****************************************************************/
 
@@ -574,7 +575,7 @@ namespace basis {
 
     int LookUpSectorIndex(int bra_subspace_index, int ket_subspace_index, int multiplicity_index=1) const
     {
-      return lookup_.at(SectorType::KeyType(bra_subspace_index,ket_subspace_index,multiplicity_index));
+      return lookup_.at(typename SectorType::KeyType(bra_subspace_index,ket_subspace_index,multiplicity_index));
     };
 
     ////////////////////////////////////////////////////////////////
