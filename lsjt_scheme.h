@@ -33,6 +33,7 @@
       constructor with *subspace* constraint Ncm+S+T+g~1 in Validate.
     - Restrict TwoBody states to canonical ordering of orbitals.
     - Replace Print() methods with Str() methods.
+  6/22/16 (mac): Make explicit typedefs for label types.
 
 ****************************************************************/
 
@@ -79,10 +80,15 @@ namespace basis {
   //
   // Note that ordering of subspaces is therefore lexicographic by (L,S,J).
 
+  // labels
+
+  typedef std::tuple<int,int,int,int,int> RelativeSubspaceLSJTLabels;
+  typedef std::tuple<int> RelativeStateLSJTLabels;
+
   // subspace
 
   class RelativeSubspaceLSJT
-    : public BaseSubspace< std::tuple<int,int,int,int,int> , std::tuple<int> >
+    : public BaseSubspace<RelativeSubspaceLSJTLabels,RelativeStateLSJTLabels>
     {
     
     public:
@@ -223,10 +229,15 @@ namespace basis {
   // However, subspaces are subject to:
   //   -- triangularity constraint on (L,S,J)
 
+  // labels
+
+  typedef std::tuple<int,int,int,int,int,int,int> RelativeCMSubspaceLSJTLabels;
+  typedef std::tuple<int,int> RelativeCMStateLSJTLabels;
+
   //subspace
   
   class RelativeCMSubspaceLSJT
-    : public BaseSubspace< std::tuple<int,int,int,int,int,int,int> , std::tuple<int,int> >
+    : public BaseSubspace<RelativeCMSubspaceLSJTLabels,RelativeCMStateLSJTLabels>
   {
     
   public:
@@ -372,10 +383,15 @@ namespace basis {
   //
   ////////////////////////////////////////////////////////////////  
 
+  // labels
+
+  typedef std::tuple<int,int,int,int,int> TwoBodySubspaceLSJTLabels;
+  typedef std::tuple<int,int,int,int> TwoBodyStateLSJTLabels;
+
   //subspace
 
   class TwoBodySubspaceLSJT
-    : public BaseSubspace< std::tuple<int,int,int,int,int> , std::tuple<int,int,int,int> >
+    : public BaseSubspace<TwoBodySubspaceLSJTLabels,TwoBodyStateLSJTLabels>
   {
     
   public:
