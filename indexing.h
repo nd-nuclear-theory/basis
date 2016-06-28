@@ -60,7 +60,8 @@
 
   Language: C++11
                                  
-  Mark A. Caprio, University of Notre Dame.
+  Mark A. Caprio
+  University of Notre Dame
 
   11/21/15 (mac): Created (indexing_base.h), abstracted from code in indexing_lsjt.
   3/5/16 (mac): Update header comment.
@@ -76,6 +77,7 @@
       directive.
     - Remove deprecated subspace method Dimension().
   6/16/16 (mac): Fix missing typename qualifier.
+  6/24/16 (mac): Add direction enum class.
 
 ****************************************************************/
 
@@ -538,6 +540,17 @@ namespace basis {
     int multiplicity_index_;
   };
 
+  // sector direction specifier
+  //
+  //   kCanonical : specifies bra_sector_index <= ket_sector_index
+  //   kBoth : specifies that both directions are allowed
+  //
+  // Note: It is up to the derived class constructor to accept a
+  // sector direction argument and to implement this symmetry
+  // constraint, if so decided.
+
+  enum class direction {kCanonical,kBoth};
+
   // BaseSectors -- container to hold sectors (as pairs of
   // indices) with reverse lookup by space labels
   //
@@ -607,7 +620,6 @@ namespace basis {
     std::vector<SectorType> sectors_;
 
     // sector index lookup by subspace indices
-
     #ifdef INDEXING_HASH
     std::unordered_map<typename SectorType::KeyType,int,boost::hash<typename SectorType::KeyType>> lookup_;
     #else

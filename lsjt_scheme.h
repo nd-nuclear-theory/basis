@@ -16,9 +16,9 @@
   of indexing scheme.
 
   Language: C++11
-  (for tuple and map::at)
                                  
-  Mark A. Caprio, University of Notre Dame.
+  Mark A. Caprio
+  University of Notre Dame
 
   11/13/15 (mac): Created, styled after shell_indexing_nlj.
   11/21/15 (mac): Rename from shell_indexing_lsjt to indexing_lsjt.
@@ -34,11 +34,21 @@
     - Restrict TwoBody states to canonical ordering of orbitals.
     - Replace Print() methods with Str() methods.
   6/22/16 (mac): Make explicit typedefs for label types.
+  6/27/16 (mac):
+    - Rename labels on relative basis (e.g., J->Jr).
+    - Add Jr_max cutoff on construction of relative basis.
+    - Change relative-c.m. scheme from spectator (Nc,lc) to active (Nc,lc).
+    - Add fixed-N subspaces in relative-c.m. scheme for use with Moshinsky 
+      transform block structure.
+    - Expand basis indexing comments.
+    - Implement canonical ordering constraint on sectors.
+    - Remove all-to-all sector constructors.
+    - Rename Str() to DebugStr().
 
 ****************************************************************/
 
-#ifndef lsjt_scheme_h
-#define lsjt_scheme_h
+#ifndef LSJT_SCHEME_H_
+#define LSJT_SCHEME_H_
 
 #include <string>
 
@@ -50,35 +60,59 @@ namespace basis {
   // relative states in LSJT scheme
   ////////////////////////////////////////////////////////////////
 
-  // subspace labels: (L,S,J,T,g)    P=(-)^g
+  ////////////////////////////////////////////////////////////////  
+  //
+  // Labeling
+  //
+  // subspace labels: (lr,S,Jr,T,gr)    Pr=(-)^gr
+  //
+  //   lr (int): orbital angular momentum of *relative* motion
+  //   S (int): total spin
+  //   Jr (int): total angular momentum of *relative* motion
+  //          (i.e., lr coupled to S)
+  //   gr (int): grade (=0,1) for the parity Pr of *relative* motion
+  //
   // state labels within subspace: (Nr)
   //
-  // Truncation of the space is by an Nmax.
+  //   Nr (int): oscillator quanta of relative motion
   //
-  // Within a subspace, states are ordered by:
-  //   -- increasing Nr (Nr~g)
-  // and subject to
-  //   -- parity constraint Nr~g
+  ////////////////////////////////////////////////////////////////
   //
-  // That is:
-  //   0 <-> Nr=g
-  //   1 <-> Nr=g+2
-  //   ...
+  // Subspaces
   //
-  // Within the space, subspaces are ordered by:
-  //   -- increasing L (L=0,1,...,Nmax)
+  // Within the full space, subspaces are ordered by:
+  //   -- increasing lr (lr=0,1,...,Nr_max)
   //   -- increasing S (S=0,1)
-  //   -- increasing J
-  //   -- [T forced by L+S+T~1]
-  //   -- [g forced by g~L]
+  //   -- increasing Jr
+  //   -- [T forced by lr+S+T~1]
+  //   -- [gr forced by gr~lr]
   // subject to:
-  //   -- triangularity of (L,S,J)
-  //   -- parity constraint L~g
-  //   -- antisymmetry constraint L+S+T~1
+  //   -- triangularity of (lr,S,Jr)
+  //   -- parity constraint lr~gr
+  //   -- antisymmetry constraint lr+S+T~1
+  // 
+  // Subspaces are asserted to have nonzero dimension (as a sanity
+  // check).
   //
-  // Assertion: sanity check on nonzero dimension for space
+  // Note that ordering of subspaces is lexicographic by (lr,S,Jr).
   //
-  // Note that ordering of subspaces is therefore lexicographic by (L,S,J).
+  // Truncation of the space is by the relative Nr_max.
+  //
+  ////////////////////////////////////////////////////////////////
+  //
+  // States
+  //
+  // Within a subspace, the states are ordered by:
+  //   -- increasing Nr
+  // and subject to:
+  //   -- oscillator branching constraint Nr~lr (or, equivalently, 
+  //      parity constraint Nr~gr)
+  //
+  // This basis is for *identical* particle states, but the
+  // antisymmetry constraint is already applied at the level of
+  // selecting the subspace labels lr+S+T~1.
+  //
+  ////////////////////////////////////////////////////////////////  
 
   // labels
 
@@ -91,29 +125,32 @@ namespace basis {
     : public BaseSubspace<RelativeSubspaceLSJTLabels,RelativeStateLSJTLabels>
     {
     
-    public:
+      public:
 
       // constructor
 
-      RelativeSubspaceLSJT (int L, int S, int J, int T, int g, int Nmax);
-      // Set up indexing in Nmax truncation.
+      RelativeSubspaceLSJT (int lr, int S, int Jr, int T, int gr, int Nr_max);
+      // Set up indexing in Nr_max truncation.
 
       // accessors
  
-      int L() const {return std::get<0>(labels_);}
+      int lr() const {return std::get<0>(labels_);}
       int S() const {return std::get<1>(labels_);}
-      int J() const {return std::get<2>(labels_);}
+      int Jr() const {return std::get<2>(labels_);}
       int T() const {return std::get<3>(labels_);}
-      int g() const {return std::get<4>(labels_);}
-      int Nmax() const {return Nmax_;}
+      int gr() const {return std::get<4>(labels_);}
+      int Nr_max() const {return Nr_max_;}
 
-    private:
+      // diagnostic string
+      std::string DebugStr() const;
+
+      private:
 
       //validation
       bool ValidLabels() const;
 
       // truncation
-      int Nmax_;
+      int Nr_max_;
 
     };
 
@@ -123,24 +160,24 @@ namespace basis {
     : public BaseState<RelativeSubspaceLSJT>
   {
     
-  public:
+    public:
 
     // pass-through constructors
 
-  RelativeStateLSJT(const SubspaceType& subspace, int index)
-    // Construct state by index.
-    : BaseState (subspace, index) {}
+    RelativeStateLSJT(const SubspaceType& subspace, int index)
+      // Construct state by index.
+      : BaseState (subspace, index) {}
 
-  RelativeStateLSJT(const SubspaceType& subspace, const typename SubspaceType::StateLabelsType& state_labels)
-    // Construct state by reverse lookup on labels.
-    : BaseState (subspace, state_labels) {}
+    RelativeStateLSJT(const SubspaceType& subspace, const typename SubspaceType::StateLabelsType& state_labels)
+      // Construct state by reverse lookup on labels.
+      : BaseState (subspace, state_labels) {}
 
     // pass-through accessors
-    int L() const {return Subspace().L();}
+    int lr() const {return Subspace().lr();}
     int S() const {return Subspace().S();}
-    int J() const {return Subspace().J();}
+    int Jr() const {return Subspace().Jr();}
     int T() const {return Subspace().T();}
-    int g() const {return Subspace().g();}
+    int gr() const {return Subspace().gr();}
 
     // state label accessors
     int Nr() const {return std::get<0>(GetStateLabels());}
@@ -153,25 +190,33 @@ namespace basis {
     : public BaseSpace<RelativeSubspaceLSJT>
   {
 
-  public:
+    public:
     
     // constructor
-    RelativeSpaceLSJT(int Nmax);
-    // Enumerates all relative LSJT subspaces of given dimension up to a
-    // given Nmax cutoff.
+    RelativeSpaceLSJT(int Nr_max, int Jr_max);
+    // Enumerates all relative LSJT subspaces of given dimension up to
+    // a given relative oscillator cutoff and relative angular
+    // momentum cutoff.
+    //
+    // The relative angular momentum cutoff is included in recognition
+    // of the common practice of truncation by highest partial wave in
+    // the representation of relative interations.
     //
     // Arguments:
-    //   Nmax (int) : one-body HO truncation on included subspaces
-
-    // diagnostic output
-    std::string Str() const;
+    //   Nr_max (int) : relative oscillator truncation on included subspaces
+    //   Jr_max (int) : relative angular momentum truncation on included 
+    //     subspaces (Jr_max<=Nr_max+1)
 
     // accessors
-    int Nmax() const {return Nmax_;}
+    int Nr_max() const {return Nr_max_;}
+    int Jr_max() const {return Jr_max_;}
 
-  private:
+    // diagnostic string
+    std::string DebugStr() const;
+
+    private:
     // truncation
-    int Nmax_;
+    int Nr_max_, Jr_max_;
 
   };
 
@@ -181,19 +226,29 @@ namespace basis {
     : public BaseSectors<RelativeSpaceLSJT>
   {
 
-  public:
+    public:
 
     // constructor
 
-    RelativeSectorsLSJT(const RelativeSpaceLSJT& space);
+    RelativeSectorsLSJT(
+        const RelativeSpaceLSJT& space,
+        basis::direction sector_direction = basis::direction::kCanonical
+      );
     // Enumerate all sector pairs ("all-to-all" sector enumeration).
     //
     // Sectors are enumerated in lexicographical order by (bra)(ket).
-    // Sectors are included in "both directions", i.e., there is no
-    // asumption of hermiticity or attempt to therefore only store
-    // "half" the sectors.
+    //
+    // Note: This all-to-all constructor is implemented primarily for
+    // the purpose of providing example code for all-to-all sector
+    // enumeration.  It is not clear that there is immediate
+    // application of all-to-all enumeration for this particular
+    // basis.
 
-    RelativeSectorsLSJT(const RelativeSpaceLSJT& space, int J0, int g0);
+    RelativeSectorsLSJT(
+        const RelativeSpaceLSJT& space,
+        int J0, int T0, int g0,
+        basis::direction sector_direction = basis::direction::kCanonical
+      );
     // Enumerate sector pairs connected by an operator of given
     // tensorial and parity character ("constrained" sector
     // enumeration).
@@ -205,69 +260,90 @@ namespace basis {
   // relative-cm states in LSJT scheme
   ////////////////////////////////////////////////////////////////
 
-  // subspace labels: (Ncm,lcm,L,S,J,T,g)
-  // state labels within subspace: (Nr,lr)
+  ////////////////////////////////////////////////////////////////  
   //
-  // Truncation of the subspace is by the two-body Nmax.
+  // Labeling
   //
-  // Subspace subject to:
-  //   -- triangularity constraint on (L,S,J)
-  //   -- antisymmetry constraint lr+S+T~1 on states
-  //      implies Ncm+S+T+g~1 for subspace
+  // subspace labels: (L,S,J,T,g)
   //
-  // Within a subspace, states are ordered by:
-  //   -- increasing N (N~g)
+  // state labels within subspace: (Nr,lr,Nc,lc)
+  //
+  ////////////////////////////////////////////////////////////////
+  //
+  // Subspaces
+  //
+  // Within the full space, subspaces are ordered by:
+  //    -- increasing L (L=0,1,...,Nmax)
+  //    -- increasing S (S=0,1)
+  //    -- increasing J
+  //    -- increasing T (T=0,1)
+  //    -- increasing g (g=0,1)
+  // subject to:
+  //    -- triangularity of (L,S,J)
+  // 
+  // Subspaces are pruned to those of nonzero dimension.
+  //
+  // Note that ordering of subspaces is lexicographic by (L,S,J,T,g).
+  //
+  // Truncation of the space is by the two-body Nmax.
+  //
+  ////////////////////////////////////////////////////////////////
+  //
+  // States
+  //
+  // Within a subspace, the states are ordered by:
+  //   -- increasing N  (N=Nr+Nc)
   //   -- lexicographically increasing (Nr,lr)
+  //   -- lexicographically increasing (Nc,lc)
   // and subject to:
-  //   -- triangularity constraint on (lr,lcm,L).
-  //   -- parity constraint N=Nr+Ncm~g
-  //   -- [antisymmetry constraint lr+S+T~1]
+  //   -- triangularity constraint on (lr,lc,L)
+  //   -- parity constraint N~g
+  //   -- antisymmetry constraint lr+S+T~1 (or, equivalentsly, 
+  //      Nr+S+T~1)
   //
-  // A full space (and ordering of subspaces) has not been
-  // implemented, as it is not needed for the Moshinsky calculations.
+  // This basis is for *identical* particle states, as enforced by the
+  // antisymmetry constraint on Nr.
   //
-  // However, subspaces are subject to:
-  //   -- triangularity constraint on (L,S,J)
+  ////////////////////////////////////////////////////////////////  
 
   // labels
 
-  typedef std::tuple<int,int,int,int,int,int,int> RelativeCMSubspaceLSJTLabels;
-  typedef std::tuple<int,int> RelativeCMStateLSJTLabels;
+  typedef std::tuple<int,int,int,int,int> RelativeCMSubspaceLSJTLabels;
+  typedef std::tuple<int,int,int,int> RelativeCMStateLSJTLabels;
 
   //subspace
   
   class RelativeCMSubspaceLSJT
     : public BaseSubspace<RelativeCMSubspaceLSJTLabels,RelativeCMStateLSJTLabels>
-  {
+    {
     
-  public:
+      public:
 
-    // constructor
+      // constructor
 
-    RelativeCMSubspaceLSJT (int Ncm, int lcm, 
-				  int L, int S, int J, int T, 
-				  int g, int Nmax);
+      RelativeCMSubspaceLSJT (int L, int S, int J, int T, int g, int Nmax);
 
-    // accessors
+      // accessors
 
-    int Ncm() const {return std::get<0>(labels_);}
-    int lcm() const {return std::get<1>(labels_);}
-    int L() const {return std::get<2>(labels_);}
-    int S() const {return std::get<3>(labels_);}
-    int J() const {return std::get<4>(labels_);}
-    int T() const {return std::get<5>(labels_);}
-    int g() const {return std::get<6>(labels_);}
-    int Nmax() const {return Nmax_;}
+      int L() const {return std::get<0>(labels_);}
+      int S() const {return std::get<1>(labels_);}
+      int J() const {return std::get<2>(labels_);}
+      int T() const {return std::get<3>(labels_);}
+      int g() const {return std::get<4>(labels_);}
+      int Nmax() const {return Nmax_;}
 
-  private:
+      // diagnostic string
+      std::string DebugStr() const;
 
-    //validation
-    bool ValidLabels() const;
+      private:
 
-    // truncation
-    int Nmax_;
+      //validation
+      bool ValidLabels() const;
 
-  };
+      // truncation
+      int Nmax_;
+
+    };
 
   // state
 
@@ -275,22 +351,20 @@ namespace basis {
     : public BaseState<RelativeCMSubspaceLSJT>
   {
     
-  public:
+    public:
 
     // pass-through constructors
 
-  RelativeCMStateLSJT(const SubspaceType& subspace, int index)
-    // Construct state by index.
-    : BaseState (subspace, index) {}
+    RelativeCMStateLSJT(const SubspaceType& subspace, int index)
+      // Construct state by index.
+      : BaseState (subspace, index) {}
 
-  RelativeCMStateLSJT(const SubspaceType& subspace, const typename SubspaceType::StateLabelsType& state_labels)
-    // Construct state by reverse lookup on labels.
-    : BaseState (subspace, state_labels) {}
+    RelativeCMStateLSJT(const SubspaceType& subspace, const typename SubspaceType::StateLabelsType& state_labels)
+      // Construct state by reverse lookup on labels.
+      : BaseState (subspace, state_labels) {}
 
     // pass-through accessors
 
-    int Ncm() const {return Subspace().Ncm();}
-    int lcm() const {return Subspace().lcm();}
     int L() const {return Subspace().L();}
     int S() const {return Subspace().S();}
     int J() const {return Subspace().J();}
@@ -300,14 +374,234 @@ namespace basis {
     // state label accessors
     int Nr() const {return std::get<0>(GetStateLabels());}
     int lr() const {return std::get<1>(GetStateLabels());}
-    int N() const {return  Nr()+Ncm();}
+    int Nc() const {return std::get<2>(GetStateLabels());}
+    int lc() const {return std::get<3>(GetStateLabels());}
+    int N() const {return  Nr()+Nc();}
 
   };
 
-  // space -- not defined
+  // space
 
-  // sectors -- not defined
+  class RelativeCMSpaceLSJT
+    : public BaseSpace<RelativeCMSubspaceLSJT>
+  {
+    
+    public:
 
+    // constructor
+
+    RelativeCMSpaceLSJT(int Nmax);
+    // Enumerates all relative LSJT subspaces of given dimension up to a
+    // given Nmax cutoff.
+
+    // accessors
+    int Nmax() const {return Nmax_;}
+
+    // diagnostic string
+    std::string DebugStr() const;
+
+    private:
+    // truncation
+    int Nmax_;
+
+  };
+
+  // sectors
+
+  class RelativeCMSectorsLSJT
+    : public BaseSectors<RelativeCMSpaceLSJT>
+  {
+
+    public:
+
+    // constructor
+
+    RelativeCMSectorsLSJT(
+        const RelativeCMSpaceLSJT& space,
+        int J0, int T0, int g0,
+        basis::direction sector_direction = basis::direction::kCanonical
+      );
+    // Enumerate sector pairs connected by an operator of given
+    // tensorial and parity character ("constrained" sector
+    // enumeration).
+
+  };
+
+
+  ////////////////////////////////////////////////////////////////
+  // relative-cm states in LSJT scheme -- subspaced by N
+  ////////////////////////////////////////////////////////////////
+
+  ////////////////////////////////////////////////////////////////  
+  //
+  // Labeling
+  //
+  // subspace labels: (L,S,J,T,g,N)  (MODIFICATION for subspacing by N)
+  //
+  // state labels within subspace: (Nr,lr,Nc,lc)
+  //
+  ////////////////////////////////////////////////////////////////
+  //
+  // Subspaces
+  //
+  // Within the full space, subspaces are ordered by:
+  //    -- increasing N (N=0,1,...,Nmax)  (MODIFICATION for subspacing by N)
+  //    -- increasing L (L=0,1,...,Nmax)
+  //    -- increasing S (S=0,1)
+  //    -- increasing J
+  //    -- increasing T (T=0,1)
+  //    -- [increasing g (g=0,1)]  (MODIFICATION for subspacing by N)
+  // subject to:
+  //    -- triangularity of (L,S,J)
+  //    -- parity constraint N~g  (MODIFICATION for subspacing by N)
+  // 
+  // Subspaces are pruned to those of nonzero dimension.
+  //
+  // Note that ordering of subspaces is lexicographic by (L,S,J,T,g).
+  //
+  // Truncation of the space is by the two-body Nmax.
+  //
+  ////////////////////////////////////////////////////////////////
+  //
+  // States
+  //
+  // Within a subspace, the states are ordered by:
+  //   -- [increasing N  (N=Nr+Nc)]  (MODIFICATION for subspacing by N)
+  //   -- lexicographically increasing (Nr,lr)
+  //   -- lexicographically increasing (Nc,lc)
+  // and subject to:
+  //   -- triangularity constraint on (lr,lc,L)
+  //   -- [parity constraint N~g]  (MODIFICATION for subspacing by N)
+  //   -- antisymmetry constraint lr+S+T~1 (or, equivalentsly, 
+  //      Nr+S+T~1)
+  //
+  // This basis is for *identical* particle states, as enforced by the
+  // antisymmetry constraint on Nr.
+  //
+  ////////////////////////////////////////////////////////////////  
+
+  // labels
+
+  typedef std::tuple<int,int,int,int,int,int> RelativeCMSubspaceNLSJTLabels;  // (MODIFICATION for subspacing by N)
+  typedef std::tuple<int,int,int,int> RelativeCMStateNLSJTLabels;
+
+  //subspace
+  
+  class RelativeCMSubspaceNLSJT
+    : public BaseSubspace<RelativeCMSubspaceNLSJTLabels,RelativeCMStateNLSJTLabels>
+    {
+    
+      public:
+
+      // constructor
+
+      RelativeCMSubspaceNLSJT (int L, int S, int J, int T, int g, int Nmax);
+
+      // accessors
+
+      int L() const {return std::get<0>(labels_);}
+      int S() const {return std::get<1>(labels_);}
+      int J() const {return std::get<2>(labels_);}
+      int T() const {return std::get<3>(labels_);}
+      int g() const {return std::get<4>(labels_);}
+      int N() const {return std::get<5>(labels_);}  // (MODIFICATION for subspacing by N)
+
+      // diagnostic string
+      std::string DebugStr() const;
+
+      private:
+
+      //validation
+      bool ValidLabels() const;
+
+      private:
+      // truncation
+      int N_;  // (MODIFICATION for subspacing by N)
+
+
+    };
+
+  // state
+
+  class RelativeCMStateNLSJT
+    : public BaseState<RelativeCMSubspaceNLSJT>
+  {
+    
+    public:
+
+    // pass-through constructors
+
+    RelativeCMStateNLSJT(const SubspaceType& subspace, int index)
+      // Construct state by index.
+      : BaseState (subspace, index) {}
+
+    RelativeCMStateNLSJT(const SubspaceType& subspace, const typename SubspaceType::StateLabelsType& state_labels)
+      // Construct state by reverse lookup on labels.
+      : BaseState (subspace, state_labels) {}
+
+    // pass-through accessors
+
+    int L() const {return Subspace().L();}
+    int S() const {return Subspace().S();}
+    int J() const {return Subspace().J();}
+    int T() const {return Subspace().T();}
+    int g() const {return Subspace().g();}
+
+    // state label accessors
+    int Nr() const {return std::get<0>(GetStateLabels());}
+    int lr() const {return std::get<1>(GetStateLabels());}
+    int Nc() const {return std::get<2>(GetStateLabels());}
+    int lc() const {return std::get<3>(GetStateLabels());}
+    int N() const {return  Nr()+Nc();}
+
+  };
+
+  // space
+
+  class RelativeCMSpaceNLSJT
+    : public BaseSpace<RelativeCMSubspaceNLSJT>
+  {
+    
+    public:
+
+    // constructor
+
+    RelativeCMSpaceNLSJT(int Nmax);
+    // Enumerates all relative NLSJT subspaces of given dimension up to a
+    // given Nmax cutoff.
+
+    // accessors
+    int Nmax() const {return Nmax_;}
+
+    // diagnostic string
+    std::string DebugStr() const;
+
+    private:
+    // truncation
+    int Nmax_;
+
+  };
+
+  // sectors
+
+  class RelativeCMSectorsNLSJT
+    : public BaseSectors<RelativeCMSpaceNLSJT>
+  {
+
+    public:
+
+    // constructor
+
+    RelativeCMSectorsNLSJT(
+        const RelativeCMSpaceNLSJT& space,
+        int J0, int T0, int g0,
+        basis::direction sector_direction = basis::direction::kCanonical
+      );
+    // Enumerate sector pairs connected by an operator of given
+    // tensorial and parity character ("constrained" sector
+    // enumeration).
+
+  };
 
 
   ////////////////////////////////////////////////////////////////
@@ -392,32 +686,35 @@ namespace basis {
 
   class TwoBodySubspaceLSJT
     : public BaseSubspace<TwoBodySubspaceLSJTLabels,TwoBodyStateLSJTLabels>
-  {
+    {
     
-  public:
+      public:
 
-    // constructor
+      // constructor
 
-    TwoBodySubspaceLSJT (int L, int S, int J, int T, int g, int Nmax);
-    // Set up indexing in Nmax truncation.
+      TwoBodySubspaceLSJT (int L, int S, int J, int T, int g, int Nmax);
+      // Set up indexing in Nmax truncation.
 
-    // accessors
+      // accessors
 
-    int L() const {return std::get<0>(labels_);}
-    int S() const {return std::get<1>(labels_);}
-    int J() const {return std::get<2>(labels_);}
-    int T() const {return std::get<3>(labels_);}
-    int g() const {return std::get<4>(labels_);}
-    int Nmax() const {return Nmax_;}
+      int L() const {return std::get<0>(labels_);}
+      int S() const {return std::get<1>(labels_);}
+      int J() const {return std::get<2>(labels_);}
+      int T() const {return std::get<3>(labels_);}
+      int g() const {return std::get<4>(labels_);}
+      int Nmax() const {return Nmax_;}
 
-  private:
+      // diagnostic string
+      std::string DebugStr() const;
 
-    //validation
-    bool ValidLabels() const;
+      private:
 
-    // truncation
-    int Nmax_;
-  };
+      //validation
+      bool ValidLabels() const;
+
+      // truncation
+      int Nmax_;
+    };
 
   // state
 
@@ -425,17 +722,17 @@ namespace basis {
     : public BaseState<TwoBodySubspaceLSJT>
   {
     
-  public:
+    public:
 
     // pass-through constructors
 
-  TwoBodyStateLSJT(const SubspaceType& subspace, int index)
-    // Construct state by index.
-    : BaseState (subspace, index) {}
+    TwoBodyStateLSJT(const SubspaceType& subspace, int index)
+      // Construct state by index.
+      : BaseState (subspace, index) {}
 
-  TwoBodyStateLSJT(const SubspaceType& subspace, const typename SubspaceType::StateLabelsType& state_labels)
-    // Construct state by reverse lookup on labels.
-    : BaseState (subspace, state_labels) {}
+    TwoBodyStateLSJT(const SubspaceType& subspace, const typename SubspaceType::StateLabelsType& state_labels)
+      // Construct state by reverse lookup on labels.
+      : BaseState (subspace, state_labels) {}
 
     // pass-through accessors
     int L() const {return Subspace().L();}
@@ -460,7 +757,7 @@ namespace basis {
     : public BaseSpace<TwoBodySubspaceLSJT>
   {
     
-  public:
+    public:
 
     // constructor
 
@@ -468,16 +765,15 @@ namespace basis {
     // Enumerates all relative LSJT subspaces of given dimension up to a
     // given Nmax cutoff.
 
-    // diagnostic output
-    std::string Str() const;
-
     // accessors
     int Nmax() const {return Nmax_;}
 
-  private:
+    // diagnostic string
+    std::string DebugStr() const;
+
+    private:
     // truncation
     int Nmax_;
-
 
   };
 
@@ -487,19 +783,15 @@ namespace basis {
     : public BaseSectors<TwoBodySpaceLSJT>
   {
 
-  public:
+    public:
 
     // constructor
 
-    TwoBodySectorsLSJT(const TwoBodySpaceLSJT& space);
-    // Enumerate all sector pairs ("all-to-all" sector enumeration).
-    //
-    // Sectors are enumerated in lexicographical order by (bra)(ket).
-    // Sectors are included in "both directions", i.e., there is no
-    // asumption of hermiticity or attempt to therefore only store
-    // "half" the sectors.
-
-    TwoBodySectorsLSJT(const TwoBodySpaceLSJT& space, int J0, int g0);
+    TwoBodySectorsLSJT(
+        const TwoBodySpaceLSJT& space,
+        int J0, int T0, int g0,
+        basis::direction sector_direction = basis::direction::kCanonical
+      );
     // Enumerate sector pairs connected by an operator of given
     // tensorial and parity character ("constrained" sector
     // enumeration).

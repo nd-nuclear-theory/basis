@@ -101,57 +101,8 @@ namespace basis {
       }
   }
 
-  // identity operator operator
+} // namespace
 
-  template <typename tSectorsType>
-  void SetOperatorToNaiveIdentityReduced(
-      const tSectorsType& sectors,
-      MatrixVector& matrices
-    )
-  // Provides spherical tensor reduced identity.
-  //
-  // CAVEAT: Assumes that the matrix elements are RMEs in a
-  // *normalized* basis.  In particular, this is not applicable if basis is two-body
-  // AS, as opposed to NAS, basis.
-  //
-  // tSpaceType::SubspaceType must have a J accessor.
-  //
-  // Assertion: Bra and ket J are same for all sectors.
-  {
-
-    // clear vector of matrices
-    matrices.clear();
-
-    // iterate over sectors
-    for (int sector_index = 0; sector_index < sectors.size(); ++sector_index)
-      {
-
-        // extract sector
-	const typename tSectorsType::SectorType& sector = sectors.GetSector(sector_index);
-	const typename tSectorsType::SubspaceType& bra_subspace = sector.bra_subspace();
-	const typename tSectorsType::SubspaceType& ket_subspace = sector.ket_subspace();
-
-        // verify sector is diagonal in J
-	int J = ket_subspace.J();
-	int J_check = bra_subspace.J();
-	assert(J == J_check);
-
-        // generate matrix for sector
-	Eigen::MatrixXd sector_matrix;
-	if (sector.bra_subspace_index() == sector.ket_subspace_index())
-	  {
-	    int J = ket_subspace.J();
-	    sector_matrix = Hat(J) * Eigen::MatrixXd::Identity(bra_subspace.size(),ket_subspace.size());
-	  }
-	else
-	  {
-	    sector_matrix = Eigen::MatrixXd::Zero(bra_subspace.size(),ket_subspace.size());
-	  }
-	matrices.push_back(sector_matrix);
-      }
-  }
-
-}
 
 ////////////////////////////////////////////////////////////////
 // main
@@ -168,11 +119,13 @@ int main(int argc, char **argv)
     {
 
       std::cout << "Relative space" << std::endl;
-      int Nmax = 2;
-      basis::RelativeSpaceLSJT space(Nmax);
+      int Nr_max = 2;
+      int Jr_max = 3;
+      basis::RelativeSpaceLSJT space(Nr_max,Jr_max);
       int J0 = 0;  // also try J0=2 for quadrupole operator
+      int T0 = 0;
       int g0 = 0;
-      basis::RelativeSectorsLSJT sectors(space,J0,g0);
+      basis::RelativeSectorsLSJT sectors(space,J0,T0,g0);
       basis::MatrixVector matrices;
 
       std::cout << "Zeros" << std::endl;
@@ -180,7 +133,7 @@ int main(int argc, char **argv)
       basis::WriteRelativeOperatorLSJT(std::cout,sectors,matrices);
 
       std::cout << "Identity" << std::endl;
-      basis::SetOperatorToNaiveIdentityReduced(sectors,matrices);
+      // TO REPLACE: basis::SetOperatorToNaiveIdentityReduced(sectors,matrices);
       basis::WriteRelativeOperatorLSJT(std::cout,sectors,matrices);
       // std::cout << "...printed as matrices..." << std::endl;
       // WriteRelativeOperatorMatrices(std::cout,sectors,matrices,6,3);
@@ -210,12 +163,13 @@ int main(int argc, char **argv)
       int Nmax = 2;
       basis::TwoBodySpaceLSJT space(Nmax);
       int J0 = 0;  // also try J0=2 for quadrupole operator
+      int T0 = 0;
       int g0 = 0;
-      basis::TwoBodySectorsLSJT sectors(space,J0,g0);
+      basis::TwoBodySectorsLSJT sectors(space,J0,T0,g0);
       basis::MatrixVector matrices;
 
       std::cout << "Identity" << std::endl;
-      basis::SetOperatorToNaiveIdentityReduced(sectors,matrices);
+      // TO REPLACE: basis::SetOperatorToNaiveIdentityReduced(sectors,matrices);
       basis::WriteTwoBodyOperatorLSJT(std::cout,sectors,matrices);
       //std::cout << "...printed as matrices..." << std::endl;
       //basis::WriteTwoBodyOperatorMatricesLSJT(std::cout,sectors,matrices,9,6);

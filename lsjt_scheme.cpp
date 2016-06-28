@@ -1,7 +1,8 @@
 /****************************************************************
   lsjt_scheme.cpp
 
-  Mark A. Caprio, University of Notre Dame.
+  Mark A. Caprio
+  University of Notre Dame
 
 ****************************************************************/
 
@@ -20,7 +21,161 @@ namespace basis {
   // relative states in LSJT scheme
   ////////////////////////////////////////////////////////////////
 
-  RelativeSubspaceLSJT::RelativeSubspaceLSJT(int L, int S, int J, int T, int g, int Nmax)
+  RelativeSubspaceLSJT::RelativeSubspaceLSJT(int lr, int S, int Jr, int T, int gr, int Nr_max)
+  {
+
+    // set values
+    labels_ = SubspaceLabelsType(lr,S,Jr,T,gr);
+    Nr_max_ = Nr_max;
+
+    // validate subspace labels
+    assert(ValidLabels()); 
+
+    // set up indexing
+
+    // manual version w/o lookup
+    //	  dimension_ = (Nr_max() - gr()) / 2 + 1;
+
+    // iterate over total oscillator quanta
+    for (int Nr = gr; Nr <= Nr_max; Nr +=2)
+      PushStateLabels(StateLabelsType(Nr));
+
+  }
+
+  bool RelativeSubspaceLSJT::ValidLabels() const
+  {
+
+    bool valid = true;
+
+    // triangularity
+    valid &= am::AllowedTriangle(lr(),S(),Jr());
+    // parity
+    valid &= (gr() == (lr()%2));
+    // antisymmetry
+    valid &= ((lr()+S()+T())%2 == 1);
+    // truncation
+    valid &= ((Nr_max()%2)==gr());
+
+    return valid;
+  }
+
+
+  RelativeSpaceLSJT::RelativeSpaceLSJT(int Nr_max, int Jr_max)
+    : Nr_max_(Nr_max), Jr_max_(Jr_max)
+  {
+
+    // iterate over lr
+    for (int lr=0; lr<=Nr_max; ++lr)
+      {
+        // set gr
+	int gr = lr%2;
+
+	// iterate over S
+	for (int S=0; S<=1; ++S)
+	  {
+            // set T
+	    int T = (lr+S+1)%2;
+
+	    // iterate over Jr
+            int Jr_limit = std::min(lr+S,Jr_max);
+	    for (int Jr=abs(lr-S); Jr<=Jr_limit; ++Jr)
+	      {
+		// downshift Nr_max to match parity of subspace
+		// required to pass label validity tests
+		int Nr_max_subspace = Nr_max - (Nr_max-gr)%2;
+
+		RelativeSubspaceLSJT subspace(lr,S,Jr,T,gr,Nr_max_subspace);
+		assert(subspace.size()!=0);
+		PushSubspace(subspace);
+	      }
+	  }
+      }
+  }
+
+  std::string RelativeSpaceLSJT::DebugStr() const
+  {
+    std::ostringstream os;
+
+    const int lw = 3;
+
+    for (int subspace_index=0; subspace_index<size(); ++subspace_index)
+      {
+	const SubspaceType& subspace = GetSubspace(subspace_index);
+	os
+	  << " " << "index"
+	  << " " << std::setw(lw) << subspace_index
+	  << " " << " (lr,S,Jr,T,gr) "
+	  << " " << std::setw(lw) << subspace.lr() 
+	  << " " << std::setw(lw) << subspace.S() 
+	  << " " << std::setw(lw) << subspace.Jr() 
+	  << " " << std::setw(lw) << subspace.T() 
+	  << " " << std::setw(lw) << subspace.gr()
+	  << " " << "Nr_max"
+	  << " " << std::setw(lw) << subspace.Nr_max()
+	  << " " << "dim"
+	  << " " << std::setw(lw) << subspace.size()
+	  << " " << std::endl;
+      }
+
+    return os.str();
+  }
+
+  RelativeSectorsLSJT::RelativeSectorsLSJT(const RelativeSpaceLSJT& space, basis::direction sector_direction)
+  {
+    for (int bra_subspace_index=0; bra_subspace_index<space.size(); ++bra_subspace_index)
+      for (int ket_subspace_index=0; ket_subspace_index<space.size(); ++ket_subspace_index)
+	{
+
+          // enforce canonical ordering
+          if (
+              (sector_direction == basis::direction::kCanonical)
+              && !(bra_subspace_index<=ket_subspace_index)
+            )
+            continue;
+
+          // retrieve subspaces
+          const SubspaceType& bra_subspace = space.GetSubspace(bra_subspace_index);
+          const SubspaceType& ket_subspace = space.GetSubspace(ket_subspace_index);
+
+          // push sector
+          PushSector(SectorType(bra_subspace_index,ket_subspace_index,bra_subspace,ket_subspace));
+        }
+  }
+
+  RelativeSectorsLSJT::RelativeSectorsLSJT(const RelativeSpaceLSJT& space, int J0, int T0, int g0, basis::direction sector_direction)
+  {
+    for (int bra_subspace_index=0; bra_subspace_index<space.size(); ++bra_subspace_index)
+      for (int ket_subspace_index=0; ket_subspace_index<space.size(); ++ket_subspace_index)
+	{
+          // enforce canonical ordering
+          if (
+              (sector_direction == basis::direction::kCanonical)
+              && !(bra_subspace_index<=ket_subspace_index)
+            )
+            continue;
+
+          // retrieve subspaces
+          const SubspaceType& bra_subspace = space.GetSubspace(bra_subspace_index);
+          const SubspaceType& ket_subspace = space.GetSubspace(ket_subspace_index);
+
+          // verify angular momentum, isosopin, and parity selection rules
+          bool allowed = true;
+          allowed &= am::AllowedTriangle(ket_subspace.Jr(),J0,bra_subspace.Jr());
+          allowed &= am::AllowedTriangle(ket_subspace.T(),T0,bra_subspace.T());
+          allowed &= ((ket_subspace.gr()+g0+bra_subspace.gr())%2==0);
+
+          // push sector
+	  if (allowed)
+            PushSector(SectorType(bra_subspace_index,ket_subspace_index,bra_subspace,ket_subspace));
+        }
+  }
+
+
+  ////////////////////////////////////////////////////////////////
+  // relative-cm states in LSJT scheme
+  ////////////////////////////////////////////////////////////////
+
+  RelativeCMSubspaceLSJT::RelativeCMSubspaceLSJT(int L, int S, int J, int T, int g, int Nmax)
   {
 
     // set values
@@ -31,79 +186,124 @@ namespace basis {
     assert(ValidLabels()); 
 
     // set up indexing
-
-    // manual version w/o lookup
-    //	  dimension_ = (Nmax() - g()) / 2 + 1;
-
     // iterate over total oscillator quanta
     for (int N = g; N <= Nmax; N +=2)
-      PushStateLabels(StateLabelsType(N));
+      // iterate over relative oscillator (Nr,lr) orbitals
+      for (int Nr = 0; Nr <= N; ++Nr)
+	for (int lr = Nr%2; lr <= Nr; lr +=2) 
+	  {
+	    // iterate over c.m. oscillator (Nc,lc) orbitals
+	    // subject to given total N
+	    int Nc = N - Nr;
+            
+	    for (int lc = Nc%2; lc <= Nc; lc +=2) 
+	      {
 
-    // std::cout << "Done constructing " << size() << std::endl;
+		// impose triangularity
+		if (!(am::AllowedTriangle(lr,lc,L)))
+		  continue;
 
+		// impose antisymmetry
+		if (!((lr+S+T)%2==1))
+		  continue;
+
+		// keep surviving states
+		PushStateLabels(StateLabelsType(Nr,lr,Nc,lc)); 
+	      }
+	  }
   }
 
-  bool RelativeSubspaceLSJT::ValidLabels() const
+  bool RelativeCMSubspaceLSJT::ValidLabels() const
   {
-
     bool valid = true;
-
-    // parity
-    valid &= (g() == (L()%2));
-    // antisymmetry
-    valid &= ((L()+S()+T())%2 == 1);
+      
     // triangularity
     valid &= am::AllowedTriangle(L(),S(),J());
+
     // truncation
     valid &= ((Nmax()%2)==g());
 
     return valid;
   }
 
-
-  RelativeSpaceLSJT::RelativeSpaceLSJT(int Nmax)
+  std::string RelativeCMSubspaceLSJT::DebugStr() const
   {
 
+    std::ostringstream os;
+
+    const int lw = 3;
+
+    for (int state_index=0; state_index<size(); ++state_index)
+      {
+        RelativeCMStateLSJT state(*this,state_index);
+
+        os
+	  << " " << "index"
+	  << " " << std::setw(lw) << state_index
+	  << " " << "Nr lr Nc lc"
+	  << " " << std::setw(lw) << state.Nr() 
+	  << " " << std::setw(lw) << state.lr() 
+	  << " " << std::setw(lw) << state.Nc() 
+	  << " " << std::setw(lw) << state.lc()
+          << std::endl;
+      }
+
+    return os.str();
+
+  }
+
+  RelativeCMSpaceLSJT::RelativeCMSpaceLSJT(int Nmax)
+  {
     // save Nmax
     Nmax_ = Nmax;
 
     // iterate over L
     for (int L=0; L<=Nmax; ++L)
       {
-	int g = L%2;
-
 	// iterate over S
 	for (int S=0; S<=1; ++S)
 	  {
-	    int T = (L+S+1)%2;
-
 	    // iterate over J
+	    // imposing triangularity (LSJ)
 	    for (int J=abs(L-S); J<=L+S; ++J)
 	      {
-		// downshift Nmax to match parity of subspace
-		// required to pass label validity tests
-		int Nmax_subspace = Nmax - (Nmax-g)%2;
 
-		RelativeSubspaceLSJT subspace(L,S,J,T,g,Nmax_subspace);
-		assert(subspace.size()!=0);
-		PushSubspace(subspace);
+		// iterate over T
+		for (int T=0; T<=1; ++T)
+		  {
+
+		    // iterate over g
+		    for (int g=0; g<=1; ++g)
+
+		      {
+			
+			// downshift Nmax to match parity of subspace
+			// required to pass label validity tests
+			int Nmax_subspace = Nmax - (Nmax-g)%2;
+		    
+			RelativeCMSubspaceLSJT subspace(L,S,J,T,g,Nmax_subspace);
+			if (subspace.size()!=0)
+			  PushSubspace(subspace);
+		      }
+		  }
 	      }
 	  }
       }
   }
 
-  std::string RelativeSpaceLSJT::Str() const
+  std::string RelativeCMSpaceLSJT::DebugStr() const
   {
+
     std::ostringstream os;
 
     const int lw = 3;
 
-    for (int s=0; s<size(); ++s)
+    for (int subspace_index=0; subspace_index<size(); ++subspace_index)
       {
-	const SubspaceType& subspace = GetSubspace(s);
+	const SubspaceType& subspace = GetSubspace(subspace_index);
 	os
 	  << " " << "index"
-	  << " " << std::setw(lw) << s 
+	  << " " << std::setw(lw) << subspace_index
 	  << " " << "LSJTg"
 	  << " " << std::setw(lw) << subspace.L() 
 	  << " " << std::setw(lw) << subspace.S() 
@@ -118,34 +318,29 @@ namespace basis {
       }
 
     return os.str();
+
   }
 
-  RelativeSectorsLSJT::RelativeSectorsLSJT(const RelativeSpaceLSJT& space)
+  RelativeCMSectorsLSJT::RelativeCMSectorsLSJT(const RelativeCMSpaceLSJT& space, int J0, int T0, int g0, basis::direction sector_direction)
   {
     for (int bra_subspace_index=0; bra_subspace_index<space.size(); ++bra_subspace_index)
       for (int ket_subspace_index=0; ket_subspace_index<space.size(); ++ket_subspace_index)
 	{
+          // enforce canonical ordering
+          if (
+              (sector_direction == basis::direction::kCanonical)
+              && !(bra_subspace_index<=ket_subspace_index)
+            )
+            continue;
+
           // retrieve subspaces
           const SubspaceType& bra_subspace = space.GetSubspace(bra_subspace_index);
           const SubspaceType& ket_subspace = space.GetSubspace(ket_subspace_index);
 
-          // push sector
-          PushSector(SectorType(bra_subspace_index,ket_subspace_index,bra_subspace,ket_subspace));
-        }
-  }
-
-  RelativeSectorsLSJT::RelativeSectorsLSJT(const RelativeSpaceLSJT& space, int J0, int g0)
-  {
-    for (int bra_subspace_index=0; bra_subspace_index<space.size(); ++bra_subspace_index)
-      for (int ket_subspace_index=0; ket_subspace_index<space.size(); ++ket_subspace_index)
-	{
-          // retrieve subspaces
-          const SubspaceType& bra_subspace = space.GetSubspace(bra_subspace_index);
-          const SubspaceType& ket_subspace = space.GetSubspace(ket_subspace_index);
-
-          // verify angular momentum and parity selection rules
+          // verify angular momentum, isosopin, and parity selection rules
           bool allowed = true;
           allowed &= am::AllowedTriangle(ket_subspace.J(),J0,bra_subspace.J());
+          allowed &= am::AllowedTriangle(ket_subspace.T(),T0,bra_subspace.T());
           allowed &= ((ket_subspace.g()+g0+bra_subspace.g())%2==0);
 
           // push sector
@@ -156,61 +351,181 @@ namespace basis {
 
 
   ////////////////////////////////////////////////////////////////
-  // relative-cm states in LSJT scheme
+  // relative-cm states in LSJT scheme -- subspaced by N
   ////////////////////////////////////////////////////////////////
 
-  RelativeCMSubspaceLSJT::RelativeCMSubspaceLSJT (int Ncm, int lcm, 
-                                                  int L, int S, int J, int T, 
-                                                  int g, int Nmax)
+  RelativeCMSubspaceNLSJT::RelativeCMSubspaceNLSJT(int L, int S, int J, int T, int g, int N)
   {
-    // set values
-    labels_ = SubspaceLabelsType(Ncm,lcm,L,S,J,T,g);
-    Nmax_ = Nmax;
 
-    // validate
+    // set values (MODIFICATION for subspacing by N)
+    labels_ = SubspaceLabelsType(L,S,J,T,g,N);
+    N_ = N;
+
+    // validate subspace labels
     assert(ValidLabels()); 
 
     // set up indexing
+    // iterate over total oscillator quanta -- omit (MODIFICATION for subspacing by N)
+    // for (int N = g; N <= Nmax; N +=2)
+    // iterate over relative oscillator (Nr,lr) orbitals
+    for (int Nr = 0; Nr <= N; ++Nr)
+      for (int lr = Nr%2; lr <= Nr; lr +=2) 
+        {
+          // iterate over c.m. oscillator (Nc,lc) orbitals
+          // subject to given total N
+          int Nc = N - Nr;
+            
+          for (int lc = Nc%2; lc <= Nc; lc +=2) 
+            {
 
-    // iterate over total oscillator quanta
-    for (int N = g; N <= Nmax; N +=2)
-      {
-	// iterate over oscillator (Nl) orbitals for relative motion
-	// subject to given total N
-	int Nr = N - Ncm;
-	for (int lr = Nr%2; lr <= Nr; lr +=2) 
-	  {
-	    // impose triangularity
-	    if (!(am::AllowedTriangle(lr,lcm,L)))
-	      continue;
+              // impose triangularity
+              if (!(am::AllowedTriangle(lr,lc,L)))
+                continue;
 
-	    // // impose antisymmetry
-	    // if (!((lr+S+T)%2==1))
-	    //   continue;
+              // impose antisymmetry
+              if (!((lr+S+T)%2==1))
+                continue;
 
-	    // keep surviving states
-	    PushStateLabels(StateLabelsType(Nr,lr)); 
-	  }
-      }
-      
-
+              // keep surviving states
+              PushStateLabels(StateLabelsType(Nr,lr,Nc,lc)); 
+            }
+        }
   }
 
-  bool RelativeCMSubspaceLSJT::ValidLabels() const
+  bool RelativeCMSubspaceNLSJT::ValidLabels() const
   {
     bool valid = true;
-
-    // impose antisymmetry
-    valid &= ((Ncm()+S()+T()+g())%2==1);
-
+      
     // triangularity
     valid &= am::AllowedTriangle(L(),S(),J());
 
-    // truncation
-    valid &= ((Nmax()%2)==g());
+    // parity (MODIFICATION for subspacing by N)
+    valid &= ((N()%2)==g());
 
     return valid;
   }
+
+  std::string RelativeCMSubspaceNLSJT::DebugStr() const
+  {
+
+    std::ostringstream os;
+
+    const int lw = 3;
+
+    for (int state_index=0; state_index<size(); ++state_index)
+      {
+        RelativeCMStateNLSJT state(*this,state_index);
+
+        os
+	  << " " << "index"
+	  << " " << std::setw(lw) << state_index
+	  << " " << "Nr lr Nc lc"
+	  << " " << std::setw(lw) << state.Nr() 
+	  << " " << std::setw(lw) << state.lr() 
+	  << " " << std::setw(lw) << state.Nc() 
+	  << " " << std::setw(lw) << state.lc()
+          << std::endl;
+      }
+
+    return os.str();
+
+  }
+
+  RelativeCMSpaceNLSJT::RelativeCMSpaceNLSJT(int Nmax)
+  {
+    // save Nmax
+    Nmax_ = Nmax;
+
+    // iterate over total oscillator quanta (MODIFICATION for subspacing by N)
+    for (int N = 0; N <= Nmax; ++N)
+      {
+        // set g (MODIFICATION for subspacing by N)
+        int g = (N%2);
+
+        // iterate over L
+        for (int L=0; L<=N; ++L)  // only need to go to N, not Nmax (MODIFICATION for subspacing by N)
+          {
+            // iterate over S
+            for (int S=0; S<=1; ++S)
+              {
+                // iterate over J
+                // imposing triangularity (LSJ)
+                for (int J=abs(L-S); J<=L+S; ++J)
+                  {
+                    // iterate over T
+                    for (int T=0; T<=1; ++T)
+                      {
+                        // iterate over g -- omit (MODIFICATION for subspacing by N)
+                        // for (int g=0; g<=1; ++g)
+                      
+                        RelativeCMSubspaceNLSJT subspace(L,S,J,T,g,N); // (MODIFICATION for subspacing by N)
+                        if (subspace.size()!=0)
+                          PushSubspace(subspace);
+                      }
+                  }
+              }
+          }
+      }
+  }
+
+  std::string RelativeCMSpaceNLSJT::DebugStr() const
+  {
+
+    std::ostringstream os;
+
+    const int lw = 3;
+
+    for (int subspace_index=0; subspace_index<size(); ++subspace_index)
+      {
+	const SubspaceType& subspace = GetSubspace(subspace_index);
+	os
+	  << " " << "index"
+	  << " " << std::setw(lw) << subspace_index
+	  << " " << "LSJTg"
+	  << " " << std::setw(lw) << subspace.L() 
+	  << " " << std::setw(lw) << subspace.S() 
+	  << " " << std::setw(lw) << subspace.J() 
+	  << " " << std::setw(lw) << subspace.T() 
+	  << " " << std::setw(lw) << subspace.g()
+	  << " " << "N"  // (MODIFICATION for subspacing by N)
+	  << " " << std::setw(lw) << subspace.N()  // (MODIFICATION for subspacing by N)
+	  << " " << "dim"
+	  << " " << std::setw(lw) << subspace.size()
+	  << " " << std::endl;
+      }
+
+    return os.str();
+
+  }
+
+  RelativeCMSectorsNLSJT::RelativeCMSectorsNLSJT(const RelativeCMSpaceNLSJT& space, int J0, int T0, int g0, basis::direction sector_direction)
+  {
+    for (int bra_subspace_index=0; bra_subspace_index<space.size(); ++bra_subspace_index)
+      for (int ket_subspace_index=0; ket_subspace_index<space.size(); ++ket_subspace_index)
+	{
+          // enforce canonical ordering
+          if (
+              (sector_direction == basis::direction::kCanonical)
+              && !(bra_subspace_index<=ket_subspace_index)
+            )
+            continue;
+
+          // retrieve subspaces
+          const SubspaceType& bra_subspace = space.GetSubspace(bra_subspace_index);
+          const SubspaceType& ket_subspace = space.GetSubspace(ket_subspace_index);
+
+          // verify angular momentum, isosopin, and parity selection rules
+          bool allowed = true;
+          allowed &= am::AllowedTriangle(ket_subspace.J(),J0,bra_subspace.J());
+          allowed &= am::AllowedTriangle(ket_subspace.T(),T0,bra_subspace.T());
+          allowed &= ((ket_subspace.g()+g0+bra_subspace.g())%2==0);
+
+          // push sector
+	  if (allowed)
+            PushSector(SectorType(bra_subspace_index,ket_subspace_index,bra_subspace,ket_subspace));
+        }
+  }
+
 
 
   ////////////////////////////////////////////////////////////////
@@ -272,6 +587,31 @@ namespace basis {
     return valid;
   }
 
+  std::string TwoBodySubspaceLSJT::DebugStr() const
+  {
+
+    std::ostringstream os;
+
+    const int lw = 3;
+
+    for (int state_index=0; state_index<size(); ++state_index)
+      {
+        TwoBodyStateLSJT state(*this,state_index);
+
+        os
+	  << " " << "index"
+	  << " " << std::setw(lw) << state_index
+	  << " " << "N1 l1 N2 l2"
+	  << " " << std::setw(lw) << state.N1() 
+	  << " " << std::setw(lw) << state.l1() 
+	  << " " << std::setw(lw) << state.N2() 
+	  << " " << std::setw(lw) << state.l2()
+          << std::endl;
+      }
+
+    return os.str();
+
+  }
 
   TwoBodySpaceLSJT::TwoBodySpaceLSJT(int Nmax)
   {
@@ -321,19 +661,19 @@ namespace basis {
       }
   }
 
-  std::string TwoBodySpaceLSJT::Str() const
+  std::string TwoBodySpaceLSJT::DebugStr() const
   {
 
     std::ostringstream os;
 
     const int lw = 3;
 
-    for (int s=0; s<size(); ++s)
+    for (int subspace_index=0; subspace_index<size(); ++subspace_index)
       {
-	const SubspaceType& subspace = GetSubspace(s);
+	const SubspaceType& subspace = GetSubspace(subspace_index);
 	os
 	  << " " << "index"
-	  << " " << std::setw(lw) << s 
+	  << " " << std::setw(lw) << subspace_index
 	  << " " << "LSJTg"
 	  << " " << std::setw(lw) << subspace.L() 
 	  << " " << std::setw(lw) << subspace.S() 
@@ -351,32 +691,27 @@ namespace basis {
 
   }
 
-  TwoBodySectorsLSJT::TwoBodySectorsLSJT(const TwoBodySpaceLSJT& space)
+  TwoBodySectorsLSJT::TwoBodySectorsLSJT(const TwoBodySpaceLSJT& space, int J0, int T0, int g0, basis::direction sector_direction)
   {
     for (int bra_subspace_index=0; bra_subspace_index<space.size(); ++bra_subspace_index)
       for (int ket_subspace_index=0; ket_subspace_index<space.size(); ++ket_subspace_index)
 	{
+
+          // enforce canonical ordering
+          if (
+              (sector_direction == basis::direction::kCanonical)
+              && !(bra_subspace_index<=ket_subspace_index)
+            )
+            continue;
+
           // retrieve subspaces
           const SubspaceType& bra_subspace = space.GetSubspace(bra_subspace_index);
           const SubspaceType& ket_subspace = space.GetSubspace(ket_subspace_index);
 
-          // push sector
-          PushSector(SectorType(bra_subspace_index,ket_subspace_index,bra_subspace,ket_subspace));
-        }
-  }
-
-  TwoBodySectorsLSJT::TwoBodySectorsLSJT(const TwoBodySpaceLSJT& space, int J0, int g0)
-  {
-    for (int bra_subspace_index=0; bra_subspace_index<space.size(); ++bra_subspace_index)
-      for (int ket_subspace_index=0; ket_subspace_index<space.size(); ++ket_subspace_index)
-	{
-          // retrieve subspaces
-          const SubspaceType& bra_subspace = space.GetSubspace(bra_subspace_index);
-          const SubspaceType& ket_subspace = space.GetSubspace(ket_subspace_index);
-
-          // verify angular momentum and parity selection rules
+          // verify angular momentum, isosopin, and parity selection rules
           bool allowed = true;
           allowed &= am::AllowedTriangle(ket_subspace.J(),J0,bra_subspace.J());
+          allowed &= am::AllowedTriangle(ket_subspace.T(),T0,bra_subspace.T());
           allowed &= ((ket_subspace.g()+g0+bra_subspace.g())%2==0);
 
           // push sector

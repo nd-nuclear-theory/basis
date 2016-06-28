@@ -18,18 +18,18 @@ int main(int argc, char **argv)
 {
 
   ////////////////////////////////////////////////////////////////
-  // relative state tests
+  // relative basis tests
   ////////////////////////////////////////////////////////////////
 
   if (true)
     {
-      std::cout << "Relative subspace" << std::endl;
+      std::cout << "Relative basis" << std::endl;
 
       // subspace construction
 
       // RelativeSubspaceLSJT(0,0,0,0,0,0);  // should violate assertion due to T
       // RelativeSubspaceLSJT(0,0,0,1,0,7);  // should violate assertion due to Nmax
-      basis::RelativeSubspaceLSJT subspace(0,0,0,1,0,6);  // LSJTg Nmax
+      basis::RelativeSubspaceLSJT subspace(0,0,0,1,0,6);  // LSJTg Nr_max
 
 
       // index-based looping
@@ -56,40 +56,96 @@ int main(int argc, char **argv)
 
       // spaces and sectors
 
-      // first set up relative spaces
+      // first set up space
 
       std::cout << "Relative space" << std::endl;
-      int Nmax = 2;
-      basis::RelativeSpaceLSJT space(Nmax);
-      std::cout << space.Str();
-
-      //      for (int s=0; s<space.size(); ++s)
-      //	{
-      //	  const RelativeSubspaceLSJT& subspace = space.GetSubspace(s);
-      //	  std::cout 
-      //	    << std::setw(3) << s 
-      //	    << std::setw(3) << subspace.L() 
-      //	    << std::setw(3) << subspace.S() 
-      //	    << std::setw(3) << subspace.J() 
-      //	    << std::setw(3) << subspace.T() 
-      //	    << std::setw(3) << subspace.g()
-      //	    << std::setw(3) << subspace.Nmax()
-      //	    << std::setw(3) << subspace.size()
-      //	    << std::endl;
-      //	}
+      int Nr_max = 2;
+      int Jr_max = 3;
+      basis::RelativeSpaceLSJT space(Nr_max,Jr_max);
+      std::cout << space.DebugStr();
 
       // then set up allowed sectors
-      std::cout << "Relative interaction sectors" << std::endl;
-      int J0 = 0;  // also try J0=2 for quadrupole operator
+      std::cout << "Relative operator sectors" << std::endl;
+      int J0 = 2;  // try: J0=0 for interaction, J0=2 for quadrupole operator
+      int T0 = 0;
       int g0 = 0;
-      basis::RelativeSectorsLSJT sectors(space,J0,g0);
+      basis::RelativeSectorsLSJT sectors(space,J0,T0,g0);
 
+
+      std::cout << " J0 " << J0 << " T0 " << T0 << " g0 " << g0 << std::endl;
       for (int sector_index=0; sector_index < sectors.size(); ++sector_index)
 	{
 	  int bra_subspace_index = sectors.GetSector(sector_index).bra_subspace_index();
 	  const basis::RelativeSubspaceLSJT& bra_subspace = sectors.GetSector(sector_index).bra_subspace();
 	  int ket_subspace_index = sectors.GetSector(sector_index).ket_subspace_index();
 	  const basis::RelativeSubspaceLSJT& ket_subspace = sectors.GetSector(sector_index).ket_subspace();
+
+	  std::cout 
+	    << " sector " 
+	    << std::setw(3) << sector_index 
+	    << "     "
+	    << " index "
+	    << std::setw(3) << bra_subspace_index
+	    << " (lr,S,Jr,T,gr) "
+	    << std::setw(3) << bra_subspace.lr() 
+	    << std::setw(3) << bra_subspace.S() 
+	    << std::setw(3) << bra_subspace.Jr() 
+	    << std::setw(3) << bra_subspace.T() 
+	    << std::setw(3) << bra_subspace.gr()
+	    << " dim "
+	    << std::setw(3) << bra_subspace.size()
+	    << "     "
+	    << " index "
+	    << std::setw(3) << ket_subspace_index
+	    << " (lr,S,Jr,T,gr) "
+	    << std::setw(3) << ket_subspace.lr() 
+	    << std::setw(3) << ket_subspace.S() 
+	    << std::setw(3) << ket_subspace.Jr() 
+	    << std::setw(3) << ket_subspace.T() 
+	    << std::setw(3) << ket_subspace.gr()
+	    << " dim "
+	    << std::setw(3) << ket_subspace.size()
+	    << std::endl;
+	}
+
+    }
+
+  ////////////////////////////////////////////////////////////////
+  // relative-cm basis tests
+  ////////////////////////////////////////////////////////////////
+
+  if (true)
+    {
+      std::cout << "Relative-c.m. basis" << std::endl;
+
+      // example subspace
+      std::cout << "Example subspace" << std::endl;
+      basis::RelativeCMSubspaceLSJT subspace(0,0,0,0,0,2);  // LSJTg Nmax
+      std::cout << subspace.DebugStr();
+
+      // spaces and sectors
+
+      // first set up space
+
+      std::cout << "Relative-c.m. space" << std::endl;
+      int Nmax = 2;
+      basis::RelativeCMSpaceLSJT space(Nmax);
+      std::cout << space.DebugStr();
+
+      // then set up allowed sectors
+      std::cout << "Relative-c.m. operator sectors" << std::endl;
+      int J0 = 2;  // try: J0=0 for interaction, J0=2 for quadrupole operator
+      int T0 = 0;
+      int g0 = 0;
+      basis::RelativeCMSectorsLSJT sectors(space,J0,T0,g0);
+
+      std::cout << " J0 " << J0 << " T0 " << T0 << " g0 " << g0 << std::endl;
+      for (int sector_index=0; sector_index < sectors.size(); ++sector_index)
+	{
+	  int bra_subspace_index = sectors.GetSector(sector_index).bra_subspace_index();
+	  const basis::RelativeCMSubspaceLSJT& bra_subspace = sectors.GetSector(sector_index).bra_subspace();
+	  int ket_subspace_index = sectors.GetSector(sector_index).ket_subspace_index();
+	  const basis::RelativeCMSubspaceLSJT& ket_subspace = sectors.GetSector(sector_index).ket_subspace();
 
 	  std::cout 
 	    << " sector " 
@@ -120,100 +176,102 @@ int main(int argc, char **argv)
 	    << std::setw(3) << ket_subspace.size()
 	    << std::endl;
 	}
-
     }
 
   ////////////////////////////////////////////////////////////////
-  // relative-cm state tests
+  // relative-cm basis tests -- subspaced by N
   ////////////////////////////////////////////////////////////////
 
   if (true)
     {
-      std::cout << "Spurious relative state" << std::endl;
+      std::cout << "Relative-c.m. basis -- subspaced by N" << std::endl;
 
-      // subspace construction
+      // spaces and sectors
 
-      // "bad" case to test validity assertion
-      if (false)
-        {
-          basis::RelativeCMSubspaceLSJT bad_subspace(
-              1,1,  // Ncm, lcm
-              2,1,3,0,0,   // L, S, J, T, g
-              6  // Nmax
-            );
-        }
+      // first set up space
 
-      basis::RelativeCMSubspaceLSJT subspace(
-          1,1,  // Ncm, lcm
-          2,1,3,1,0,   // L, S, J, T, g
-          6  // Nmax
-        );
+      std::cout << "Relative-c.m. space" << std::endl;
+      int Nmax = 2;
+      basis::RelativeCMSpaceNLSJT space(Nmax);
+      std::cout << space.DebugStr();
 
-      // index-based looping
-      const int dimension = subspace.size();
-      for (int k = 0; k < dimension; ++k)
+      // then set up allowed sectors
+      std::cout << "Relative-c.m. operator sectors" << std::endl;
+      int J0 = 2;  // try: J0=0 for interaction, J0=2 for quadrupole operator
+      int T0 = 0;
+      int g0 = 0;
+      basis::RelativeCMSectorsNLSJT sectors(space,J0,T0,g0);
+
+      std::cout << " J0 " << J0 << " T0 " << T0 << " g0 " << g0 << std::endl;
+      for (int sector_index=0; sector_index < sectors.size(); ++sector_index)
 	{
-	  basis::RelativeCMStateLSJT state(subspace,k);
-	  std::cout << state.index() 
-		    << " " << state.N() 
-		    << " " << state.Nr() << " " << state.lr() 
-		    << std::endl;
-	};
+	  int bra_subspace_index = sectors.GetSector(sector_index).bra_subspace_index();
+	  const basis::RelativeCMSubspaceNLSJT& bra_subspace = sectors.GetSector(sector_index).bra_subspace();
+	  int ket_subspace_index = sectors.GetSector(sector_index).ket_subspace_index();
+	  const basis::RelativeCMSubspaceNLSJT& ket_subspace = sectors.GetSector(sector_index).ket_subspace();
+
+	  std::cout 
+	    << " sector " 
+	    << std::setw(3) << sector_index 
+	    << "     "
+	    << " index "
+	    << std::setw(3) << bra_subspace_index
+	    << " LSJTg-N "
+	    << std::setw(3) << bra_subspace.L() 
+	    << std::setw(3) << bra_subspace.S() 
+	    << std::setw(3) << bra_subspace.J() 
+	    << std::setw(3) << bra_subspace.T() 
+	    << std::setw(3) << bra_subspace.g()
+	    << std::setw(3) << bra_subspace.N()
+	    << " dim "
+	    << std::setw(3) << bra_subspace.size()
+	    << "     "
+	    << " index "
+	    << std::setw(3) << ket_subspace_index
+	    << " LSJTg-N "
+	    << std::setw(3) << ket_subspace.L() 
+	    << std::setw(3) << ket_subspace.S() 
+	    << std::setw(3) << ket_subspace.J() 
+	    << std::setw(3) << ket_subspace.T() 
+	    << std::setw(3) << ket_subspace.g()
+	    << std::setw(3) << ket_subspace.N()
+	    << " dim "
+	    << std::setw(3) << ket_subspace.size()
+	    << std::endl;
+	}
     }
 
   ////////////////////////////////////////////////////////////////
-  // two-body state tests
+  // two-body basis tests
   ////////////////////////////////////////////////////////////////
 
   if (true)
     {
-      std::cout << "Two-body subspace" << std::endl;
+      std::cout << "Two-body basis" << std::endl;
 
-      // subspace construction
-
-      basis::TwoBodySubspaceLSJT subspace(0,0,0,1,0,6);
-
-      // index-based looping
-      for (int k = 0; k < subspace.size(); ++k)
-	{
-	  basis::TwoBodyStateLSJT state(subspace,k);
-	  std::cout << state.index() 
-		    << " " << state.N() 
-		    << " " << state.N1() << " " << state.l1() << " " << state.N2() << " " << state.l2() 
-		    << std::endl;
-	};
+      // example subspace
+      std::cout << "Example subspace" << std::endl;
+      basis::TwoBodySubspaceLSJT subspace(0,0,0,0,0,2);  // LSJTg Nmax
+      std::cout << subspace.DebugStr();
 
 
       // spaces and sectors
 
-      // first set up relative spaces
+      // first set up space
 
       std::cout << "Two-body space" << std::endl;
-      int Nmax = 3;
+      int Nmax = 2;
       basis::TwoBodySpaceLSJT space(Nmax);
-      std::cout << space.Str();
-
-      //      for (int s=0; s<space.size(); ++s)
-      //	{
-      //	  const TwoBodySubspaceLSJT& subspace = space.GetSubspace(s);
-      //	  std::cout 
-      //	    << std::setw(3) << s 
-      //	    << std::setw(3) << subspace.L() 
-      //	    << std::setw(3) << subspace.S() 
-      //	    << std::setw(3) << subspace.J() 
-      //	    << std::setw(3) << subspace.T() 
-      //	    << std::setw(3) << subspace.g()
-      //	    << std::setw(3) << subspace.Nmax()
-      //	    << std::setw(3) << subspace.size()
-      //	    << std::endl;
-      //	}
+      std::cout << space.DebugStr();
 
       // then set up allowed sectors
-      std::cout << "Two-body interaction sectors" << std::endl;
-      int J0 = 0;  // also try J0=2 for quadrupole operator
+      std::cout << "Two-body operator sectors" << std::endl;
+      int J0 = 2;  // try: J0=0 for interaction, J0=2 for quadrupole operator
+      int T0 = 0;
       int g0 = 0;
-      basis::TwoBodySectorsLSJT sectors(space,J0,g0);
+      basis::TwoBodySectorsLSJT sectors(space,J0,T0,g0);
 
+      std::cout << " J0 " << J0 << " T0 " << T0 << " g0 " << g0 << std::endl;
       for (int sector_index=0; sector_index < sectors.size(); ++sector_index)
 	{
 	  int bra_subspace_index = sectors.GetSector(sector_index).bra_subspace_index();
