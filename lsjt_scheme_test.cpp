@@ -29,28 +29,28 @@ int main(int argc, char **argv)
 
       // RelativeSubspaceLSJT(0,0,0,0,0,0);  // should violate assertion due to T
       // RelativeSubspaceLSJT(0,0,0,1,0,7);  // should violate assertion due to Nmax
-      basis::RelativeSubspaceLSJT subspace(0,0,0,1,0,6);  // LSJTg Nr_max
+      basis::RelativeSubspaceLSJT subspace(0,0,0,1,0,6);  // LSJTg N_max
 
 
       // index-based looping
       for (int k=0; k<subspace.size(); ++k)
 	{
 	  basis::RelativeStateLSJT state(subspace,k);
-	  std::cout << "index " << state.index() << " Nr " << state.Nr() << std::endl;
+	  std::cout << "index " << state.index() << " N " << state.N() << std::endl;
 	};
 
       std::cout << "State construction by index" << std::endl;
-      for (int Nr=0; Nr<=6; Nr+=2)
+      for (int N=0; N<=6; N+=2)
 	{
-	  basis::RelativeStateLSJT state(subspace,Nr/2);
-	  std::cout << "Nr " << Nr << " index " << state.index() << " Nr " << state.Nr() << std::endl;
+	  basis::RelativeStateLSJT state(subspace,N/2);
+	  std::cout << "N " << N << " index " << state.index() << " N " << state.N() << std::endl;
 	}
 
       std::cout << "State lookup" << std::endl;
-      for (int Nr=0; Nr<=6; Nr+=2)
+      for (int N=0; N<=6; N+=2)
 	{
-	  basis::RelativeStateLSJT state(subspace,basis::RelativeSubspaceLSJT::StateLabelsType(Nr));
-	  std::cout << "Nr " << Nr << " index " << state.index() << " Nr " << state.Nr() << std::endl;
+	  basis::RelativeStateLSJT state(subspace,basis::RelativeSubspaceLSJT::StateLabelsType(N));
+	  std::cout << "N " << N << " index " << state.index() << " N " << state.N() << std::endl;
 	}
 
 
@@ -59,15 +59,15 @@ int main(int argc, char **argv)
       // first set up space
 
       std::cout << "Relative space" << std::endl;
-      int Nr_max = 2;
-      int Jr_max = 3;
-      basis::RelativeSpaceLSJT space(Nr_max,Jr_max);
+      int N_max = 2;
+      int J_max = 3;
+      basis::RelativeSpaceLSJT space(N_max,J_max);
       std::cout << space.DebugStr();
 
       // then set up allowed sectors
       std::cout << "Relative operator sectors" << std::endl;
-      int J0 = 2;  // try: J0=0 for interaction, J0=2 for quadrupole operator
-      int T0 = 0;
+      int J0 = 0;  // try: J0=0 for interaction, J0=2 for quadrupole operator
+      int T0 = 1;
       int g0 = 0;
       basis::RelativeSectorsLSJT sectors(space,J0,T0,g0);
 
@@ -86,25 +86,27 @@ int main(int argc, char **argv)
 	    << "     "
 	    << " index "
 	    << std::setw(3) << bra_subspace_index
-	    << " (lr,S,Jr,T,gr) "
-	    << std::setw(3) << bra_subspace.lr() 
+	    << " LSJTg "
+	    << std::setw(3) << bra_subspace.L() 
 	    << std::setw(3) << bra_subspace.S() 
-	    << std::setw(3) << bra_subspace.Jr() 
+	    << std::setw(3) << bra_subspace.J() 
 	    << std::setw(3) << bra_subspace.T() 
-	    << std::setw(3) << bra_subspace.gr()
+	    << std::setw(3) << bra_subspace.g()
 	    << " dim "
 	    << std::setw(3) << bra_subspace.size()
 	    << "     "
 	    << " index "
 	    << std::setw(3) << ket_subspace_index
-	    << " (lr,S,Jr,T,gr) "
-	    << std::setw(3) << ket_subspace.lr() 
+	    << " LSJTg "
+	    << std::setw(3) << ket_subspace.L() 
 	    << std::setw(3) << ket_subspace.S() 
-	    << std::setw(3) << ket_subspace.Jr() 
+	    << std::setw(3) << ket_subspace.J() 
 	    << std::setw(3) << ket_subspace.T() 
-	    << std::setw(3) << ket_subspace.gr()
+	    << std::setw(3) << ket_subspace.g()
 	    << " dim "
 	    << std::setw(3) << ket_subspace.size()
+	    << " "
+            << (sectors.GetSector(sector_index).IsDiagonal() ? "*" : " ")
 	    << std::endl;
 	}
 

@@ -35,7 +35,6 @@
     - Replace Print() methods with Str() methods.
   6/22/16 (mac): Make explicit typedefs for label types.
   6/27/16 (mac):
-    - Rename labels on relative basis (e.g., J->Jr).
     - Add Jr_max cutoff on construction of relative basis.
     - Change relative-c.m. scheme from spectator (Nc,lc) to active (Nc,lc).
     - Add fixed-N subspaces in relative-c.m. scheme for use with Moshinsky 
@@ -44,6 +43,9 @@
     - Implement canonical ordering constraint on sectors.
     - Remove all-to-all sector constructors.
     - Rename Str() to DebugStr().
+    - Rename labels on relative basis (e.g., J->Jr).
+  6/30/16 (mac):
+    - Revert labels on relative basis (e.g., Jr->J).
 
 ****************************************************************/
 
@@ -64,53 +66,54 @@ namespace basis {
   //
   // Labeling
   //
-  // subspace labels: (lr,S,Jr,T,gr)    Pr=(-)^gr
+  // subspace labels: (L,S,J,T,g)    P=(-)^g
   //
-  //   lr (int): orbital angular momentum of *relative* motion
+  //   L (int): orbital angular momentum of *relative* motion (=lr)
   //   S (int): total spin
-  //   Jr (int): total angular momentum of *relative* motion
-  //          (i.e., lr coupled to S)
-  //   gr (int): grade (=0,1) for the parity Pr of *relative* motion
+  //   J (int): total angular momentum of *relative* motion (=Jr)
+  //            (i.e., L coupled to S)
+  //   g (int): grade (=0,1) for the parity P of *relative* 
+  //            motion (=gr)
   //
-  // state labels within subspace: (Nr)
+  // state labels within subspace: (N)
   //
-  //   Nr (int): oscillator quanta of relative motion
+  //   N (int): oscillator quanta of relative motion (=Nr)
   //
   ////////////////////////////////////////////////////////////////
   //
   // Subspaces
   //
   // Within the full space, subspaces are ordered by:
-  //   -- increasing lr (lr=0,1,...,Nr_max)
+  //   -- increasing L (L=0,1,...,Nmax)
   //   -- increasing S (S=0,1)
-  //   -- increasing Jr
-  //   -- [T forced by lr+S+T~1]
-  //   -- [gr forced by gr~lr]
+  //   -- increasing J
+  //   -- [T forced by L+S+T~1]
+  //   -- [g forced by g~L]
   // subject to:
-  //   -- triangularity of (lr,S,Jr)
-  //   -- parity constraint lr~gr
-  //   -- antisymmetry constraint lr+S+T~1
+  //   -- triangularity of (L,S,J)
+  //   -- parity constraint L~g
+  //   -- antisymmetry constraint L+S+T~1
   // 
   // Subspaces are asserted to have nonzero dimension (as a sanity
   // check).
   //
-  // Note that ordering of subspaces is lexicographic by (lr,S,Jr).
+  // Note that ordering of subspaces is lexicographic by (L,S,J).
   //
-  // Truncation of the space is by the relative Nr_max.
+  // Truncation of the space is by the relative Nmax.
   //
   ////////////////////////////////////////////////////////////////
   //
   // States
   //
   // Within a subspace, the states are ordered by:
-  //   -- increasing Nr
+  //   -- increasing N
   // and subject to:
-  //   -- oscillator branching constraint Nr~lr (or, equivalently, 
-  //      parity constraint Nr~gr)
+  //   -- oscillator branching constraint N~L (or, equivalently, 
+  //      parity constraint N~g)
   //
   // This basis is for *identical* particle states, but the
   // antisymmetry constraint is already applied at the level of
-  // selecting the subspace labels lr+S+T~1.
+  // selecting the subspace labels L+S+T~1.
   //
   ////////////////////////////////////////////////////////////////  
 
@@ -129,17 +132,17 @@ namespace basis {
 
       // constructor
 
-      RelativeSubspaceLSJT (int lr, int S, int Jr, int T, int gr, int Nr_max);
-      // Set up indexing in Nr_max truncation.
+      RelativeSubspaceLSJT (int L, int S, int J, int T, int g, int Nmax);
+      // Set up indexing in Nmax truncation.
 
       // accessors
  
-      int lr() const {return std::get<0>(labels_);}
+      int L() const {return std::get<0>(labels_);}
       int S() const {return std::get<1>(labels_);}
-      int Jr() const {return std::get<2>(labels_);}
+      int J() const {return std::get<2>(labels_);}
       int T() const {return std::get<3>(labels_);}
-      int gr() const {return std::get<4>(labels_);}
-      int Nr_max() const {return Nr_max_;}
+      int g() const {return std::get<4>(labels_);}
+      int Nmax() const {return Nmax_;}
 
       // diagnostic string
       std::string DebugStr() const;
@@ -150,7 +153,7 @@ namespace basis {
       bool ValidLabels() const;
 
       // truncation
-      int Nr_max_;
+      int Nmax_;
 
     };
 
@@ -173,14 +176,14 @@ namespace basis {
       : BaseState (subspace, state_labels) {}
 
     // pass-through accessors
-    int lr() const {return Subspace().lr();}
+    int L() const {return Subspace().L();}
     int S() const {return Subspace().S();}
-    int Jr() const {return Subspace().Jr();}
+    int J() const {return Subspace().J();}
     int T() const {return Subspace().T();}
-    int gr() const {return Subspace().gr();}
+    int g() const {return Subspace().g();}
 
     // state label accessors
-    int Nr() const {return std::get<0>(GetStateLabels());}
+    int N() const {return std::get<0>(GetStateLabels());}
 
   };
 
@@ -193,7 +196,7 @@ namespace basis {
     public:
     
     // constructor
-    RelativeSpaceLSJT(int Nr_max, int Jr_max);
+    RelativeSpaceLSJT(int Nmax, int Jmax);
     // Enumerates all relative LSJT subspaces of given dimension up to
     // a given relative oscillator cutoff and relative angular
     // momentum cutoff.
@@ -203,20 +206,20 @@ namespace basis {
     // the representation of relative interations.
     //
     // Arguments:
-    //   Nr_max (int) : relative oscillator truncation on included subspaces
-    //   Jr_max (int) : relative angular momentum truncation on included 
-    //     subspaces (Jr_max<=Nr_max+1)
+    //   Nmax (int) : relative oscillator truncation on included subspaces
+    //   Jmax (int) : relative angular momentum truncation on included 
+    //     subspaces (Jmax<=Nmax+1)
 
     // accessors
-    int Nr_max() const {return Nr_max_;}
-    int Jr_max() const {return Jr_max_;}
+    int Nmax() const {return Nmax_;}
+    int Jmax() const {return Jmax_;}
 
     // diagnostic string
     std::string DebugStr() const;
 
     private:
     // truncation
-    int Nr_max_, Jr_max_;
+    int Nmax_, Jmax_;
 
   };
 
@@ -232,7 +235,7 @@ namespace basis {
 
     RelativeSectorsLSJT(
         const RelativeSpaceLSJT& space,
-        basis::direction sector_direction = basis::direction::kCanonical
+        basis::SectorDirection sector_direction = basis::SectorDirection::kCanonical
       );
     // Enumerate all sector pairs ("all-to-all" sector enumeration).
     //
@@ -247,7 +250,7 @@ namespace basis {
     RelativeSectorsLSJT(
         const RelativeSpaceLSJT& space,
         int J0, int T0, int g0,
-        basis::direction sector_direction = basis::direction::kCanonical
+        basis::SectorDirection sector_direction = basis::SectorDirection::kCanonical
       );
     // Enumerate sector pairs connected by an operator of given
     // tensorial and parity character ("constrained" sector
@@ -419,7 +422,7 @@ namespace basis {
     RelativeCMSectorsLSJT(
         const RelativeCMSpaceLSJT& space,
         int J0, int T0, int g0,
-        basis::direction sector_direction = basis::direction::kCanonical
+        basis::SectorDirection sector_direction = basis::SectorDirection::kCanonical
       );
     // Enumerate sector pairs connected by an operator of given
     // tensorial and parity character ("constrained" sector
@@ -595,7 +598,7 @@ namespace basis {
     RelativeCMSectorsNLSJT(
         const RelativeCMSpaceNLSJT& space,
         int J0, int T0, int g0,
-        basis::direction sector_direction = basis::direction::kCanonical
+        basis::SectorDirection sector_direction = basis::SectorDirection::kCanonical
       );
     // Enumerate sector pairs connected by an operator of given
     // tensorial and parity character ("constrained" sector
@@ -790,7 +793,7 @@ namespace basis {
     TwoBodySectorsLSJT(
         const TwoBodySpaceLSJT& space,
         int J0, int T0, int g0,
-        basis::direction sector_direction = basis::direction::kCanonical
+        basis::SectorDirection sector_direction = basis::SectorDirection::kCanonical
       );
     // Enumerate sector pairs connected by an operator of given
     // tensorial and parity character ("constrained" sector

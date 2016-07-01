@@ -78,6 +78,10 @@
     - Remove deprecated subspace method Dimension().
   6/16/16 (mac): Fix missing typename qualifier.
   6/24/16 (mac): Add direction enum class.
+  6/30/16 (mac):
+    - Flesh out documentation of member functions.
+    - Add utility member functions ContainsState, ContainsSector,
+      IsDiagonal.
 
 ****************************************************************/
 
@@ -102,8 +106,8 @@ namespace basis {
   // generic subspace
   ////////////////////////////////////////////////////////////////
 
-  // BaseSubspace -- holds indexing of states sharing common subspace
-  // quantum numbers
+  // BaseSubspace -- holds indexing of states within a symmetry
+  // subspace
   //
   // The derived class is expected to set up a constructor and
   // friendlier accessors for the individual labels.
@@ -120,7 +124,7 @@ namespace basis {
     class BaseSubspace
   {
 
-  public:
+    public:
 
     ////////////////////////////////////////////////////////////////
     //  common type definitions
@@ -135,7 +139,7 @@ namespace basis {
 
     // default constructor
     //   Implicitly invoked by derived class.
-  BaseSubspace() : dimension_(0) {}
+    BaseSubspace() : dimension_(0) {}
 
     // copy constructor -- synthesized
 
@@ -145,40 +149,65 @@ namespace basis {
     ////////////////////////////////////////////////////////////////
 
     const SubspaceLabelsType& GetSubspaceLabels() const
-    // const SubspaceLabels& GetSubspaceLabels() const
+    // Return the labels of the subspace itself.
     {
       return labels_;
     }
 
     const StateLabelsType& GetStateLabels(int index) const
-    // const StateLabels& GetStateLabels(int index) const
+    // Retrieve the labels of a state within the subspace, given its
+    // index within the subspace.
+    //
+    // Note: It is not normally expected that this member function
+    // should be used directly.  The idea is instead to work with the
+    // *state* type (derived from BaseState) associated with this
+    // subspace.  One would rather instantiate a *state*, identified
+    // by this index, then query the state for various specific
+    // labels, as they are needed, using accessors provided by the
+    // state.
     {
       return state_table_[index];
     }
 
+    bool ContainsState(const StateLabelsType& state_labels) const
+    // Given the labels for a state, returns whether or not the state
+    // is found within the subspace.
+    {
+      return lookup_.count(state_labels);
+    };
+
     int LookUpStateIndex(const StateLabelsType& state_labels) const
-      {
-	return lookup_.at(state_labels);
-      };
+    // Given the labels for a state, look up its index within the
+    // subspace.
+    //
+    // If no such labels are found, an exception will result.
+    {
+	
+      // trap failed lookup with assert for easier debugging
+      assert(ContainsState(state_labels));
+
+      return lookup_.at(state_labels);
+    };
+
+    ////////////////////////////////////////////////////////////////
+    // size retrieval
+    ////////////////////////////////////////////////////////////////
 
     int size() const
+    // Return the size of the subspace.
     {
       return dimension_;
     }
 
-    // int Dimension() const
-    // // DEPRECATED in favor of size()
-    // {
-    //   return dimension_;
-    // }
-
-  protected:
+    protected:
 
     ////////////////////////////////////////////////////////////////
     // state label push (for initial construction)
     ////////////////////////////////////////////////////////////////
 
     void PushStateLabels(const StateLabelsType& state_labels)
+    // Create indexing information (in both directions, index <->
+    // labels) for a state.
     {
       lookup_[state_labels] = dimension_; // index for lookup
       state_table_.push_back(state_labels);  // save state
@@ -197,11 +226,11 @@ namespace basis {
     std::vector<StateLabelsType> state_table_;
 
     // state index lookup by labels
-    #ifdef INDEXING_HASH
+#ifdef INDEXING_HASH
     std::unordered_map<StateLabelsType,int,boost::hash<StateLabelsType>> lookup_;
-    #else
+#else
     std::map<StateLabelsType,int> lookup_;
-    #endif
+#endif
 
   };
 
@@ -224,122 +253,133 @@ namespace basis {
   
   template <typename tSubspaceType> 
     class BaseState
-  {
+    {
 
-  public:
+      public:
 
-    ////////////////////////////////////////////////////////////////
-    // common typedefs
-    ////////////////////////////////////////////////////////////////
+      ////////////////////////////////////////////////////////////////
+      // common typedefs
+      ////////////////////////////////////////////////////////////////
 
-    typedef tSubspaceType SubspaceType; 
+      typedef tSubspaceType SubspaceType; 
 
-    ////////////////////////////////////////////////////////////////
-    // general constructors
-    ////////////////////////////////////////////////////////////////
+      ////////////////////////////////////////////////////////////////
+      // general constructors
+      ////////////////////////////////////////////////////////////////
 
-    // default constructor -- disabled
-    BaseState();
+      // default constructor -- disabled
+      BaseState();
 
-    // copy constructor -- synthesized
+      // copy constructor -- synthesized
 
-    // constructors
+      // constructors
 
-    BaseState(const SubspaceType& subspace, int index)
-      // Construct state by index.
-      : subspace_ptr_(&subspace), index_(index)
+      BaseState(const SubspaceType& subspace, int index)
+        // Construct state, given index index within subspace.
+        : subspace_ptr_(&subspace), index_(index)
       {
 	assert(ValidIndex());
       }
 
-    BaseState(const SubspaceType& subspace, const typename SubspaceType::StateLabelsType& state_labels)
-    // Construct state by reverse lookup on labels.
+      BaseState(const SubspaceType& subspace, const typename SubspaceType::StateLabelsType& state_labels)
+        // Construct state, by reverse lookup on labels within subspace.
+        {
+
+          // Debugging: Delegation to BaseState(subspace,index)
+          // fails. Argument index is saved in index_ as far as the
+          // subordinate BaseState(...,index) call is concerned, but
+          // after return to present calling constructor, index_
+          // contains garbage.  (Why???)
+          //
+          // BaseState(subspace,index);
+
+          subspace_ptr_ = &subspace;
+          index_ = subspace.LookUpStateIndex(state_labels);
+
+        }
+
+      ////////////////////////////////////////////////////////////////
+      // retrieval
+      ////////////////////////////////////////////////////////////////
+
+      const SubspaceType& Subspace() const
+      // Return reference to subspace in which this state lies.
+      {return *subspace_ptr_;}
+      
+
+      const typename SubspaceType::StateLabelsType& GetStateLabels() const 
+      // Return labels of this state.
+      //
+      // Note: It is not normally expected that this member function
+      // should be used directly (see related comment for
+      // BaseSubspace::GetStateLabels).  Rather, derived types will
+      // provide accessors for convenient access to individual labels.
       {
-
-	// debugging: Delegation to BaseState(subspace,index)
-	// fails. Argument index is saved in index_ as far as the
-	// subordinate BaseState(...,index) call is concerned, but
-	// after return to present calling constructor, index_
-	// contains garbage.  (Why???)
-
-	// BaseState(subspace,index);
-
-	subspace_ptr_ = &subspace;
-	index_ = subspace.LookUpStateIndex(state_labels);
-
+        return Subspace().GetStateLabels(index());
       }
 
-    ////////////////////////////////////////////////////////////////
-    // retrieval
-    ////////////////////////////////////////////////////////////////
+      int index() const
+      // Retrieve integer index of state within subspace.
+      {return index_;}
 
-    const SubspaceType& Subspace() const {return *subspace_ptr_;}  // subspace in which state lies
-    const typename SubspaceType::StateLabelsType& GetStateLabels() const 
-    {
-      return Subspace().GetStateLabels(index());
-    }
+      ////////////////////////////////////////////////////////////////
+      // generic iteration support -- DISABLED
+      ////////////////////////////////////////////////////////////////
 
-    int index() const {return index_;}
+      // currently DISABLED, pending decision about whether or not
+      // this is a good thing
+      //
+      // Example:
+      //
+      //   for (RelativeStateLSJT state(space); state.ValidIndex(); ++state)
+      //     {
+      //   	std::cout << state.index() << " " << state.N() << std::endl;
+      //     };
+      //
+      // This usage requires ValidIndex() to be made public.
 
-    ////////////////////////////////////////////////////////////////
-    // generic iteration support -- disabled
-    //
-    // currently DISABLED, pending decision about whether or not
-    // this is a good thing
-    //
-    // Example:
-    //
-    //   for (RelativeStateLSJT state(space); state.ValidIndex(); ++state)
-    //     {
-    //   	std::cout << state.index() << " " << state.N() << std::endl;
-    //     };
-    //
-    ////////////////////////////////////////////////////////////////
+      // BaseState(const SubspaceType& subspace)
+      // // Construct state, defaulting to 0th state in space.
+      // // Meant for use with iterator-style iteration over states.
+      //  {
+      //	space_ptr = subspace;
+      //	index_ = 0;
+      //  }
 
-    BaseState(const SubspaceType& subspace);
-    // Constructs state, defaulting to 0th state in space.
-    // Meant for use with iterator-style iteration over states.
-    //  {
-    //	space_ptr = subspace;
-    //	index_ = 0;
-    //  }
+      // BaseState& operator ++();
+      // // Provide prefix increment operator.
+      // //
+      // // Meant for use with iterator-style iteration over states.
+      // {
+      // 	++index_;
+      // 	return *this;
+      // }
 
-    BaseState& operator ++();
-    // Provides prefix increment operator.
-    //
-    // Meant for use with iterator-style iteration over states.
-    // {
-    // 	++index_;
-    // 	return *this;
-    // }
+      ////////////////////////////////////////////////////////////////
+      // validation
+      ////////////////////////////////////////////////////////////////
 
+      private:
 
-  private:
+      int ValidIndex() const
+      // Verify whether or not state indexing lies within allowed
+      // dimension.
+      //
+      // For use on construction (or possibly with iteration).
+      {
+        return index() < Subspace().size();
+      }
 
-    ////////////////////////////////////////////////////////////////
-    // validation
-    ////////////////////////////////////////////////////////////////
+      private:
 
-    int ValidIndex() const
-    // Verifies whether or not state indexing lies within allowed
-    // dimension.
-    //
-    // For use on construction or possibly with iteration.
-    {
-      return index() < Subspace().size();
-    }
+      ////////////////////////////////////////////////////////////////
+      // private storage
+      ////////////////////////////////////////////////////////////////
 
-  private:
+      const SubspaceType* subspace_ptr_;  // subspace in which state lies
+      int index_;   // 0-based index within space
 
-    ////////////////////////////////////////////////////////////////
-    // private storage
-    ////////////////////////////////////////////////////////////////
-
-    // const SubspaceType& subspace_;  // subspace in which state lies
-    const SubspaceType* subspace_ptr_;  // subspace in which state lies
-    int index_;   // 0-based index within space
-
-  };
+    };
 
 
 
@@ -347,8 +387,8 @@ namespace basis {
   // generic space
   ////////////////////////////////////////////////////////////////
 
-  // BaseSpace -- container to hold subspaces of type S with reverse
-  // lookup by subspace labels
+  // BaseSpace -- container to hold subspaces, with reverse lookup by
+  // subspace labels
   //
   // Template arguments:
   //   tSubspaceType (typename) : type for subspace
@@ -356,7 +396,7 @@ namespace basis {
   template <typename tSubspaceType>
     class BaseSpace
     {
-    public:
+      public:
 
       ////////////////////////////////////////////////////////////////
       // common typedefs
@@ -369,45 +409,38 @@ namespace basis {
       ////////////////////////////////////////////////////////////////
 
       bool ContainsSubspace(const typename SubspaceType::SubspaceLabelsType& subspace_labels) const
+      // Given the labels for a subspace, returns whether or not the
+      // subspace is found within the space.
       {
         return lookup_.count(subspace_labels);
       }
 
       int LookUpSubspaceIndex(const typename SubspaceType::SubspaceLabelsType& subspace_labels) const
+      // Given the labels for a subspace, look up its index within the
+      // space.
+      //
+      // If no such labels are found, an exception will result.
       {
 	
         // trap failed lookup with assert for easier debugging
-        assert(lookup_.count(subspace_labels));
-
-	// diagnostic output for failed lookup
-	// if (!lookup_.count(subspace_labels))
-	//   {
-        // 
-	//     // std::cout << "Space lookup: label not found " << subspace_labels << std::endl;
-	//     std::cout << "Map size: " << lookup_.size() << std::endl;
-	//     // for (auto& elem : lookup_) // doesn't work
-	//     //for (auto iter =lookup_.begin(); iter != lookup_.end(); ++iter)
-	//     //  {
-	//     //	const auto& ikey = (*iter).first;
-	//     //	std::cout << std::get<0>(ikey) << "," << std::get<1>(ikey) << "," << std::get<2>(ikey) << "," << std::get<3>(ikey);
-	//     //	std::cout << " : ";
-	//     //	std::cout << (*iter).second;
-	//     //	std::cout << " match ";
-	//     //	std::cout << (subspace_labels == ikey);
-	//     //	std::cout << std::endl;
-	//     //  }
-	//     std::cout << std::endl;
-	//   }
+        assert(ContainsSubspace(subspace_labels));
 
 	return lookup_.at(subspace_labels);
       };
 
       const SubspaceType& LookUpSubspace(const typename SubspaceType::SubspaceLabelsType& labels) const
+      // Given the labels for a subspace, retrieve a reference to the
+      // subspace.
+      //
+      // If no such labels are found, an exception will result
+      // (enforced by LookUpSubspaceIndex).
       {
 	return subspaces_[LookUpSubspaceIndex(labels)];
       };
 
       const SubspaceType& GetSubspace(int i) const
+      // Given the index for a subspace, return a reference to the
+      // subspace.
       {
 	return subspaces_[i];
       };
@@ -417,12 +450,13 @@ namespace basis {
       ////////////////////////////////////////////////////////////////
 
       int size() const
+      // Return the number of subspaces within the space.
       {
 	return subspaces_.size();
       };
 
       int TotalDimension() const
-      // Sum dimensions of subspaces.
+      // Return the total dimension of all subspaces within the space.
       {
         int dimension = 0;
         for (int i=0; i<size(); ++i)
@@ -430,13 +464,15 @@ namespace basis {
         return dimension;
       }
 
-    protected:
+      protected:
 
       ////////////////////////////////////////////////////////////////
       // subspace push (for initial construction)
       ////////////////////////////////////////////////////////////////
 
       void PushSubspace(const SubspaceType& subspace)
+      // Create indexing information (in both directions, index <->
+      // labels) for a subspace.
       {
 	lookup_[subspace.GetSubspaceLabels()] = subspaces_.size(); // index for lookup
 	subspaces_.push_back(subspace);  // save space
@@ -450,97 +486,97 @@ namespace basis {
       std::vector<SubspaceType> subspaces_;
 
       // subspace index lookup by labels
-      #ifdef INDEXING_HASH
+#ifdef INDEXING_HASH
       std::unordered_map<typename SubspaceType::SubspaceLabelsType,int,boost::hash<typename SubspaceType::SubspaceLabelsType>> lookup_;
-      #else
+#else
       std::map<typename SubspaceType::SubspaceLabelsType,int> lookup_;
-      #endif
+#endif
     };
 
   ////////////////////////////////////////////////////////////////
-  // sector storage -- LEGACY
+  // sector indexing
   ////////////////////////////////////////////////////////////////
 
-  // // LEGACY sector type -- to remove
-  // class Sector
-  //   : public std::pair<int,int> 
-  // // Sector -- sector index pair
-  // //
-  // // Derived from pair<int,int>, so that it can be easily used as sortable key.
-  // // Inheritance is public so that the pair<int,int> comparison operators work.
-  // {
-  // 
-  // public:
-  // 
-  //   // constructor
-  // Sector(int index2, int index1) 
-  //   : pair(index2,index1) {}
-  // 
-  //   // accessors (aliases for pair members)
-  // 
-  //   int index2() const {return first;}
-  //   int index1() const {return second;}
-  // 
-  // };
+  // Note: A "sector" is a pair of subspaces (which thus define a
+  // "sector" or block in the matrix representation of an operator on
+  // the space).
+  //
+  // The sector may also be labeled with a multiplicity index.  The
+  // concept of a multiplicity index on a sector applies when the
+  // symmetry group has outer multiplicites, so reduced matrix
+  // elements are labeled not only by the bra and ket but also by a
+  // multiplicity index.
 
-  ////////////////////////////////////////////////////////////////
-  // sector storage class
-  ////////////////////////////////////////////////////////////////
+
+  // BaseSector -- provide storage of information for a single sector
 
   template <typename tSubspaceType>
-  class BaseSector
+    class BaseSector
     // Store indexing and subspace reference information for a sector.
     //
     // Allows for multiplicity index on sector, for symmetry sectors
     // of groups with outer multiplicities.
-  {
-
-    ////////////////////////////////////////////////////////////////
-    // typedefs
-    ////////////////////////////////////////////////////////////////
-
-  public:
-    typedef tSubspaceType SubspaceType; 
-    typedef std::tuple<int,int,int> KeyType;
-
-    ////////////////////////////////////////////////////////////////
-    // constructors
-    ////////////////////////////////////////////////////////////////
-
-  BaseSector(
-         int bra_subspace_index, int ket_subspace_index, 
-         const SubspaceType& bra_subspace, const SubspaceType& ket_subspace,
-         int multiplicity_index=1
-         ) 
-    : bra_subspace_index_(bra_subspace_index), ket_subspace_index_(ket_subspace_index), multiplicity_index_(multiplicity_index)
     {
-      bra_subspace_ptr_ = &bra_subspace;
-      ket_subspace_ptr_ = &ket_subspace;
-    }
 
-    ////////////////////////////////////////////////////////////////
-    // accessors
-    ////////////////////////////////////////////////////////////////
+      ////////////////////////////////////////////////////////////////
+      // typedefs
+      ////////////////////////////////////////////////////////////////
 
-    inline KeyType Key() const
-    {
-      return KeyType(bra_subspace_index(),ket_subspace_index(),multiplicity_index());
-    }
+      public:
+      typedef tSubspaceType SubspaceType; 
+      typedef std::tuple<int,int,int> KeyType;
 
-    int bra_subspace_index() const {return bra_subspace_index_;}
-    int ket_subspace_index() const {return ket_subspace_index_;}
-    const SubspaceType& bra_subspace() const {return *bra_subspace_ptr_;}
-    const SubspaceType& ket_subspace() const {return *ket_subspace_ptr_;}
-    int multiplicity_index() const {return multiplicity_index_;}
+      ////////////////////////////////////////////////////////////////
+      // constructors
+      ////////////////////////////////////////////////////////////////
 
-  private:
-    int bra_subspace_index_, ket_subspace_index_;
-    const SubspaceType* bra_subspace_ptr_;
-    const SubspaceType* ket_subspace_ptr_;
-    int multiplicity_index_;
-  };
+      BaseSector(
+          int bra_subspace_index, int ket_subspace_index, 
+          const SubspaceType& bra_subspace, const SubspaceType& ket_subspace,
+          int multiplicity_index=1
+        ) 
+        : bra_subspace_index_(bra_subspace_index), ket_subspace_index_(ket_subspace_index), multiplicity_index_(multiplicity_index)
+      {
+        bra_subspace_ptr_ = &bra_subspace;
+        ket_subspace_ptr_ = &ket_subspace;
+      }
 
-  // sector direction specifier
+      ////////////////////////////////////////////////////////////////
+      // accessors
+      ////////////////////////////////////////////////////////////////
+
+      inline KeyType Key() const
+      // Return tuple key identifying sector for sorting/lookup
+      // purposes.
+      {
+        return KeyType(bra_subspace_index(),ket_subspace_index(),multiplicity_index());
+      }
+
+      int bra_subspace_index() const {return bra_subspace_index_;}
+      int ket_subspace_index() const {return ket_subspace_index_;}
+      // Return integer index of bra/ket subspace.
+
+      const SubspaceType& bra_subspace() const {return *bra_subspace_ptr_;}
+      const SubspaceType& ket_subspace() const {return *ket_subspace_ptr_;}
+      // Return reference to bra/ket subspace.
+
+      int multiplicity_index() const {return multiplicity_index_;}
+      // Return multiplicity index of this sector.
+
+      inline bool IsDiagonal() const
+      // Test if sector is diagonal (i.e., within a single subspace).
+      {
+        return (bra_subspace_index()==ket_subspace_index());
+      }
+
+      private:
+      int bra_subspace_index_, ket_subspace_index_;
+      const SubspaceType* bra_subspace_ptr_;
+      const SubspaceType* ket_subspace_ptr_;
+      int multiplicity_index_;
+    };
+
+  // SectorDirection -- sector direction specifier
   //
   //   kCanonical : specifies bra_sector_index <= ket_sector_index
   //   kBoth : specifies that both directions are allowed
@@ -549,84 +585,98 @@ namespace basis {
   // sector direction argument and to implement this symmetry
   // constraint, if so decided.
 
-  enum class direction {kCanonical,kBoth};
+  enum class SectorDirection {kCanonical,kBoth};
 
-  // BaseSectors -- container to hold sectors (as pairs of
-  // indices) with reverse lookup by space labels
-  //
-  // Effectively an invertible function ZxZ->Z.
-  //
-  // It is not clear there is any actual need for this class to be
-  // templatized, since tSpaceType is not actually used, but it
-  // maintains logical parallelism to the other base classes in this
-  // header.
+  // BaseSectors -- container to hold a set of sectors with reverse
+  // lookup by sector labels
   //
   // Template arguments:
   //   tSpaceType (typename) : type for space
 
   template <typename tSpaceType>
     class BaseSectors
-  {
-  public:
-
-    ////////////////////////////////////////////////////////////////
-    // common typedefs
-    ////////////////////////////////////////////////////////////////
-
-    typedef tSpaceType SpaceType;
-    typedef typename tSpaceType::SubspaceType SubspaceType;
-    typedef BaseSector<SubspaceType> SectorType;
-
-    ////////////////////////////////////////////////////////////////
-    // subspace lookup and retrieval
-    ////////////////////////////////////////////////////////////////
-
-    const SectorType& GetSector(int i) const
     {
-      return sectors_[i];
-    };
+      public:
 
-    int LookUpSectorIndex(int bra_subspace_index, int ket_subspace_index, int multiplicity_index=1) const
-    {
-      return lookup_.at(typename SectorType::KeyType(bra_subspace_index,ket_subspace_index,multiplicity_index));
-    };
+      ////////////////////////////////////////////////////////////////
+      // common typedefs
+      ////////////////////////////////////////////////////////////////
 
-    ////////////////////////////////////////////////////////////////
-    // size retrieval
-    ////////////////////////////////////////////////////////////////
+      typedef tSpaceType SpaceType;
+      typedef typename tSpaceType::SubspaceType SubspaceType;
+      typedef BaseSector<SubspaceType> SectorType;
 
-    int size() const
-    {
-      return sectors_.size();
-    };
+      ////////////////////////////////////////////////////////////////
+      // subspace lookup and retrieval
+      ////////////////////////////////////////////////////////////////
 
-  protected:
+      const SectorType& GetSector(int i) const
+      // Given sector index, return reference to sector itself.
+      {
+        return sectors_[i];
+      };
 
-    ////////////////////////////////////////////////////////////////
-    // sector push (for initial construction)
-    ////////////////////////////////////////////////////////////////
+      bool ContainsSector(int bra_subspace_index, int ket_subspace_index, int multiplicity_index=1) const
+      // Given the labels for a sector, returns whether or not the sector
+      // is found within the the sector set.
+      {
+        typename SectorType::KeyType key(bra_subspace_index,ket_subspace_index,multiplicity_index);
+        return lookup_.count(key);
+      };
 
-    void PushSector(const SectorType& sector)
-    {
-      lookup_[sector.Key()] = sectors_.size(); // index for lookup
-      sectors_.push_back(sector);  // save sector
-    };
+      int LookUpSectorIndex(int bra_subspace_index, int ket_subspace_index, int multiplicity_index=1) const
+      // Given the labels for a sector, look up its index within the
+      // sector set.
+      //
+      // If no such labels are found, an exception will result.
+      {
 
-    ////////////////////////////////////////////////////////////////
-    // internal storage
-    ////////////////////////////////////////////////////////////////
+        // trap failed lookup with assert for easier debugging
+        assert(ContainsSector(bra_subspace_index,ket_subspace_index,multiplicity_index));
+
+        typename SectorType::KeyType key(bra_subspace_index,ket_subspace_index,multiplicity_index);
+        return lookup_.at(key);
+      };
+
+      ////////////////////////////////////////////////////////////////
+      // size retrieval
+      ////////////////////////////////////////////////////////////////
+
+      int size() const
+      // Return number of sectors within sector set.
+      {
+        return sectors_.size();
+      };
+
+      protected:
+
+      ////////////////////////////////////////////////////////////////
+      // sector push (for initial construction)
+      ////////////////////////////////////////////////////////////////
+
+      void PushSector(const SectorType& sector)
+      // Create indexing information (in both directions, index <->
+      // labels) for a sector.
+      {
+        lookup_[sector.Key()] = sectors_.size(); // index for lookup
+        sectors_.push_back(sector);  // save sector
+      };
+
+      ////////////////////////////////////////////////////////////////
+      // internal storage
+      ////////////////////////////////////////////////////////////////
     
-    // sectors (accessible by index)
-    std::vector<SectorType> sectors_;
+      // sectors (accessible by index)
+      std::vector<SectorType> sectors_;
 
-    // sector index lookup by subspace indices
-    #ifdef INDEXING_HASH
-    std::unordered_map<typename SectorType::KeyType,int,boost::hash<typename SectorType::KeyType>> lookup_;
-    #else
-    std::map<typename SectorType::KeyType,int> lookup_;
-    #endif
+      // sector index lookup by subspace indices
+#ifdef INDEXING_HASH
+      std::unordered_map<typename SectorType::KeyType,int,boost::hash<typename SectorType::KeyType>> lookup_;
+#else
+      std::map<typename SectorType::KeyType,int> lookup_;
+#endif
 
-  };
+    };
 
   ////////////////////////////////////////////////////////////////
   ////////////////////////////////////////////////////////////////
