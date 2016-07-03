@@ -7,101 +7,8 @@
 ****************************************************************/
 
 #include <iomanip>
-#include <sstream>
 
 #include "lsjt_operator.h"
-
-////////////////////////////////////////////////////////////////
-// templatized generic definitions
-////////////////////////////////////////////////////////////////
-
-// TODO: move these generic definitions elsewhere!  not part of lsjt
-
-namespace basis {
-
-  // output
-  //
-  // with generic index labels only... maybe someday to generalize using
-  // a label member function on the subspace
-
-  template <typename tSectorsType>
-  void WriteOperator(
-      std::ostream& os,
-      const tSectorsType& sectors,
-      const MatrixVector& matrices
-    )
-  {
-
-    // output formatting
-    const int lw = 3;
-
-    // iterate over sectors
-    for (int sector_index = 0; sector_index < sectors.size(); ++sector_index)
-      {
-
-        // extract sector
-	const typename tSectorsType::SectorType& sector = sectors.GetSector(sector_index);
-	const typename tSectorsType::SubspaceType& bra_subspace = sector.bra_subspace();
-	const typename tSectorsType::SubspaceType& ket_subspace = sector.ket_subspace();
-
-        // write sector indices
-	const int bra_subspace_index = sector.bra_subspace_index();
-	const int ket_subspace_index = sector.ket_subspace_index();
-	os 
-	  << "sector"
-          << " " << std::setw(lw) << sector_index
-	  << " " << std::setw(lw) << bra_subspace_index
-	  << " " << std::setw(lw) << ket_subspace_index
-	  << std::endl;
-
-	// iterate over matrix elements
-	for (int bra_index=0; bra_index<bra_subspace.size(); ++bra_index)
-	  for (int ket_index=0; ket_index<ket_subspace.size(); ++ket_index)
-	    {
-	      const double matrix_element = matrices[sector_index](bra_index,ket_index);
-	      os 
-		<< "  " 
-                << std::setw(lw) << bra_index
-		<< " " << std::setw(lw) << ket_index
-		<< " " << std::showpoint << std::scientific << matrix_element
-		<< std::endl;
-	    
-	    }
-
-      };
-  }
-
-
-
-  // zero operator
-
-  template <typename tSectorsType>
-  void SetOperatorToZero(
-      const tSectorsType& sectors,
-      MatrixVector& matrices
-    )
-  {
-
-    // clear vector of matrices
-    matrices.clear();
-
-    // iterator over sectors
-    for (int sector_index = 0; sector_index < sectors.size(); ++sector_index)
-      {
-
-        // extract sector
-	const typename tSectorsType::SectorType& sector = sectors.GetSector(sector_index);
-	const typename tSectorsType::SubspaceType& bra_subspace = sector.bra_subspace();
-	const typename tSectorsType::SubspaceType& ket_subspace = sector.ket_subspace();
-
-        // construct zero matrix
-	Eigen::MatrixXd sector_matrix;
-	sector_matrix = Eigen::MatrixXd::Zero(bra_subspace.size(),ket_subspace.size());
-	matrices.push_back(sector_matrix);
-      }
-  }
-
-} // namespace
 
 
 ////////////////////////////////////////////////////////////////
@@ -112,70 +19,123 @@ int main(int argc, char **argv)
 {
 
   ////////////////////////////////////////////////////////////////
-  // relative state tests
+  // relative basis tests
   ////////////////////////////////////////////////////////////////
 
   if (true)
     {
 
-      std::cout << "Relative space" << std::endl;
-      int Nr_max = 2;
-      int Jr_max = 3;
-      basis::RelativeSpaceLSJT space(Nr_max,Jr_max);
-      int J0 = 0;  // also try J0=2 for quadrupole operator
-      int T0 = 0;
-      int g0 = 0;
-      basis::RelativeSectorsLSJT sectors(space,J0,T0,g0);
-      basis::MatrixVector matrices;
+      ////////////////////////////////////////////////////////////////
+      // defining operator
+      ////////////////////////////////////////////////////////////////
 
-      std::cout << "Zeros" << std::endl;
-      basis::SetOperatorToZero(sectors,matrices);
-      basis::WriteRelativeOperatorLSJT(std::cout,sectors,matrices);
+      std::cout << "Setup" << std::endl;
 
-      std::cout << "Identity" << std::endl;
-      // TO REPLACE: basis::SetOperatorToNaiveIdentityReduced(sectors,matrices);
-      basis::WriteRelativeOperatorLSJT(std::cout,sectors,matrices);
-      // std::cout << "...printed as matrices..." << std::endl;
-      // WriteRelativeOperatorMatrices(std::cout,sectors,matrices,6,3);
-
-      // writeout/readback test
-      std::cout << "Readback" << std::endl;
-
-      std::ostringstream os;
-      basis::WriteRelativeOperatorLSJT(os,sectors,matrices);
-      // std::cout << os.str() << std::endl; // debugging: inspect stream contents
-
-      std::istringstream is(os.str());
-      basis::MatrixVector matrices2;
-      basis::ReadRelativeOperatorLSJT(is,sectors,matrices2);
-      basis::WriteRelativeOperatorLSJT(std::cout,sectors,matrices2);
-
-    }
-
-  ////////////////////////////////////////////////////////////////
-  // two-body state tests
-  ////////////////////////////////////////////////////////////////
-
-  if (true)
-    {
-
-      std::cout << "Two-body space" << std::endl;
+      // set up space
       int Nmax = 2;
-      basis::TwoBodySpaceLSJT space(Nmax);
-      int J0 = 0;  // also try J0=2 for quadrupole operator
-      int T0 = 0;
+      int Jmax = 3;
+      basis::RelativeSpaceLSJT space(Nmax,Jmax);
+
+      // set up operator containers
+      //
+      // These are vectors to store information for T0=0/1/2 components.
+      std::vector<basis::RelativeSectorsLSJT> component_sectors(3);
+      std::vector<basis::MatrixVector> component_matrices(3);
+
+      // populate operator containers
+      int J0 = 0;
       int g0 = 0;
-      basis::TwoBodySectorsLSJT sectors(space,J0,T0,g0);
-      basis::MatrixVector matrices;
+      for (int T0=0; T0<=2; ++T0)
+        // for each isospin component
+        {
 
-      std::cout << "Identity" << std::endl;
-      // TO REPLACE: basis::SetOperatorToNaiveIdentityReduced(sectors,matrices);
-      basis::WriteTwoBodyOperatorLSJT(std::cout,sectors,matrices);
-      //std::cout << "...printed as matrices..." << std::endl;
-      //basis::WriteTwoBodyOperatorMatricesLSJT(std::cout,sectors,matrices,9,6);
+          // enumerate sectors
+          component_sectors[T0] = basis::RelativeSectorsLSJT(space,J0,T0,g0);
+          std::cout << " T0 " << T0 << " size " << component_sectors[T0].size() << std::endl;
+          
+          // populate matrices
+          if (T0==0)
+            basis::SetOperatorToIdentity(component_sectors[T0],component_matrices[T0]);
+          else
+            basis::SetOperatorToZero(component_sectors[T0],component_matrices[T0]);
+        }
 
+      ////////////////////////////////////////////////////////////////
+      // write test
+      ////////////////////////////////////////////////////////////////
+
+      // set up stream for output
+      //std::ofstream os("lsjt_operator_test_identity.dat");
+      std::ostringstream os;
+
+      // write header parameters
+      basis::RelativeOperatorParametersLSJT parameters;
+      parameters.version=1;
+      parameters.J0=J0;
+      parameters.g0=g0;
+      parameters.T0_min=0;
+      parameters.T0_max=2;
+      parameters.Nmax=Nmax;
+      parameters.Jmax=Jmax;
+      basis::WriteRelativeOperatorParametersLSJT(os,parameters);
+
+      // write matrices
+      for (int T0=parameters.T0_min; T0<=parameters.T0_max; ++T0)
+        {
+          basis::WriteRelativeOperatorComponentLSJT(
+              os,
+              T0,
+              component_sectors[T0],component_matrices[T0]
+            );
+        }
+
+      // dump to terminal for inspection
+      std::cout << os.str();
+
+      ////////////////////////////////////////////////////////////////
+      // read test
+      ////////////////////////////////////////////////////////////////
+
+      std::cout << "Readback test" << std::endl;
+
+      // set up stream for readback
+      std::istringstream is(os.str());
+
+      // read header parameters
+      basis::RelativeOperatorParametersLSJT parameters2;
+      basis::ReadRelativeOperatorParametersLSJT(is,parameters2);
+      // and inspect...
+      basis::WriteRelativeOperatorParametersLSJT(std::cout,parameters2);
+
+      // set up space
+      basis::RelativeSpaceLSJT space2(parameters2.Nmax,parameters2.Jmax);
+
+      // read matrices
+      std::vector<basis::RelativeSectorsLSJT> component_sectors2;
+      component_sectors2.resize(3);
+      std::vector<basis::MatrixVector> component_matrices2;
+      component_matrices2.resize(3);
+
+      for (int T0=parameters2.T0_min; T0<=parameters2.T0_max; ++T0)
+        // for each isospin component
+        {
+          // enumerate sectors
+          component_sectors2[T0] = basis::RelativeSectorsLSJT(space2,J0,T0,g0);
+
+          // read matrices
+          basis::ReadRelativeOperatorComponentLSJT(
+              is,
+              T0,
+              component_sectors2[T0],component_matrices2[T0]
+            );
+          // and inspect...
+          basis::WriteRelativeOperatorComponentLSJT(
+              std::cout,
+              T0,
+              component_sectors2[T0],component_matrices2[T0]
+            );
+        }
     }
-
 
   // termination
   return 0;
