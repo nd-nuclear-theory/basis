@@ -44,8 +44,8 @@
     - Remove all-to-all sector constructors.
     - Rename Str() to DebugStr().
     - Rename labels on relative basis (e.g., J->Jr).
-  6/30/16 (mac):
-    - Revert labels on relative basis (e.g., Jr->J).
+  6/30/16 (mac): Revert labels on relative basis (e.g., Jr->J).
+  7/3/16 (mac): Add certain default constructors.
 
 ****************************************************************/
 
@@ -132,7 +132,11 @@ namespace basis {
 
       // constructor
 
-      RelativeSubspaceLSJT (int L, int S, int J, int T, int g, int Nmax);
+      RelativeSubspaceLSJT() {};
+      // default constructor -- provided since required for certain
+      // purposes by STL container classes (e.g., std::vector::resize)
+
+      RelativeSubspaceLSJT(int L, int S, int J, int T, int g, int Nmax);
       // Set up indexing in Nmax truncation.
 
       // accessors
@@ -196,8 +200,13 @@ namespace basis {
     public:
     
     // constructor
+
+    RelativeSpaceLSJT() {};
+    // default constructor -- provided since required for certain
+    // purposes by STL container classes (e.g., std::vector::resize)
+
     RelativeSpaceLSJT(int Nmax, int Jmax);
-    // Enumerates all relative LSJT subspaces of given dimension up to
+    // Enumerate all relative LSJT subspaces of given dimension up to
     // a given relative oscillator cutoff and relative angular
     // momentum cutoff.
     //
@@ -232,6 +241,10 @@ namespace basis {
     public:
 
     // constructor
+
+    RelativeSectorsLSJT() {};
+    // default constructor -- provided since required for certain
+    // purposes by STL container classes (e.g., std::vector::resize)
 
     RelativeSectorsLSJT(
         const RelativeSpaceLSJT& space,
@@ -324,7 +337,7 @@ namespace basis {
 
       // constructor
 
-      RelativeCMSubspaceLSJT (int L, int S, int J, int T, int g, int Nmax);
+      RelativeCMSubspaceLSJT(int L, int S, int J, int T, int g, int Nmax);
 
       // accessors
 
@@ -498,7 +511,7 @@ namespace basis {
 
       // constructor
 
-      RelativeCMSubspaceNLSJT (int L, int S, int J, int T, int g, int Nmax);
+      RelativeCMSubspaceNLSJT(int L, int S, int J, int T, int g, int Nmax);
 
       // accessors
 
@@ -695,7 +708,7 @@ namespace basis {
 
       // constructor
 
-      TwoBodySubspaceLSJT (int L, int S, int J, int T, int g, int Nmax);
+      TwoBodySubspaceLSJT(int L, int S, int J, int T, int g, int Nmax);
       // Set up indexing in Nmax truncation.
 
       // accessors
