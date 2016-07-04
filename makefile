@@ -37,5 +37,6 @@ include $(COMMON_MAKE_DIR)/common.mk
 CC := $(CXX)
 
 # external libraries
-LDLIBS +=  -lhalfint -lgsl
+LDFLAGS += -L../am
+LDLIBS +=  -lam -lgsl
 

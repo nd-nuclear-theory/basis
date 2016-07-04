@@ -37,7 +37,7 @@
   6/27/16 (mac):
     - Add Jr_max cutoff on construction of relative basis.
     - Change relative-c.m. scheme from spectator (Nc,lc) to active (Nc,lc).
-    - Add fixed-N subspaces in relative-c.m. scheme for use with Moshinsky 
+    - Add fixed-N subspaces in relative-c.m. basis for use with Moshinsky 
       transform block structure.
     - Expand basis indexing comments.
     - Implement canonical ordering constraint on sectors.
@@ -45,7 +45,9 @@
     - Rename Str() to DebugStr().
     - Rename labels on relative basis (e.g., J->Jr).
   6/30/16 (mac): Revert labels on relative basis (e.g., Jr->J).
-  7/3/16 (mac): Add certain default constructors.
+  7/3/16 (mac): Add some default constructors.
+  7/4/16 (mac): Add fixed-N subspaces in two-body basis for use with 
+    Moshinsky transform block structure.
 
 ****************************************************************/
 
@@ -491,10 +493,14 @@ namespace basis {
   //   -- antisymmetry constraint lr+S+T~1 (or, equivalentsly, 
   //      Nr+S+T~1)
   //
-  // This basis is for *identical* particle states, as enforced by the
-  // antisymmetry constraint on Nr.
+  // This basis is for *identical* particle states (see discussion
+  // above for non-N version).
   //
   ////////////////////////////////////////////////////////////////  
+
+  // Modification for subspacing by N is by lexical replacement LSJT
+  // -> NLSJT plus specific mods as flagged by MODIFICATION comments
+  // in code.
 
   // labels
 
@@ -511,7 +517,7 @@ namespace basis {
 
       // constructor
 
-      RelativeCMSubspaceNLSJT(int L, int S, int J, int T, int g, int Nmax);
+      RelativeCMSubspaceNLSJT(int L, int S, int J, int T, int g, int N);  // (MODIFICATION for subspacing by N)
 
       // accessors
 
@@ -805,6 +811,184 @@ namespace basis {
 
     TwoBodySectorsLSJT(
         const TwoBodySpaceLSJT& space,
+        int J0, int T0, int g0,
+        basis::SectorDirection sector_direction = basis::SectorDirection::kCanonical
+      );
+    // Enumerate sector pairs connected by an operator of given
+    // tensorial and parity character ("constrained" sector
+    // enumeration).
+
+  };
+
+  ////////////////////////////////////////////////////////////////
+  // two-body states in LSJT scheme -- subspaced by N
+  ////////////////////////////////////////////////////////////////
+  
+  ////////////////////////////////////////////////////////////////  
+  //
+  // Labeling
+  //
+  // subspace labels: (L,S,J,T,g,N)  (MODIFICATION for subspacing by N)
+  //
+  // state labels within subspace: (N1,l1,N2,l2)
+  //
+  ////////////////////////////////////////////////////////////////
+  //
+  // Subspaces
+  //
+  // Within the full space, subspaces are ordered by:
+  //    -- increasing N (N=0,1,...,Nmax)  (MODIFICATION for subspacing by N)
+  //    -- increasing L (L=0,1,...,Nmax)
+  //    -- increasing S (S=0,1)
+  //    -- increasing J
+  //    -- increasing T (T=0,1)
+  //    -- [increasing g (g=0,1)]  (MODIFICATION for subspacing by N)
+  // subject to:
+  //    -- triangularity of (L,S,J)
+  //    -- parity constraint N~g  (MODIFICATION for subspacing by N)
+  // 
+  // Subspaces are pruned to those of nonzero dimension.
+  //
+  // Note that ordering of subspaces is lexicographic by (L,S,J,g).
+  //
+  // Truncation of the space is by the two-body Nmax.
+  //
+  ////////////////////////////////////////////////////////////////
+  //
+  // States
+  //
+  // Within a subspace, the states are ordered by:
+  //   -- [increasing N  (N=N1+N2)]  (MODIFICATION for subspacing by N)
+  //   -- lexicographically increasing (N1,l1)
+  //   -- lexicographically increasing (N2,l2)
+  // and subject to:
+  //   -- triangularity constraint on (l1,l2,L)
+  //   -- [parity constraint N~g]  (MODIFICATION for subspacing by N)
+  //   -- antisymmetry constraint L+S+T~1 if (N1,l1)==(N2,l2)
+  //
+  //
+  // This basis is for *identical* particle states (see discussion
+  // above for non-N version).
+  //
+  ////////////////////////////////////////////////////////////////  
+
+  // Modification for subspacing by N is by lexical replacement LSJT
+  // -> NLSJT plus specific mods as flagged by MODIFICATION comments
+  // in code.
+
+
+  // labels
+
+  typedef std::tuple<int,int,int,int,int,int> TwoBodySubspaceNLSJTLabels;  // (MODIFICATION for subspacing by N)
+  typedef std::tuple<int,int,int,int> TwoBodyStateNLSJTLabels;
+
+  //subspace
+
+  class TwoBodySubspaceNLSJT
+    : public BaseSubspace<TwoBodySubspaceNLSJTLabels,TwoBodyStateNLSJTLabels>
+    {
+    
+      public:
+
+      // constructor
+
+      TwoBodySubspaceNLSJT(int L, int S, int J, int T, int g, int N);  // (MODIFICATION for subspacing by N)
+      // Set up indexing in Nmax truncation.
+
+      // accessors
+
+      int L() const {return std::get<0>(labels_);}
+      int S() const {return std::get<1>(labels_);}
+      int J() const {return std::get<2>(labels_);}
+      int T() const {return std::get<3>(labels_);}
+      int g() const {return std::get<4>(labels_);}
+      int N() const {return std::get<5>(labels_);}  // (MODIFICATION for subspacing by N)
+
+      // diagnostic string
+      std::string DebugStr() const;
+
+      private:
+
+      //validation
+      bool ValidLabels() const;
+
+      // truncation
+      int N_;  // (MODIFICATION for subspacing by N)
+    };
+
+  // state
+
+  class TwoBodyStateNLSJT
+    : public BaseState<TwoBodySubspaceNLSJT>
+  {
+    
+    public:
+
+    // pass-through constructors
+
+    TwoBodyStateNLSJT(const SubspaceType& subspace, int index)
+      // Construct state by index.
+      : BaseState (subspace, index) {}
+
+    TwoBodyStateNLSJT(const SubspaceType& subspace, const typename SubspaceType::StateLabelsType& state_labels)
+      // Construct state by reverse lookup on labels.
+      : BaseState (subspace, state_labels) {}
+
+    // pass-through accessors
+    int L() const {return Subspace().L();}
+    int S() const {return Subspace().S();}
+    int J() const {return Subspace().J();}
+    int T() const {return Subspace().T();}
+    int g() const {return Subspace().g();}
+
+    // state label accessors
+    int N1() const {return std::get<0>(GetStateLabels());}
+    int l1() const {return std::get<1>(GetStateLabels());}
+    int N2() const {return std::get<2>(GetStateLabels());}
+    int l2() const {return std::get<3>(GetStateLabels());}
+
+    int N() const {return  N1()+N2();}
+
+  };
+
+  // space
+
+  class TwoBodySpaceNLSJT
+    : public BaseSpace<TwoBodySubspaceNLSJT>
+  {
+    
+    public:
+
+    // constructor
+
+    TwoBodySpaceNLSJT(int Nmax);
+    // Enumerates all relative NLSJT subspaces of given dimension up to a
+    // given Nmax cutoff.
+
+    // accessors
+    int Nmax() const {return Nmax_;}
+
+    // diagnostic string
+    std::string DebugStr() const;
+
+    private:
+    // truncation
+    int Nmax_;
+
+  };
+
+  // sectors
+
+  class TwoBodySectorsNLSJT
+    : public BaseSectors<TwoBodySpaceNLSJT>
+  {
+
+    public:
+
+    // constructor
+
+    TwoBodySectorsNLSJT(
+        const TwoBodySpaceNLSJT& space,
         int J0, int T0, int g0,
         basis::SectorDirection sector_direction = basis::SectorDirection::kCanonical
       );
