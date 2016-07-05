@@ -177,7 +177,7 @@ namespace basis {
       // Construct state by index.
       : BaseState (subspace, index) {}
 
-    RelativeStateLSJT(const SubspaceType& subspace, const typename SubspaceType::StateLabelsType& state_labels)
+    RelativeStateLSJT(const SubspaceType& subspace, const StateLabelsType& state_labels)
       // Construct state by reverse lookup on labels.
       : BaseState (subspace, state_labels) {}
 
@@ -377,7 +377,7 @@ namespace basis {
       // Construct state by index.
       : BaseState (subspace, index) {}
 
-    RelativeCMStateLSJT(const SubspaceType& subspace, const typename SubspaceType::StateLabelsType& state_labels)
+    RelativeCMStateLSJT(const SubspaceType& subspace, const StateLabelsType& state_labels)
       // Construct state by reverse lookup on labels.
       : BaseState (subspace, state_labels) {}
 
@@ -557,7 +557,7 @@ namespace basis {
       // Construct state by index.
       : BaseState (subspace, index) {}
 
-    RelativeCMStateNLSJT(const SubspaceType& subspace, const typename SubspaceType::StateLabelsType& state_labels)
+    RelativeCMStateNLSJT(const SubspaceType& subspace, const StateLabelsType& state_labels)
       // Construct state by reverse lookup on labels.
       : BaseState (subspace, state_labels) {}
 
@@ -752,7 +752,7 @@ namespace basis {
       // Construct state by index.
       : BaseState (subspace, index) {}
 
-    TwoBodyStateLSJT(const SubspaceType& subspace, const typename SubspaceType::StateLabelsType& state_labels)
+    TwoBodyStateLSJT(const SubspaceType& subspace, const StateLabelsType& state_labels)
       // Construct state by reverse lookup on labels.
       : BaseState (subspace, state_labels) {}
 
@@ -930,7 +930,7 @@ namespace basis {
       // Construct state by index.
       : BaseState (subspace, index) {}
 
-    TwoBodyStateNLSJT(const SubspaceType& subspace, const typename SubspaceType::StateLabelsType& state_labels)
+    TwoBodyStateNLSJT(const SubspaceType& subspace, const StateLabelsType& state_labels)
       // Construct state by reverse lookup on labels.
       : BaseState (subspace, state_labels) {}
 

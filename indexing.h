@@ -82,6 +82,7 @@
     - Flesh out documentation of member functions.
     - Add utility member functions ContainsState, ContainsSector,
       IsDiagonal.
+  7/5/16 (mac): Add pass-through typedef StateLabelsType to BaseState.
 
 ****************************************************************/
 
@@ -259,6 +260,7 @@ namespace basis {
       ////////////////////////////////////////////////////////////////
 
       typedef tSubspaceType SubspaceType; 
+      typedef typename SubspaceType::StateLabelsType StateLabelsType;
 
       ////////////////////////////////////////////////////////////////
       // general constructors
@@ -278,7 +280,7 @@ namespace basis {
 	assert(ValidIndex());
       }
 
-      BaseState(const SubspaceType& subspace, const typename SubspaceType::StateLabelsType& state_labels)
+      BaseState(const SubspaceType& subspace, const StateLabelsType& state_labels)
         // Construct state, by reverse lookup on labels within subspace.
         {
 
@@ -304,7 +306,7 @@ namespace basis {
       {return *subspace_ptr_;}
       
 
-      const typename SubspaceType::StateLabelsType& GetStateLabels() const 
+      const StateLabelsType& GetStateLabels() const 
       // Return labels of this state.
       //
       // Note: It is not normally expected that this member function
