@@ -208,12 +208,12 @@ namespace basis {
   // Write file header for relative operator in LSJT scheme.
   //
   // Arguments:
-  //   os (std::ostream) : text-mode output stream
+  //   is (std::istream) : text-mode input stream
   //   parameters (basis::RelativeOperatorParametersLSJT, output)
   //     : operator parameters
 
   void WriteRelativeOperatorComponentLSJT(
-      std::ostream& is,
+      std::ostream& os,
       int T0,
       const basis::RelativeSectorsLSJT& sectors,
       const basis::MatrixVector& matrices
@@ -240,7 +240,7 @@ namespace basis {
   // scheme.
   //
   // Arguments:
-  //   os (std::ostream) : text-mode output stream
+  //   is (std::istream) : text-mode inpus stream
   //   T0 (int) : isospin for this isospin component
   //   sector (basis::RelativeSectorsLSJT) :  sectors defining operator
   //   matrices (basis::MatrixVector, output) :  matrices defining operator
