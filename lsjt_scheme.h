@@ -4,8 +4,8 @@
   Defines relative and two-body state indexing in LSJT coupling scheme.
   Written for use in Moshinsky transformation.
 
-  Indexing is in each case broken into a *subspace* (described by LSJT
-  labels and an Nmax trunction) and then indexed states within
+  Indexing is in each case broken into a *subspace* (described by
+  LSJTg labels and an Nmax trunction) and then indexed states within
   the subspace.
 
   Variant indexing schemes where the subspaces are further broken down

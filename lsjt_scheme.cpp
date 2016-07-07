@@ -120,7 +120,10 @@ namespace basis {
     return os.str();
   }
 
-  RelativeSectorsLSJT::RelativeSectorsLSJT(const RelativeSpaceLSJT& space, basis::SectorDirection sector_direction)
+  RelativeSectorsLSJT::RelativeSectorsLSJT(
+      const RelativeSpaceLSJT& space,
+      basis::SectorDirection sector_direction
+    )
   {
     for (int bra_subspace_index=0; bra_subspace_index<space.size(); ++bra_subspace_index)
       for (int ket_subspace_index=0; ket_subspace_index<space.size(); ++ket_subspace_index)
@@ -142,7 +145,11 @@ namespace basis {
         }
   }
 
-  RelativeSectorsLSJT::RelativeSectorsLSJT(const RelativeSpaceLSJT& space, int J0, int T0, int g0, basis::SectorDirection sector_direction)
+  RelativeSectorsLSJT::RelativeSectorsLSJT(
+      const RelativeSpaceLSJT& space,
+      int J0, int T0, int g0,
+      basis::SectorDirection sector_direction
+    )
   {
     for (int bra_subspace_index=0; bra_subspace_index<space.size(); ++bra_subspace_index)
       for (int ket_subspace_index=0; ket_subspace_index<space.size(); ++ket_subspace_index)
@@ -321,7 +328,11 @@ namespace basis {
 
   }
 
-  RelativeCMSectorsLSJT::RelativeCMSectorsLSJT(const RelativeCMSpaceLSJT& space, int J0, int T0, int g0, basis::SectorDirection sector_direction)
+  RelativeCMSectorsLSJT::RelativeCMSectorsLSJT(
+      const RelativeCMSpaceLSJT& space,
+      int J0, int T0, int g0,
+      basis::SectorDirection sector_direction
+    )
   {
     for (int bra_subspace_index=0; bra_subspace_index<space.size(); ++bra_subspace_index)
       for (int ket_subspace_index=0; ket_subspace_index<space.size(); ++ket_subspace_index)
@@ -498,7 +509,11 @@ namespace basis {
 
   }
 
-  RelativeCMSectorsNLSJT::RelativeCMSectorsNLSJT(const RelativeCMSpaceNLSJT& space, int J0, int T0, int g0, basis::SectorDirection sector_direction)
+  RelativeCMSectorsNLSJT::RelativeCMSectorsNLSJT(
+      const RelativeCMSpaceNLSJT& space,
+      int J0, int T0, int g0,
+      basis::SectorDirection sector_direction
+    )
   {
     for (int bra_subspace_index=0; bra_subspace_index<space.size(); ++bra_subspace_index)
       for (int ket_subspace_index=0; ket_subspace_index<space.size(); ++ket_subspace_index)
@@ -691,7 +706,11 @@ namespace basis {
 
   }
 
-  TwoBodySectorsLSJT::TwoBodySectorsLSJT(const TwoBodySpaceLSJT& space, int J0, int T0, int g0, basis::SectorDirection sector_direction)
+  TwoBodySectorsLSJT::TwoBodySectorsLSJT(
+      const TwoBodySpaceLSJT& space,
+      int J0, int T0, int g0,
+      basis::SectorDirection sector_direction
+    )
   {
     for (int bra_subspace_index=0; bra_subspace_index<space.size(); ++bra_subspace_index)
       for (int ket_subspace_index=0; ket_subspace_index<space.size(); ++ket_subspace_index)
@@ -738,32 +757,32 @@ namespace basis {
     // iterate over total oscillator quanta -- omit (MODIFICATION for subspacing by N)
     // for (int N = g; N <= Nmax; N +=2)
     // iterate over oscillator (Nl) orbitals for particle 1
-      for (int N1 = 0; N1 <= N; ++N1)
-	for (int l1 = N1%2; l1 <= N1; l1 +=2) 
-	  {
-	    // iterate over oscillator (Nl) orbitals for particle 2
-	    // subject to given total N
-	    int N2 = N - N1;
+    for (int N1 = 0; N1 <= N; ++N1)
+      for (int l1 = N1%2; l1 <= N1; l1 +=2) 
+        {
+          // iterate over oscillator (Nl) orbitals for particle 2
+          // subject to given total N
+          int N2 = N - N1;
             
-	    for (int l2 = N2%2; l2 <= N2; l2 +=2) 
-	      {
+          for (int l2 = N2%2; l2 <= N2; l2 +=2) 
+            {
 
-                // impose canonical ordering on single-particle states
-                if (!( std::make_pair(N1,l1) <= std::make_pair(N2,l2) ))
-                  continue;
+              // impose canonical ordering on single-particle states
+              if (!( std::make_pair(N1,l1) <= std::make_pair(N2,l2) ))
+                continue;
 
-		// impose triangularity
-		if (!(am::AllowedTriangle(l1,l2,L)))
-		  continue;
+              // impose triangularity
+              if (!(am::AllowedTriangle(l1,l2,L)))
+                continue;
 
-		// impose antisymmetry
-		if ((N1==N2)&&(l1==l2)&&(!((L+S+T)%2==1)))
-		  continue;
+              // impose antisymmetry
+              if ((N1==N2)&&(l1==l2)&&(!((L+S+T)%2==1)))
+                continue;
 
-		// keep surviving states
-		PushStateLabels(StateLabelsType(N1,l1,N2,l2)); 
-	      }
-	  }
+              // keep surviving states
+              PushStateLabels(StateLabelsType(N1,l1,N2,l2)); 
+            }
+        }
   }
 
   bool TwoBodySubspaceNLSJT::ValidLabels() const
@@ -876,7 +895,11 @@ namespace basis {
 
   }
 
-  TwoBodySectorsNLSJT::TwoBodySectorsNLSJT(const TwoBodySpaceNLSJT& space, int J0, int T0, int g0, basis::SectorDirection sector_direction)
+  TwoBodySectorsNLSJT::TwoBodySectorsNLSJT(
+      const TwoBodySpaceNLSJT& space,
+      int J0, int T0, int g0,
+      basis::SectorDirection sector_direction
+    )
   {
     for (int bra_subspace_index=0; bra_subspace_index<space.size(); ++bra_subspace_index)
       for (int ket_subspace_index=0; ket_subspace_index<space.size(); ++ket_subspace_index)
