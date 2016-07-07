@@ -18,9 +18,14 @@ namespace basis {
     assert(parameters.version==1);
     os 
       << "# RELATIVE LSJT" << std::endl
+      << "#   version" << std::endl
+      << "#   J0 g0 T0_min T0_max symmetry_phase  [P0=(-)^g0]" << std::endl
+      << "#   Nmax Jmax" << std::endl
+      << "#   T0   N' L' S' J' T'   N L S J T   JT-RME" << std::endl
       << " " << parameters.version << std::endl
-      << " " << parameters.J0 << " " << parameters.g0 << std::endl
-      << " " << parameters.T0_min << " " << parameters.T0_max << std::endl
+      << " " << parameters.J0 << " " << parameters.g0
+      << " " << parameters.T0_min << " " << parameters.T0_max
+      << " " << int(parameters.symmetry_phase) << std::endl
       << " " << parameters.Nmax << " " << parameters.Jmax << std::endl;
   }
 
@@ -39,13 +44,15 @@ namespace basis {
     
     // line 2: operator tensor properties
     std::getline(is,line);
-    std::stringstream(line) >> parameters.J0 >> parameters.g0;
+    int symmetry_phase_int;
+    std::stringstream(line)
+      >> parameters.J0 >> parameters.g0
+      >> parameters.T0_min >> parameters.T0_max
+      >> symmetry_phase_int;
+    assert (symmetry_phase_int==0);
+    parameters.symmetry_phase = basis::SymmetryPhase(symmetry_phase_int);
 
-    // line 3: isospin components
-    std::getline(is,line);
-    std::stringstream(line) >> parameters.T0_min >> parameters.T0_max;
-
-    // line 4: truncation
+    // line 3: relative basis truncation
     std::getline(is,line);
     std::stringstream(line) >> parameters.Nmax >> parameters.Jmax;
   }

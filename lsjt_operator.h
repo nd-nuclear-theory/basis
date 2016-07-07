@@ -17,6 +17,7 @@
     - Remove matrix-style output.
     - Remove generic template functions.
   7/3/16 (mac): Add relative LSJT operator file I/O.
+  7/6/16 (mac): Add symmetry phase header field and update documentation.
 
 ****************************************************************/
 
@@ -44,33 +45,58 @@ namespace basis {
   //
   // general relative two-body operator format
   //
-  // # RELATIVE LSJT
-  // version             # version = 1
-  // J0 g0               # operator a.m. and parity [P0=(-)^g0]
-  // T0_min T0_max       # operator isospin components (a TBO may have components T0=0,1,2)
-  // Nmax Jmax           # basis: max N (relative quanta), max J (relative a.m.) (Jmax<=Nmax+1)
+  // Header
   //
-  // Then data lines are of form:
+  //   Header format:
   //
-  //    T0 N' L' S' J' T' N L S J T matrix_element
+  //     # RELATIVE LSJT
+  //     # ...
+  //     version                               # version
+  //     J0 g0 T0_min T0_max symmetry_phase    # operator tensor properties
+  //     Nmax Jmax                             # relative basis truncation
   //
-  // Here matrix_element is the JT-reduced matrix element under group
-  // theory conventions (i.e., no dimension factor in the
-  // Wigner-Eckart theorem):
+  //   The header may start with one or more contiguous comment lines, 
+  //   which are designated by a hash character in the first column.
+  //  
+  //   Then, the header contains the following fields:
   //
-  //    < N' L' S' J' T' || op || N L S J T >
+  //     version : file format version (=1)
+  //     J0 (int) : angular momentum of operator
+  //     g0 (int) : parity grade of operator [P0=(-)^g0] (g0=0,1)
+  //     T0_min T0_max (int) : range of operator isospin components (a two-body operator  
+  //       may in general have components T0=0,1,2 from the coupling of four isospin-1/2 
+  //       fermionic operators)
+  //     symmetry_phase (int) : RESERVED to describe how to obtain phase for lower triangle
+  //       (see "Conjugation symmetry" below) (=0)
+  //     Nmax (int) : oscillator truncation of relative space (Nmax>=0)
+  //     Jmax (int) : additional relative angular momentum truncation of relative space
+  //       (Jmax<=Nmax+1); Jmax=Nmax+1 includes the full relative space at the given 
+  //       oscillator truncation, but operators may often be truncated at lower partial
+  //       waves
   //
-  // For the special case of a rotational scalar (J0=0), isoscalar
-  // (T0=0) operator, this is equivalently the unreduced matrix
-  // element, as is often used to represent Hamiltonians in shell
-  // model codes:
+  // Data
   //
-  //    < N' L' S' J' T'; MJ MT | op | N L S J T; MJ MT >
+  //   Then data lines are of form:
   //
-  // (Note that this matrix element is independent of MJ and MT for a
-  // scalar, isoscalar operator.)
+  //      T0 N' L' S' J' T' N L S J T JT-RME
   //
-  // Iteration order:
+  //   Here JT-RME is the JT-reduced matrix element under group
+  //   theory conventions (i.e., no dimension factor in the
+  //   Wigner-Eckart theorem):
+  //
+  //      < N' L' S' J' T' || op || N L S J T >
+  //
+  //   For the special case of a rotational scalar (J0=0), isoscalar
+  //   (T0=0) operator, this is equivalently the unreduced matrix
+  //   element, as is often used to represent Hamiltonians in shell
+  //   model codes:
+  //
+  //      < N' L' S' J' T'; MJ MT | op | N L S J T; MJ MT >
+  //
+  //   (Note that this matrix element is independent of MJ and MT for a
+  //   scalar, isoscalar operator.)
+  //
+  // Iteration order and symmetry
   //
   //   It is assumed that the RelativeSectorsLSJT was constucted with
   //   the direction=kCanonical option.
@@ -87,33 +113,64 @@ namespace basis {
   //   canonical order.  It is assumed that the matrix elements in the
   //   other direction can be obtained by symmetry.
   //
-  //   CAVEAT: The user code is currently responsible for "knowing"
-  //   the phase factor required to obtain matrix elements by
-  //   symmetry.
-  //
   //   States are likewise ordered lexicographical by
   //   (bra_state_index,ket_state_index), i.e., row-major ordering.
   //   In diagonal sectors (i.e., when the bra and ket subspaces are
   //   the same), only matrix elements with indices in canonical order
   //   (upper triangle) are read from or written to file.
   //
-  // Phase convention:
+  // Conjugation symmetry
+  //
+  //   Since only the upper triangle of the operator is stored, the
+  //   user code is responsible for obtaining the lower triangle
+  //   (conjugate) matrix elements by "symmetry".  Recall that the
+  //   matrix elements are JT-reduced matrix elements, not simple
+  //   matrix elements.  Therefore, conjuation will in general involve
+  //   phase and dimension factors.
+  //
+  //   The symmetry_phase field in the header is reserved to provide
+  //   information on the correct form to use for this phase factor.
+  //   However, for now, only the placeholder value 0 is defined for
+  //   symmetry_phase, and phase conventions are only well-defined for a
+  //   Hamiltonian-like (J0=0, g0=0) operator.
+  //
+  //   symmetry_phase=0, J0=0, g0=0: For a Hamiltonian-like operator,
+  //   we expect Hermiticity, i.e., symmetry of (M_J,M_T)-branched
+  //   matrix elements.  Within a diagonal sector, this means that the
+  //   lower triangle is obtained from the upper triangle by ordinary
+  //   symmetry.  For off-diagonal sectors, the appropriate symmetry
+  //   on the JT-reduced matrix elements in general includes phase and
+  //   dimension factors from the isospin Clebsches:
+  //
+  //     <a,J,T,g || A_{T0} || a',J,T',g>
+  //       = (-)^(T'-T)*Hat(T')/Hat(T)
+  //         * <a',J,T',g || A_{T0} || a,J,T,g>
+  //
+  //   However, note that the symmetry factor only differs from unity
+  //   in the isospin-changing <T=0|T=1> sectors.  These sectors
+  //   conventionally only contain vanishing matrix elements for
+  //   nuclear interactions.
+  //
+  // Radial oscillator phase convention
   //
   //   Two phase conventions are in use for radial wave functions and
   //   thus for harmonic oscillator basis functions.  See, e.g.,
-  //   footnote 8 of csbasis [PRC 86, 034312 (2012)].  The "positive
-  //   at the origin" convention is used for oscillator functions in,
-  //   e.g., Suhonen (3.42), Moshinsky (1.1.8) & (1.9.15), and MFDn
-  //   interaction files.  The "positive at the origin" convention
-  //   should therefore be used when writing matrix elements to file
-  //   in the present format.  However, the "positive at infinity"
-  //   convention is more natural when considering oscillator
-  //   functions as members of SU(3) irreps, so conversion may be
-  //   necessary.
+  //   footnote 8 of csbasis [PRC 86, 034312 (2012)].  We adopt the
+  //   "positive at the origin" convention, which should thus be used
+  //   when writing matrix elements to file in the present format.
+  //   The "positive at the origin" convention is followed for the
+  //   oscillator functions in, e.g., Suhonen (3.42), Moshinsky
+  //   (1.1.8) & (1.9.15), and MFDn interaction files.  However, the
+  //   "positive at infinity" convention is more natural when
+  //   considering oscillator functions as members of SU(3) irreps.
+  //   So it may be necessary to convert to this convention for
+  //   internal use in SU(3) calculations.
   
   ////////////////////////////////////////////////////////////////
   // operator header
   ////////////////////////////////////////////////////////////////
+
+  enum class SymmetryPhase {kHermitian=0};
 
   struct RelativeOperatorParametersLSJT
   // Parameters for relative operator storage.
@@ -122,8 +179,8 @@ namespace basis {
   //   See comment describing header for relative operator file.
   {
     int version;
-    int J0, g0;
-    int T0_min, T0_max;
+    int J0, g0, T0_min, T0_max;
+    SymmetryPhase symmetry_phase;
     int Nmax, Jmax;
   };
 
