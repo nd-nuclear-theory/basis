@@ -51,7 +51,7 @@ namespace basis {
 
     std::ostringstream os;
 
-    const int lw = 3;
+    const int width = 3;
 
     for (int state_index=0; state_index<size(); ++state_index)
       {
@@ -59,11 +59,11 @@ namespace basis {
 
         os
 	  << " " << "index"
-	  << " " << std::setw(lw) << state_index
+	  << " " << std::setw(width) << state_index
 	  << " " << "nlj"
-	  << " " << std::setw(lw) << state.n()
-	  << " " << std::setw(lw) << state.l()
-	  << " " << std::setw(lw+2) << state.j().Str()
+	  << " " << std::setw(width) << state.n()
+	  << " " << std::setw(width) << state.l()
+	  << " " << std::setw(width+2) << state.j().Str()
 	  << " " << "weight"
           << " " << state.weight()
           << std::endl;
@@ -94,18 +94,19 @@ namespace basis {
 
     std::ostringstream os;
 
-    const int lw = 3;
+    const int width = 3;
 
     for (int subspace_index=0; subspace_index<size(); ++subspace_index)
       {
 	const SubspaceType& subspace = GetSubspace(subspace_index);
+        
 	os
 	  << " " << "index"
-	  << " " << std::setw(lw) << subspace_index
+	  << " " << std::setw(width) << subspace_index
 	  << " " << "species"
-	  << " " << std::setw(lw) << int(subspace.orbital_species()) 
+	  << " " << std::setw(width) << int(subspace.orbital_species()) 
 	  << " " << "dim"
-	  << " " << std::setw(lw) << subspace.size()
+	  << " " << std::setw(width) << subspace.size()
 	  << " " << std::endl;
       }
 
@@ -113,6 +114,53 @@ namespace basis {
 
   }
 
+
+  std::string OrbitalSpacePN::OrbitalDefinitionStr() const
+  {
+
+    std::ostringstream os;
+
+    // header comments
+    os << "# MFDn SPorbital file" << std::endl;
+    os << "#   version" << std::endl;
+    os << "#   norb_p norb_n" << std::endl;
+    os << "#   index n l 2*j species weight" << std::endl;
+
+    // header line 1: version
+    int version = 15055;
+    os << version << std::endl;
+
+    // header line 2: dimensions
+    os << GetSubspace(0).size() << " " << GetSubspace(1).size() << std::endl;
+        
+    // data
+    const int width = 3;
+    const int precision = 8;
+    for (int subspace_index=0; subspace_index<size(); ++subspace_index)
+      {
+        // retrieve subspace
+	const SubspaceType& subspace = GetSubspace(subspace_index);
+
+        // iterate over states
+        for (int state_index=0; state_index<subspace.size(); ++state_index)
+          {
+            OrbitalStatePN state(subspace,state_index);
+            
+            os
+              << " " << std::setw(width) << state.index()+1  // 1-based
+              << " " << std::setw(width) << state.n()
+              << " " << std::setw(width) << state.l()
+              << " " << std::setw(width) << TwiceValue(state.j())
+              << " " << std::setw(width) << int(state.orbital_species())+1 // 1-based
+              << " " << std::fixed << std::setw(width+1+precision)
+              << std::setprecision(precision) << state.weight()
+              << std::endl;
+          }
+      }
+    
+    return os.str();
+
+  }
 
   //  ////////////////////////////////////////////////////////////////
   //  // two-body states in jjJT scheme
@@ -175,7 +223,7 @@ namespace basis {
   //
   //    std::ostringstream os;
   //
-  //    const int lw = 3;
+  //    const int width = 3;
   //
   //    for (int state_index=0; state_index<size(); ++state_index)
   //      {
@@ -183,14 +231,14 @@ namespace basis {
   //
   //        os
   //	  << " " << "index"
-  //	  << " " << std::setw(lw) << state_index
+  //	  << " " << std::setw(width) << state_index
   //	  << " " << "N1 l1 j1 N2 l2 j2"
-  //	  << " " << std::setw(lw) << state.N1()
-  //	  << " " << std::setw(lw) << state.l1()
-  //	  << " " << std::setw(lw) << state.j1()
-  //	  << " " << std::setw(lw) << state.N2()
-  //	  << " " << std::setw(lw) << state.l2()
-  //	  << " " << std::setw(lw) << state.j2()
+  //	  << " " << std::setw(width) << state.N1()
+  //	  << " " << std::setw(width) << state.l1()
+  //	  << " " << std::setw(width) << state.j1()
+  //	  << " " << std::setw(width) << state.N2()
+  //	  << " " << std::setw(width) << state.l2()
+  //	  << " " << std::setw(width) << state.j2()
   //          << std::endl;
   //      }
   //
@@ -233,22 +281,22 @@ namespace basis {
   //
   //    std::ostringstream os;
   //
-  //    const int lw = 3;
+  //    const int width = 3;
   //
   //    for (int subspace_index=0; subspace_index<size(); ++subspace_index)
   //      {
   //	const SubspaceType& subspace = GetSubspace(subspace_index);
   //	os
   //	  << " " << "index"
-  //	  << " " << std::setw(lw) << subspace_index
+  //	  << " " << std::setw(width) << subspace_index
   //	  << " " << "JTg"
-  //	  << " " << std::setw(lw) << subspace.J() 
-  //	  << " " << std::setw(lw) << subspace.T() 
-  //	  << " " << std::setw(lw) << subspace.g()
+  //	  << " " << std::setw(width) << subspace.J() 
+  //	  << " " << std::setw(width) << subspace.T() 
+  //	  << " " << std::setw(width) << subspace.g()
   //	  << " " << "Nmax"
-  //	  << " " << std::setw(lw) << subspace.Nmax()
+  //	  << " " << std::setw(width) << subspace.Nmax()
   //	  << " " << "dim"
-  //	  << " " << std::setw(lw) << subspace.size()
+  //	  << " " << std::setw(width) << subspace.size()
   //	  << " " << std::endl;
   //      }
   //

@@ -6,9 +6,9 @@
 
 ****************************************************************/
 
+#include <fstream>
 #include <iomanip>
 #include <iostream>
-
 
 #include "jjjpn_scheme_general.h"
 
@@ -16,7 +16,7 @@
 // test code
 ////////////////////////////////////////////////////////////////
 
-void test_orbitals_Nmax()
+void test_orbitals_Nmax(const std::string& filename)
 {
 
   ////////////////////////////////////////////////////////////////
@@ -43,6 +43,11 @@ void test_orbitals_Nmax()
 
       std::cout << subspace.DebugStr();
     }
+
+  // check file output
+  std::ofstream os(filename.c_str());
+  os << space.OrbitalDefinitionStr();
+
 }
 
 void test_two_body_Nmax()
@@ -118,7 +123,8 @@ void test_two_body_Nmax()
 int main(int argc, char **argv)
 {
 
-  test_orbitals_Nmax();
+  std::string filename("test/jjjpn_scheme_general_test_orbitals_Nmax04.dat");
+  test_orbitals_Nmax(filename);
   test_two_body_Nmax();
 
   // termination

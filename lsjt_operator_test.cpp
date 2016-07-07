@@ -146,14 +146,9 @@ void read_test(const std::string& filename)
 int main(int argc, char **argv)
 {
 
-  ////////////////////////////////////////////////////////////////
-  // relative basis tests
-  ////////////////////////////////////////////////////////////////
-
-  std::string filename("lsjt_operator_test_identity_Nmax02.dat");
+  std::string filename("test/lsjt_operator_test_identity_Nmax02.dat");
   write_test(filename);
   read_test(filename);
-
  
   // termination
   return 0;

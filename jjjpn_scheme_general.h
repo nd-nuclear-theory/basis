@@ -175,6 +175,14 @@ namespace basis {
     // diagnostic string
     std::string DebugStr() const;
 
+    // orbital tabulation
+    std::string OrbitalDefinitionStr() const;
+    // Generate orbital tabulation suitable for output as an MFDn
+    // Version 15 orbital file.
+    //
+    // See Pieter Maris's README_SPorbitals_2016June20.txt.
+
+
     private:
 
     // truncation

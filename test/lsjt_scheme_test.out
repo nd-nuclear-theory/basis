@@ -1,0 +1,461 @@
+Relative basis
+index 0 N 0
+index 1 N 2
+index 2 N 4
+index 3 N 6
+State construction by index
+N 0 index 0 N 0
+N 2 index 1 N 2
+N 4 index 2 N 4
+N 6 index 3 N 6
+State lookup
+N 0 index 0 N 0
+N 2 index 1 N 2
+N 4 index 2 N 4
+N 6 index 3 N 6
+Relative space
+ index   0  (L,S,J,T,g)    0   0   0   1   0 Nmax   2 dim   2 
+ index   1  (L,S,J,T,g)    0   1   1   0   0 Nmax   2 dim   2 
+ index   2  (L,S,J,T,g)    1   0   1   0   1 Nmax   1 dim   1 
+ index   3  (L,S,J,T,g)    1   1   0   1   1 Nmax   1 dim   1 
+ index   4  (L,S,J,T,g)    1   1   1   1   1 Nmax   1 dim   1 
+ index   5  (L,S,J,T,g)    1   1   2   1   1 Nmax   1 dim   1 
+ index   6  (L,S,J,T,g)    2   0   2   1   0 Nmax   2 dim   2 
+ index   7  (L,S,J,T,g)    2   1   1   0   0 Nmax   2 dim   2 
+ index   8  (L,S,J,T,g)    2   1   2   0   0 Nmax   2 dim   2 
+ index   9  (L,S,J,T,g)    2   1   3   0   0 Nmax   2 dim   2 
+Relative operator sectors
+ J0 0 T0 1 g0 0
+ sector   0      index   0 LSJTg   0  0  0  1  0 dim   2      index   0 LSJTg   0  0  0  1  0 dim   2 *
+ sector   1      index   2 LSJTg   1  0  1  0  1 dim   1      index   4 LSJTg   1  1  1  1  1 dim   1  
+ sector   2      index   3 LSJTg   1  1  0  1  1 dim   1      index   3 LSJTg   1  1  0  1  1 dim   1 *
+ sector   3      index   4 LSJTg   1  1  1  1  1 dim   1      index   4 LSJTg   1  1  1  1  1 dim   1 *
+ sector   4      index   5 LSJTg   1  1  2  1  1 dim   1      index   5 LSJTg   1  1  2  1  1 dim   1 *
+ sector   5      index   6 LSJTg   2  0  2  1  0 dim   2      index   6 LSJTg   2  0  2  1  0 dim   2 *
+ sector   6      index   6 LSJTg   2  0  2  1  0 dim   2      index   8 LSJTg   2  1  2  0  0 dim   2  
+Relative-c.m. basis
+Example subspace
+ index   0 Nr lr Nc lc   1   1   1   1
+Relative-c.m. space
+ index   0 LSJTg   0   0   0   0   0 Nmax   2 dim   1 
+ index   1 LSJTg   0   0   0   1   0 Nmax   2 dim   3 
+ index   2 LSJTg   0   1   1   0   0 Nmax   2 dim   3 
+ index   3 LSJTg   0   1   1   1   0 Nmax   2 dim   1 
+ index   4 LSJTg   1   0   1   0   0 Nmax   2 dim   1 
+ index   5 LSJTg   1   0   1   0   1 Nmax   1 dim   1 
+ index   6 LSJTg   1   0   1   1   1 Nmax   1 dim   1 
+ index   7 LSJTg   1   1   0   0   1 Nmax   1 dim   1 
+ index   8 LSJTg   1   1   0   1   0 Nmax   2 dim   1 
+ index   9 LSJTg   1   1   0   1   1 Nmax   1 dim   1 
+ index  10 LSJTg   1   1   1   0   1 Nmax   1 dim   1 
+ index  11 LSJTg   1   1   1   1   0 Nmax   2 dim   1 
+ index  12 LSJTg   1   1   1   1   1 Nmax   1 dim   1 
+ index  13 LSJTg   1   1   2   0   1 Nmax   1 dim   1 
+ index  14 LSJTg   1   1   2   1   0 Nmax   2 dim   1 
+ index  15 LSJTg   1   1   2   1   1 Nmax   1 dim   1 
+ index  16 LSJTg   2   0   2   0   0 Nmax   2 dim   1 
+ index  17 LSJTg   2   0   2   1   0 Nmax   2 dim   2 
+ index  18 LSJTg   2   1   1   0   0 Nmax   2 dim   2 
+ index  19 LSJTg   2   1   1   1   0 Nmax   2 dim   1 
+ index  20 LSJTg   2   1   2   0   0 Nmax   2 dim   2 
+ index  21 LSJTg   2   1   2   1   0 Nmax   2 dim   1 
+ index  22 LSJTg   2   1   3   0   0 Nmax   2 dim   2 
+ index  23 LSJTg   2   1   3   1   0 Nmax   2 dim   1 
+Relative-c.m. operator sectors
+ J0 2 T0 0 g0 0
+ sector   0      index   0 LSJTg   0  0  0  0  0 dim   1      index  16 LSJTg   2  0  2  0  0 dim   1
+ sector   1      index   0 LSJTg   0  0  0  0  0 dim   1      index  20 LSJTg   2  1  2  0  0 dim   2
+ sector   2      index   1 LSJTg   0  0  0  1  0 dim   3      index  14 LSJTg   1  1  2  1  0 dim   1
+ sector   3      index   1 LSJTg   0  0  0  1  0 dim   3      index  17 LSJTg   2  0  2  1  0 dim   2
+ sector   4      index   1 LSJTg   0  0  0  1  0 dim   3      index  21 LSJTg   2  1  2  1  0 dim   1
+ sector   5      index   2 LSJTg   0  1  1  0  0 dim   3      index   2 LSJTg   0  1  1  0  0 dim   3
+ sector   6      index   2 LSJTg   0  1  1  0  0 dim   3      index   4 LSJTg   1  0  1  0  0 dim   1
+ sector   7      index   2 LSJTg   0  1  1  0  0 dim   3      index  16 LSJTg   2  0  2  0  0 dim   1
+ sector   8      index   2 LSJTg   0  1  1  0  0 dim   3      index  18 LSJTg   2  1  1  0  0 dim   2
+ sector   9      index   2 LSJTg   0  1  1  0  0 dim   3      index  20 LSJTg   2  1  2  0  0 dim   2
+ sector  10      index   2 LSJTg   0  1  1  0  0 dim   3      index  22 LSJTg   2  1  3  0  0 dim   2
+ sector  11      index   3 LSJTg   0  1  1  1  0 dim   1      index   3 LSJTg   0  1  1  1  0 dim   1
+ sector  12      index   3 LSJTg   0  1  1  1  0 dim   1      index  11 LSJTg   1  1  1  1  0 dim   1
+ sector  13      index   3 LSJTg   0  1  1  1  0 dim   1      index  14 LSJTg   1  1  2  1  0 dim   1
+ sector  14      index   3 LSJTg   0  1  1  1  0 dim   1      index  17 LSJTg   2  0  2  1  0 dim   2
+ sector  15      index   3 LSJTg   0  1  1  1  0 dim   1      index  19 LSJTg   2  1  1  1  0 dim   1
+ sector  16      index   3 LSJTg   0  1  1  1  0 dim   1      index  21 LSJTg   2  1  2  1  0 dim   1
+ sector  17      index   3 LSJTg   0  1  1  1  0 dim   1      index  23 LSJTg   2  1  3  1  0 dim   1
+ sector  18      index   4 LSJTg   1  0  1  0  0 dim   1      index   4 LSJTg   1  0  1  0  0 dim   1
+ sector  19      index   4 LSJTg   1  0  1  0  0 dim   1      index  16 LSJTg   2  0  2  0  0 dim   1
+ sector  20      index   4 LSJTg   1  0  1  0  0 dim   1      index  18 LSJTg   2  1  1  0  0 dim   2
+ sector  21      index   4 LSJTg   1  0  1  0  0 dim   1      index  20 LSJTg   2  1  2  0  0 dim   2
+ sector  22      index   4 LSJTg   1  0  1  0  0 dim   1      index  22 LSJTg   2  1  3  0  0 dim   2
+ sector  23      index   5 LSJTg   1  0  1  0  1 dim   1      index   5 LSJTg   1  0  1  0  1 dim   1
+ sector  24      index   5 LSJTg   1  0  1  0  1 dim   1      index  10 LSJTg   1  1  1  0  1 dim   1
+ sector  25      index   5 LSJTg   1  0  1  0  1 dim   1      index  13 LSJTg   1  1  2  0  1 dim   1
+ sector  26      index   6 LSJTg   1  0  1  1  1 dim   1      index   6 LSJTg   1  0  1  1  1 dim   1
+ sector  27      index   6 LSJTg   1  0  1  1  1 dim   1      index  12 LSJTg   1  1  1  1  1 dim   1
+ sector  28      index   6 LSJTg   1  0  1  1  1 dim   1      index  15 LSJTg   1  1  2  1  1 dim   1
+ sector  29      index   7 LSJTg   1  1  0  0  1 dim   1      index  13 LSJTg   1  1  2  0  1 dim   1
+ sector  30      index   8 LSJTg   1  1  0  1  0 dim   1      index  14 LSJTg   1  1  2  1  0 dim   1
+ sector  31      index   8 LSJTg   1  1  0  1  0 dim   1      index  17 LSJTg   2  0  2  1  0 dim   2
+ sector  32      index   8 LSJTg   1  1  0  1  0 dim   1      index  21 LSJTg   2  1  2  1  0 dim   1
+ sector  33      index   9 LSJTg   1  1  0  1  1 dim   1      index  15 LSJTg   1  1  2  1  1 dim   1
+ sector  34      index  10 LSJTg   1  1  1  0  1 dim   1      index  10 LSJTg   1  1  1  0  1 dim   1
+ sector  35      index  10 LSJTg   1  1  1  0  1 dim   1      index  13 LSJTg   1  1  2  0  1 dim   1
+ sector  36      index  11 LSJTg   1  1  1  1  0 dim   1      index  11 LSJTg   1  1  1  1  0 dim   1
+ sector  37      index  11 LSJTg   1  1  1  1  0 dim   1      index  14 LSJTg   1  1  2  1  0 dim   1
+ sector  38      index  11 LSJTg   1  1  1  1  0 dim   1      index  17 LSJTg   2  0  2  1  0 dim   2
+ sector  39      index  11 LSJTg   1  1  1  1  0 dim   1      index  19 LSJTg   2  1  1  1  0 dim   1
+ sector  40      index  11 LSJTg   1  1  1  1  0 dim   1      index  21 LSJTg   2  1  2  1  0 dim   1
+ sector  41      index  11 LSJTg   1  1  1  1  0 dim   1      index  23 LSJTg   2  1  3  1  0 dim   1
+ sector  42      index  12 LSJTg   1  1  1  1  1 dim   1      index  12 LSJTg   1  1  1  1  1 dim   1
+ sector  43      index  12 LSJTg   1  1  1  1  1 dim   1      index  15 LSJTg   1  1  2  1  1 dim   1
+ sector  44      index  13 LSJTg   1  1  2  0  1 dim   1      index  13 LSJTg   1  1  2  0  1 dim   1
+ sector  45      index  14 LSJTg   1  1  2  1  0 dim   1      index  14 LSJTg   1  1  2  1  0 dim   1
+ sector  46      index  14 LSJTg   1  1  2  1  0 dim   1      index  17 LSJTg   2  0  2  1  0 dim   2
+ sector  47      index  14 LSJTg   1  1  2  1  0 dim   1      index  19 LSJTg   2  1  1  1  0 dim   1
+ sector  48      index  14 LSJTg   1  1  2  1  0 dim   1      index  21 LSJTg   2  1  2  1  0 dim   1
+ sector  49      index  14 LSJTg   1  1  2  1  0 dim   1      index  23 LSJTg   2  1  3  1  0 dim   1
+ sector  50      index  15 LSJTg   1  1  2  1  1 dim   1      index  15 LSJTg   1  1  2  1  1 dim   1
+ sector  51      index  16 LSJTg   2  0  2  0  0 dim   1      index  16 LSJTg   2  0  2  0  0 dim   1
+ sector  52      index  16 LSJTg   2  0  2  0  0 dim   1      index  18 LSJTg   2  1  1  0  0 dim   2
+ sector  53      index  16 LSJTg   2  0  2  0  0 dim   1      index  20 LSJTg   2  1  2  0  0 dim   2
+ sector  54      index  16 LSJTg   2  0  2  0  0 dim   1      index  22 LSJTg   2  1  3  0  0 dim   2
+ sector  55      index  17 LSJTg   2  0  2  1  0 dim   2      index  17 LSJTg   2  0  2  1  0 dim   2
+ sector  56      index  17 LSJTg   2  0  2  1  0 dim   2      index  19 LSJTg   2  1  1  1  0 dim   1
+ sector  57      index  17 LSJTg   2  0  2  1  0 dim   2      index  21 LSJTg   2  1  2  1  0 dim   1
+ sector  58      index  17 LSJTg   2  0  2  1  0 dim   2      index  23 LSJTg   2  1  3  1  0 dim   1
+ sector  59      index  18 LSJTg   2  1  1  0  0 dim   2      index  18 LSJTg   2  1  1  0  0 dim   2
+ sector  60      index  18 LSJTg   2  1  1  0  0 dim   2      index  20 LSJTg   2  1  2  0  0 dim   2
+ sector  61      index  18 LSJTg   2  1  1  0  0 dim   2      index  22 LSJTg   2  1  3  0  0 dim   2
+ sector  62      index  19 LSJTg   2  1  1  1  0 dim   1      index  19 LSJTg   2  1  1  1  0 dim   1
+ sector  63      index  19 LSJTg   2  1  1  1  0 dim   1      index  21 LSJTg   2  1  2  1  0 dim   1
+ sector  64      index  19 LSJTg   2  1  1  1  0 dim   1      index  23 LSJTg   2  1  3  1  0 dim   1
+ sector  65      index  20 LSJTg   2  1  2  0  0 dim   2      index  20 LSJTg   2  1  2  0  0 dim   2
+ sector  66      index  20 LSJTg   2  1  2  0  0 dim   2      index  22 LSJTg   2  1  3  0  0 dim   2
+ sector  67      index  21 LSJTg   2  1  2  1  0 dim   1      index  21 LSJTg   2  1  2  1  0 dim   1
+ sector  68      index  21 LSJTg   2  1  2  1  0 dim   1      index  23 LSJTg   2  1  3  1  0 dim   1
+ sector  69      index  22 LSJTg   2  1  3  0  0 dim   2      index  22 LSJTg   2  1  3  0  0 dim   2
+ sector  70      index  23 LSJTg   2  1  3  1  0 dim   1      index  23 LSJTg   2  1  3  1  0 dim   1
+Relative-c.m. basis -- subspaced by N
+Relative-c.m. space
+ index   0 LSJTg   0   0   0   1   0 N   0 dim   1 
+ index   1 LSJTg   0   1   1   0   0 N   0 dim   1 
+ index   2 LSJTg   1   0   1   0   1 N   1 dim   1 
+ index   3 LSJTg   1   0   1   1   1 N   1 dim   1 
+ index   4 LSJTg   1   1   0   0   1 N   1 dim   1 
+ index   5 LSJTg   1   1   0   1   1 N   1 dim   1 
+ index   6 LSJTg   1   1   1   0   1 N   1 dim   1 
+ index   7 LSJTg   1   1   1   1   1 N   1 dim   1 
+ index   8 LSJTg   1   1   2   0   1 N   1 dim   1 
+ index   9 LSJTg   1   1   2   1   1 N   1 dim   1 
+ index  10 LSJTg   0   0   0   0   0 N   2 dim   1 
+ index  11 LSJTg   0   0   0   1   0 N   2 dim   2 
+ index  12 LSJTg   0   1   1   0   0 N   2 dim   2 
+ index  13 LSJTg   0   1   1   1   0 N   2 dim   1 
+ index  14 LSJTg   1   0   1   0   0 N   2 dim   1 
+ index  15 LSJTg   1   1   0   1   0 N   2 dim   1 
+ index  16 LSJTg   1   1   1   1   0 N   2 dim   1 
+ index  17 LSJTg   1   1   2   1   0 N   2 dim   1 
+ index  18 LSJTg   2   0   2   0   0 N   2 dim   1 
+ index  19 LSJTg   2   0   2   1   0 N   2 dim   2 
+ index  20 LSJTg   2   1   1   0   0 N   2 dim   2 
+ index  21 LSJTg   2   1   1   1   0 N   2 dim   1 
+ index  22 LSJTg   2   1   2   0   0 N   2 dim   2 
+ index  23 LSJTg   2   1   2   1   0 N   2 dim   1 
+ index  24 LSJTg   2   1   3   0   0 N   2 dim   2 
+ index  25 LSJTg   2   1   3   1   0 N   2 dim   1 
+Relative-c.m. operator sectors
+ J0 2 T0 0 g0 0
+ sector   0      index   0 LSJTg-N   0  0  0  1  0  0 dim   1      index  17 LSJTg-N   1  1  2  1  0  2 dim   1
+ sector   1      index   0 LSJTg-N   0  0  0  1  0  0 dim   1      index  19 LSJTg-N   2  0  2  1  0  2 dim   2
+ sector   2      index   0 LSJTg-N   0  0  0  1  0  0 dim   1      index  23 LSJTg-N   2  1  2  1  0  2 dim   1
+ sector   3      index   1 LSJTg-N   0  1  1  0  0  0 dim   1      index   1 LSJTg-N   0  1  1  0  0  0 dim   1
+ sector   4      index   1 LSJTg-N   0  1  1  0  0  0 dim   1      index  12 LSJTg-N   0  1  1  0  0  2 dim   2
+ sector   5      index   1 LSJTg-N   0  1  1  0  0  0 dim   1      index  14 LSJTg-N   1  0  1  0  0  2 dim   1
+ sector   6      index   1 LSJTg-N   0  1  1  0  0  0 dim   1      index  18 LSJTg-N   2  0  2  0  0  2 dim   1
+ sector   7      index   1 LSJTg-N   0  1  1  0  0  0 dim   1      index  20 LSJTg-N   2  1  1  0  0  2 dim   2
+ sector   8      index   1 LSJTg-N   0  1  1  0  0  0 dim   1      index  22 LSJTg-N   2  1  2  0  0  2 dim   2
+ sector   9      index   1 LSJTg-N   0  1  1  0  0  0 dim   1      index  24 LSJTg-N   2  1  3  0  0  2 dim   2
+ sector  10      index   2 LSJTg-N   1  0  1  0  1  1 dim   1      index   2 LSJTg-N   1  0  1  0  1  1 dim   1
+ sector  11      index   2 LSJTg-N   1  0  1  0  1  1 dim   1      index   6 LSJTg-N   1  1  1  0  1  1 dim   1
+ sector  12      index   2 LSJTg-N   1  0  1  0  1  1 dim   1      index   8 LSJTg-N   1  1  2  0  1  1 dim   1
+ sector  13      index   3 LSJTg-N   1  0  1  1  1  1 dim   1      index   3 LSJTg-N   1  0  1  1  1  1 dim   1
+ sector  14      index   3 LSJTg-N   1  0  1  1  1  1 dim   1      index   7 LSJTg-N   1  1  1  1  1  1 dim   1
+ sector  15      index   3 LSJTg-N   1  0  1  1  1  1 dim   1      index   9 LSJTg-N   1  1  2  1  1  1 dim   1
+ sector  16      index   4 LSJTg-N   1  1  0  0  1  1 dim   1      index   8 LSJTg-N   1  1  2  0  1  1 dim   1
+ sector  17      index   5 LSJTg-N   1  1  0  1  1  1 dim   1      index   9 LSJTg-N   1  1  2  1  1  1 dim   1
+ sector  18      index   6 LSJTg-N   1  1  1  0  1  1 dim   1      index   6 LSJTg-N   1  1  1  0  1  1 dim   1
+ sector  19      index   6 LSJTg-N   1  1  1  0  1  1 dim   1      index   8 LSJTg-N   1  1  2  0  1  1 dim   1
+ sector  20      index   7 LSJTg-N   1  1  1  1  1  1 dim   1      index   7 LSJTg-N   1  1  1  1  1  1 dim   1
+ sector  21      index   7 LSJTg-N   1  1  1  1  1  1 dim   1      index   9 LSJTg-N   1  1  2  1  1  1 dim   1
+ sector  22      index   8 LSJTg-N   1  1  2  0  1  1 dim   1      index   8 LSJTg-N   1  1  2  0  1  1 dim   1
+ sector  23      index   9 LSJTg-N   1  1  2  1  1  1 dim   1      index   9 LSJTg-N   1  1  2  1  1  1 dim   1
+ sector  24      index  10 LSJTg-N   0  0  0  0  0  2 dim   1      index  18 LSJTg-N   2  0  2  0  0  2 dim   1
+ sector  25      index  10 LSJTg-N   0  0  0  0  0  2 dim   1      index  22 LSJTg-N   2  1  2  0  0  2 dim   2
+ sector  26      index  11 LSJTg-N   0  0  0  1  0  2 dim   2      index  17 LSJTg-N   1  1  2  1  0  2 dim   1
+ sector  27      index  11 LSJTg-N   0  0  0  1  0  2 dim   2      index  19 LSJTg-N   2  0  2  1  0  2 dim   2
+ sector  28      index  11 LSJTg-N   0  0  0  1  0  2 dim   2      index  23 LSJTg-N   2  1  2  1  0  2 dim   1
+ sector  29      index  12 LSJTg-N   0  1  1  0  0  2 dim   2      index  12 LSJTg-N   0  1  1  0  0  2 dim   2
+ sector  30      index  12 LSJTg-N   0  1  1  0  0  2 dim   2      index  14 LSJTg-N   1  0  1  0  0  2 dim   1
+ sector  31      index  12 LSJTg-N   0  1  1  0  0  2 dim   2      index  18 LSJTg-N   2  0  2  0  0  2 dim   1
+ sector  32      index  12 LSJTg-N   0  1  1  0  0  2 dim   2      index  20 LSJTg-N   2  1  1  0  0  2 dim   2
+ sector  33      index  12 LSJTg-N   0  1  1  0  0  2 dim   2      index  22 LSJTg-N   2  1  2  0  0  2 dim   2
+ sector  34      index  12 LSJTg-N   0  1  1  0  0  2 dim   2      index  24 LSJTg-N   2  1  3  0  0  2 dim   2
+ sector  35      index  13 LSJTg-N   0  1  1  1  0  2 dim   1      index  13 LSJTg-N   0  1  1  1  0  2 dim   1
+ sector  36      index  13 LSJTg-N   0  1  1  1  0  2 dim   1      index  16 LSJTg-N   1  1  1  1  0  2 dim   1
+ sector  37      index  13 LSJTg-N   0  1  1  1  0  2 dim   1      index  17 LSJTg-N   1  1  2  1  0  2 dim   1
+ sector  38      index  13 LSJTg-N   0  1  1  1  0  2 dim   1      index  19 LSJTg-N   2  0  2  1  0  2 dim   2
+ sector  39      index  13 LSJTg-N   0  1  1  1  0  2 dim   1      index  21 LSJTg-N   2  1  1  1  0  2 dim   1
+ sector  40      index  13 LSJTg-N   0  1  1  1  0  2 dim   1      index  23 LSJTg-N   2  1  2  1  0  2 dim   1
+ sector  41      index  13 LSJTg-N   0  1  1  1  0  2 dim   1      index  25 LSJTg-N   2  1  3  1  0  2 dim   1
+ sector  42      index  14 LSJTg-N   1  0  1  0  0  2 dim   1      index  14 LSJTg-N   1  0  1  0  0  2 dim   1
+ sector  43      index  14 LSJTg-N   1  0  1  0  0  2 dim   1      index  18 LSJTg-N   2  0  2  0  0  2 dim   1
+ sector  44      index  14 LSJTg-N   1  0  1  0  0  2 dim   1      index  20 LSJTg-N   2  1  1  0  0  2 dim   2
+ sector  45      index  14 LSJTg-N   1  0  1  0  0  2 dim   1      index  22 LSJTg-N   2  1  2  0  0  2 dim   2
+ sector  46      index  14 LSJTg-N   1  0  1  0  0  2 dim   1      index  24 LSJTg-N   2  1  3  0  0  2 dim   2
+ sector  47      index  15 LSJTg-N   1  1  0  1  0  2 dim   1      index  17 LSJTg-N   1  1  2  1  0  2 dim   1
+ sector  48      index  15 LSJTg-N   1  1  0  1  0  2 dim   1      index  19 LSJTg-N   2  0  2  1  0  2 dim   2
+ sector  49      index  15 LSJTg-N   1  1  0  1  0  2 dim   1      index  23 LSJTg-N   2  1  2  1  0  2 dim   1
+ sector  50      index  16 LSJTg-N   1  1  1  1  0  2 dim   1      index  16 LSJTg-N   1  1  1  1  0  2 dim   1
+ sector  51      index  16 LSJTg-N   1  1  1  1  0  2 dim   1      index  17 LSJTg-N   1  1  2  1  0  2 dim   1
+ sector  52      index  16 LSJTg-N   1  1  1  1  0  2 dim   1      index  19 LSJTg-N   2  0  2  1  0  2 dim   2
+ sector  53      index  16 LSJTg-N   1  1  1  1  0  2 dim   1      index  21 LSJTg-N   2  1  1  1  0  2 dim   1
+ sector  54      index  16 LSJTg-N   1  1  1  1  0  2 dim   1      index  23 LSJTg-N   2  1  2  1  0  2 dim   1
+ sector  55      index  16 LSJTg-N   1  1  1  1  0  2 dim   1      index  25 LSJTg-N   2  1  3  1  0  2 dim   1
+ sector  56      index  17 LSJTg-N   1  1  2  1  0  2 dim   1      index  17 LSJTg-N   1  1  2  1  0  2 dim   1
+ sector  57      index  17 LSJTg-N   1  1  2  1  0  2 dim   1      index  19 LSJTg-N   2  0  2  1  0  2 dim   2
+ sector  58      index  17 LSJTg-N   1  1  2  1  0  2 dim   1      index  21 LSJTg-N   2  1  1  1  0  2 dim   1
+ sector  59      index  17 LSJTg-N   1  1  2  1  0  2 dim   1      index  23 LSJTg-N   2  1  2  1  0  2 dim   1
+ sector  60      index  17 LSJTg-N   1  1  2  1  0  2 dim   1      index  25 LSJTg-N   2  1  3  1  0  2 dim   1
+ sector  61      index  18 LSJTg-N   2  0  2  0  0  2 dim   1      index  18 LSJTg-N   2  0  2  0  0  2 dim   1
+ sector  62      index  18 LSJTg-N   2  0  2  0  0  2 dim   1      index  20 LSJTg-N   2  1  1  0  0  2 dim   2
+ sector  63      index  18 LSJTg-N   2  0  2  0  0  2 dim   1      index  22 LSJTg-N   2  1  2  0  0  2 dim   2
+ sector  64      index  18 LSJTg-N   2  0  2  0  0  2 dim   1      index  24 LSJTg-N   2  1  3  0  0  2 dim   2
+ sector  65      index  19 LSJTg-N   2  0  2  1  0  2 dim   2      index  19 LSJTg-N   2  0  2  1  0  2 dim   2
+ sector  66      index  19 LSJTg-N   2  0  2  1  0  2 dim   2      index  21 LSJTg-N   2  1  1  1  0  2 dim   1
+ sector  67      index  19 LSJTg-N   2  0  2  1  0  2 dim   2      index  23 LSJTg-N   2  1  2  1  0  2 dim   1
+ sector  68      index  19 LSJTg-N   2  0  2  1  0  2 dim   2      index  25 LSJTg-N   2  1  3  1  0  2 dim   1
+ sector  69      index  20 LSJTg-N   2  1  1  0  0  2 dim   2      index  20 LSJTg-N   2  1  1  0  0  2 dim   2
+ sector  70      index  20 LSJTg-N   2  1  1  0  0  2 dim   2      index  22 LSJTg-N   2  1  2  0  0  2 dim   2
+ sector  71      index  20 LSJTg-N   2  1  1  0  0  2 dim   2      index  24 LSJTg-N   2  1  3  0  0  2 dim   2
+ sector  72      index  21 LSJTg-N   2  1  1  1  0  2 dim   1      index  21 LSJTg-N   2  1  1  1  0  2 dim   1
+ sector  73      index  21 LSJTg-N   2  1  1  1  0  2 dim   1      index  23 LSJTg-N   2  1  2  1  0  2 dim   1
+ sector  74      index  21 LSJTg-N   2  1  1  1  0  2 dim   1      index  25 LSJTg-N   2  1  3  1  0  2 dim   1
+ sector  75      index  22 LSJTg-N   2  1  2  0  0  2 dim   2      index  22 LSJTg-N   2  1  2  0  0  2 dim   2
+ sector  76      index  22 LSJTg-N   2  1  2  0  0  2 dim   2      index  24 LSJTg-N   2  1  3  0  0  2 dim   2
+ sector  77      index  23 LSJTg-N   2  1  2  1  0  2 dim   1      index  23 LSJTg-N   2  1  2  1  0  2 dim   1
+ sector  78      index  23 LSJTg-N   2  1  2  1  0  2 dim   1      index  25 LSJTg-N   2  1  3  1  0  2 dim   1
+ sector  79      index  24 LSJTg-N   2  1  3  0  0  2 dim   2      index  24 LSJTg-N   2  1  3  0  0  2 dim   2
+ sector  80      index  25 LSJTg-N   2  1  3  1  0  2 dim   1      index  25 LSJTg-N   2  1  3  1  0  2 dim   1
+Two-body basis
+Example subspace
+ index   0 N1 l1 N2 l2   0   0   2   0
+Two-body space
+ index   0 LSJTg   0   0   0   0   0 Nmax   2 dim   1 
+ index   1 LSJTg   0   0   0   1   0 Nmax   2 dim   3 
+ index   2 LSJTg   0   1   1   0   0 Nmax   2 dim   3 
+ index   3 LSJTg   0   1   1   1   0 Nmax   2 dim   1 
+ index   4 LSJTg   1   0   1   0   0 Nmax   2 dim   1 
+ index   5 LSJTg   1   0   1   0   1 Nmax   1 dim   1 
+ index   6 LSJTg   1   0   1   1   1 Nmax   1 dim   1 
+ index   7 LSJTg   1   1   0   0   1 Nmax   1 dim   1 
+ index   8 LSJTg   1   1   0   1   0 Nmax   2 dim   1 
+ index   9 LSJTg   1   1   0   1   1 Nmax   1 dim   1 
+ index  10 LSJTg   1   1   1   0   1 Nmax   1 dim   1 
+ index  11 LSJTg   1   1   1   1   0 Nmax   2 dim   1 
+ index  12 LSJTg   1   1   1   1   1 Nmax   1 dim   1 
+ index  13 LSJTg   1   1   2   0   1 Nmax   1 dim   1 
+ index  14 LSJTg   1   1   2   1   0 Nmax   2 dim   1 
+ index  15 LSJTg   1   1   2   1   1 Nmax   1 dim   1 
+ index  16 LSJTg   2   0   2   0   0 Nmax   2 dim   1 
+ index  17 LSJTg   2   0   2   1   0 Nmax   2 dim   2 
+ index  18 LSJTg   2   1   1   0   0 Nmax   2 dim   2 
+ index  19 LSJTg   2   1   1   1   0 Nmax   2 dim   1 
+ index  20 LSJTg   2   1   2   0   0 Nmax   2 dim   2 
+ index  21 LSJTg   2   1   2   1   0 Nmax   2 dim   1 
+ index  22 LSJTg   2   1   3   0   0 Nmax   2 dim   2 
+ index  23 LSJTg   2   1   3   1   0 Nmax   2 dim   1 
+Two-body operator sectors
+ J0 2 T0 0 g0 0
+ sector   0      index   0 LSJTg   0  0  0  0  0 dim   1      index  16 LSJTg   2  0  2  0  0 dim   1
+ sector   1      index   0 LSJTg   0  0  0  0  0 dim   1      index  20 LSJTg   2  1  2  0  0 dim   2
+ sector   2      index   1 LSJTg   0  0  0  1  0 dim   3      index  14 LSJTg   1  1  2  1  0 dim   1
+ sector   3      index   1 LSJTg   0  0  0  1  0 dim   3      index  17 LSJTg   2  0  2  1  0 dim   2
+ sector   4      index   1 LSJTg   0  0  0  1  0 dim   3      index  21 LSJTg   2  1  2  1  0 dim   1
+ sector   5      index   2 LSJTg   0  1  1  0  0 dim   3      index   2 LSJTg   0  1  1  0  0 dim   3
+ sector   6      index   2 LSJTg   0  1  1  0  0 dim   3      index   4 LSJTg   1  0  1  0  0 dim   1
+ sector   7      index   2 LSJTg   0  1  1  0  0 dim   3      index  16 LSJTg   2  0  2  0  0 dim   1
+ sector   8      index   2 LSJTg   0  1  1  0  0 dim   3      index  18 LSJTg   2  1  1  0  0 dim   2
+ sector   9      index   2 LSJTg   0  1  1  0  0 dim   3      index  20 LSJTg   2  1  2  0  0 dim   2
+ sector  10      index   2 LSJTg   0  1  1  0  0 dim   3      index  22 LSJTg   2  1  3  0  0 dim   2
+ sector  11      index   3 LSJTg   0  1  1  1  0 dim   1      index   3 LSJTg   0  1  1  1  0 dim   1
+ sector  12      index   3 LSJTg   0  1  1  1  0 dim   1      index  11 LSJTg   1  1  1  1  0 dim   1
+ sector  13      index   3 LSJTg   0  1  1  1  0 dim   1      index  14 LSJTg   1  1  2  1  0 dim   1
+ sector  14      index   3 LSJTg   0  1  1  1  0 dim   1      index  17 LSJTg   2  0  2  1  0 dim   2
+ sector  15      index   3 LSJTg   0  1  1  1  0 dim   1      index  19 LSJTg   2  1  1  1  0 dim   1
+ sector  16      index   3 LSJTg   0  1  1  1  0 dim   1      index  21 LSJTg   2  1  2  1  0 dim   1
+ sector  17      index   3 LSJTg   0  1  1  1  0 dim   1      index  23 LSJTg   2  1  3  1  0 dim   1
+ sector  18      index   4 LSJTg   1  0  1  0  0 dim   1      index   4 LSJTg   1  0  1  0  0 dim   1
+ sector  19      index   4 LSJTg   1  0  1  0  0 dim   1      index  16 LSJTg   2  0  2  0  0 dim   1
+ sector  20      index   4 LSJTg   1  0  1  0  0 dim   1      index  18 LSJTg   2  1  1  0  0 dim   2
+ sector  21      index   4 LSJTg   1  0  1  0  0 dim   1      index  20 LSJTg   2  1  2  0  0 dim   2
+ sector  22      index   4 LSJTg   1  0  1  0  0 dim   1      index  22 LSJTg   2  1  3  0  0 dim   2
+ sector  23      index   5 LSJTg   1  0  1  0  1 dim   1      index   5 LSJTg   1  0  1  0  1 dim   1
+ sector  24      index   5 LSJTg   1  0  1  0  1 dim   1      index  10 LSJTg   1  1  1  0  1 dim   1
+ sector  25      index   5 LSJTg   1  0  1  0  1 dim   1      index  13 LSJTg   1  1  2  0  1 dim   1
+ sector  26      index   6 LSJTg   1  0  1  1  1 dim   1      index   6 LSJTg   1  0  1  1  1 dim   1
+ sector  27      index   6 LSJTg   1  0  1  1  1 dim   1      index  12 LSJTg   1  1  1  1  1 dim   1
+ sector  28      index   6 LSJTg   1  0  1  1  1 dim   1      index  15 LSJTg   1  1  2  1  1 dim   1
+ sector  29      index   7 LSJTg   1  1  0  0  1 dim   1      index  13 LSJTg   1  1  2  0  1 dim   1
+ sector  30      index   8 LSJTg   1  1  0  1  0 dim   1      index  14 LSJTg   1  1  2  1  0 dim   1
+ sector  31      index   8 LSJTg   1  1  0  1  0 dim   1      index  17 LSJTg   2  0  2  1  0 dim   2
+ sector  32      index   8 LSJTg   1  1  0  1  0 dim   1      index  21 LSJTg   2  1  2  1  0 dim   1
+ sector  33      index   9 LSJTg   1  1  0  1  1 dim   1      index  15 LSJTg   1  1  2  1  1 dim   1
+ sector  34      index  10 LSJTg   1  1  1  0  1 dim   1      index  10 LSJTg   1  1  1  0  1 dim   1
+ sector  35      index  10 LSJTg   1  1  1  0  1 dim   1      index  13 LSJTg   1  1  2  0  1 dim   1
+ sector  36      index  11 LSJTg   1  1  1  1  0 dim   1      index  11 LSJTg   1  1  1  1  0 dim   1
+ sector  37      index  11 LSJTg   1  1  1  1  0 dim   1      index  14 LSJTg   1  1  2  1  0 dim   1
+ sector  38      index  11 LSJTg   1  1  1  1  0 dim   1      index  17 LSJTg   2  0  2  1  0 dim   2
+ sector  39      index  11 LSJTg   1  1  1  1  0 dim   1      index  19 LSJTg   2  1  1  1  0 dim   1
+ sector  40      index  11 LSJTg   1  1  1  1  0 dim   1      index  21 LSJTg   2  1  2  1  0 dim   1
+ sector  41      index  11 LSJTg   1  1  1  1  0 dim   1      index  23 LSJTg   2  1  3  1  0 dim   1
+ sector  42      index  12 LSJTg   1  1  1  1  1 dim   1      index  12 LSJTg   1  1  1  1  1 dim   1
+ sector  43      index  12 LSJTg   1  1  1  1  1 dim   1      index  15 LSJTg   1  1  2  1  1 dim   1
+ sector  44      index  13 LSJTg   1  1  2  0  1 dim   1      index  13 LSJTg   1  1  2  0  1 dim   1
+ sector  45      index  14 LSJTg   1  1  2  1  0 dim   1      index  14 LSJTg   1  1  2  1  0 dim   1
+ sector  46      index  14 LSJTg   1  1  2  1  0 dim   1      index  17 LSJTg   2  0  2  1  0 dim   2
+ sector  47      index  14 LSJTg   1  1  2  1  0 dim   1      index  19 LSJTg   2  1  1  1  0 dim   1
+ sector  48      index  14 LSJTg   1  1  2  1  0 dim   1      index  21 LSJTg   2  1  2  1  0 dim   1
+ sector  49      index  14 LSJTg   1  1  2  1  0 dim   1      index  23 LSJTg   2  1  3  1  0 dim   1
+ sector  50      index  15 LSJTg   1  1  2  1  1 dim   1      index  15 LSJTg   1  1  2  1  1 dim   1
+ sector  51      index  16 LSJTg   2  0  2  0  0 dim   1      index  16 LSJTg   2  0  2  0  0 dim   1
+ sector  52      index  16 LSJTg   2  0  2  0  0 dim   1      index  18 LSJTg   2  1  1  0  0 dim   2
+ sector  53      index  16 LSJTg   2  0  2  0  0 dim   1      index  20 LSJTg   2  1  2  0  0 dim   2
+ sector  54      index  16 LSJTg   2  0  2  0  0 dim   1      index  22 LSJTg   2  1  3  0  0 dim   2
+ sector  55      index  17 LSJTg   2  0  2  1  0 dim   2      index  17 LSJTg   2  0  2  1  0 dim   2
+ sector  56      index  17 LSJTg   2  0  2  1  0 dim   2      index  19 LSJTg   2  1  1  1  0 dim   1
+ sector  57      index  17 LSJTg   2  0  2  1  0 dim   2      index  21 LSJTg   2  1  2  1  0 dim   1
+ sector  58      index  17 LSJTg   2  0  2  1  0 dim   2      index  23 LSJTg   2  1  3  1  0 dim   1
+ sector  59      index  18 LSJTg   2  1  1  0  0 dim   2      index  18 LSJTg   2  1  1  0  0 dim   2
+ sector  60      index  18 LSJTg   2  1  1  0  0 dim   2      index  20 LSJTg   2  1  2  0  0 dim   2
+ sector  61      index  18 LSJTg   2  1  1  0  0 dim   2      index  22 LSJTg   2  1  3  0  0 dim   2
+ sector  62      index  19 LSJTg   2  1  1  1  0 dim   1      index  19 LSJTg   2  1  1  1  0 dim   1
+ sector  63      index  19 LSJTg   2  1  1  1  0 dim   1      index  21 LSJTg   2  1  2  1  0 dim   1
+ sector  64      index  19 LSJTg   2  1  1  1  0 dim   1      index  23 LSJTg   2  1  3  1  0 dim   1
+ sector  65      index  20 LSJTg   2  1  2  0  0 dim   2      index  20 LSJTg   2  1  2  0  0 dim   2
+ sector  66      index  20 LSJTg   2  1  2  0  0 dim   2      index  22 LSJTg   2  1  3  0  0 dim   2
+ sector  67      index  21 LSJTg   2  1  2  1  0 dim   1      index  21 LSJTg   2  1  2  1  0 dim   1
+ sector  68      index  21 LSJTg   2  1  2  1  0 dim   1      index  23 LSJTg   2  1  3  1  0 dim   1
+ sector  69      index  22 LSJTg   2  1  3  0  0 dim   2      index  22 LSJTg   2  1  3  0  0 dim   2
+ sector  70      index  23 LSJTg   2  1  3  1  0 dim   1      index  23 LSJTg   2  1  3  1  0 dim   1
+Two-body basis -- subspaced by N
+Example subspace
+ index   0 N1 l1 N2 l2   0   0   2   0
+Two-body space
+ index   0 LSJTg   0   0   0   1   0 N   0 dim   1 
+ index   1 LSJTg   0   1   1   0   0 N   0 dim   1 
+ index   2 LSJTg   1   0   1   0   1 N   1 dim   1 
+ index   3 LSJTg   1   0   1   1   1 N   1 dim   1 
+ index   4 LSJTg   1   1   0   0   1 N   1 dim   1 
+ index   5 LSJTg   1   1   0   1   1 N   1 dim   1 
+ index   6 LSJTg   1   1   1   0   1 N   1 dim   1 
+ index   7 LSJTg   1   1   1   1   1 N   1 dim   1 
+ index   8 LSJTg   1   1   2   0   1 N   1 dim   1 
+ index   9 LSJTg   1   1   2   1   1 N   1 dim   1 
+ index  10 LSJTg   0   0   0   0   0 N   2 dim   1 
+ index  11 LSJTg   0   0   0   1   0 N   2 dim   2 
+ index  12 LSJTg   0   1   1   0   0 N   2 dim   2 
+ index  13 LSJTg   0   1   1   1   0 N   2 dim   1 
+ index  14 LSJTg   1   0   1   0   0 N   2 dim   1 
+ index  15 LSJTg   1   1   0   1   0 N   2 dim   1 
+ index  16 LSJTg   1   1   1   1   0 N   2 dim   1 
+ index  17 LSJTg   1   1   2   1   0 N   2 dim   1 
+ index  18 LSJTg   2   0   2   0   0 N   2 dim   1 
+ index  19 LSJTg   2   0   2   1   0 N   2 dim   2 
+ index  20 LSJTg   2   1   1   0   0 N   2 dim   2 
+ index  21 LSJTg   2   1   1   1   0 N   2 dim   1 
+ index  22 LSJTg   2   1   2   0   0 N   2 dim   2 
+ index  23 LSJTg   2   1   2   1   0 N   2 dim   1 
+ index  24 LSJTg   2   1   3   0   0 N   2 dim   2 
+ index  25 LSJTg   2   1   3   1   0 N   2 dim   1 
+Two-body operator sectors
+ J0 2 T0 0 g0 0
+ sector   0      index   0 LSJTg-N   0  0  0  1  0  0 dim   1      index  17 LSJTg-N   1  1  2  1  0  2 dim   1
+ sector   1      index   0 LSJTg-N   0  0  0  1  0  0 dim   1      index  19 LSJTg-N   2  0  2  1  0  2 dim   2
+ sector   2      index   0 LSJTg-N   0  0  0  1  0  0 dim   1      index  23 LSJTg-N   2  1  2  1  0  2 dim   1
+ sector   3      index   1 LSJTg-N   0  1  1  0  0  0 dim   1      index   1 LSJTg-N   0  1  1  0  0  0 dim   1
+ sector   4      index   1 LSJTg-N   0  1  1  0  0  0 dim   1      index  12 LSJTg-N   0  1  1  0  0  2 dim   2
+ sector   5      index   1 LSJTg-N   0  1  1  0  0  0 dim   1      index  14 LSJTg-N   1  0  1  0  0  2 dim   1
+ sector   6      index   1 LSJTg-N   0  1  1  0  0  0 dim   1      index  18 LSJTg-N   2  0  2  0  0  2 dim   1
+ sector   7      index   1 LSJTg-N   0  1  1  0  0  0 dim   1      index  20 LSJTg-N   2  1  1  0  0  2 dim   2
+ sector   8      index   1 LSJTg-N   0  1  1  0  0  0 dim   1      index  22 LSJTg-N   2  1  2  0  0  2 dim   2
+ sector   9      index   1 LSJTg-N   0  1  1  0  0  0 dim   1      index  24 LSJTg-N   2  1  3  0  0  2 dim   2
+ sector  10      index   2 LSJTg-N   1  0  1  0  1  1 dim   1      index   2 LSJTg-N   1  0  1  0  1  1 dim   1
+ sector  11      index   2 LSJTg-N   1  0  1  0  1  1 dim   1      index   6 LSJTg-N   1  1  1  0  1  1 dim   1
+ sector  12      index   2 LSJTg-N   1  0  1  0  1  1 dim   1      index   8 LSJTg-N   1  1  2  0  1  1 dim   1
+ sector  13      index   3 LSJTg-N   1  0  1  1  1  1 dim   1      index   3 LSJTg-N   1  0  1  1  1  1 dim   1
+ sector  14      index   3 LSJTg-N   1  0  1  1  1  1 dim   1      index   7 LSJTg-N   1  1  1  1  1  1 dim   1
+ sector  15      index   3 LSJTg-N   1  0  1  1  1  1 dim   1      index   9 LSJTg-N   1  1  2  1  1  1 dim   1
+ sector  16      index   4 LSJTg-N   1  1  0  0  1  1 dim   1      index   8 LSJTg-N   1  1  2  0  1  1 dim   1
+ sector  17      index   5 LSJTg-N   1  1  0  1  1  1 dim   1      index   9 LSJTg-N   1  1  2  1  1  1 dim   1
+ sector  18      index   6 LSJTg-N   1  1  1  0  1  1 dim   1      index   6 LSJTg-N   1  1  1  0  1  1 dim   1
+ sector  19      index   6 LSJTg-N   1  1  1  0  1  1 dim   1      index   8 LSJTg-N   1  1  2  0  1  1 dim   1
+ sector  20      index   7 LSJTg-N   1  1  1  1  1  1 dim   1      index   7 LSJTg-N   1  1  1  1  1  1 dim   1
+ sector  21      index   7 LSJTg-N   1  1  1  1  1  1 dim   1      index   9 LSJTg-N   1  1  2  1  1  1 dim   1
+ sector  22      index   8 LSJTg-N   1  1  2  0  1  1 dim   1      index   8 LSJTg-N   1  1  2  0  1  1 dim   1
+ sector  23      index   9 LSJTg-N   1  1  2  1  1  1 dim   1      index   9 LSJTg-N   1  1  2  1  1  1 dim   1
+ sector  24      index  10 LSJTg-N   0  0  0  0  0  2 dim   1      index  18 LSJTg-N   2  0  2  0  0  2 dim   1
+ sector  25      index  10 LSJTg-N   0  0  0  0  0  2 dim   1      index  22 LSJTg-N   2  1  2  0  0  2 dim   2
+ sector  26      index  11 LSJTg-N   0  0  0  1  0  2 dim   2      index  17 LSJTg-N   1  1  2  1  0  2 dim   1
+ sector  27      index  11 LSJTg-N   0  0  0  1  0  2 dim   2      index  19 LSJTg-N   2  0  2  1  0  2 dim   2
+ sector  28      index  11 LSJTg-N   0  0  0  1  0  2 dim   2      index  23 LSJTg-N   2  1  2  1  0  2 dim   1
+ sector  29      index  12 LSJTg-N   0  1  1  0  0  2 dim   2      index  12 LSJTg-N   0  1  1  0  0  2 dim   2
+ sector  30      index  12 LSJTg-N   0  1  1  0  0  2 dim   2      index  14 LSJTg-N   1  0  1  0  0  2 dim   1
+ sector  31      index  12 LSJTg-N   0  1  1  0  0  2 dim   2      index  18 LSJTg-N   2  0  2  0  0  2 dim   1
+ sector  32      index  12 LSJTg-N   0  1  1  0  0  2 dim   2      index  20 LSJTg-N   2  1  1  0  0  2 dim   2
+ sector  33      index  12 LSJTg-N   0  1  1  0  0  2 dim   2      index  22 LSJTg-N   2  1  2  0  0  2 dim   2
+ sector  34      index  12 LSJTg-N   0  1  1  0  0  2 dim   2      index  24 LSJTg-N   2  1  3  0  0  2 dim   2
+ sector  35      index  13 LSJTg-N   0  1  1  1  0  2 dim   1      index  13 LSJTg-N   0  1  1  1  0  2 dim   1
+ sector  36      index  13 LSJTg-N   0  1  1  1  0  2 dim   1      index  16 LSJTg-N   1  1  1  1  0  2 dim   1
+ sector  37      index  13 LSJTg-N   0  1  1  1  0  2 dim   1      index  17 LSJTg-N   1  1  2  1  0  2 dim   1
+ sector  38      index  13 LSJTg-N   0  1  1  1  0  2 dim   1      index  19 LSJTg-N   2  0  2  1  0  2 dim   2
+ sector  39      index  13 LSJTg-N   0  1  1  1  0  2 dim   1      index  21 LSJTg-N   2  1  1  1  0  2 dim   1
+ sector  40      index  13 LSJTg-N   0  1  1  1  0  2 dim   1      index  23 LSJTg-N   2  1  2  1  0  2 dim   1
+ sector  41      index  13 LSJTg-N   0  1  1  1  0  2 dim   1      index  25 LSJTg-N   2  1  3  1  0  2 dim   1
+ sector  42      index  14 LSJTg-N   1  0  1  0  0  2 dim   1      index  14 LSJTg-N   1  0  1  0  0  2 dim   1
+ sector  43      index  14 LSJTg-N   1  0  1  0  0  2 dim   1      index  18 LSJTg-N   2  0  2  0  0  2 dim   1
+ sector  44      index  14 LSJTg-N   1  0  1  0  0  2 dim   1      index  20 LSJTg-N   2  1  1  0  0  2 dim   2
+ sector  45      index  14 LSJTg-N   1  0  1  0  0  2 dim   1      index  22 LSJTg-N   2  1  2  0  0  2 dim   2
+ sector  46      index  14 LSJTg-N   1  0  1  0  0  2 dim   1      index  24 LSJTg-N   2  1  3  0  0  2 dim   2
+ sector  47      index  15 LSJTg-N   1  1  0  1  0  2 dim   1      index  17 LSJTg-N   1  1  2  1  0  2 dim   1
+ sector  48      index  15 LSJTg-N   1  1  0  1  0  2 dim   1      index  19 LSJTg-N   2  0  2  1  0  2 dim   2
+ sector  49      index  15 LSJTg-N   1  1  0  1  0  2 dim   1      index  23 LSJTg-N   2  1  2  1  0  2 dim   1
+ sector  50      index  16 LSJTg-N   1  1  1  1  0  2 dim   1      index  16 LSJTg-N   1  1  1  1  0  2 dim   1
+ sector  51      index  16 LSJTg-N   1  1  1  1  0  2 dim   1      index  17 LSJTg-N   1  1  2  1  0  2 dim   1
+ sector  52      index  16 LSJTg-N   1  1  1  1  0  2 dim   1      index  19 LSJTg-N   2  0  2  1  0  2 dim   2
+ sector  53      index  16 LSJTg-N   1  1  1  1  0  2 dim   1      index  21 LSJTg-N   2  1  1  1  0  2 dim   1
+ sector  54      index  16 LSJTg-N   1  1  1  1  0  2 dim   1      index  23 LSJTg-N   2  1  2  1  0  2 dim   1
+ sector  55      index  16 LSJTg-N   1  1  1  1  0  2 dim   1      index  25 LSJTg-N   2  1  3  1  0  2 dim   1
+ sector  56      index  17 LSJTg-N   1  1  2  1  0  2 dim   1      index  17 LSJTg-N   1  1  2  1  0  2 dim   1
+ sector  57      index  17 LSJTg-N   1  1  2  1  0  2 dim   1      index  19 LSJTg-N   2  0  2  1  0  2 dim   2
+ sector  58      index  17 LSJTg-N   1  1  2  1  0  2 dim   1      index  21 LSJTg-N   2  1  1  1  0  2 dim   1
+ sector  59      index  17 LSJTg-N   1  1  2  1  0  2 dim   1      index  23 LSJTg-N   2  1  2  1  0  2 dim   1
+ sector  60      index  17 LSJTg-N   1  1  2  1  0  2 dim   1      index  25 LSJTg-N   2  1  3  1  0  2 dim   1
+ sector  61      index  18 LSJTg-N   2  0  2  0  0  2 dim   1      index  18 LSJTg-N   2  0  2  0  0  2 dim   1
+ sector  62      index  18 LSJTg-N   2  0  2  0  0  2 dim   1      index  20 LSJTg-N   2  1  1  0  0  2 dim   2
+ sector  63      index  18 LSJTg-N   2  0  2  0  0  2 dim   1      index  22 LSJTg-N   2  1  2  0  0  2 dim   2
+ sector  64      index  18 LSJTg-N   2  0  2  0  0  2 dim   1      index  24 LSJTg-N   2  1  3  0  0  2 dim   2
+ sector  65      index  19 LSJTg-N   2  0  2  1  0  2 dim   2      index  19 LSJTg-N   2  0  2  1  0  2 dim   2
+ sector  66      index  19 LSJTg-N   2  0  2  1  0  2 dim   2      index  21 LSJTg-N   2  1  1  1  0  2 dim   1
+ sector  67      index  19 LSJTg-N   2  0  2  1  0  2 dim   2      index  23 LSJTg-N   2  1  2  1  0  2 dim   1
+ sector  68      index  19 LSJTg-N   2  0  2  1  0  2 dim   2      index  25 LSJTg-N   2  1  3  1  0  2 dim   1
+ sector  69      index  20 LSJTg-N   2  1  1  0  0  2 dim   2      index  20 LSJTg-N   2  1  1  0  0  2 dim   2
+ sector  70      index  20 LSJTg-N   2  1  1  0  0  2 dim   2      index  22 LSJTg-N   2  1  2  0  0  2 dim   2
+ sector  71      index  20 LSJTg-N   2  1  1  0  0  2 dim   2      index  24 LSJTg-N   2  1  3  0  0  2 dim   2
+ sector  72      index  21 LSJTg-N   2  1  1  1  0  2 dim   1      index  21 LSJTg-N   2  1  1  1  0  2 dim   1
+ sector  73      index  21 LSJTg-N   2  1  1  1  0  2 dim   1      index  23 LSJTg-N   2  1  2  1  0  2 dim   1
+ sector  74      index  21 LSJTg-N   2  1  1  1  0  2 dim   1      index  25 LSJTg-N   2  1  3  1  0  2 dim   1
+ sector  75      index  22 LSJTg-N   2  1  2  0  0  2 dim   2      index  22 LSJTg-N   2  1  2  0  0  2 dim   2
+ sector  76      index  22 LSJTg-N   2  1  2  0  0  2 dim   2      index  24 LSJTg-N   2  1  3  0  0  2 dim   2
+ sector  77      index  23 LSJTg-N   2  1  2  1  0  2 dim   1      index  23 LSJTg-N   2  1  2  1  0  2 dim   1
+ sector  78      index  23 LSJTg-N   2  1  2  1  0  2 dim   1      index  25 LSJTg-N   2  1  3  1  0  2 dim   1
+ sector  79      index  24 LSJTg-N   2  1  3  0  0  2 dim   2      index  24 LSJTg-N   2  1  3  0  0  2 dim   2
+ sector  80      index  25 LSJTg-N   2  1  3  1  0  2 dim   1      index  25 LSJTg-N   2  1  3  1  0  2 dim   1
