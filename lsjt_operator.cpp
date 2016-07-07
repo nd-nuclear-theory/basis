@@ -90,7 +90,9 @@ namespace basis {
 	    
               // generate output line
               const int width = 3;
-	      const double matrix_element = matrices[sector_index](bra_index,ket_index);
+              const int precision = 16;
+              os << std::setprecision(precision);
+      	      const double matrix_element = matrices[sector_index](bra_index,ket_index);
 	      os 
 		<< " " << std::setw(width) << T0
 		<< " " << "  "

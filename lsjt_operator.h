@@ -17,7 +17,9 @@
     - Remove matrix-style output.
     - Remove generic template functions.
   7/3/16 (mac): Add relative LSJT operator file I/O.
-  7/6/16 (mac): Add symmetry phase header field and update documentation.
+  7/6/16 (mac):
+    - Add symmetry phase header field and update documentation.
+    - Upgrade precision on operator output.
 
 ****************************************************************/
 
@@ -218,6 +220,9 @@ namespace basis {
     );
   // Write single isospin component of a relative operator in LSJT
   // scheme.
+  //
+  // Side effect: The floating point precision attribute of the output
+  // stream is modified.
   //
   // Arguments:
   //   os (std::ostream) : text-mode output stream

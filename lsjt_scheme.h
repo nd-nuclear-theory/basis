@@ -8,9 +8,10 @@
   labels and an Nmax trunction) and then indexed states within
   the subspace.
 
-  Relations: Although some of the state types are built from (Nl)
-  orbitals, these are stored explicitly as (N,l) values, rather than
-  making use of shell_indexing_nl.
+  Variant indexing schemes where the subspaces are further broken down
+  by the number of oscillator quanta N are then provided, so that the
+  Moshinsky transformation implementation can be more easily broken
+  down by N blocks.
 
   See notes "Moshinsky xform for operators" (2015) for derivation
   of indexing scheme.
@@ -74,6 +75,7 @@ namespace basis {
   //   S (int): total spin
   //   J (int): total angular momentum of *relative* motion (=Jr)
   //            (i.e., L coupled to S)
+  //   T (int): isospin
   //   g (int): grade (=0,1) for the parity P of *relative* 
   //            motion (=gr)
   //
@@ -284,7 +286,18 @@ namespace basis {
   //
   // subspace labels: (L,S,J,T,g)
   //
+  //   L (int): orbital angular momentum
+  //   S (int): total spin
+  //   J (int): total angular momentum
+  //   T (int): isospin
+  //   g (int): grade (=0,1) for the parity P
+  //
   // state labels within subspace: (Nr,lr,Nc,lc)
+  //
+  //   Nr (int): oscillator quanta of relative motion
+  //   lr (int): orbital angular momentum of relative motion
+  //   Nc (int): oscillator quanta of c.m. motion
+  //   lc (int): orbital angular momentum of c.m. motion
   //
   ////////////////////////////////////////////////////////////////
   //
@@ -409,8 +422,7 @@ namespace basis {
     // constructor
 
     RelativeCMSpaceLSJT(int Nmax);
-    // Enumerates all relative LSJT subspaces of given dimension up to a
-    // given Nmax cutoff.
+    // Enumerate all subspaces up to a given Nmax cutoff.
 
     // accessors
     int Nmax() const {return Nmax_;}
@@ -589,8 +601,7 @@ namespace basis {
     // constructor
 
     RelativeCMSpaceNLSJT(int Nmax);
-    // Enumerates all relative NLSJT subspaces of given dimension up to a
-    // given Nmax cutoff.
+    // Enumerate all subspaces up to a given Nmax cutoff.
 
     // accessors
     int Nmax() const {return Nmax_;}
@@ -769,7 +780,7 @@ namespace basis {
     int N2() const {return std::get<2>(GetStateLabels());}
     int l2() const {return std::get<3>(GetStateLabels());}
 
-    int N() const {return  N1()+N2();}
+    int N() const {return N1()+N2();}
 
   };
 
@@ -784,8 +795,7 @@ namespace basis {
     // constructor
 
     TwoBodySpaceLSJT(int Nmax);
-    // Enumerates all relative LSJT subspaces of given dimension up to a
-    // given Nmax cutoff.
+    // Enumerate all subspaces up to a given Nmax cutoff.
 
     // accessors
     int Nmax() const {return Nmax_;}
@@ -947,7 +957,7 @@ namespace basis {
     int N2() const {return std::get<2>(GetStateLabels());}
     int l2() const {return std::get<3>(GetStateLabels());}
 
-    int N() const {return  N1()+N2();}
+    int N() const {return N1()+N2();}
 
   };
 
@@ -962,8 +972,7 @@ namespace basis {
     // constructor
 
     TwoBodySpaceNLSJT(int Nmax);
-    // Enumerates all relative NLSJT subspaces of given dimension up to a
-    // given Nmax cutoff.
+    // Enumerate all subspaces up to a given Nmax cutoff.
 
     // accessors
     int Nmax() const {return Nmax_;}
