@@ -150,7 +150,7 @@ int main(int argc, char **argv)
   // relative basis tests
   ////////////////////////////////////////////////////////////////
 
-  std::string filename("lsjt_operator_test_identity.dat");
+  std::string filename("lsjt_operator_test_identity_Nmax02.dat");
   write_test(filename);
   read_test(filename);
 

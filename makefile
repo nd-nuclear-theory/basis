@@ -9,11 +9,11 @@ modules_h = indexing
 
 # modules -- header-plus-object 
 ##modules_ho = jt_scheme
-modules_ho = lsjt_scheme lsjt_operator
+modules_ho = lsjt_scheme lsjt_operator jjjt_scheme
 
 # programs
 ##programs = jt_scheme_test
-programs = lsjt_scheme_test lsjt_operator_test
+programs = lsjt_scheme_test lsjt_operator_test jjjt_scheme_test
 ##programs += write_lsjt_relative
 CC := $(CXX)
 
