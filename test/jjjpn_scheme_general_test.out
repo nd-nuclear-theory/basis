@@ -1,0 +1,102 @@
+Orbitals -- Nmax scheme
+Space
+ index   0 species   0 dim  15 
+ index   1 species   1 dim  15 
+Subspaces
+ index 0 species 0
+ index   0 nlj   0   0   1/2 weight 0
+ index   1 nlj   0   1   1/2 weight 1
+ index   2 nlj   0   1   3/2 weight 1
+ index   3 nlj   1   0   1/2 weight 2
+ index   4 nlj   0   2   3/2 weight 2
+ index   5 nlj   0   2   5/2 weight 2
+ index   6 nlj   1   1   1/2 weight 3
+ index   7 nlj   1   1   3/2 weight 3
+ index   8 nlj   0   3   5/2 weight 3
+ index   9 nlj   0   3   7/2 weight 3
+ index  10 nlj   2   0   1/2 weight 4
+ index  11 nlj   1   2   3/2 weight 4
+ index  12 nlj   1   2   5/2 weight 4
+ index  13 nlj   0   4   7/2 weight 4
+ index  14 nlj   0   4   9/2 weight 4
+ index 1 species 1
+ index   0 nlj   0   0   1/2 weight 0
+ index   1 nlj   0   1   1/2 weight 1
+ index   2 nlj   0   1   3/2 weight 1
+ index   3 nlj   1   0   1/2 weight 2
+ index   4 nlj   0   2   3/2 weight 2
+ index   5 nlj   0   2   5/2 weight 2
+ index   6 nlj   1   1   1/2 weight 3
+ index   7 nlj   1   1   3/2 weight 3
+ index   8 nlj   0   3   5/2 weight 3
+ index   9 nlj   0   3   7/2 weight 3
+ index  10 nlj   2   0   1/2 weight 4
+ index  11 nlj   1   2   3/2 weight 4
+ index  12 nlj   1   2   5/2 weight 4
+ index  13 nlj   0   4   7/2 weight 4
+ index  14 nlj   0   4   9/2 weight 4
+Two-body basis -- Nmax scheme
+Example subspace
+  basis::TwoBodySpeciesPN::kPN,2,0,basis::WeightMax(2,4)
+ index   0 index1 index2   0   4 nlj1 nlj2   0   0   1/2   0   2   3/2
+ index   1 index1 index2   0   5 nlj1 nlj2   0   0   1/2   0   2   5/2
+ index   2 index1 index2   1   2 nlj1 nlj2   0   1   1/2   0   1   3/2
+ index   3 index1 index2   2   1 nlj1 nlj2   0   1   3/2   0   1   1/2
+ index   4 index1 index2   2   2 nlj1 nlj2   0   1   3/2   0   1   3/2
+ index   5 index1 index2   3   4 nlj1 nlj2   1   0   1/2   0   2   3/2
+ index   6 index1 index2   3   5 nlj1 nlj2   1   0   1/2   0   2   5/2
+ index   7 index1 index2   4   0 nlj1 nlj2   0   2   3/2   0   0   1/2
+ index   8 index1 index2   4   3 nlj1 nlj2   0   2   3/2   1   0   1/2
+ index   9 index1 index2   4   4 nlj1 nlj2   0   2   3/2   0   2   3/2
+ index  10 index1 index2   4   5 nlj1 nlj2   0   2   3/2   0   2   5/2
+ index  11 index1 index2   5   0 nlj1 nlj2   0   2   5/2   0   0   1/2
+ index  12 index1 index2   5   3 nlj1 nlj2   0   2   5/2   1   0   1/2
+ index  13 index1 index2   5   4 nlj1 nlj2   0   2   5/2   0   2   3/2
+ index  14 index1 index2   5   5 nlj1 nlj2   0   2   5/2   0   2   5/2
+Orbital subspace sizes 15 15
+Two-body space
+      basis::WeightMax(2,2)
+ index   0 sJg   0   0   0 dim   4 
+ index   1 sJg   0   0   1 dim   1 
+ index   2 sJg   0   1   0 dim   3 
+ index   3 sJg   0   1   1 dim   2 
+ index   4 sJg   0   2   0 dim   4 
+ index   5 sJg   0   2   1 dim   1 
+ index   6 sJg   0   3   0 dim   1 
+ index   7 sJg   1   0   0 dim   4 
+ index   8 sJg   1   0   1 dim   1 
+ index   9 sJg   1   1   0 dim   3 
+ index  10 sJg   1   1   1 dim   2 
+ index  11 sJg   1   2   0 dim   4 
+ index  12 sJg   1   2   1 dim   1 
+ index  13 sJg   1   3   0 dim   1 
+ index  14 sJg   2   0   0 dim   5 
+ index  15 sJg   2   0   1 dim   2 
+ index  16 sJg   2   1   0 dim   9 
+ index  17 sJg   2   1   1 dim   4 
+ index  18 sJg   2   2   0 dim   7 
+ index  19 sJg   2   2   1 dim   2 
+ index  20 sJg   2   3   0 dim   3 
+Two-body operator sectors
+ J0 0 g0 0
+ sector   0      index   0 sJg   0  0  0 dim   4      index   0 sJg   0  0  0 dim   4
+ sector   1      index   1 sJg   0  0  1 dim   1      index   1 sJg   0  0  1 dim   1
+ sector   2      index   2 sJg   0  1  0 dim   3      index   2 sJg   0  1  0 dim   3
+ sector   3      index   3 sJg   0  1  1 dim   2      index   3 sJg   0  1  1 dim   2
+ sector   4      index   4 sJg   0  2  0 dim   4      index   4 sJg   0  2  0 dim   4
+ sector   5      index   5 sJg   0  2  1 dim   1      index   5 sJg   0  2  1 dim   1
+ sector   6      index   6 sJg   0  3  0 dim   1      index   6 sJg   0  3  0 dim   1
+ sector   7      index   7 sJg   1  0  0 dim   4      index   7 sJg   1  0  0 dim   4
+ sector   8      index   8 sJg   1  0  1 dim   1      index   8 sJg   1  0  1 dim   1
+ sector   9      index   9 sJg   1  1  0 dim   3      index   9 sJg   1  1  0 dim   3
+ sector  10      index  10 sJg   1  1  1 dim   2      index  10 sJg   1  1  1 dim   2
+ sector  11      index  11 sJg   1  2  0 dim   4      index  11 sJg   1  2  0 dim   4
+ sector  12      index  12 sJg   1  2  1 dim   1      index  12 sJg   1  2  1 dim   1
+ sector  13      index  13 sJg   1  3  0 dim   1      index  13 sJg   1  3  0 dim   1
+ sector  14      index  14 sJg   2  0  0 dim   5      index  14 sJg   2  0  0 dim   5
+ sector  15      index  15 sJg   2  0  1 dim   2      index  15 sJg   2  0  1 dim   2
+ sector  16      index  16 sJg   2  1  0 dim   9      index  16 sJg   2  1  0 dim   9
+ sector  17      index  17 sJg   2  1  1 dim   4      index  17 sJg   2  1  1 dim   4
+ sector  18      index  18 sJg   2  2  0 dim   7      index  18 sJg   2  2  0 dim   7
+ sector  19      index  19 sJg   2  2  1 dim   2      index  19 sJg   2  2  1 dim   2
+ sector  20      index  20 sJg   2  3  0 dim   3      index  20 sJg   2  3  0 dim   3

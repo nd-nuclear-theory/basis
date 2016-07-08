@@ -1,0 +1,71 @@
+Two-body space
+ index   0 JTg   0   0   0 Nmax   2 dim   1 
+ index   1 JTg   0   0   1 Nmax   1 dim   1 
+ index   2 JTg   0   1   0 Nmax   2 dim   4 
+ index   3 JTg   0   1   1 Nmax   1 dim   1 
+ index   4 JTg   1   0   0 Nmax   2 dim   6 
+ index   5 JTg   1   0   1 Nmax   1 dim   2 
+ index   6 JTg   1   1   0 Nmax   2 dim   3 
+ index   7 JTg   1   1   1 Nmax   1 dim   2 
+ index   8 JTg   2   0   0 Nmax   2 dim   3 
+ index   9 JTg   2   0   1 Nmax   1 dim   1 
+ index  10 JTg   2   1   0 Nmax   2 dim   4 
+ index  11 JTg   2   1   1 Nmax   1 dim   1 
+ index  12 JTg   3   0   0 Nmax   2 dim   2 
+ index  13 JTg   3   1   0 Nmax   2 dim   1 
+
+Two-body space
+      basis::WeightMax(2,2)
+ index   0 sJg   0   0   0 dim   4 
+ index   1 sJg   0   0   1 dim   1 
+ index   2 sJg   0   1   0 dim   3 
+ index   3 sJg   0   1   1 dim   2 
+ index   4 sJg   0   2   0 dim   4 
+ index   5 sJg   0   2   1 dim   1 
+ index   6 sJg   0   3   0 dim   1 
+ index   7 sJg   1   0   0 dim   4 
+ index   8 sJg   1   0   1 dim   1 
+ index   9 sJg   1   1   0 dim   3 
+ index  10 sJg   1   1   1 dim   2 
+ index  11 sJg   1   2   0 dim   4 
+ index  12 sJg   1   2   1 dim   1 
+ index  13 sJg   1   3   0 dim   1 
+ index  14 sJg   2   0   0 dim   5 
+ index  15 sJg   2   0   1 dim   2 
+ index  16 sJg   2   1   0 dim   9 
+ index  17 sJg   2   1   1 dim   4 
+ index  18 sJg   2   2   0 dim   7 
+ index  19 sJg   2   2   1 dim   2 
+ index  20 sJg   2   3   0 dim   3 
+
+
+Jg=00
+
+ index   0 JTg   0   0   0 Nmax   2 dim   1 
+ index   2 JTg   0   1   0 Nmax   2 dim   4 
+
+ like 4 unlike 4+1=5
+
+ index   0 sJg   0   0   0 dim   4 
+ index   4 sJg   1   0   0 dim   4 
+ index   8 sJg   2   0   0 dim   5 
+
+Jg=01
+ index   1 JTg   0   0   1 Nmax   1 dim   1 
+ index   3 JTg   0   1   1 Nmax   1 dim   1 
+
+ like 1 unlike 1+1=2
+
+ index   1 sJg   0   0   1 dim   1 
+ index   5 sJg   1   0   1 dim   1 
+ index   9 sJg   2   0   1 dim   2 
+
+Jg=30
+ index  12 JTg   3   0   0 Nmax   2 dim   2 
+ index  13 JTg   3   1   0 Nmax   2 dim   1 
+
+ like 1 unlike 2+1=3
+
+ index   6 sJg   0   3   0 dim   1 
+ index  13 sJg   1   3   0 dim   1 
+ index  20 sJg   2   3   0 dim   3 

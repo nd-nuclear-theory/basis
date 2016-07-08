@@ -16,6 +16,7 @@
 #ifndef JJJPN_SCHEME_GENERAL_H_
 #define JJJPN_SCHEME_GENERAL_H_
 
+#include <array>
 #include <string>
 
 #include "am/halfint.h"
@@ -78,9 +79,14 @@ namespace basis {
   //
   ////////////////////////////////////////////////////////////////  
 
-  // labels
+  // enumerated type for orbital species
+  //
+  // Note: Follows same sequence as MFDn, but MFDn uses 1-based
+  // numbering.
 
   enum class OrbitalSpeciesPN {kP=0,kN=1};
+
+  // labels
 
   typedef std::tuple<OrbitalSpeciesPN> OrbitalSubspacePNLabels;
   typedef std::tuple<int,int,HalfInt> OrbitalStatePNLabels;
@@ -192,6 +198,223 @@ namespace basis {
   };
 
   // sectors -- not applicable
+
+  ////////////////////////////////////////////////////////////////
+  // two-body states in jjJpn scheme with general orbitals
+  ////////////////////////////////////////////////////////////////
+
+  ////////////////////////////////////////////////////////////////  
+  //
+  // Labeling
+  //
+  // subspace labels: (type,J,g)    P=(-)^g
+  //
+  //   species (enum): two-body species (equivalent to Tz)
+  //   J (int): total angular momentum
+  //   g (int): grade (=0,1) for the parity P
+  //
+  // state labels within subspace: (index1,index2)
+  //
+  //   index1 (int): index of particle 1 within appropriate
+  //     (proton or neutron) orbital set
+  //   index2 (int): index of particle 2 within appropriate
+  //     (proton or neutron) orbital set
+  //
+  ////////////////////////////////////////////////////////////////
+  //
+  // Subspaces
+  //
+  // Within the full space, subspaces are ordered by:
+  //    -- increasing type (type=pp,nn,pn)
+  //    -- increasing J
+  //    -- increasing g (g=0,1)
+  // 
+  // Subspaces are pruned to those of nonzero dimension.
+  //
+  // Note that ordering of subspaces is lexicographic by (type,J,g).
+  //
+  // Truncation of the space is by one-body and two-body weights.
+  //
+  ////////////////////////////////////////////////////////////////
+  //
+  // States
+  //
+  // Within a subspace, the states are ordered by:
+  //   -- increasing index1
+  //   -- increasing index2
+  // and subject to:
+  //   -- triangularity constraint on (j1,j2,J)
+  //   -- parity constraint g1+g2~g
+  //   -- in pp/nn subspaces, antisymmetry constraint J~0
+  //      if index1==index2
+  //
+  // This basis is for *identical* particle states:
+  //   -- In the pp/nn subspaces, the labels are subject to 
+  //      the antisymmetry constraint (J~0) if the orbitals are identical.
+  //   -- In the pp/nn subspaces, a canonical (lexicographic) ordering
+  //      constraint is applied to the single-particle quantum numbers.
+  //      That is, when enumerating the basis, the states
+  //    
+  //        |(index1,index2)...>  and  |(index2,index1)...>
+  //
+  //      would be redundant, and only the first (for index1<=index2) is
+  //      retained.
+  //
+  ////////////////////////////////////////////////////////////////  
+
+  // enumerated type for two-body state species
+  //
+  // Note: Follows same sequence as MFDn, but MFDn uses 1-based
+  // numbering.
+
+  enum class TwoBodySpeciesPN {kPP=0,kNN=1,kPN=2};
+
+  // maximum weight collection
+  struct WeightMax
+  {
+
+    // constructor
+
+    WeightMax() {};
+    // default constructor
+
+    WeightMax(int N1max, int N2max)
+    // Set conventional oscillator one-body/two-body trunctation.
+    {
+      one_body[0] = N1max;
+      one_body[1] = N1max;
+      two_body[0] = N2max;
+      two_body[1] = N2max;
+      two_body[2] = N2max;
+    }
+
+    // maximum weights 
+    std::array<double,2> one_body;
+    std::array<double,3> two_body;
+  };
+
+  // labels
+
+  typedef std::tuple<TwoBodySpeciesPN,int,int> TwoBodySubspaceJJJPNLabels;
+  typedef std::tuple<int,int> TwoBodyStateJJJPNLabels;
+
+  // subspace
+
+  class TwoBodySubspaceJJJPN
+    : public BaseSubspace<TwoBodySubspaceJJJPNLabels,TwoBodyStateJJJPNLabels>
+    {
+    
+      public:
+
+      // constructor
+      TwoBodySubspaceJJJPN(
+          const OrbitalSpacePN& orbital_space,
+          TwoBodySpeciesPN two_body_species, int J, int g,
+          const WeightMax& weight_max
+        );
+
+      // accessors
+      TwoBodySpeciesPN two_body_species() const {return std::get<0>(labels_);}
+      int J() const {return std::get<1>(labels_);}
+      int g() const {return std::get<2>(labels_);}
+      const WeightMax& weight_max() const {return weight_max_;}
+      const OrbitalSubspacePN& orbital_subspace1() const {return *orbital_subspace1_ptr_;}
+      const OrbitalSubspacePN& orbital_subspace2() const {return *orbital_subspace2_ptr_;}
+
+      // diagnostic string
+      std::string DebugStr() const;
+
+      private:
+
+      // truncation
+      WeightMax weight_max_;
+      
+      // direct access to orbital subspaces
+      const OrbitalSubspacePN* orbital_subspace1_ptr_;
+      const OrbitalSubspacePN* orbital_subspace2_ptr_;
+    };
+
+  // state
+
+  class TwoBodyStateJJJPN
+    : public BaseState<TwoBodySubspaceJJJPN>
+  {
+    
+    public:
+
+    // pass-through constructors
+
+    TwoBodyStateJJJPN(const SubspaceType& subspace, int index)
+      // Construct state by index.
+      : BaseState (subspace, index) {}
+
+    TwoBodyStateJJJPN(const SubspaceType& subspace, const StateLabelsType& state_labels)
+      // Construct state by reverse lookup on labels.
+      : BaseState (subspace, state_labels) {}
+
+    // pass-through accessors
+    TwoBodySpeciesPN two_body_species() const {return Subspace().two_body_species();}
+    int J() const {return Subspace().J();}
+    int g() const {return Subspace().g();}
+    const OrbitalSubspacePN& orbital_subspace1() const {return Subspace().orbital_subspace1();}
+    const OrbitalSubspacePN& orbital_subspace2() const {return Subspace().orbital_subspace1();}
+
+    // state label accessors
+    int index1() const {return std::get<0>(GetStateLabels());}
+    int index2() const {return std::get<1>(GetStateLabels());}
+
+  };
+
+  // space
+
+  class TwoBodySpaceJJJPN
+    : public BaseSpace<TwoBodySubspaceJJJPN>
+  {
+    
+    public:
+
+    // constructor
+    TwoBodySpaceJJJPN(
+          const OrbitalSpacePN orbital_space,
+          const WeightMax& weight_max
+      );
+
+    // accessors
+      const WeightMax& weight_max() const {return weight_max_;}
+
+    // diagnostic string
+    std::string DebugStr() const;
+
+    private:
+    // truncation
+    WeightMax weight_max_;
+
+  };
+
+  // sectors
+
+  class TwoBodySectorsJJJPN
+    : public BaseSectors<TwoBodySpaceJJJPN>
+  {
+
+    public:
+
+    // constructor
+
+    TwoBodySectorsJJJPN(
+        const TwoBodySpaceJJJPN& space,
+        int J0, int g0,
+        basis::SectorDirection sector_direction = basis::SectorDirection::kCanonical
+      );
+    // Enumerate sector pairs connected by an operator of given
+    // tensorial and parity character ("constrained" sector
+    // enumeration).
+    //
+    // TODO: add possibility of delta Tz
+
+  };
+
+
 
   ////////////////////////////////////////////////////////////////
   ////////////////////////////////////////////////////////////////

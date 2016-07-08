@@ -95,7 +95,7 @@ namespace basis {
   //   -- lexicographically increasing (N1,j1)
   //   -- lexicographically increasing (N2,j2)
   // and subject to:
-  //   -- triangularity constraint on (j1,j2,L)
+  //   -- triangularity constraint on (j1,j2,J)
   //   -- parity constraint N~g
   //   -- antisymmetry constraint J+T~1 if (N1,j1)==(N2,j2)
   //
@@ -299,7 +299,7 @@ namespace basis {
   //   -- lexicographically increasing (N1,j1)
   //   -- lexicographically increasing (N2,j2)
   // and subject to:
-  //   -- triangularity constraint on (j1,j2,L)
+  //   -- triangularity constraint on (j1,j2,J)
   //   -- [parity constraint N~g]  (MODIFICATION for subspacing by N)
   //   -- antisymmetry constraint J+T~1 if (N1,j1)==(N2,j2)
   //

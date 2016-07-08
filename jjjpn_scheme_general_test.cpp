@@ -53,67 +53,77 @@ void test_orbitals_Nmax(const std::string& filename)
 void test_two_body_Nmax()
 {
 
-//  ////////////////////////////////////////////////////////////////
-//  // two-body basis tests
-//  ////////////////////////////////////////////////////////////////
-//
-//  std::cout << "Two-body basis" << std::endl;
-//
-//  // example subspace
-//  std::cout << "Example subspace" << std::endl;
-//  basis::TwoBodySubspaceJJJT subspace(0,1,0,6);
-//  std::cout << subspace.DebugStr();
-//
-//
-//  // spaces and sectors
-//
-//  // first set up space
-//
-//  std::cout << "Two-body space" << std::endl;
-//  int Nmax = 2;
-//  basis::TwoBodySpaceJJJT space(Nmax);
-//  std::cout << space.DebugStr();
-//
-//  // then set up allowed sectors
-//  std::cout << "Two-body operator sectors" << std::endl;
-//  int J0 = 2;  // try: J0=0 for interaction, J0=2 for quadrupole operator
-//  int T0 = 0;
-//  int g0 = 0;
-//  basis::TwoBodySectorsJJJT sectors(space,J0,T0,g0);
-//
-//  std::cout << " J0 " << J0 << " T0 " << T0 << " g0 " << g0 << std::endl;
-//  for (int sector_index=0; sector_index < sectors.size(); ++sector_index)
-//    {
-//      int bra_subspace_index = sectors.GetSector(sector_index).bra_subspace_index();
-//      const basis::TwoBodySubspaceJJJT& bra_subspace = sectors.GetSector(sector_index).bra_subspace();
-//      int ket_subspace_index = sectors.GetSector(sector_index).ket_subspace_index();
-//      const basis::TwoBodySubspaceJJJT& ket_subspace = sectors.GetSector(sector_index).ket_subspace();
-//
-//      std::cout 
-//        << " sector " 
-//        << std::setw(3) << sector_index 
-//        << "     "
-//        << " index "
-//        << std::setw(3) << bra_subspace_index
-//        << " JTg "
-//        << std::setw(3) << bra_subspace.J() 
-//        << std::setw(3) << bra_subspace.T() 
-//        << std::setw(3) << bra_subspace.g()
-//        // << std::setw(3) << bra_subspace.Nmax()
-//        << " dim "
-//        << std::setw(3) << bra_subspace.size()
-//        << "     "
-//        << " index "
-//        << std::setw(3) << ket_subspace_index
-//        << " JTg "
-//        << std::setw(3) << ket_subspace.J() 
-//        << std::setw(3) << ket_subspace.T() 
-//        << std::setw(3) << ket_subspace.g()
-//        // << std::setw(3) << ket_subspace.Nmax()
-//        << " dim "
-//        << std::setw(3) << ket_subspace.size()
-//        << std::endl;
-//    }
+  ////////////////////////////////////////////////////////////////
+  // two-body basis tests
+  ////////////////////////////////////////////////////////////////
+
+  std::cout << "Two-body basis -- Nmax scheme" << std::endl;
+
+  // set up orbitals
+  int orbital_Nmax = 4;
+  basis::OrbitalSpacePN orbital_space(orbital_Nmax);
+
+  // example subspace
+  std::cout << "Example subspace" << std::endl;
+  std::cout << "  basis::TwoBodySpeciesPN::kPN,2,0,basis::WeightMax(2,4)" << std::endl;
+  basis::TwoBodySubspaceJJJPN subspace(
+      orbital_space,
+      basis::TwoBodySpeciesPN::kPN,2,0,
+      basis::WeightMax(2,4)
+    );
+  std::cout << subspace.DebugStr();
+  std::cout << "Orbital subspace sizes"
+            << " " << subspace.orbital_subspace1().size()
+            << " " << subspace.orbital_subspace2().size()
+            << std::endl;
+
+  // set up space
+
+  std::cout << "Two-body space" << std::endl;
+  std::cout << "      basis::WeightMax(2,2)" << std::endl;
+  basis::TwoBodySpaceJJJPN space(
+      orbital_space,
+      basis::WeightMax(2,2)
+    );
+  std::cout << space.DebugStr();
+
+  // then set up allowed sectors
+  std::cout << "Two-body operator sectors" << std::endl;
+  int J0 = 0;  // try: J0=0 for interaction, J0=2 for quadrupole operator
+  int g0 = 0;
+  basis::TwoBodySectorsJJJPN sectors(space,J0,g0);
+
+  std::cout << " J0 " << J0 << " g0 " << g0 << std::endl;
+  for (int sector_index=0; sector_index < sectors.size(); ++sector_index)
+    {
+      int bra_subspace_index = sectors.GetSector(sector_index).bra_subspace_index();
+      const basis::TwoBodySubspaceJJJPN& bra_subspace = sectors.GetSector(sector_index).bra_subspace();
+      int ket_subspace_index = sectors.GetSector(sector_index).ket_subspace_index();
+      const basis::TwoBodySubspaceJJJPN& ket_subspace = sectors.GetSector(sector_index).ket_subspace();
+
+      std::cout 
+        << " sector " 
+        << std::setw(3) << sector_index 
+        << "     "
+        << " index "
+        << std::setw(3) << bra_subspace_index
+        << " sJg "
+        << std::setw(3) << int(bra_subspace.two_body_species())
+        << std::setw(3) << bra_subspace.J() 
+        << std::setw(3) << bra_subspace.g()
+        << " dim "
+        << std::setw(3) << bra_subspace.size()
+        << "     "
+        << " index "
+        << std::setw(3) << ket_subspace_index
+        << " sJg "
+        << std::setw(3) << int(ket_subspace.two_body_species())
+        << std::setw(3) << ket_subspace.J() 
+        << std::setw(3) << ket_subspace.g()
+        << " dim "
+        << std::setw(3) << ket_subspace.size()
+        << std::endl;
+    }
 }
 
 ////////////////////////////////////////////////////////////////
