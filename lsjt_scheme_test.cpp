@@ -29,7 +29,7 @@ void test_relative()
   // RelativeSubspaceLSJT(0,0,0,1,0,7);  // should violate assertion due to Nmax
   basis::RelativeSubspaceLSJT subspace(0,0,0,1,0,6);  // LSJTg N_max
   std::cout << subspace.LabelStr() << std::endl;
-  std::cout << subspace.DebugStr() << std::endl;
+  std::cout << subspace.DebugStr();
 
 
   // index-based looping
@@ -123,6 +123,7 @@ void test_relative_cm()
   // example subspace
   std::cout << "Example subspace" << std::endl;
   basis::RelativeCMSubspaceLSJT subspace(0,0,0,0,0,2);  // LSJTg Nmax
+  std::cout << subspace.LabelStr() << std::endl;
   std::cout << subspace.DebugStr();
 
   // spaces and sectors

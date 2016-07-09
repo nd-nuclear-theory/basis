@@ -71,7 +71,7 @@ namespace basis {
        << " " << std::setw(width) << J() 
        << " " << std::setw(width) << T() 
        << " " << std::setw(width) << g()
-       << " " << "]" << std::endl;
+       << " " << "]";
 
     return os.str();
   }
@@ -272,6 +272,24 @@ namespace basis {
     return valid;
   }
 
+  std::string RelativeCMSubspaceLSJT::LabelStr() const
+  {
+    std::ostringstream os;
+
+    const int width = 0;  // for now, no fixed width
+
+    os << "["
+       << " " << std::setw(width) << L() 
+       << " " << std::setw(width) << S() 
+       << " " << std::setw(width) << J() 
+       << " " << std::setw(width) << T() 
+       << " " << std::setw(width) << g()
+       << " " << "]";
+
+    return os.str();
+  }
+
+
   std::string RelativeCMSubspaceLSJT::DebugStr() const
   {
 
@@ -454,6 +472,26 @@ namespace basis {
 
     return valid;
   }
+
+  std::string RelativeCMSubspaceNLSJT::LabelStr() const
+  {
+    std::ostringstream os;
+
+    const int width = 0;  // for now, no fixed width
+
+    os << "["
+       << " " << std::setw(width) << L() 
+       << " " << std::setw(width) << S() 
+       << " " << std::setw(width) << J() 
+       << " " << std::setw(width) << T() 
+       << " " << std::setw(width) << g()
+       << " " << ";"
+       << " " << std::setw(width) << N()
+       << " " << "]";
+
+    return os.str();
+  }
+
 
   std::string RelativeCMSubspaceNLSJT::DebugStr() const
   {

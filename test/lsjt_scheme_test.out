@@ -1,11 +1,9 @@
 Relative basis
-[ 0 0 0 1 0]
-
+[ 0 0 0 1 0 ]
  index   0 N   0
  index   1 N   2
  index   2 N   4
  index   3 N   6
-
 index 0 N 0
 index 1 N 2
 index 2 N 4
@@ -42,6 +40,7 @@ Relative operator sectors
  sector   6      index   6 LSJTg   2  0  2  1  0 dim   2      index   8 LSJTg   2  1  2  0  0 dim   2  
 Relative-c.m. basis
 Example subspace
+[ 0 0 0 0 0 ]
  index   0 Nr lr Nc lc   1   1   1   1
 Relative-c.m. space
  index   0 LSJTg   0   0   0   0   0 Nmax   2 dim   1 
