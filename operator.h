@@ -37,6 +37,15 @@ namespace basis {
   typedef std::vector<Eigen::MatrixXd> MatrixVector;
 
   ////////////////////////////////////////////////////////////////
+  // conversion flag enum
+  ////////////////////////////////////////////////////////////////
+
+  enum class NormalizationConversion {kNone, kASToNAS, kNASToAS};
+  // Used as value for a mode parameter to requests on-the-fly
+  // conversion between antisymmetrized (AS) and normalized
+  // antisymmetrized (NAS) matrix elements on input/output.
+
+  ////////////////////////////////////////////////////////////////
   // zero operator
   ////////////////////////////////////////////////////////////////
 

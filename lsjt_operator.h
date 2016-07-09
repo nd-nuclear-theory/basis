@@ -20,6 +20,7 @@
   7/6/16 (mac):
     - Add symmetry phase header field and update documentation.
     - Upgrade precision on operator output.
+  7/8/16 (mac): Add two-body LSJT operator file I/O.
 
 ****************************************************************/
 
@@ -78,7 +79,7 @@ namespace basis {
   //
   // Data
   //
-  //   Then data lines are of form:
+  //   Then data lines are of the form:
   //
   //      T0 N' L' S' J' T' N L S J T JT-RME
   //
@@ -182,7 +183,7 @@ namespace basis {
   {
     int version;
     int J0, g0, T0_min, T0_max;
-    SymmetryPhase symmetry_phase;
+    basis::SymmetryPhase symmetry_phase;
     int Nmax, Jmax;
   };
 
@@ -233,8 +234,8 @@ namespace basis {
   void ReadRelativeOperatorComponentLSJT(
       std::istream& is,
       int T0,
-      const RelativeSectorsLSJT& sectors,
-      MatrixVector& matrices
+      const basis::RelativeSectorsLSJT& sectors,
+      basis::MatrixVector& matrices
     );
   // Read single isospin component of a relative operator in LSJT
   // scheme.
@@ -249,13 +250,47 @@ namespace basis {
   // two-body LSJT operator
   ////////////////////////////////////////////////////////////////
 
-  void WriteTwoBodyOperatorLSJT(
-      std::ostream& os,
-      const TwoBodySectorsLSJT& sectors,
-      const MatrixVector& matrices
-    );
-  // TODO
+  // Note that the primary intention of the output for two-body
+  // operators in LSJT scheme is for diagnostic purposes.  If we were
+  // to store operators more permanently in this format, we would also
+  // want to define an appropriate file header format.
+  //
+  // Data lines are of the form:
+  //
+  //   T0  N1' l1' N2' l2' L' S' J' T' g'  N1 l1 N2 l2 L S J T g  JT-RME
+  //
+  // Although the g label is redundant (it can be deduced from l1 and
+  // l2), it is included to make the sector structure more easily
+  // apparent to a human reader.
+  //
+  // Iteration follows the usual scheme within the basis module:
+  // sectors are lexicographic by (bra,ket) subspace indices, then
+  // matrix elements within a sector are lexicographic by (bra,ket)
+  // state indices.
+  //
+  // Reminder: One should be sure to document whether one is writing
+  // AS or NAS matrix elements!
 
+  void WriteTwoBodyOperatorComponentLSJT(
+      std::ostream& os,
+      int T0,
+      const basis::TwoBodySectorsLSJT& sectors,
+      const basis::MatrixVector& matrices,
+      basis::NormalizationConversion conversion_mode
+    );
+  // Write single isospin component of a two-body operator in LSJT
+  // scheme.
+  //
+  // Side effect: The floating point precision attribute of the output
+  // stream is modified.
+  //
+  // Arguments:
+  //   os (std::ostream) : text-mode output stream
+  //   T0 (int) : isospin for this isospin component
+  //   sector (basis::TwoBodySectorsLSJT) :  sectors defining operator
+  //   matrices (basis::MatrixVector) :  matrices defining operator
+  //   conversion (basis::NormalizationConversion) : specifies any 
+  //     conversion between AS and NAS for output
 
   ////////////////////////////////////////////////////////////////
   ////////////////////////////////////////////////////////////////

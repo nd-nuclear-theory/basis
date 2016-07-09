@@ -10,6 +10,10 @@
 
 namespace basis {
 
+  ////////////////////////////////////////////////////////////////
+  // relative two-body operator
+  ////////////////////////////////////////////////////////////////
+
   void WriteRelativeOperatorParametersLSJT(
       std::ostream& os,
       const basis::RelativeOperatorParametersLSJT& parameters
@@ -74,6 +78,13 @@ namespace basis {
 	const typename RelativeSectorsLSJT::SubspaceType& bra_subspace = sector.bra_subspace();
 	const typename RelativeSectorsLSJT::SubspaceType& ket_subspace = sector.ket_subspace();
 
+        // verify that sector is canonical
+        //
+        // This is a check that the caller's sector construction
+        // followed the specification that only "upper triangle"
+        // sectors are stored.
+        assert(sector.bra_subspace_index()<=sector.ket_subspace_index());
+
 	// iterate over matrix elements
 	for (int bra_index=0; bra_index<bra_subspace.size(); ++bra_index)
 	  for (int ket_index=0; ket_index<ket_subspace.size(); ++ket_index)
@@ -87,12 +98,14 @@ namespace basis {
               // define states
 	      const basis::RelativeStateLSJT bra(bra_subspace,bra_index);
 	      const basis::RelativeStateLSJT ket(ket_subspace,ket_index);
+
+              // extract matrix element factor
+      	      const double matrix_element = matrices[sector_index](bra_index,ket_index);
 	    
               // generate output line
               const int width = 3;
               const int precision = 16;
               os << std::setprecision(precision);
-      	      const double matrix_element = matrices[sector_index](bra_index,ket_index);
 	      os 
 		<< " " << std::setw(width) << T0
 		<< " " << "  "
@@ -204,14 +217,15 @@ namespace basis {
   }
 
   ////////////////////////////////////////////////////////////////
-  // two-body space
+  // two-body LSJT operator
   ////////////////////////////////////////////////////////////////
 
-
-  void WriteTwoBodyOperatorLSJT(
+  void WriteTwoBodyOperatorComponentLSJT(
       std::ostream& os,
+      int T0,
       const TwoBodySectorsLSJT& sectors,
-      const MatrixVector& matrices
+      const MatrixVector& matrices,
+      basis::NormalizationConversion conversion_mode
     )
   {
 
@@ -224,18 +238,52 @@ namespace basis {
 	const typename TwoBodySectorsLSJT::SubspaceType& bra_subspace = sector.bra_subspace();
 	const typename TwoBodySectorsLSJT::SubspaceType& ket_subspace = sector.ket_subspace();
 
+        // verify that sector is canonical
+        //
+        // This is a check that the caller's sector construction
+        // followed the specification that only "upper triangle"
+        // sectors are stored.
+        assert(sector.bra_subspace_index()<=sector.ket_subspace_index());
+
 	// iterate over matrix elements
 	for (int bra_index=0; bra_index<bra_subspace.size(); ++bra_index)
 	  for (int ket_index=0; ket_index<ket_subspace.size(); ++ket_index)
 	    {
 
+              // diagonal sector: restrict to upper triangle
+              if (sector.IsDiagonal())
+                if (!(bra_index<=ket_index))
+                  continue;
+
               // define states
 	      const basis::TwoBodyStateLSJT bra(bra_subspace,bra_index);
 	      const basis::TwoBodyStateLSJT ket(ket_subspace,ket_index);
-	    
+
+              // extract matrix element factor
+              double conversion_factor = 1.;
+              if (conversion_mode == basis::NormalizationConversion::kASToNAS)
+                {
+                  if ((bra.N1()==bra.N2())&&(bra.l1()==bra.l2()))
+                    conversion_factor *= (1/sqrt(2.));
+                  if ((ket.N1()==ket.N2())&&(ket.l1()==ket.l2()))
+                    conversion_factor *= (1/sqrt(2.));
+                }
+              else if (conversion_mode == basis::NormalizationConversion::kNASToAS)
+                {
+                  if ((bra.N1()==bra.N2())&&(bra.l1()==bra.l2()))
+                    conversion_factor *= sqrt(2.);
+                  if ((ket.N1()==ket.N2())&&(ket.l1()==ket.l2()))
+                    conversion_factor *= sqrt(2.);
+                }
+              const double matrix_element = conversion_factor*matrices[sector_index](bra_index,ket_index);
+
+              // generate output line
               const int width = 3;
-              const double matrix_element = matrices[sector_index](bra_index,ket_index);
+              const int precision = 16;
+              os << std::setprecision(precision);
 	      os 
+		<< " " << std::setw(width) << T0
+		<< " " << "  "
 		<< " " << std::setw(width) << bra.N1()
 		<< " " << std::setw(width) << bra.l1()
 		<< " " << std::setw(width) << bra.N2()

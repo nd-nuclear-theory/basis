@@ -46,9 +46,10 @@
     - Rename Str() to DebugStr().
     - Rename labels on relative basis (e.g., J->Jr).
   6/30/16 (mac): Revert labels on relative basis (e.g., Jr->J).
-  7/3/16 (mac): Add some default constructors.
+  7/3/16 (mac): Add default constructors for RelativeLSJT basis.
   7/4/16 (mac): Add fixed-N subspaces in two-body basis for use with 
     Moshinsky transform block structure.
+  7/8/16 (mac): Add default constructors for TwoBodyLSJT basis.
 
 ****************************************************************/
 
@@ -725,6 +726,10 @@ namespace basis {
 
       // constructor
 
+      TwoBodySubspaceLSJT() {};
+      // default constructor -- provided since required for certain
+      // purposes by STL container classes (e.g., std::vector::resize)
+
       TwoBodySubspaceLSJT(int L, int S, int J, int T, int g, int Nmax);
       // Set up indexing in Nmax truncation.
 
@@ -794,6 +799,10 @@ namespace basis {
 
     // constructor
 
+    TwoBodySpaceLSJT() {};
+    // default constructor -- provided since required for certain
+    // purposes by STL container classes (e.g., std::vector::resize)
+
     TwoBodySpaceLSJT(int Nmax);
     // Enumerate all subspaces up to a given Nmax cutoff.
 
@@ -818,6 +827,10 @@ namespace basis {
     public:
 
     // constructor
+
+    TwoBodySectorsLSJT() {};
+    // default constructor -- provided since required for certain
+    // purposes by STL container classes (e.g., std::vector::resize)
 
     TwoBodySectorsLSJT(
         const TwoBodySpaceLSJT& space,

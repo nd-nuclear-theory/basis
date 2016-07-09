@@ -15,7 +15,7 @@
 // test parts
 ////////////////////////////////////////////////////////////////
 
-void write_test(const std::string& filename)
+void write_test_relative(const std::string& filename)
 {
   ////////////////////////////////////////////////////////////////
   // defining operator
@@ -89,7 +89,7 @@ void write_test(const std::string& filename)
   ofile << os.str();
 }
 
-void read_test(const std::string& filename)
+void read_test_relative(const std::string& filename)
 {
   ////////////////////////////////////////////////////////////////
   // read test
@@ -138,6 +138,70 @@ void read_test(const std::string& filename)
     }
 }
 
+void write_test_two_body(const std::string& filename)
+{
+  ////////////////////////////////////////////////////////////////
+  // defining operator
+  ////////////////////////////////////////////////////////////////
+
+  // since we set the operator to a "naive identity" operator, the
+  // matrix elements are taken to be NAS
+
+  std::cout << "Setup" << std::endl;
+
+  // set up space
+  int Nmax = 2;
+  basis::TwoBodySpaceLSJT space(Nmax);
+
+  // set up operator containers
+  //
+  // These are vectors to store information for T0=0/1/2 components.
+  std::vector<basis::TwoBodySectorsLSJT> component_sectors(3);
+  std::vector<basis::MatrixVector> component_matrices(3);
+
+  // populate operator containers
+  int J0 = 0;
+  int g0 = 0;
+  for (int T0=0; T0<=2; ++T0)
+    // for each isospin component
+    {
+
+      // enumerate sectors
+      component_sectors[T0] = basis::TwoBodySectorsLSJT(space,J0,T0,g0);
+      std::cout << " T0 " << T0 << " size " << component_sectors[T0].size() << std::endl;
+          
+      // populate matrices
+      if (T0==0)
+        basis::SetOperatorToIdentity(component_sectors[T0],component_matrices[T0]);
+      else
+        basis::SetOperatorToZero(component_sectors[T0],component_matrices[T0]);
+    }
+
+  ////////////////////////////////////////////////////////////////
+  // write test
+  ////////////////////////////////////////////////////////////////
+
+  // set up stream for output
+  std::ostringstream os;
+
+  // write matrices
+  int T0_min=0;
+  int T0_max=2;
+  for (int T0=T0_min; T0<=T0_max; ++T0)
+    {
+      basis::WriteTwoBodyOperatorComponentLSJT(
+          os,
+          T0,
+          component_sectors[T0],component_matrices[T0],
+          basis::NormalizationConversion::kNone
+        );
+    }
+
+  // dump to file
+  std::ofstream ofile(filename.c_str());
+  ofile << os.str();
+}
+
 
 ////////////////////////////////////////////////////////////////
 // main
@@ -146,10 +210,13 @@ void read_test(const std::string& filename)
 int main(int argc, char **argv)
 {
 
-  std::string filename("test/lsjt_operator_test_identity_Nmax02.dat");
-  write_test(filename);
-  read_test(filename);
+  std::string relative_filename("test/lsjt_operator_test_relative_identity_Nmax02.dat");
+  write_test_relative(relative_filename);
+  read_test_relative(relative_filename);
  
+  std::string two_body_filename("test/lsjt_operator_test_two_body_identity_nas_Nmax02.dat");
+  write_test_two_body(two_body_filename);
+
   // termination
   return 0;
 }
