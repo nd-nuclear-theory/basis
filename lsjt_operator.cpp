@@ -251,7 +251,7 @@ namespace basis {
     // Hamiltonian-like operators.
     assert(
         (symmetry_phase_mode==basis::SymmetryPhaseMode::kHermitian)
-        && (J0=0) && (g0==0)
+        && (J0==0) && (g0==0)
       );
     
     // case: Hamiltonain-like operator
