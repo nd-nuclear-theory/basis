@@ -6,9 +6,10 @@
 
   Libraries: Eigen 3
 
-  Note: Eigen should be installed and the compiler include path such
-  that the subdirectory chain "eigen3/Eigen/" can be found in a
-  directory in the search path.
+  Note: Eigen should be installed, and the compiler include path
+  should be set ("-I") to include the appropriate *parent* directory
+  such that the subdirectory chain "eigen3/Eigen/" stems from this
+  directory.
 
   Language: C++11
                                  
@@ -16,6 +17,8 @@
   University of Notre Dame
 
   7/2/16 (mac): Created from code in lsjt_operator.h.
+  7/9/16 (mac): Add support for canonicalizing indices in matrix
+    element lookup.
 
 ****************************************************************/
 
@@ -89,7 +92,6 @@ namespace basis {
       }
   }
 
-
   ////////////////////////////////////////////////////////////////
   // identity operator
   ////////////////////////////////////////////////////////////////
@@ -155,6 +157,50 @@ namespace basis {
 
       }
   }
+
+  ////////////////////////////////////////////////////////////////
+  // matrix element lookup
+  ////////////////////////////////////////////////////////////////
+
+  inline
+  void CanonicalizeIndices(
+      int& bra_subspace_index, int& ket_subspace_index,
+      bool& swapped_subspaces, 
+      int& bra_state_index, int& ket_state_index,
+      bool& swapped_states
+    )
+  // Convert subspace and state indices for a matrix element to
+  // canonical ("upper triangle") indices.
+  //
+  // Note: For specific indexing schemes, it might be more convenient
+  // to define a customized "canonicalizaton" function, which, rather
+  // than simply flagging the swaps through boolean variable, actually
+  // calculates any necessary phase an dimension factors arising from
+  // the swaps.
+  //
+  // Arguments:
+  //    bra_subspace_index, ket_subspace_index (int, input/output) :
+  //      sector bra and ket subspace indices, possibly to be swapped
+  //    swapped_subspaces (bool, output) : whether or not subspace
+  //      indices were swapped
+  //    bra_state_index, ket_state_index (int, input/output) :
+  //      bra and ket state indices, possibly to be swapped if sector
+  //      is diagonal sector
+  //    swapped_states (bool, output) : whether or not state
+  //      indices were swapped
+  {
+    // process subspace indices
+    swapped_subspaces = !(bra_subspace_index <= ket_subspace_index);
+    if (swapped_subspaces)
+      std::swap(bra_subspace_index,ket_subspace_index);
+
+    // process state indices
+    swapped_states = (bra_subspace_index == ket_subspace_index) 
+      & !(bra_state_index <= ket_state_index);
+    if (swapped_states)
+      std::swap(bra_state_index,ket_state_index);
+  }
+
 
   ////////////////////////////////////////////////////////////////
   ////////////////////////////////////////////////////////////////

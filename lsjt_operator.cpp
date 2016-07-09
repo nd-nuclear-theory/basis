@@ -217,6 +217,70 @@ namespace basis {
   }
 
   ////////////////////////////////////////////////////////////////
+  // operator matrix element canonicalizaton
+  ////////////////////////////////////////////////////////////////
+
+  void CanonicalizeIndicesRelativeLSJT(
+      const basis::RelativeSpaceLSJT& space,
+      int& bra_subspace_index, int& ket_subspace_index,
+      int& bra_state_index, int& ket_state_index,
+      double& canonicalization_factor,
+      int J0, int T0, int g0,
+      basis::SymmetryPhase symmetry_phase
+    )
+  {
+
+    // canonicalize indices
+    bool swapped_subspaces, swapped_states;
+    basis::CanonicalizeIndices(
+        bra_subspace_index, ket_subspace_index,
+        swapped_subspaces,
+        bra_state_index, ket_state_index,
+        swapped_states
+      );
+
+    // calculate canonicalization factor
+    //
+    // Beware that the indices now describe the "new" bra and ket
+    // *after* any swap, so one must take care in matching up bra and
+    // ket labels to those in any formula describing the symmetry.
+
+    // check that case is covered
+    //
+    // Phase definitions are currently only provided for
+    // Hamiltonian-like operators.
+    assert(
+        (symmetry_phase==basis::SymmetryPhase::kHermitian)
+        && (J0=0) && (g0==0)
+      );
+    
+    // case: Hamiltonain-like operator
+    //
+    // Recall symmetry relation:
+    //
+    //     <a,J,T,g || A_{T0} || a',J,T',g>
+    //       = (-)^(T'-T)*Hat(T')/Hat(T)
+    //         * <a',J,T',g || A_{T0} || a,J,T,g>
+    
+    canonicalization_factor = 1.;
+    if (swapped_subspaces)
+      {
+
+        // retrieve sector labels (*after* swap, i.e., canonical m.e. on RHS)
+        const basis::RelativeSubspaceLSJT& bra_subspace = space.GetSubspace(
+            bra_subspace_index
+          );
+        const basis::RelativeSubspaceLSJT& ket_subspace = space.GetSubspace(
+            ket_subspace_index
+          );
+        int Tp = bra_subspace.T();
+        int T = ket_subspace.T();
+
+        canonicalization_factor *= ParitySign(Tp-T)*Hat(Tp)/Hat(T);
+      }
+  }
+
+  ////////////////////////////////////////////////////////////////
   // two-body LSJT operator
   ////////////////////////////////////////////////////////////////
 

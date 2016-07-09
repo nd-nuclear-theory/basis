@@ -21,6 +21,8 @@
     - Add symmetry phase header field and update documentation.
     - Upgrade precision on operator output.
   7/8/16 (mac): Add two-body LSJT operator file I/O.
+  7/9/16 (mac): Add support for canonicalizing indices in relative
+    LSJT matrix element lookup (for Hamiltonian-like operators).
 
 ****************************************************************/
 
@@ -133,11 +135,11 @@ namespace basis {
   //
   //   The symmetry_phase field in the header is reserved to provide
   //   information on the correct form to use for this phase factor.
-  //   However, for now, only the placeholder value 0 is defined for
-  //   symmetry_phase, and phase conventions are only well-defined for a
-  //   Hamiltonian-like (J0=0, g0=0) operator.
+  //   However, for now, only the placeholder value kHermitian(=0) is
+  //   defined for symmetry_phase, and phase conventions are only
+  //   well-defined for a Hamiltonian-like (J0=0, g0=0) operator.
   //
-  //   symmetry_phase=0, J0=0, g0=0: For a Hamiltonian-like operator,
+  //   symmetry_phase=kHermitian, J0=0, g0=0: For a Hamiltonian-like operator,
   //   we expect Hermiticity, i.e., symmetry of (M_J,M_T)-branched
   //   matrix elements.  Within a diagonal sector, this means that the
   //   lower triangle is obtained from the upper triangle by ordinary
@@ -245,6 +247,40 @@ namespace basis {
   //   T0 (int) : isospin for this isospin component
   //   sector (basis::RelativeSectorsLSJT) :  sectors defining operator
   //   matrices (basis::MatrixVector, output) :  matrices defining operator
+
+  ////////////////////////////////////////////////////////////////
+  // operator matrix element canonicalizaton
+  ////////////////////////////////////////////////////////////////
+
+  void CanonicalizeIndicesRelativeLSJT(
+      const basis::RelativeSpaceLSJT& space,
+      int& bra_subspace_index, int& ket_subspace_index,
+      int& bra_state_index, int& ket_state_index,
+      double& canonicalization_factor,
+      int J0, int T0, int g0,
+      basis::SymmetryPhase symmetry_phase
+    );
+  // Convert subspace and state indices for a matrix element to
+  // canonical ("upper triangle") indices.
+  //
+  // This is a customized wrapper for basis::CanonicalizeIndices (see
+  // operator.h), for use with RelativeLSJT operators.
+  //
+  // Arguments:
+  //    relative_space (basis::RelativeSpaceLSJT) : space, for retrieving 
+  //      subspace quantum numbers to calculate canonicalization factor
+  //    bra_subspace_index, ket_subspace_index (int, input/output) :
+  //      sector bra and ket subspace indices, possibly to be swapped
+  //    bra_state_index, ket_state_index (int, input/output) :
+  //      bra and ket state indices, possibly to be swapped if sector
+  //      is diagonal sector
+  //    canonicalization_factor (double, output) : phase and dimension
+  //      factor arising from any swaps
+  //    J0, T0, g0 (int) : operator properties
+  //    symmetry_phase (basis::SymmetryPhase) : specification of
+  //      matrix element conjugation properties of the operator
+
+
 
   ////////////////////////////////////////////////////////////////
   // two-body LSJT operator
