@@ -56,9 +56,9 @@ namespace basis {
   //
   //     # RELATIVE LSJT
   //     # ...
-  //     version                               # version
-  //     J0 g0 T0_min T0_max symmetry_phase    # operator tensor properties
-  //     Nmax Jmax                             # relative basis truncation
+  //     version                                 # version
+  //     J0 g0 T0_min T0_max symmetry_phase_mode # operator tensor properties
+  //     Nmax Jmax                               # relative basis truncation
   //
   //   The header may start with one or more contiguous comment lines, 
   //   which are designated by a hash character in the first column.
@@ -71,7 +71,7 @@ namespace basis {
   //     T0_min T0_max (int) : range of operator isospin components (a two-body operator  
   //       may in general have components T0=0,1,2 from the coupling of four isospin-1/2 
   //       fermionic operators)
-  //     symmetry_phase (int) : RESERVED to describe how to obtain phase for lower triangle
+  //     symmetry_phase_mode (int) : RESERVED to describe how to obtain phase for lower triangle
   //       (see "Conjugation symmetry" below) (=0)
   //     Nmax (int) : oscillator truncation of relative space (Nmax>=0)
   //     Jmax (int) : additional relative angular momentum truncation of relative space
@@ -133,13 +133,13 @@ namespace basis {
   //   matrix elements.  Therefore, conjuation will in general involve
   //   phase and dimension factors.
   //
-  //   The symmetry_phase field in the header is reserved to provide
+  //   The symmetry_phase_mode field in the header is reserved to provide
   //   information on the correct form to use for this phase factor.
   //   However, for now, only the placeholder value kHermitian(=0) is
-  //   defined for symmetry_phase, and phase conventions are only
+  //   defined for symmetry_phase_mode, and phase conventions are only
   //   well-defined for a Hamiltonian-like (J0=0, g0=0) operator.
   //
-  //   symmetry_phase=kHermitian, J0=0, g0=0: For a Hamiltonian-like operator,
+  //   symmetry_phase_mode=kHermitian, J0=0, g0=0: For a Hamiltonian-like operator,
   //   we expect Hermiticity, i.e., symmetry of (M_J,M_T)-branched
   //   matrix elements.  Within a diagonal sector, this means that the
   //   lower triangle is obtained from the upper triangle by ordinary
@@ -175,7 +175,7 @@ namespace basis {
   // operator header
   ////////////////////////////////////////////////////////////////
 
-  enum class SymmetryPhase {kHermitian=0};
+  enum class SymmetryPhaseMode {kHermitian=0};
 
   struct RelativeOperatorParametersLSJT
   // Parameters for relative operator storage.
@@ -185,7 +185,7 @@ namespace basis {
   {
     int version;
     int J0, g0, T0_min, T0_max;
-    basis::SymmetryPhase symmetry_phase;
+    basis::SymmetryPhaseMode symmetry_phase_mode;
     int Nmax, Jmax;
   };
 
@@ -258,7 +258,7 @@ namespace basis {
       int& bra_state_index, int& ket_state_index,
       double& canonicalization_factor,
       int J0, int T0, int g0,
-      basis::SymmetryPhase symmetry_phase
+      basis::SymmetryPhaseMode symmetry_phase_mode
     );
   // Convert subspace and state indices for a matrix element to
   // canonical ("upper triangle") indices.
@@ -276,11 +276,9 @@ namespace basis {
   //      is diagonal sector
   //    canonicalization_factor (double, output) : phase and dimension
   //      factor arising from any swaps
-  //    J0, T0, g0 (int) : operator properties
-  //    symmetry_phase (basis::SymmetryPhase) : specification of
-  //      matrix element conjugation properties of the operator
-
-
+  //    J0, T0, g0 (int) : operator tensorial properties
+  //    symmetry_phase_mode (basis::SymmetryPhaseMode) : operator
+  //      conjugation symmetry
 
   ////////////////////////////////////////////////////////////////
   // two-body LSJT operator

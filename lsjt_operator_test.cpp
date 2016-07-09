@@ -64,7 +64,7 @@ void write_test_relative(const std::string& filename)
   parameters.version=1;
   parameters.J0=J0;
   parameters.g0=g0;
-  parameters.symmetry_phase=basis::SymmetryPhase::kHermitian;
+  parameters.symmetry_phase_mode=basis::SymmetryPhaseMode::kHermitian;
   parameters.T0_min=0;
   parameters.T0_max=2;
   parameters.Nmax=Nmax;

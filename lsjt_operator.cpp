@@ -23,13 +23,13 @@ namespace basis {
     os 
       << "# RELATIVE LSJT" << std::endl
       << "#   version" << std::endl
-      << "#   J0 g0 T0_min T0_max symmetry_phase  [P0=(-)^g0]" << std::endl
+      << "#   J0 g0 T0_min T0_max symmetry_phase_mode  [P0=(-)^g0]" << std::endl
       << "#   Nmax Jmax" << std::endl
       << "#   T0   N' L' S' J' T'   N L S J T   JT-RME" << std::endl
       << " " << parameters.version << std::endl
       << " " << parameters.J0 << " " << parameters.g0
       << " " << parameters.T0_min << " " << parameters.T0_max
-      << " " << int(parameters.symmetry_phase) << std::endl
+      << " " << int(parameters.symmetry_phase_mode) << std::endl
       << " " << parameters.Nmax << " " << parameters.Jmax << std::endl;
   }
 
@@ -48,13 +48,13 @@ namespace basis {
     
     // line 2: operator tensor properties
     std::getline(is,line);
-    int symmetry_phase_int;
+    int symmetry_phase_mode_int;
     std::stringstream(line)
       >> parameters.J0 >> parameters.g0
       >> parameters.T0_min >> parameters.T0_max
-      >> symmetry_phase_int;
-    assert (symmetry_phase_int==0);
-    parameters.symmetry_phase = basis::SymmetryPhase(symmetry_phase_int);
+      >> symmetry_phase_mode_int;
+    assert (symmetry_phase_mode_int==0);
+    parameters.symmetry_phase_mode = basis::SymmetryPhaseMode(symmetry_phase_mode_int);
 
     // line 3: relative basis truncation
     std::getline(is,line);
@@ -226,7 +226,7 @@ namespace basis {
       int& bra_state_index, int& ket_state_index,
       double& canonicalization_factor,
       int J0, int T0, int g0,
-      basis::SymmetryPhase symmetry_phase
+      basis::SymmetryPhaseMode symmetry_phase_mode
     )
   {
 
@@ -250,7 +250,7 @@ namespace basis {
     // Phase definitions are currently only provided for
     // Hamiltonian-like operators.
     assert(
-        (symmetry_phase==basis::SymmetryPhase::kHermitian)
+        (symmetry_phase_mode==basis::SymmetryPhaseMode::kHermitian)
         && (J0=0) && (g0==0)
       );
     
