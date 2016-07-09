@@ -59,6 +59,45 @@ namespace basis {
     return valid;
   }
 
+  std::string RelativeSubspaceLSJT::LabelStr() const
+  {
+    std::ostringstream os;
+
+    const int width = 0;  // for now, no fixed width
+
+    os << "["
+       << " " << std::setw(width) << L() 
+       << " " << std::setw(width) << S() 
+       << " " << std::setw(width) << J() 
+       << " " << std::setw(width) << T() 
+       << " " << std::setw(width) << g()
+       << " " << "]" << std::endl;
+
+    return os.str();
+  }
+
+  std::string RelativeSubspaceLSJT::DebugStr() const
+  {
+
+    std::ostringstream os;
+
+    const int width = 3;
+
+    for (int state_index=0; state_index<size(); ++state_index)
+      {
+        RelativeStateLSJT state(*this,state_index);
+
+        os
+	  << " " << "index"
+	  << " " << std::setw(width) << state_index
+	  << " " << "N"
+	  << " " << std::setw(width) << state.N() 
+          << std::endl;
+      }
+
+    return os.str();
+
+  }
 
   RelativeSpaceLSJT::RelativeSpaceLSJT(int Nmax, int Jmax)
     : Nmax_(Nmax), Jmax_(Jmax)
@@ -96,24 +135,24 @@ namespace basis {
   {
     std::ostringstream os;
 
-    const int lw = 3;
+    const int width = 3;
 
     for (int subspace_index=0; subspace_index<size(); ++subspace_index)
       {
 	const SubspaceType& subspace = GetSubspace(subspace_index);
 	os
 	  << " " << "index"
-	  << " " << std::setw(lw) << subspace_index
+	  << " " << std::setw(width) << subspace_index
 	  << " " << " (L,S,J,T,g) "
-	  << " " << std::setw(lw) << subspace.L() 
-	  << " " << std::setw(lw) << subspace.S() 
-	  << " " << std::setw(lw) << subspace.J() 
-	  << " " << std::setw(lw) << subspace.T() 
-	  << " " << std::setw(lw) << subspace.g()
+	  << " " << std::setw(width) << subspace.L() 
+	  << " " << std::setw(width) << subspace.S() 
+	  << " " << std::setw(width) << subspace.J() 
+	  << " " << std::setw(width) << subspace.T() 
+	  << " " << std::setw(width) << subspace.g()
 	  << " " << "Nmax"
-	  << " " << std::setw(lw) << subspace.Nmax()
+	  << " " << std::setw(width) << subspace.Nmax()
 	  << " " << "dim"
-	  << " " << std::setw(lw) << subspace.size()
+	  << " " << std::setw(width) << subspace.size()
 	  << " " << std::endl;
       }
 
@@ -238,7 +277,7 @@ namespace basis {
 
     std::ostringstream os;
 
-    const int lw = 3;
+    const int width = 3;
 
     for (int state_index=0; state_index<size(); ++state_index)
       {
@@ -246,12 +285,12 @@ namespace basis {
 
         os
 	  << " " << "index"
-	  << " " << std::setw(lw) << state_index
+	  << " " << std::setw(width) << state_index
 	  << " " << "Nr lr Nc lc"
-	  << " " << std::setw(lw) << state.Nr() 
-	  << " " << std::setw(lw) << state.lr() 
-	  << " " << std::setw(lw) << state.Nc() 
-	  << " " << std::setw(lw) << state.lc()
+	  << " " << std::setw(width) << state.Nr() 
+	  << " " << std::setw(width) << state.lr() 
+	  << " " << std::setw(width) << state.Nc() 
+	  << " " << std::setw(width) << state.lc()
           << std::endl;
       }
 
@@ -303,24 +342,24 @@ namespace basis {
 
     std::ostringstream os;
 
-    const int lw = 3;
+    const int width = 3;
 
     for (int subspace_index=0; subspace_index<size(); ++subspace_index)
       {
 	const SubspaceType& subspace = GetSubspace(subspace_index);
 	os
 	  << " " << "index"
-	  << " " << std::setw(lw) << subspace_index
+	  << " " << std::setw(width) << subspace_index
 	  << " " << "LSJTg"
-	  << " " << std::setw(lw) << subspace.L() 
-	  << " " << std::setw(lw) << subspace.S() 
-	  << " " << std::setw(lw) << subspace.J() 
-	  << " " << std::setw(lw) << subspace.T() 
-	  << " " << std::setw(lw) << subspace.g()
+	  << " " << std::setw(width) << subspace.L() 
+	  << " " << std::setw(width) << subspace.S() 
+	  << " " << std::setw(width) << subspace.J() 
+	  << " " << std::setw(width) << subspace.T() 
+	  << " " << std::setw(width) << subspace.g()
 	  << " " << "Nmax"
-	  << " " << std::setw(lw) << subspace.Nmax()
+	  << " " << std::setw(width) << subspace.Nmax()
 	  << " " << "dim"
-	  << " " << std::setw(lw) << subspace.size()
+	  << " " << std::setw(width) << subspace.size()
 	  << " " << std::endl;
       }
 
@@ -421,7 +460,7 @@ namespace basis {
 
     std::ostringstream os;
 
-    const int lw = 3;
+    const int width = 3;
 
     for (int state_index=0; state_index<size(); ++state_index)
       {
@@ -429,12 +468,12 @@ namespace basis {
 
         os
 	  << " " << "index"
-	  << " " << std::setw(lw) << state_index
+	  << " " << std::setw(width) << state_index
 	  << " " << "Nr lr Nc lc"
-	  << " " << std::setw(lw) << state.Nr() 
-	  << " " << std::setw(lw) << state.lr() 
-	  << " " << std::setw(lw) << state.Nc() 
-	  << " " << std::setw(lw) << state.lc()
+	  << " " << std::setw(width) << state.Nr() 
+	  << " " << std::setw(width) << state.lr() 
+	  << " " << std::setw(width) << state.Nc() 
+	  << " " << std::setw(width) << state.lc()
           << std::endl;
       }
 
@@ -484,24 +523,24 @@ namespace basis {
 
     std::ostringstream os;
 
-    const int lw = 3;
+    const int width = 3;
 
     for (int subspace_index=0; subspace_index<size(); ++subspace_index)
       {
 	const SubspaceType& subspace = GetSubspace(subspace_index);
 	os
 	  << " " << "index"
-	  << " " << std::setw(lw) << subspace_index
+	  << " " << std::setw(width) << subspace_index
 	  << " " << "LSJTg"
-	  << " " << std::setw(lw) << subspace.L() 
-	  << " " << std::setw(lw) << subspace.S() 
-	  << " " << std::setw(lw) << subspace.J() 
-	  << " " << std::setw(lw) << subspace.T() 
-	  << " " << std::setw(lw) << subspace.g()
+	  << " " << std::setw(width) << subspace.L() 
+	  << " " << std::setw(width) << subspace.S() 
+	  << " " << std::setw(width) << subspace.J() 
+	  << " " << std::setw(width) << subspace.T() 
+	  << " " << std::setw(width) << subspace.g()
 	  << " " << "N"  // (MODIFICATION for subspacing by N)
-	  << " " << std::setw(lw) << subspace.N()  // (MODIFICATION for subspacing by N)
+	  << " " << std::setw(width) << subspace.N()  // (MODIFICATION for subspacing by N)
 	  << " " << "dim"
-	  << " " << std::setw(lw) << subspace.size()
+	  << " " << std::setw(width) << subspace.size()
 	  << " " << std::endl;
       }
 
@@ -607,7 +646,7 @@ namespace basis {
 
     std::ostringstream os;
 
-    const int lw = 3;
+    const int width = 3;
 
     for (int state_index=0; state_index<size(); ++state_index)
       {
@@ -615,12 +654,12 @@ namespace basis {
 
         os
 	  << " " << "index"
-	  << " " << std::setw(lw) << state_index
+	  << " " << std::setw(width) << state_index
 	  << " " << "N1 l1 N2 l2"
-	  << " " << std::setw(lw) << state.N1() 
-	  << " " << std::setw(lw) << state.l1() 
-	  << " " << std::setw(lw) << state.N2() 
-	  << " " << std::setw(lw) << state.l2()
+	  << " " << std::setw(width) << state.N1() 
+	  << " " << std::setw(width) << state.l1() 
+	  << " " << std::setw(width) << state.N2() 
+	  << " " << std::setw(width) << state.l2()
           << std::endl;
       }
 
@@ -681,24 +720,24 @@ namespace basis {
 
     std::ostringstream os;
 
-    const int lw = 3;
+    const int width = 3;
 
     for (int subspace_index=0; subspace_index<size(); ++subspace_index)
       {
 	const SubspaceType& subspace = GetSubspace(subspace_index);
 	os
 	  << " " << "index"
-	  << " " << std::setw(lw) << subspace_index
+	  << " " << std::setw(width) << subspace_index
 	  << " " << "LSJTg"
-	  << " " << std::setw(lw) << subspace.L() 
-	  << " " << std::setw(lw) << subspace.S() 
-	  << " " << std::setw(lw) << subspace.J() 
-	  << " " << std::setw(lw) << subspace.T() 
-	  << " " << std::setw(lw) << subspace.g()
+	  << " " << std::setw(width) << subspace.L() 
+	  << " " << std::setw(width) << subspace.S() 
+	  << " " << std::setw(width) << subspace.J() 
+	  << " " << std::setw(width) << subspace.T() 
+	  << " " << std::setw(width) << subspace.g()
 	  << " " << "Nmax"
-	  << " " << std::setw(lw) << subspace.Nmax()
+	  << " " << std::setw(width) << subspace.Nmax()
 	  << " " << "dim"
-	  << " " << std::setw(lw) << subspace.size()
+	  << " " << std::setw(width) << subspace.size()
 	  << " " << std::endl;
       }
 
@@ -803,7 +842,7 @@ namespace basis {
 
     std::ostringstream os;
 
-    const int lw = 3;
+    const int width = 3;
 
     for (int state_index=0; state_index<size(); ++state_index)
       {
@@ -811,12 +850,12 @@ namespace basis {
 
         os
 	  << " " << "index"
-	  << " " << std::setw(lw) << state_index
+	  << " " << std::setw(width) << state_index
 	  << " " << "N1 l1 N2 l2"
-	  << " " << std::setw(lw) << state.N1() 
-	  << " " << std::setw(lw) << state.l1() 
-	  << " " << std::setw(lw) << state.N2() 
-	  << " " << std::setw(lw) << state.l2()
+	  << " " << std::setw(width) << state.N1() 
+	  << " " << std::setw(width) << state.l1() 
+	  << " " << std::setw(width) << state.N2() 
+	  << " " << std::setw(width) << state.l2()
           << std::endl;
       }
 
@@ -870,24 +909,24 @@ namespace basis {
 
     std::ostringstream os;
 
-    const int lw = 3;
+    const int width = 3;
 
     for (int subspace_index=0; subspace_index<size(); ++subspace_index)
       {
 	const SubspaceType& subspace = GetSubspace(subspace_index);
 	os
 	  << " " << "index"
-	  << " " << std::setw(lw) << subspace_index
+	  << " " << std::setw(width) << subspace_index
 	  << " " << "LSJTg"
-	  << " " << std::setw(lw) << subspace.L() 
-	  << " " << std::setw(lw) << subspace.S() 
-	  << " " << std::setw(lw) << subspace.J() 
-	  << " " << std::setw(lw) << subspace.T() 
-	  << " " << std::setw(lw) << subspace.g()
+	  << " " << std::setw(width) << subspace.L() 
+	  << " " << std::setw(width) << subspace.S() 
+	  << " " << std::setw(width) << subspace.J() 
+	  << " " << std::setw(width) << subspace.T() 
+	  << " " << std::setw(width) << subspace.g()
 	  << " " << "N"  // (MODIFICATION for subspacing by N)
-	  << " " << std::setw(lw) << subspace.N()  // (MODIFICATION for subspacing by N)
+	  << " " << std::setw(width) << subspace.N()  // (MODIFICATION for subspacing by N)
 	  << " " << "dim"
-	  << " " << std::setw(lw) << subspace.size()
+	  << " " << std::setw(width) << subspace.size()
 	  << " " << std::endl;
       }
 

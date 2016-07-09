@@ -1,4 +1,11 @@
 Relative basis
+[ 0 0 0 1 0]
+
+ index   0 N   0
+ index   1 N   2
+ index   2 N   4
+ index   3 N   6
+
 index 0 N 0
 index 1 N 2
 index 2 N 4

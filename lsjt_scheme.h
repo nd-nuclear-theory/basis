@@ -50,6 +50,7 @@
   7/4/16 (mac): Add fixed-N subspaces in two-body basis for use with 
     Moshinsky transform block structure.
   7/8/16 (mac): Add default constructors for TwoBodyLSJT basis.
+  7/9/16 (mac): Add debug strings for RelativeLSJT basis.
 
 ****************************************************************/
 
@@ -153,8 +154,11 @@ namespace basis {
       int g() const {return std::get<4>(labels_);}
       int Nmax() const {return Nmax_;}
 
-      // diagnostic string
+      // diagnostic strings
+      std::string LabelStr() const;
+      // Indicate subspace labels.
       std::string DebugStr() const;
+      // Dump subspace contents.
 
       private:
 

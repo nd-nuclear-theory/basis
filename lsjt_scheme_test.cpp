@@ -28,6 +28,8 @@ void test_relative()
   // RelativeSubspaceLSJT(0,0,0,0,0,0);  // should violate assertion due to T
   // RelativeSubspaceLSJT(0,0,0,1,0,7);  // should violate assertion due to Nmax
   basis::RelativeSubspaceLSJT subspace(0,0,0,1,0,6);  // LSJTg N_max
+  std::cout << subspace.LabelStr() << std::endl;
+  std::cout << subspace.DebugStr() << std::endl;
 
 
   // index-based looping
