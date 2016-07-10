@@ -25,6 +25,7 @@
     scheme in indexing_lsjt.
   7/6/16 (mac): Overhaul to new basis module conventions.
   7/7/16 (mac): Add fixed-N subspaces in two-body basis.
+  7/9/16 (mac): Add default constructors.
 
 ****************************************************************/
 
@@ -128,6 +129,10 @@ namespace basis {
 
       // constructor
 
+      TwoBodySubspaceJJJT() {};
+      // default constructor -- provided since required for certain
+      // purposes by STL container classes (e.g., std::vector::resize)
+
       TwoBodySubspaceJJJT(int J, int T, int g, int Nmax);
       // Set up indexing in Nmax truncation.
 
@@ -206,6 +211,10 @@ namespace basis {
 
     // constructor
 
+    TwoBodySpaceJJJT() {};
+    // default constructor -- provided since required for certain
+    // purposes by STL container classes (e.g., std::vector::resize)
+
     TwoBodySpaceJJJT(int Nmax);
     // Enumerate all subspaces up to a given Nmax cutoff.
 
@@ -230,6 +239,10 @@ namespace basis {
     public:
 
     // constructor
+    
+    TwoBodySectorsJJJT() {};
+    // default constructor -- provided since required for certain
+    // purposes by STL container classes (e.g., std::vector::resize)
 
     TwoBodySectorsJJJT(
         const TwoBodySpaceJJJT& space,
@@ -337,6 +350,10 @@ namespace basis {
 
       // constructor
 
+      TwoBodySubspaceNJJJT() {};
+      // default constructor -- provided since required for certain
+      // purposes by STL container classes (e.g., std::vector::resize)
+
       TwoBodySubspaceNJJJT(int J, int T, int g, int N);  // (MODIFICATION for subspacing by N)
       // Set up indexing in Nmax truncation.
 
@@ -415,6 +432,10 @@ namespace basis {
 
     // constructor
 
+    TwoBodySpaceJJJT() {};
+    // default constructor -- provided since required for certain
+    // purposes by STL container classes (e.g., std::vector::resize)
+
     TwoBodySpaceNJJJT(int Nmax);
     // Enumerate all subspaces up to a given Nmax cutoff.
 
@@ -439,6 +460,10 @@ namespace basis {
     public:
 
     // constructor
+
+    TwoBodySectorsNJJJT() {};
+    // default constructor -- provided since required for certain
+    // purposes by STL container classes (e.g., std::vector::resize)
 
     TwoBodySectorsNJJJT(
         const TwoBodySpaceNJJJT& space,
