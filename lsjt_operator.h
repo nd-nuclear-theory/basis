@@ -52,6 +52,8 @@ namespace basis {
   //
   // general relative two-body operator format
   //
+  ////////////////////////////////////////////////////////////////
+  //
   // Header
   //
   //   Header format:
@@ -172,6 +174,50 @@ namespace basis {
   //   considering oscillator functions as members of SU(3) irreps.
   //   So it may be necessary to convert to this convention for
   //   internal use in SU(3) calculations.
+
+  ////////////////////////////////////////////////////////////////
+  //
+  // internal representation of an operator in JT scheme
+  //
+  ////////////////////////////////////////////////////////////////
+  //
+  // The data structures to be used for the internal representation of
+  // an operator in a JT coupled basis consist of:
+  //
+  //   operator_labels (OperatorLabelsJT) : general information needed
+  //     to work with operator (see comment on relative LSJT format
+  //     above for a description of these labels):
+  //
+  //         J0, g0, T0_min, T0_max, symmetry_phase_mode
+  //
+  //     For a RelativeLSJT operator, one can use the daughter type
+  //     RelativeOperatorParametersLSJT, which contains additional
+  //     fields describing the relative file format and Nmax and Jmax
+  //     truncation.
+  //
+  //   component_sectors (std::array<tSectorsType,3>) : the sector
+  //     enumerations for each isospin component (T0=0,1,2) of the
+  //     operator -- Here, tSectorsType represents the indexing
+  //     Sectors type for the particular basis being used, e.g.,
+  //     RelativeCMSectorsNLSJT.  In general, the sector enumerations
+  //     should contain "upper trianglar" sectors only (see notes on
+  //     relative LSJT file format).
+  //
+  //   component_matrices (std::array<basis::MatrixVector,3>) : the
+  //     matrix representations for each isospin component (T0=0,1,2)
+  //     of the operator -- In general, for diagonal sectors, only the
+  //     matrix elements in the "upper triangle" are guaranteed to be
+  //     populated.  However, individual functions are free to further
+  //     specify that they require input matrices or give output
+  //     matrices in which the lower triangle is filled as well.
+  //
+  //   Not all three isospin components (T0=0,1,2) need actually be
+  //   *used* for a given operator, depending on the parameter values
+  //   T0_min and T0_max.  However, we specify that the arrays have
+  //   the fixed size of 3 to keep the access scheme (i.e.,
+  //   component_sectors[T0] and component_matrices[T0]) consistent.
+  //   Any unused isospin components will just be default initialized
+  //   and can be ignored.
   
   ////////////////////////////////////////////////////////////////
   // operator header
@@ -179,15 +225,25 @@ namespace basis {
 
   enum class SymmetryPhaseMode {kHermitian=0};
 
-  struct RelativeOperatorParametersLSJT
-  // Parameters for relative operator storage.
+  struct OperatorLabelsJT
+  // Labels giving tensorial properties for generic JT operator.
   //
-  // Data members:
-  //   See comment describing header for relative operator file.
+  // See comments on relative LSJT file format and internal
+  // representation of an operator in JT scheme for description.
   {
-    int version;
     int J0, g0, T0_min, T0_max;
     basis::SymmetryPhaseMode symmetry_phase_mode;
+  };
+
+  struct RelativeOperatorParametersLSJT
+    : OperatorLabelsJT
+  // Parameters for relative operator storage.
+  //
+  // Contains operator tensorial properties (inherited from
+  // OperatorLabelsJT), plus file format version and truncation
+  // information.
+  {
+    int version;
     int Nmax, Jmax;
   };
 
