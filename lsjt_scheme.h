@@ -50,7 +50,10 @@
   7/4/16 (mac): Add fixed-N subspaces in two-body basis for use with 
     Moshinsky transform block structure.
   7/8/16 (mac): Add default constructors for TwoBodyLSJT basis.
-  7/9/16 (mac): Add debug strings for RelativeLSJT basis.
+  7/9/16 (mac):
+    - Add debug strings for RelativeLSJT basis.
+    - Add default constructors for remaining subspaces, spaces,
+      and sectors.
 
 ****************************************************************/
 
@@ -357,6 +360,10 @@ namespace basis {
 
       // constructor
 
+      RelativeCMSubspaceLSJT() {};
+      // default constructor -- provided since required for certain
+      // purposes by STL container classes (e.g., std::vector::resize)
+
       RelativeCMSubspaceLSJT(int L, int S, int J, int T, int g, int Nmax);
 
       // accessors
@@ -429,6 +436,10 @@ namespace basis {
 
     // constructor
 
+    RelativeCMSpaceLSJT() {};
+    // default constructor -- provided since required for certain
+    // purposes by STL container classes (e.g., std::vector::resize)
+
     RelativeCMSpaceLSJT(int Nmax);
     // Enumerate all subspaces up to a given Nmax cutoff.
 
@@ -453,6 +464,10 @@ namespace basis {
     public:
 
     // constructor
+
+    RelativeCMSectorsLSJT() {};
+    // default constructor -- provided since required for certain
+    // purposes by STL container classes (e.g., std::vector::resize)
 
     RelativeCMSectorsLSJT(
         const RelativeCMSpaceLSJT& space,
@@ -537,6 +552,10 @@ namespace basis {
 
       // constructor
 
+      RelativeCMSubspaceNLSJT() {};
+      // default constructor -- provided since required for certain
+      // purposes by STL container classes (e.g., std::vector::resize)
+
       RelativeCMSubspaceNLSJT(int L, int S, int J, int T, int g, int N);  // (MODIFICATION for subspacing by N)
 
       // accessors
@@ -611,6 +630,10 @@ namespace basis {
 
     // constructor
 
+    RelativeCMSpaceNLSJT() {};
+    // default constructor -- provided since required for certain
+    // purposes by STL container classes (e.g., std::vector::resize)
+
     RelativeCMSpaceNLSJT(int Nmax);
     // Enumerate all subspaces up to a given Nmax cutoff.
 
@@ -635,6 +658,11 @@ namespace basis {
     public:
 
     // constructor
+
+    RelativeCMSectorsNLSJT() {};
+    // default constructor -- provided since required for certain
+    // purposes by STL container classes (e.g., std::vector::resize)
+
 
     RelativeCMSectorsNLSJT(
         const RelativeCMSpaceNLSJT& space,
@@ -925,6 +953,10 @@ namespace basis {
 
       // constructor
 
+      TwoBodySubspaceNLSJT() {};
+      // default constructor -- provided since required for certain
+      // purposes by STL container classes (e.g., std::vector::resize)
+
       TwoBodySubspaceNLSJT(int L, int S, int J, int T, int g, int N);  // (MODIFICATION for subspacing by N)
       // Set up indexing in Nmax truncation.
 
@@ -994,6 +1026,10 @@ namespace basis {
 
     // constructor
 
+    TwoBodySpaceNLSJT() {};
+    // default constructor -- provided since required for certain
+    // purposes by STL container classes (e.g., std::vector::resize)
+
     TwoBodySpaceNLSJT(int Nmax);
     // Enumerate all subspaces up to a given Nmax cutoff.
 
@@ -1018,6 +1054,10 @@ namespace basis {
     public:
 
     // constructor
+
+    TwoBodySectorsNLSJT() {};
+    // default constructor -- provided since required for certain
+    // purposes by STL container classes (e.g., std::vector::resize)
 
     TwoBodySectorsNLSJT(
         const TwoBodySpaceNLSJT& space,
