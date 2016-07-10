@@ -432,7 +432,7 @@ namespace basis {
 
     // constructor
 
-    TwoBodySpaceJJJT() {};
+    TwoBodySpaceNJJJT() {};
     // default constructor -- provided since required for certain
     // purposes by STL container classes (e.g., std::vector::resize)
 
