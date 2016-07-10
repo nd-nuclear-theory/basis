@@ -2,7 +2,7 @@
   lsjt_operator.h
 
   Defines functions for I/O and manipulation of relative and two-body
-  interaction matrices in LSJT coupling scheme.  Written for use in
+  operator matrices in LSJT coupling scheme.  Written for use in
   Moshinsky transformation.
 
   Language: C++11
@@ -22,6 +22,8 @@
     - Upgrade precision on operator output.
   7/8/16 (mac): Add two-body LSJT operator file I/O.
   7/9/16 (mac): Add support for canonicalizing indices in relative
+    LSJT matrix element lookup (for Hamiltonian-like operators).
+  7/10/16 (mac): Add support for canonicalizing indices in general
     LSJT matrix element lookup (for Hamiltonian-like operators).
 
 ****************************************************************/
@@ -263,6 +265,9 @@ namespace basis {
   // Convert subspace and state indices for a matrix element to
   // canonical ("upper triangle") indices.
   //
+  // DEPRECATED -- in favor of the more general templatized version
+  // CanonicalizeIndicesLSJT
+  //
   // This is a customized wrapper for basis::CanonicalizeIndices (see
   // operator.h), for use with RelativeLSJT operators.
   //
@@ -279,6 +284,95 @@ namespace basis {
   //    J0, T0, g0 (int) : operator tensorial properties
   //    symmetry_phase_mode (basis::SymmetryPhaseMode) : operator
   //      conjugation symmetry
+
+
+
+
+  template <typename tLSJTSpace>
+    void CanonicalizeIndicesLSJT(
+        const tLSJTSpace& space,
+        int& bra_subspace_index, int& ket_subspace_index,
+        int& bra_state_index, int& ket_state_index,
+        double& canonicalization_factor,
+        int J0, int T0, int g0,
+        basis::SymmetryPhaseMode symmetry_phase_mode
+      )
+    // Convert subspace and state indices for a matrix element to
+    // canonical ("upper triangle") indices.
+    //
+    // This is a customized wrapper for basis::CanonicalizeIndices (see
+    // operator.h), for use with RelativeLSJT operators.
+    //
+    // Template parameters:
+    //   tLSJTSpace : type for the LSJT space from which the subspaces are 
+    //     drawn (subspaces must provide the T(), J(), and other needed
+    //      accessor)
+    //
+    // Arguments:
+    //    relative_space (basis::RelativeSpaceLSJT) : space, for retrieving 
+    //      subspace quantum numbers to calculate canonicalization factor
+    //    bra_subspace_index, ket_subspace_index (int, input/output) :
+    //      sector bra and ket subspace indices, possibly to be swapped
+    //    bra_state_index, ket_state_index (int, input/output) :
+    //      bra and ket state indices, possibly to be swapped if sector
+    //      is diagonal sector
+    //    canonicalization_factor (double, output) : phase and dimension
+    //      factor arising from any swaps
+    //    J0, T0, g0 (int) : operator tensorial properties
+    //    symmetry_phase_mode (basis::SymmetryPhaseMode) : operator
+    //      conjugation symmetry
+    {
+
+      // canonicalize indices
+      bool swapped_subspaces, swapped_states;
+      basis::CanonicalizeIndices(
+          bra_subspace_index, ket_subspace_index,
+          swapped_subspaces,
+          bra_state_index, ket_state_index,
+          swapped_states
+        );
+
+      // calculate canonicalization factor
+      //
+      // Beware that the indices now describe the "new" bra and ket
+      // *after* any swap, so one must take care in matching up bra and
+      // ket labels to those in any formula describing the symmetry.
+
+      // check that case is covered
+      //
+      // Phase definitions are currently only provided for
+      // Hamiltonian-like operators.
+      assert(
+          (symmetry_phase_mode==basis::SymmetryPhaseMode::kHermitian)
+          && (J0==0) && (g0==0)
+        );
+    
+      // case: Hamiltonian-like operator
+      //
+      // Recall symmetry relation:
+      //
+      //     <a,J,T,g || A_{T0} || a',J,T',g>
+      //       = (-)^(T'-T)*Hat(T')/Hat(T)
+      //         * <a',J,T',g || A_{T0} || a,J,T,g>
+    
+      canonicalization_factor = 1.;
+      if (swapped_subspaces)
+        {
+
+          // retrieve sector labels (*after* swap, i.e., canonical m.e. on RHS)
+          const typename tLSJTSpace::SubspaceType& bra_subspace = space.GetSubspace(
+              bra_subspace_index
+            );
+          const typename tLSJTSpace::SubspaceType& ket_subspace = space.GetSubspace(
+              ket_subspace_index
+            );
+          int Tp = bra_subspace.T();
+          int T = ket_subspace.T();
+
+          canonicalization_factor *= ParitySign(Tp-T)*Hat(Tp)/Hat(T);
+        }
+    }
+
 
   ////////////////////////////////////////////////////////////////
   // two-body LSJT operator
@@ -325,6 +419,7 @@ namespace basis {
   //   matrices (basis::MatrixVector) :  matrices defining operator
   //   conversion (basis::NormalizationConversion) : specifies any 
   //     conversion between AS and NAS for output
+
 
   ////////////////////////////////////////////////////////////////
   ////////////////////////////////////////////////////////////////

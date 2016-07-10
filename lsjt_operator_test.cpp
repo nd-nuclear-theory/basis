@@ -30,9 +30,9 @@ void write_test_relative(const std::string& filename)
 
   // set up operator containers
   //
-  // These are vectors to store information for T0=0/1/2 components.
-  std::vector<basis::RelativeSectorsLSJT> component_sectors(3);
-  std::vector<basis::MatrixVector> component_matrices(3);
+  // These are arrays to store information for T0=0/1/2 components.
+  std::array<basis::RelativeSectorsLSJT,3> component_sectors;
+  std::array<basis::MatrixVector,3> component_matrices;
 
   // populate operator containers
   int J0 = 0;
@@ -112,10 +112,8 @@ void read_test_relative(const std::string& filename)
   basis::RelativeSpaceLSJT space(parameters.Nmax,parameters.Jmax);
 
   // read matrices
-  std::vector<basis::RelativeSectorsLSJT> component_sectors;
-  component_sectors.resize(3);
-  std::vector<basis::MatrixVector> component_matrices;
-  component_matrices.resize(3);
+  std::array<basis::RelativeSectorsLSJT,3> component_sectors;
+  std::array<basis::MatrixVector,3> component_matrices;
 
   for (int T0=parameters.T0_min; T0<=parameters.T0_max; ++T0)
     // for each isospin component
@@ -156,8 +154,8 @@ void write_test_two_body(const std::string& filename)
   // set up operator containers
   //
   // These are vectors to store information for T0=0/1/2 components.
-  std::vector<basis::TwoBodySectorsLSJT> component_sectors(3);
-  std::vector<basis::MatrixVector> component_matrices(3);
+  std::array<basis::TwoBodySectorsLSJT,3> component_sectors;
+  std::array<basis::MatrixVector,3> component_matrices;
 
   // populate operator containers
   int J0 = 0;

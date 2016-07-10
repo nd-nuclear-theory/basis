@@ -228,6 +228,7 @@ namespace basis {
       int J0, int T0, int g0,
       basis::SymmetryPhaseMode symmetry_phase_mode
     )
+  // DEPRECATED
   {
 
     // canonicalize indices
@@ -254,7 +255,7 @@ namespace basis {
         && (J0==0) && (g0==0)
       );
     
-    // case: Hamiltonain-like operator
+    // case: Hamiltonian-like operator
     //
     // Recall symmetry relation:
     //

@@ -182,19 +182,22 @@ namespace basis {
   //    bra_subspace_index, ket_subspace_index (int, input/output) :
   //      sector bra and ket subspace indices, possibly to be swapped
   //    swapped_subspaces (bool, output) : whether or not subspace
-  //      indices were swapped
+  //      indices were swapped (off-diagonal sectors)
   //    bra_state_index, ket_state_index (int, input/output) :
   //      bra and ket state indices, possibly to be swapped if sector
   //      is diagonal sector
   //    swapped_states (bool, output) : whether or not state
-  //      indices were swapped
+  //      indices were swapped (diagonal sectors)
   {
-    // process subspace indices
+    // process subspace indices (off-diagonal sectors)
     swapped_subspaces = !(bra_subspace_index <= ket_subspace_index);
     if (swapped_subspaces)
-      std::swap(bra_subspace_index,ket_subspace_index);
+      {
+        std::swap(bra_subspace_index,ket_subspace_index);
+        std::swap(bra_state_index,ket_state_index);  // so index stays with sector
+      }
 
-    // process state indices
+    // process state indices (diagonal sectors)
     swapped_states = (bra_subspace_index == ket_subspace_index) 
       & !(bra_state_index <= ket_state_index);
     if (swapped_states)
