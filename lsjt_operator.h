@@ -5,6 +5,15 @@
   operator matrices in LSJT coupling scheme.  Written for use in
   Moshinsky transformation.
 
+  A few functions which provide simple "bookkeeping" operations on
+  operators, such as ConstructIdentityOperatorRelativeLSJT or
+  GatherBlocksTwoBodyNLSJTToTwoBodyLSJT are included here.  These
+  provide examples of the coding idioms required to work with
+  JT-coupled operators (looping over T0 components, looking up matrix
+  elements, etc.).  But functions which have more mathematical content
+  to them (Racah reduction formulas, Moshinsky transformation,
+  recoupling, etc.) are deferred to the dedicated Moshinsky code.
+
   Language: C++11
                                  
   Mark A. Caprio
@@ -23,8 +32,12 @@
   7/8/16 (mac): Add two-body LSJT operator file I/O.
   7/9/16 (mac): Add support for canonicalizing indices in relative
     LSJT matrix element lookup (for Hamiltonian-like operators).
-  7/10/16 (mac): Add support for canonicalizing indices in general
-    LSJT matrix element lookup (for Hamiltonian-like operators).
+  7/10/16 (mac):
+    - Add support for canonicalizing indices in general
+      LSJT matrix element lookup (for Hamiltonian-like operators).
+    - Define OperatorLabelsJT and add documentation on operators.
+    - Incorporate some basic LSJT operator construction and
+      manipulation functions.
 
 ****************************************************************/
 
@@ -211,16 +224,22 @@ namespace basis {
   //     specify that they require input matrices or give output
   //     matrices in which the lower triangle is filled as well.
   //
-  //   Not all three isospin components (T0=0,1,2) need actually be
-  //   *used* for a given operator, depending on the parameter values
-  //   T0_min and T0_max.  However, we specify that the arrays have
-  //   the fixed size of 3 to keep the access scheme (i.e.,
-  //   component_sectors[T0] and component_matrices[T0]) consistent.
-  //   Any unused isospin components will just be default initialized
-  //   and can be ignored.
-  
+  // Not all three isospin components (T0=0,1,2) need actually be
+  // *used* for a given operator, depending on the parameter values
+  // T0_min and T0_max.  However, we specify that the arrays have the
+  // fixed size of 3 to keep the access scheme (i.e.,
+  // component_sectors[T0] and component_matrices[T0]) consistent.
+  // Any unused isospin components will just be default initialized
+  // and can be ignored.
+  // 
+  // A function which works with this operator *might* also need
+  // access to the full space definition (e.g., RelativeCMSSpaceNLSJT)
+  // to look up subspaces directly by their labels, etc., if the
+  // required information is not all readily available through
+  // component_sectors.
+
   ////////////////////////////////////////////////////////////////
-  // operator header
+  // operator labeling information
   ////////////////////////////////////////////////////////////////
 
   enum class SymmetryPhaseMode {kHermitian=0};
@@ -237,7 +256,8 @@ namespace basis {
 
   struct RelativeOperatorParametersLSJT
     : OperatorLabelsJT
-  // Parameters for relative operator storage.
+  // Parameters for relative operator storage, corresponding to the
+  // contents of a relative LSJT operator file header.
   //
   // Contains operator tensorial properties (inherited from
   // OperatorLabelsJT), plus file format version and truncation
@@ -429,9 +449,60 @@ namespace basis {
         }
     }
 
+  ////////////////////////////////////////////////////////////////
+  // relative LSJT operator construction
+  ////////////////////////////////////////////////////////////////
+
+  void ConstructIdentityOperatorRelativeLSJT(
+      const basis::OperatorLabelsJT& operator_labels,
+      const basis::RelativeSpaceLSJT& relative_space,
+      std::array<basis::RelativeSectorsLSJT,3>& relative_component_sectors,
+      std::array<basis::MatrixVector,3>& relative_component_matrices
+    );
+  // Construct identity operator in relative LSJT basis.
+  //
+  // See notes on "internal representation of an operator in JT
+  // scheme" in lsjt_operator.h for the general principles of how the
+  // operators are represented.
+  //
+  // Arguments:
+  //   operator_labels (basis::OperatorLabelsJT) : tensorial properties of operator
+  //   relative_space (...) : target space
+  //   relative_component_sectors (..., output) : target sectors
+  //   relative_component_matrices (..., output) : target matrices
 
   ////////////////////////////////////////////////////////////////
-  // two-body LSJT operator
+  // two-body LSJT operator manipulation
+  ////////////////////////////////////////////////////////////////
+
+  void GatherBlocksTwoBodyNLSJTToTwoBodyLSJT(
+      const basis::OperatorLabelsJT& operator_labels,
+      const basis::TwoBodySpaceNLSJT& two_body_nlsjt_space,
+      const std::array<basis::TwoBodySectorsNLSJT,3>& two_body_nlsjt_component_sectors,
+      const std::array<basis::MatrixVector,3>& two_body_nlsjt_component_matrices,
+      const basis::TwoBodySpaceLSJT& two_body_lsjt_space,
+      std::array<basis::TwoBodySectorsLSJT,3>& two_body_lsjt_component_sectors,
+      std::array<basis::MatrixVector,3>& two_body_lsjt_component_matrices
+    );
+  // Assemble two-body representation of operator in LSJT basis, from
+  // two-body representation in NLSJT basis, i.e., gathering the
+  // matrix elements from different N blocks.
+  //
+  // See notes on "internal representation of an operator in JT
+  // scheme" in lsjt_operator.h for the general principles of how the
+  // operators are represented.
+  //
+  // Arguments:
+  //   operator_labels (basis::OperatorLabelsJT) : tensorial properties of operator
+  //   two_body_nlsjt_space (...) : source space
+  //   two_body_nlsjt_component_sectors (...) : source sectors
+  //   two_body_nlsjt_component_matrices (...) : source matrices
+  //   two_body_lsjt_space (...) : target space
+  //   two_body_lsjt_component_sectors (..., output) : target sectors
+  //   two_body_lsjt_component_matrices (..., output) : target matrices
+
+  ////////////////////////////////////////////////////////////////
+  // two-body LSJT operator output
   ////////////////////////////////////////////////////////////////
 
   // Note that the primary intention of the output for two-body

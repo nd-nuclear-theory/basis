@@ -35,6 +35,10 @@ void write_test_relative(const std::string& filename)
   std::array<basis::MatrixVector,3> component_matrices;
 
   // populate operator containers
+  //
+  // Note: This can now instead be done automatically using
+  // ConstructIdentityOperatorRelativeLSJT.
+
   int J0 = 0;
   int g0 = 0;
   for (int T0=0; T0<=2; ++T0)
@@ -200,6 +204,38 @@ void write_test_two_body(const std::string& filename)
   ofile << os.str();
 }
 
+void identity_test()
+{
+  ////////////////////////////////////////////////////////////////
+  // construct relative identity operator
+  ////////////////////////////////////////////////////////////////
+
+  // define operator properties
+  int Nmax_relative = 4;
+  int Jmax_relative = Nmax_relative+1;
+
+  basis::OperatorLabelsJT operator_labels;
+  operator_labels.J0 = 0;
+  operator_labels.g0 = 0;
+  operator_labels.T0_min = 0;
+  operator_labels.T0_max = 2;
+  operator_labels.symmetry_phase_mode = basis::SymmetryPhaseMode::kHermitian;
+
+  // define space and operator containers
+  basis::RelativeSpaceLSJT relative_space(Nmax_relative,Jmax_relative);
+  std::array<basis::RelativeSectorsLSJT,3> relative_component_sectors;
+  std::array<basis::MatrixVector,3> relative_component_matrices;
+
+  // do construction
+  ConstructIdentityOperatorRelativeLSJT(
+      operator_labels,
+      relative_space,relative_component_sectors,relative_component_matrices
+    );
+
+  // and now it would be nice to inspect the contents, wouldn't it,
+  // ...
+
+}
 
 ////////////////////////////////////////////////////////////////
 // main
@@ -214,6 +250,8 @@ int main(int argc, char **argv)
  
   std::string two_body_filename("test/lsjt_operator_test_two_body_identity_nas_Nmax02.dat");
   write_test_two_body(two_body_filename);
+
+  identity_test();
 
   // termination
   return 0;
