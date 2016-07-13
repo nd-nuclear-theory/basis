@@ -361,9 +361,6 @@ namespace basis {
   //    symmetry_phase_mode (basis::SymmetryPhaseMode) : operator
   //      conjugation symmetry
 
-
-
-
   template <typename tLSJTSpace>
     void CanonicalizeIndicesLSJT(
         const tLSJTSpace& space,
@@ -491,6 +488,9 @@ namespace basis {
   // See notes on "internal representation of an operator in JT
   // scheme" in lsjt_operator.h for the general principles of how the
   // operators are represented.
+  //
+  // Symmetry: Currently the lower triangle of diagonal sectors is
+  // written on output, but not accessed on input.  (TO REASSESS)
   //
   // Arguments:
   //   operator_labels (basis::OperatorLabelsJT) : tensorial properties of operator

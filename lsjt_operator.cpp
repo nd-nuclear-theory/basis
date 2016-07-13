@@ -409,13 +409,20 @@ namespace basis {
 
                 // canonicalize indices for matrix element lookup
                 //
-                // We must ensure that we look up a canonical (upper
-                // triangular) NLSJT sector.  Looking up a canonical
-                // (upper triangular) matrix element within a diagonal
-                // sector is not essential, since the Moshinsky
-                // transformation machinery up until this point has
-                // actually been populating the full (square) matrices
-                // for the diagonal sectors.
+                // This should only be necessary when we are filling
+                // in a *lower* triangle matrix element of a diagonal
+                // target sector.  Then we must ensure that we look up
+                // a canonical (upper triangular) NLSJT sector.
+                //
+                // Otherwise, matrix elements which are canonical by
+                // LSJT sector, and ordered by N within a LSJT sector,
+                // should also be canonical by (LSJT;N) sector.
+                //
+                // Looking up a canonical (upper triangular) matrix
+                // element within a diagonal sector is not essential,
+                // since the Moshinsky transformation machinery up
+                // until this point has actually been populating the
+                // full (square) matrices for the diagonal sectors.
                 //
                 // Note that no canonicalization factor is needed.
                 // Since N is the trailing entry in the subspace label
