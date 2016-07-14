@@ -37,7 +37,7 @@ namespace basis {
     //	  dimension_ = (Nmax() - g()) / 2 + 1;
 
     // iterate over total oscillator quanta
-    for (int N = g; N <= Nmax; N +=2)
+    for (int N = L; N <= Nmax; N +=2)
       PushStateLabels(StateLabelsType(N));
 
   }

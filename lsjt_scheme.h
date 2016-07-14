@@ -54,6 +54,7 @@
     - Add debug strings for RelativeLSJT basis.
     - Add default constructors for remaining subspaces, spaces,
       and sectors.
+  7/13/16 (mac): Fix relative enumeration.
 
 ****************************************************************/
 
@@ -117,8 +118,8 @@ namespace basis {
   // Within a subspace, the states are ordered by:
   //   -- increasing N
   // and subject to:
-  //   -- oscillator branching constraint N~L (or, equivalently, 
-  //      parity constraint N~g)
+  //   -- oscillator branching constraints N>=L and N~L (or,
+  //      equivalently, parity constraint N~g)
   //
   // This basis is for *identical* particle states, but the
   // antisymmetry constraint is already applied at the level of
