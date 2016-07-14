@@ -498,7 +498,7 @@ namespace basis {
                       two_body_nlsjt_subspace_labels_ket
                     );
                 int two_body_nlsjt_state_index_ket
-                  = two_body_nlsjt_space.GetSubspace(two_body_nlsjt_subspace_index_bra).LookUpStateIndex(
+                  = two_body_nlsjt_space.GetSubspace(two_body_nlsjt_subspace_index_ket).LookUpStateIndex(
                       two_body_nlsjt_state_labels_ket
                     );
 
