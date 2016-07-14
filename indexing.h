@@ -83,6 +83,10 @@
     - Add utility member functions ContainsState, ContainsSector,
       IsDiagonal.
   7/5/16 (mac): Add pass-through typedef StateLabelsType to BaseState.
+  7/13/16 (mac): Clean up accessor naming: Add labels() accessor to 
+    subspace and state, deprecating subspace GetSubspaceLabels() and 
+    state GetStateLabels().  Add subspace() accessor to state, deprecating
+    Subspace().
 
 ****************************************************************/
 
@@ -148,6 +152,16 @@ namespace basis {
 
     const SubspaceLabelsType& GetSubspaceLabels() const
     // Return the labels of the subspace itself.
+    //
+    // DEPRECATED in favor of labels().
+    {
+      return labels_;
+    }
+
+    const SubspaceLabelsType& labels() const
+    // Return the labels of the subspace itself.
+    //
+    // DEPRECATED in favor of labels().
     {
       return labels_;
     }
@@ -303,10 +317,30 @@ namespace basis {
 
       const SubspaceType& Subspace() const
       // Return reference to subspace in which this state lies.
+      //
+      // DEPRECATED in favor of subspace().
+      {return *subspace_ptr_;}
+
+      const SubspaceType& subspace() const
+      // Return reference to subspace in which this state lies.
       {return *subspace_ptr_;}
       
 
       const StateLabelsType& GetStateLabels() const 
+      // Return labels of this state.
+      //
+      // DEPRECATED in favor of labels().
+      //
+      // Note: It is not normally expected that this member function
+      // should be used directly (see related comment for
+      // BaseSubspace::GetStateLabels).  Rather, derived types will
+      // provide accessors for convenient access to individual labels.
+      {
+        return Subspace().GetStateLabels(index());
+      }
+
+
+      const StateLabelsType& labels() const 
       // Return labels of this state.
       //
       // Note: It is not normally expected that this member function
