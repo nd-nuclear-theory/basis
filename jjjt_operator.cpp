@@ -96,6 +96,11 @@ namespace basis {
               // for each target matrix element
               {
                 
+                // ensure canonical matrix element if diagonal sector
+                if (two_body_jjjt_sector.IsDiagonal())
+                  if (!(bra_index<=ket_index))
+                    continue;
+
                 // retrieve target states
                 basis::TwoBodyStateJJJT two_body_jjjt_bra(two_body_jjjt_sector.bra_subspace(),bra_index);
                 basis::TwoBodyStateJJJT two_body_jjjt_ket(two_body_jjjt_sector.ket_subspace(),ket_index);

@@ -401,6 +401,11 @@ namespace basis {
               // for each target matrix element
               {
                 
+                // ensure canonical matrix element if diagonal sector
+                if (two_body_lsjt_sector.IsDiagonal())
+                  if (!(bra_index<=ket_index))
+                    continue;
+
                 // retrieve target states
                 basis::TwoBodyStateLSJT two_body_lsjt_bra(two_body_lsjt_sector.bra_subspace(),bra_index);
                 basis::TwoBodyStateLSJT two_body_lsjt_ket(two_body_lsjt_sector.ket_subspace(),ket_index);
