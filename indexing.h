@@ -150,7 +150,7 @@ namespace basis {
     // retrieval
     ////////////////////////////////////////////////////////////////
 
-    const SubspaceLabelsType& GetSubspaceLabels() const
+    const SubspaceLabelsType& labels() const
     // Return the labels of the subspace itself.
     //
     // DEPRECATED in favor of labels().
@@ -158,7 +158,7 @@ namespace basis {
       return labels_;
     }
 
-    const SubspaceLabelsType& labels() const
+    const SubspaceLabelsType& GetSubspaceLabels() const
     // Return the labels of the subspace itself.
     //
     // DEPRECATED in favor of labels().
@@ -315,21 +315,18 @@ namespace basis {
       // retrieval
       ////////////////////////////////////////////////////////////////
 
+      const SubspaceType& subspace() const
+      // Return reference to subspace in which this state lies.
+      {return *subspace_ptr_;}
+      
       const SubspaceType& Subspace() const
       // Return reference to subspace in which this state lies.
       //
       // DEPRECATED in favor of subspace().
       {return *subspace_ptr_;}
 
-      const SubspaceType& subspace() const
-      // Return reference to subspace in which this state lies.
-      {return *subspace_ptr_;}
-      
-
-      const StateLabelsType& GetStateLabels() const 
+      const StateLabelsType& labels() const 
       // Return labels of this state.
-      //
-      // DEPRECATED in favor of labels().
       //
       // Note: It is not normally expected that this member function
       // should be used directly (see related comment for
@@ -339,9 +336,10 @@ namespace basis {
         return Subspace().GetStateLabels(index());
       }
 
-
-      const StateLabelsType& labels() const 
+      const StateLabelsType& GetStateLabels() const 
       // Return labels of this state.
+      //
+      // DEPRECATED in favor of labels().
       //
       // Note: It is not normally expected that this member function
       // should be used directly (see related comment for

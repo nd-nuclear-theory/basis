@@ -38,6 +38,7 @@
     - Define OperatorLabelsJT and add documentation on operators.
     - Incorporate some basic LSJT operator construction and
       manipulation functions.
+  7/13/16 (mac): Revise code for NLSJT->LSJT gathering operation.
 
 ****************************************************************/
 
@@ -472,7 +473,7 @@ namespace basis {
   // two-body LSJT operator manipulation
   ////////////////////////////////////////////////////////////////
 
-  void GatherBlocksTwoBodyNLSJTToTwoBodyLSJT(
+  void GatherOperatorTwoBodyNLSJTToTwoBodyLSJT(
       const basis::OperatorLabelsJT& operator_labels,
       const basis::TwoBodySpaceNLSJT& two_body_nlsjt_space,
       const std::array<basis::TwoBodySectorsNLSJT,3>& two_body_nlsjt_component_sectors,
