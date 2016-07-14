@@ -497,52 +497,52 @@ namespace basis {
                       two_body_nlsjt_state_labels_ket
                     );
 
-                // canonicalize indices for matrix element lookup
-                //
-                // Matrix elements which are canonical by
-                // LSJT sector, and ordered by N within a LSJT sector,
-                // should also be canonical by (LSJT;N) sector.  That
-                // is, the upper triangle of a matrix with basis
-                // states ordered by
-                //
-                //   (L,S,J,T,g) : ([N],N1,l1,N2,l2)
-                //
-                // or
-                //
-                //   (L,S,J,T,g,N) : (N1,l1,N2,l2)
-                //
-                // should be identica.
-                //
-                // So canonicalization should only be necessary when
-                // we are filling in a *lower* triangle matrix element
-                // of a diagonal target sector.  Then we must ensure
-                // that we look up a canonical (upper triangular)
-                // NLSJT sector.
-                //
-                // If the matrix element happens to fall within a
-                // diagonal NLSJT subblocks, canonicalization of the
-                // state indices should not actually be necessary,
-                // since the Moshinsky transformation machinery up
-                // until this point has actually been populating the
-                // full (square) matrices for the diagonal sectors.
-                //
-                // Note that no canonicalization factor is needed.
-                // Since N is the least significant subspace label
-                // in the lexicographic ordering, canonical
-                // swaps will never entail swapping subspace LSJT
-                // labels, just the N labels.
-                //
-                // Maybe a saner alternative is just to look up upper
-                // triangular matrix elements, then brute force
-                // symmetrize all LSJT diagonal sectors.
-
-                bool swapped_subspaces, swapped_states;
-                basis::CanonicalizeIndices(
-                    two_body_nlsjt_subspace_index_bra,two_body_nlsjt_subspace_index_ket,
-                    swapped_subspaces,
-                    two_body_nlsjt_state_index_bra,two_body_nlsjt_state_index_ket,
-                    swapped_states
-                  );
+                // // canonicalize indices for matrix element lookup
+                // //
+                // // Matrix elements which are canonical by
+                // // LSJT sector, and ordered by N within a LSJT sector,
+                // // should also be canonical by (LSJT;N) sector.  That
+                // // is, the upper triangle of a matrix with basis
+                // // states ordered by
+                // //
+                // //   (L,S,J,T,g) : ([N],N1,l1,N2,l2)
+                // //
+                // // or
+                // //
+                // //   (L,S,J,T,g,N) : (N1,l1,N2,l2)
+                // //
+                // // should be identical.
+                // //
+                // // So canonicalization should only be necessary when
+                // // we are filling in a *lower* triangle matrix element
+                // // of a diagonal target sector.  Then we must ensure
+                // // that we look up a canonical (upper triangular)
+                // // NLSJT sector.
+                // //
+                // // If the matrix element happens to fall within a
+                // // diagonal NLSJT subblocks, canonicalization of the
+                // // state indices should not actually be necessary,
+                // // since the Moshinsky transformation machinery up
+                // // until this point has actually been populating the
+                // // full (square) matrices for the diagonal sectors.
+                // //
+                // // Note that no canonicalization factor is needed.
+                // // Since N is the least significant subspace label
+                // // in the lexicographic ordering, canonical
+                // // swaps will never entail swapping subspace LSJT
+                // // labels, just the N labels.
+                // //
+                // // Maybe a saner alternative is just to look up upper
+                // // triangular matrix elements, then brute force
+                // // symmetrize all LSJT diagonal sectors.
+                // 
+                // bool swapped_subspaces, swapped_states;
+                // basis::CanonicalizeIndices(
+                //     two_body_nlsjt_subspace_index_bra,two_body_nlsjt_subspace_index_ket,
+                //     swapped_subspaces,
+                //     two_body_nlsjt_state_index_bra,two_body_nlsjt_state_index_ket,
+                //     swapped_states
+                //   );
 
                 // look up matrix element
                 int two_body_nlsjt_sector_index

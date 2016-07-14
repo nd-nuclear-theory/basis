@@ -9,7 +9,7 @@ modules_h = indexing
 
 # modules -- header-plus-object 
 ##modules_ho = jt_scheme
-modules_ho = lsjt_scheme lsjt_operator jjjt_scheme
+modules_ho = lsjt_scheme lsjt_operator jjjt_scheme jjjt_operator
 modules_ho += jjjpn_scheme_general
 
 # programs

@@ -470,7 +470,7 @@ namespace basis {
   //   relative_component_matrices (..., output) : target matrices
 
   ////////////////////////////////////////////////////////////////
-  // two-body LSJT operator manipulation
+  // two-body LSJT operator -- gather N blocks
   ////////////////////////////////////////////////////////////////
 
   void GatherOperatorTwoBodyNLSJTToTwoBodyLSJT(
@@ -490,8 +490,8 @@ namespace basis {
   // scheme" in lsjt_operator.h for the general principles of how the
   // operators are represented.
   //
-  // Symmetry: Currently the lower triangle of diagonal sectors is
-  // written on output, but not accessed on input.  (TO REASSESS)
+  // Symmetry: The lower triangle of diagonal sectors is
+  // zero-initialized, but not populated.
   //
   // Arguments:
   //   operator_labels (basis::OperatorLabelsJT) : tensorial properties of operator
@@ -543,8 +543,8 @@ namespace basis {
   // Arguments:
   //   os (std::ostream) : text-mode output stream
   //   T0 (int) : isospin for this isospin component
-  //   sector (basis::TwoBodySectorsLSJT) :  sectors defining operator
-  //   matrices (basis::MatrixVector) :  matrices defining operator
+  //   sector (basis::TwoBodySectorsLSJT) : sectors defining operator
+  //   matrices (basis::MatrixVector) : matrices defining operator
   //   conversion (basis::NormalizationConversion) : specifies any 
   //     conversion between AS and NAS for output
 
