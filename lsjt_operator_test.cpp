@@ -15,7 +15,7 @@
 // test parts
 ////////////////////////////////////////////////////////////////
 
-void write_test_relative(const std::string& filename)
+void WriteTestRelative(const std::string& filename)
 {
   ////////////////////////////////////////////////////////////////
   // defining operator
@@ -23,10 +23,22 @@ void write_test_relative(const std::string& filename)
 
   std::cout << "Setup" << std::endl;
 
-  // set up space
-  int Nmax = 2;
-  int Jmax = 3;
-  basis::RelativeSpaceLSJT space(Nmax,Jmax);
+  // set operator and file header parameters
+  basis::RelativeOperatorParametersLSJT parameters;
+  // file format
+  parameters.version=1;
+  // operator tensorial parameters
+  parameters.J0=0;
+  parameters.g0=0;
+  parameters.symmetry_phase_mode=basis::SymmetryPhaseMode::kHermitian;
+  parameters.T0_min=0;
+  parameters.T0_max=2;
+  // relative basis parameters
+  parameters.Nmax=2;
+  parameters.Jmax=parameters.Nmax+1;
+
+  // set up relative space
+  basis::RelativeSpaceLSJT space(parameters.Nmax,parameters.Jmax);
 
   // set up operator containers
   //
@@ -39,14 +51,12 @@ void write_test_relative(const std::string& filename)
   // Note: This can now instead be done automatically using
   // ConstructIdentityOperatorRelativeLSJT.
 
-  int J0 = 0;
-  int g0 = 0;
-  for (int T0=0; T0<=2; ++T0)
+  for (int T0=parameters.T0_min; T0<=parameters.T0_max; ++T0)
     // for each isospin component
     {
 
       // enumerate sectors
-      component_sectors[T0] = basis::RelativeSectorsLSJT(space,J0,T0,g0);
+      component_sectors[T0] = basis::RelativeSectorsLSJT(space,parameters.J0,T0,parameters.g0);
       std::cout << " T0 " << T0 << " size " << component_sectors[T0].size() << std::endl;
           
       // populate matrices
@@ -64,15 +74,6 @@ void write_test_relative(const std::string& filename)
   std::ostringstream os;
 
   // write header parameters
-  basis::RelativeOperatorParametersLSJT parameters;
-  parameters.version=1;
-  parameters.J0=J0;
-  parameters.g0=g0;
-  parameters.symmetry_phase_mode=basis::SymmetryPhaseMode::kHermitian;
-  parameters.T0_min=0;
-  parameters.T0_max=2;
-  parameters.Nmax=Nmax;
-  parameters.Jmax=Jmax;
   basis::WriteRelativeOperatorParametersLSJT(os,parameters);
 
   // write matrices
@@ -93,7 +94,7 @@ void write_test_relative(const std::string& filename)
   ofile << os.str();
 }
 
-void read_test_relative(const std::string& filename)
+void ReadTestRelative(const std::string& filename)
 {
   ////////////////////////////////////////////////////////////////
   // read test
@@ -140,7 +141,7 @@ void read_test_relative(const std::string& filename)
     }
 }
 
-void write_test_two_body(const std::string& filename)
+void WriteTestTwoBody(const std::string& filename)
 {
   ////////////////////////////////////////////////////////////////
   // defining operator
@@ -204,7 +205,7 @@ void write_test_two_body(const std::string& filename)
   ofile << os.str();
 }
 
-void identity_test()
+void IdentityTest()
 {
   ////////////////////////////////////////////////////////////////
   // construct relative identity operator
@@ -245,13 +246,13 @@ int main(int argc, char **argv)
 {
 
   std::string relative_filename("test/lsjt_operator_test_relative_identity_Nmax02.dat");
-  write_test_relative(relative_filename);
-  read_test_relative(relative_filename);
+  WriteTestRelative(relative_filename);
+  ReadTestRelative(relative_filename);
  
   std::string two_body_filename("test/lsjt_operator_test_two_body_identity_nas_Nmax02.dat");
-  write_test_two_body(two_body_filename);
+  WriteTestTwoBody(two_body_filename);
 
-  identity_test();
+  IdentityTest();
 
   // termination
   return 0;
