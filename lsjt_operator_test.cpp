@@ -24,21 +24,21 @@ void WriteTestRelative(const std::string& filename)
   std::cout << "Setup" << std::endl;
 
   // set operator and file header parameters
-  basis::RelativeOperatorParametersLSJT parameters;
+  basis::RelativeOperatorParametersLSJT operator_parameters;
   // file format
-  parameters.version=1;
+  operator_parameters.version=1;
   // operator tensorial parameters
-  parameters.J0=0;
-  parameters.g0=0;
-  parameters.symmetry_phase_mode=basis::SymmetryPhaseMode::kHermitian;
-  parameters.T0_min=0;
-  parameters.T0_max=2;
+  operator_parameters.J0=0;
+  operator_parameters.g0=0;
+  operator_parameters.symmetry_phase_mode=basis::SymmetryPhaseMode::kHermitian;
+  operator_parameters.T0_min=0;
+  operator_parameters.T0_max=2;
   // relative basis parameters
-  parameters.Nmax=2;
-  parameters.Jmax=parameters.Nmax+1;
+  operator_parameters.Nmax=2;
+  operator_parameters.Jmax=operator_parameters.Nmax+1;
 
   // set up relative space
-  basis::RelativeSpaceLSJT space(parameters.Nmax,parameters.Jmax);
+  basis::RelativeSpaceLSJT space(operator_parameters.Nmax,operator_parameters.Jmax);
 
   // set up operator containers
   //
@@ -51,12 +51,12 @@ void WriteTestRelative(const std::string& filename)
   // Note: This can now instead be done automatically using
   // ConstructIdentityOperatorRelativeLSJT.
 
-  for (int T0=parameters.T0_min; T0<=parameters.T0_max; ++T0)
+  for (int T0=operator_parameters.T0_min; T0<=operator_parameters.T0_max; ++T0)
     // for each isospin component
     {
 
       // enumerate sectors
-      component_sectors[T0] = basis::RelativeSectorsLSJT(space,parameters.J0,T0,parameters.g0);
+      component_sectors[T0] = basis::RelativeSectorsLSJT(space,operator_parameters.J0,T0,operator_parameters.g0);
       std::cout << " T0 " << T0 << " size " << component_sectors[T0].size() << std::endl;
           
       // populate matrices
@@ -74,10 +74,10 @@ void WriteTestRelative(const std::string& filename)
   std::ostringstream os;
 
   // write header parameters
-  basis::WriteRelativeOperatorParametersLSJT(os,parameters);
+  basis::WriteRelativeOperatorParametersLSJT(os,operator_parameters);
 
   // write matrices
-  for (int T0=parameters.T0_min; T0<=parameters.T0_max; ++T0)
+  for (int T0=operator_parameters.T0_min; T0<=operator_parameters.T0_max; ++T0)
     {
       basis::WriteRelativeOperatorComponentLSJT(
           os,
@@ -106,21 +106,21 @@ void ReadTestRelative(const std::string& filename)
   std::ifstream is(filename.c_str());
 
   // read header parameters
-  basis::RelativeOperatorParametersLSJT parameters;
-  basis::ReadRelativeOperatorParametersLSJT(is,parameters);
-  int J0=parameters.J0;
-  int g0=parameters.g0;
+  basis::RelativeOperatorParametersLSJT operator_parameters;
+  basis::ReadRelativeOperatorParametersLSJT(is,operator_parameters);
+  int J0=operator_parameters.J0;
+  int g0=operator_parameters.g0;
   // and inspect...
-  basis::WriteRelativeOperatorParametersLSJT(std::cout,parameters);
+  basis::WriteRelativeOperatorParametersLSJT(std::cout,operator_parameters);
 
   // set up space
-  basis::RelativeSpaceLSJT space(parameters.Nmax,parameters.Jmax);
+  basis::RelativeSpaceLSJT space(operator_parameters.Nmax,operator_parameters.Jmax);
 
   // read matrices
   std::array<basis::RelativeSectorsLSJT,3> component_sectors;
   std::array<basis::MatrixVector,3> component_matrices;
 
-  for (int T0=parameters.T0_min; T0<=parameters.T0_max; ++T0)
+  for (int T0=operator_parameters.T0_min; T0<=operator_parameters.T0_max; ++T0)
     // for each isospin component
     {
       // enumerate sectors
