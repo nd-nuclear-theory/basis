@@ -410,50 +410,6 @@ namespace basis {
                 basis::TwoBodyStateLSJT two_body_lsjt_bra(two_body_lsjt_sector.bra_subspace(),bra_index);
                 basis::TwoBodyStateLSJT two_body_lsjt_ket(two_body_lsjt_sector.ket_subspace(),ket_index);
                 
-                // // look up source subspace indices
-                // int two_body_nlsjt_bra_subspace_index = two_body_nlsjt_space.LookUpSubspaceIndex(
-                //     basis::TwoBodySubspaceNLSJTLabels(
-                //         two_body_lsjt_bra.L(),
-                //         two_body_lsjt_bra.S(),
-                //         two_body_lsjt_bra.J(),
-                //         two_body_lsjt_bra.T(),
-                //         two_body_lsjt_bra.g(),
-                //         two_body_lsjt_bra.N()
-                //       )
-                //   );
-                // int two_body_nlsjt_ket_subspace_index = two_body_nlsjt_space.LookUpSubspaceIndex(
-                //     basis::TwoBodySubspaceNLSJTLabels(
-                //         two_body_lsjt_ket.L(),
-                //         two_body_lsjt_ket.S(),
-                //         two_body_lsjt_ket.J(),
-                //         two_body_lsjt_ket.T(),
-                //         two_body_lsjt_ket.g(),
-                //         two_body_lsjt_ket.N()
-                //       )
-                //   );
-                // 
-                // // look up source matrix element indices
-                // const basis::TwoBodySubspaceNLSJT& two_body_nlsjt_bra_subspace
-                //   = two_body_nlsjt_space.GetSubspace(two_body_nlsjt_bra_subspace_index);
-                // const basis::TwoBodySubspaceNLSJT& two_body_nlsjt_ket_subspace
-                //   = two_body_nlsjt_space.GetSubspace(two_body_nlsjt_ket_subspace_index);
-                // int two_body_nlsjt_bra_index = two_body_nlsjt_bra_subspace.LookUpStateIndex(
-                //     basis::TwoBodyStateNLSJT::StateLabelsType(
-                //         two_body_lsjt_bra.N1(),
-                //         two_body_lsjt_bra.l1(),
-                //         two_body_lsjt_bra.N2(),
-                //         two_body_lsjt_bra.l2()
-                //       )
-                //   );
-                // int two_body_nlsjt_ket_index = two_body_nlsjt_ket_subspace.LookUpStateIndex(
-                //     basis::TwoBodyStateNLSJT::StateLabelsType(
-                //         two_body_lsjt_ket.N1(),
-                //         two_body_lsjt_ket.l1(),
-                //         two_body_lsjt_ket.N2(),
-                //         two_body_lsjt_ket.l2()
-                //       )
-                //   );
-
                 // extract source bra labels
                 TwoBodySubspaceLSJTLabels two_body_lsjt_subspace_labels_bra
                   = two_body_lsjt_bra.subspace().labels();
@@ -501,6 +457,24 @@ namespace basis {
                   = two_body_nlsjt_space.GetSubspace(two_body_nlsjt_subspace_index_ket).LookUpStateIndex(
                       two_body_nlsjt_state_labels_ket
                     );
+
+                // // debugging
+                // const TwoBodySubspaceNLSJT& two_body_nlsjt_subspace_bra
+                //   = two_body_nlsjt_space.GetSubspace(two_body_nlsjt_subspace_index_bra);
+                // const TwoBodySubspaceNLSJT& two_body_nlsjt_subspace_ket
+                //   = two_body_nlsjt_space.GetSubspace(two_body_nlsjt_subspace_index_ket);
+                // std::cout << " pre-lookup "
+                //           << " " << two_body_nlsjt_subspace_index_bra
+                //           << " " << two_body_nlsjt_subspace_index_ket
+                //           << " " << ";"
+                //           << " " << two_body_nlsjt_state_index_bra
+                //           << " " << two_body_nlsjt_state_index_ket
+                //           << " " << ";"
+                //           << " " << two_body_nlsjt_subspace_bra.LabelStr()
+                //           << " " << two_body_nlsjt_subspace_ket.LabelStr()
+                //           << " " << two_body_nlsjt_subspace_bra.size()
+                //           << " " << two_body_nlsjt_subspace_ket.size()
+                //           << std::endl;
 
                 // // canonicalize indices for matrix element lookup
                 // //
