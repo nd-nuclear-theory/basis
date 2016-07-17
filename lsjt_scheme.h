@@ -55,6 +55,7 @@
     - Add default constructors for remaining subspaces, spaces,
       and sectors.
   7/13/16 (mac): Fix relative enumeration.
+  7/16/16 (mac): Add debug strings for TwoBodyLSJT basis.
 
 ****************************************************************/
 
@@ -781,8 +782,11 @@ namespace basis {
       int g() const {return std::get<4>(labels_);}
       int Nmax() const {return Nmax_;}
 
-      // diagnostic string
+      // diagnostic strings
+      std::string LabelStr() const;
+      // Provide string representation of subspace labels.
       std::string DebugStr() const;
+      // Dump subspace contents.
 
       private:
 
@@ -970,8 +974,11 @@ namespace basis {
       int g() const {return std::get<4>(labels_);}
       int N() const {return std::get<5>(labels_);}  // (MODIFICATION for subspacing by N)
 
-      // diagnostic string
+      // diagnostic strings
+      std::string LabelStr() const;
+      // Provide string representation of subspace labels.
       std::string DebugStr() const;
+      // Dump subspace contents.
 
       private:
 

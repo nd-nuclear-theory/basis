@@ -679,6 +679,23 @@ namespace basis {
     return valid;
   }
 
+  std::string TwoBodySubspaceLSJT::LabelStr() const
+  {
+    std::ostringstream os;
+
+    const int width = 0;  // for now, no fixed width
+
+    os << "["
+       << " " << std::setw(width) << L() 
+       << " " << std::setw(width) << S() 
+       << " " << std::setw(width) << J() 
+       << " " << std::setw(width) << T() 
+       << " " << std::setw(width) << g()
+       << " " << "]";
+
+    return os.str();
+  }
+
   std::string TwoBodySubspaceLSJT::DebugStr() const
   {
 
@@ -873,6 +890,25 @@ namespace basis {
     valid &= ((N()%2)==g());
 
     return valid;
+  }
+
+  std::string TwoBodySubspaceNLSJT::LabelStr() const
+  {
+    std::ostringstream os;
+
+    const int width = 0;  // for now, no fixed width
+
+    os << "["
+       << " " << std::setw(width) << L() 
+       << " " << std::setw(width) << S() 
+       << " " << std::setw(width) << J() 
+       << " " << std::setw(width) << T() 
+       << " " << std::setw(width) << g()
+       << " " << ";"
+       << " " << std::setw(width) << N()
+       << " " << "]";
+
+    return os.str();
   }
 
   std::string TwoBodySubspaceNLSJT::DebugStr() const
