@@ -26,6 +26,9 @@
   7/6/16 (mac): Overhaul to new basis module conventions.
   7/7/16 (mac): Add fixed-N subspaces in two-body basis.
   7/9/16 (mac): Add default constructors.
+  7/16/16 (mac):
+    - Add debug strings.
+    - Move N to least significant subspace label in NLSJT basis.
 
 ****************************************************************/
 
@@ -143,8 +146,11 @@ namespace basis {
       int g() const {return std::get<2>(labels_);}
       int Nmax() const {return Nmax_;}
 
-      // diagnostic string
+      // diagnostic strings
+      std::string LabelStr() const;
+      // Provide string representation of subspace labels.
       std::string DebugStr() const;
+      // Dump subspace contents.
 
       private:
 
@@ -223,6 +229,7 @@ namespace basis {
 
     // diagnostic string
     std::string DebugStr() const;
+    // Dump space contents.
 
     private:
     // truncation
@@ -287,10 +294,10 @@ namespace basis {
   // Subspaces
   //
   // Within the full space, subspaces are ordered by:
-  //    -- increasing N (N=0,1,...,Nmax)  (MODIFICATION for subspacing by N)
   //    -- increasing J (J=0,1,...,Nmax+1)
   //    -- increasing T (T=0,1)
-  //    -- [increasing g (g=0,1)]  (MODIFICATION for subspacing by N)
+  //    -- increasing g (g=0,1)
+  //    -- increasing N (N=0,1,...,Nmax)  (MODIFICATION for subspacing by N)
   // subject to:
   //    -- [implicit constraint J=Nmax+1 is excluded for T=1,
   //       but this is simply enforced by pruning to subspaces of 
@@ -299,7 +306,7 @@ namespace basis {
   // 
   // Subspaces are pruned to those of nonzero dimension.
   //
-  // Note that ordering of subspaces is lexicographic by (J,T,g).
+  // Note that ordering of subspaces is lexicographic by (J,T,g,N).  (MODIFICATION for subspacing by N)
   //
   // Truncation of the space is by the two-body Nmax.
   //
@@ -364,8 +371,11 @@ namespace basis {
       int g() const {return std::get<2>(labels_);}
       int N() const {return std::get<3>(labels_);}  // (MODIFICATION for subspacing by N)
 
-      // diagnostic string
+      // diagnostic strings
+      std::string LabelStr() const;
+      // Provide string representation of subspace labels.
       std::string DebugStr() const;
+      // Dump subspace contents.
 
       private:
 
@@ -444,6 +454,7 @@ namespace basis {
 
     // diagnostic string
     std::string DebugStr() const;
+    // Dump space contents.
 
     private:
     // truncation

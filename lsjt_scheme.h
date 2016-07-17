@@ -55,7 +55,9 @@
     - Add default constructors for remaining subspaces, spaces,
       and sectors.
   7/13/16 (mac): Fix relative enumeration.
-  7/16/16 (mac): Add debug strings for TwoBodyLSJT basis.
+  7/16/16 (mac):
+    - Add debug strings for TwoBodyLSJT basis.
+    - Move N to least significant subspace label in NLSJT bases.
 
 ****************************************************************/
 
@@ -500,19 +502,19 @@ namespace basis {
   // Subspaces
   //
   // Within the full space, subspaces are ordered by:
-  //    -- increasing N (N=0,1,...,Nmax)  (MODIFICATION for subspacing by N)
   //    -- increasing L (L=0,1,...,Nmax)
   //    -- increasing S (S=0,1)
   //    -- increasing J
   //    -- increasing T (T=0,1)
-  //    -- [increasing g (g=0,1)]  (MODIFICATION for subspacing by N)
+  //    -- increasing g (g=0,1)
+  //    -- increasing N (N=0,1,...,Nmax)  (MODIFICATION for subspacing by N)
   // subject to:
   //    -- triangularity of (L,S,J)
   //    -- parity constraint N~g  (MODIFICATION for subspacing by N)
   // 
   // Subspaces are pruned to those of nonzero dimension.
   //
-  // Note that ordering of subspaces is lexicographic by (L,S,J,T,g).
+  // Note that ordering of subspaces is lexicographic by (L,S,J,T,g,N).  (MODIFICATION for subspacing by N)
   //
   // Truncation of the space is by the two-body Nmax.
   //
@@ -903,19 +905,19 @@ namespace basis {
   // Subspaces
   //
   // Within the full space, subspaces are ordered by:
-  //    -- increasing N (N=0,1,...,Nmax)  (MODIFICATION for subspacing by N)
   //    -- increasing L (L=0,1,...,Nmax)
   //    -- increasing S (S=0,1)
   //    -- increasing J
   //    -- increasing T (T=0,1)
-  //    -- [increasing g (g=0,1)]  (MODIFICATION for subspacing by N)
+  //    -- increasing g (g=0,1)
+  //    -- increasing N (N=0,1,...,Nmax)  (MODIFICATION for subspacing by N)
   // subject to:
   //    -- triangularity of (L,S,J)
   //    -- parity constraint N~g  (MODIFICATION for subspacing by N)
   // 
   // Subspaces are pruned to those of nonzero dimension.
   //
-  // Note that ordering of subspaces is lexicographic by (L,S,J,g).
+  // Note that ordering of subspaces is lexicographic by (L,S,J,T,g,N).  (MODIFICATION for subspacing by N)
   //
   // Truncation of the space is by the two-body Nmax.
   //

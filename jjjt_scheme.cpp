@@ -73,6 +73,22 @@ namespace basis {
     return valid;
   }
 
+  std::string TwoBodySubspaceJJJT::LabelStr() const
+  {
+    std::ostringstream os;
+
+    const int width = 0;  // for now, no fixed width
+
+    os << "["
+       << " " << std::setw(width) << J() 
+       << " " << std::setw(width) << T() 
+       << " " << std::setw(width) << g()
+       << " " << "]";
+
+    return os.str();
+  }
+
+
   std::string TwoBodySubspaceJJJT::DebugStr() const
   {
 
@@ -110,10 +126,8 @@ namespace basis {
 
     // iterate over J
     for (int J=0; J<=Nmax+1; ++J)
-      {
 	// iterate over T
 	for (int T=0; T<=1; ++T)
-	  {
 	    // iterate over g
 	    for (int g=0; g<=1; ++g)
 	      {
@@ -127,8 +141,6 @@ namespace basis {
 		if (subspace.size()!=0)
 		  PushSubspace(subspace);
 	      }
-	  }
-      }
   }
 
   std::string TwoBodySpaceJJJT::DebugStr() const
@@ -249,6 +261,23 @@ namespace basis {
     return valid;
   }
 
+  std::string TwoBodySubspaceNJJJT::LabelStr() const
+  {
+    std::ostringstream os;
+
+    const int width = 0;  // for now, no fixed width
+
+    os << "["
+       << " " << std::setw(width) << J() 
+       << " " << std::setw(width) << T() 
+       << " " << std::setw(width) << g()
+       << " " << ";"
+       << " " << std::setw(width) << N()
+       << " " << "]";
+
+    return os.str();
+  }
+
   std::string TwoBodySubspaceNJJJT::DebugStr() const
   {
 
@@ -284,29 +313,20 @@ namespace basis {
     // save Nmax
     Nmax_ = Nmax;
 
-    // iterate over total oscillator quanta (MODIFICATION for subspacing by N)
-    for (int N = 0; N <= Nmax; ++N)
-      {
-        // set g (MODIFICATION for subspacing by N)
-        int g = (N%2);
+    // iterate over J
+    for (int J=0; J<=Nmax+1; ++J)
+	// iterate over T
+	for (int T=0; T<=1; ++T)
+	    // iterate over g
+	    for (int g=0; g<=1; ++g)
+              // iterate over total oscillator quanta (MODIFICATION for subspacing by N)
+              for (int N = g; N <= Nmax; N +=2)
+                {	
+                  TwoBodySubspaceNJJJT subspace(J,T,g,N);  // (MODIFICATION for subspacing by N)
 
-
-        // iterate over J
-        for (int J=0; J<=N+1; ++J)   // only need to go to N+1, not Nmax+1 (MODIFICATION for subspacing by N)
-          {
-            // iterate over T
-            for (int T=0; T<=1; ++T)
-              {
-                // iterate over g -- omit (MODIFICATION for subspacing by N)
-                // for (int g=0; g<=1; ++g)
-		
-		TwoBodySubspaceNJJJT subspace(J,T,g,N);  // (MODIFICATION for subspacing by N)
-
-		if (subspace.size()!=0)
-		  PushSubspace(subspace);
-	      }
-          }
-      }
+                  if (subspace.size()!=0)
+                    PushSubspace(subspace);
+                }
   }
 
   std::string TwoBodySpaceNJJJT::DebugStr() const

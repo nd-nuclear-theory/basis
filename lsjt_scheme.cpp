@@ -323,22 +323,15 @@ namespace basis {
 
     // iterate over L
     for (int L=0; L<=Nmax; ++L)
-      {
 	// iterate over S
 	for (int S=0; S<=1; ++S)
-	  {
 	    // iterate over J
 	    // imposing triangularity (LSJ)
 	    for (int J=abs(L-S); J<=L+S; ++J)
-	      {
-
 		// iterate over T
 		for (int T=0; T<=1; ++T)
-		  {
-
 		    // iterate over g
 		    for (int g=0; g<=1; ++g)
-
 		      {
 			
 			// downshift Nmax to match parity of subspace
@@ -349,10 +342,6 @@ namespace basis {
 			if (subspace.size()!=0)
 			  PushSubspace(subspace);
 		      }
-		  }
-	      }
-	  }
-      }
   }
 
   std::string RelativeCMSpaceLSJT::DebugStr() const
@@ -516,7 +505,6 @@ namespace basis {
       }
 
     return os.str();
-
   }
 
   RelativeCMSpaceNLSJT::RelativeCMSpaceNLSJT(int Nmax)
@@ -524,36 +512,24 @@ namespace basis {
     // save Nmax
     Nmax_ = Nmax;
 
-    // iterate over total oscillator quanta (MODIFICATION for subspacing by N)
-    for (int N = 0; N <= Nmax; ++N)
-      {
-        // set g (MODIFICATION for subspacing by N)
-        int g = (N%2);
-
-        // iterate over L
-        for (int L=0; L<=N; ++L)  // only need to go to N, not Nmax (MODIFICATION for subspacing by N)
-          {
-            // iterate over S
-            for (int S=0; S<=1; ++S)
-              {
-                // iterate over J
-                // imposing triangularity (LSJ)
-                for (int J=abs(L-S); J<=L+S; ++J)
-                  {
-                    // iterate over T
-                    for (int T=0; T<=1; ++T)
-                      {
-                        // iterate over g -- omit (MODIFICATION for subspacing by N)
-                        // for (int g=0; g<=1; ++g)
-                      
-                        RelativeCMSubspaceNLSJT subspace(L,S,J,T,g,N); // (MODIFICATION for subspacing by N)
-                        if (subspace.size()!=0)
-                          PushSubspace(subspace);
-                      }
-                  }
-              }
-          }
-      }
+   // iterate over L
+    for (int L=0; L<=Nmax; ++L)
+	// iterate over S
+	for (int S=0; S<=1; ++S)
+	    // iterate over J
+	    // imposing triangularity (LSJ)
+	    for (int J=abs(L-S); J<=L+S; ++J)
+		// iterate over T
+		for (int T=0; T<=1; ++T)
+		    // iterate over g
+		    for (int g=0; g<=1; ++g)
+                      // iterate over total oscillator quanta (MODIFICATION for subspacing by N)
+                      for (int N = g; N <= Nmax; N+=2)
+                        {                      
+                          RelativeCMSubspaceNLSJT subspace(L,S,J,T,g,N); // (MODIFICATION for subspacing by N)
+                          if (subspace.size()!=0)
+                            PushSubspace(subspace);
+                        }
   }
 
   std::string RelativeCMSpaceNLSJT::DebugStr() const
@@ -729,22 +705,15 @@ namespace basis {
 
     // iterate over L
     for (int L=0; L<=Nmax; ++L)
-      {
 	// iterate over S
 	for (int S=0; S<=1; ++S)
-	  {
 	    // iterate over J
 	    // imposing triangularity (LSJ)
 	    for (int J=abs(L-S); J<=L+S; ++J)
-	      {
-
 		// iterate over T
 		for (int T=0; T<=1; ++T)
-		  {
-
 		    // iterate over g
 		    for (int g=0; g<=1; ++g)
-
 		      {
 			
 			// downshift Nmax to match parity of subspace
@@ -764,11 +733,8 @@ namespace basis {
 			if (subspace.size()!=0)
 			  PushSubspace(subspace);
 		      }
-		  }
-	      }
-	  }
-      }
   }
+
 
   std::string TwoBodySpaceLSJT::DebugStr() const
   {
@@ -937,47 +903,32 @@ namespace basis {
 
   }
 
+
   TwoBodySpaceNLSJT::TwoBodySpaceNLSJT(int Nmax)
   {
     // save Nmax
     Nmax_ = Nmax;
 
-    // iterate over total oscillator quanta (MODIFICATION for subspacing by N)
-    for (int N = 0; N <= Nmax; ++N)
-      {
-        // set g (MODIFICATION for subspacing by N)
-        int g = (N%2);
-
-        // iterate over L
-        for (int L=0; L<=N; ++L)  // only need to go to N, not Nmax (MODIFICATION for subspacing by N)
-          {
-            // iterate over S
-            for (int S=0; S<=1; ++S)
-              {
-                // iterate over J
-                // imposing triangularity (LSJ)
-                for (int J=abs(L-S); J<=L+S; ++J)
-                  {
-
-                    // iterate over T
-                    for (int T=0; T<=1; ++T)
-                      {
-
-                        // iterate over g -- omit (MODIFICATION for subspacing by N)
-                        // for (int g=0; g<=1; ++g)
-
-			
-		
-			TwoBodySubspaceNLSJT subspace(L,S,J,T,g,N);  // (MODIFICATION for subspacing by N)
-			if (subspace.size()!=0)
-			  PushSubspace(subspace);
-		      }
-                  }
-              }
-          }
-      }
+    // iterate over L
+    for (int L=0; L<=Nmax; ++L)
+	// iterate over S
+	for (int S=0; S<=1; ++S)
+	    // iterate over J
+	    // imposing triangularity (LSJ)
+	    for (int J=abs(L-S); J<=L+S; ++J)
+		// iterate over T
+		for (int T=0; T<=1; ++T)
+		    // iterate over g
+		    for (int g=0; g<=1; ++g)
+                      // iterate over total oscillator quanta (MODIFICATION for subspacing by N)
+                      for (int N = g; N <= Nmax; N+=2)
+                        {
+                          TwoBodySubspaceNLSJT subspace(L,S,J,T,g,N);  // (MODIFICATION for subspacing by N)
+                          if (subspace.size()!=0)
+                            PushSubspace(subspace);
+                        }
   }
-
+  
   std::string TwoBodySpaceNLSJT::DebugStr() const
   {
 
@@ -987,21 +938,21 @@ namespace basis {
 
     for (int subspace_index=0; subspace_index<size(); ++subspace_index)
       {
-	const SubspaceType& subspace = GetSubspace(subspace_index);
-	os
-	  << " " << "index"
-	  << " " << std::setw(width) << subspace_index
-	  << " " << "LSJTg"
-	  << " " << std::setw(width) << subspace.L() 
-	  << " " << std::setw(width) << subspace.S() 
-	  << " " << std::setw(width) << subspace.J() 
-	  << " " << std::setw(width) << subspace.T() 
-	  << " " << std::setw(width) << subspace.g()
-	  << " " << "N"  // (MODIFICATION for subspacing by N)
-	  << " " << std::setw(width) << subspace.N()  // (MODIFICATION for subspacing by N)
-	  << " " << "dim"
-	  << " " << std::setw(width) << subspace.size()
-	  << " " << std::endl;
+        const SubspaceType& subspace = GetSubspace(subspace_index);
+        os
+          << " " << "index"
+          << " " << std::setw(width) << subspace_index
+          << " " << "LSJTg"
+          << " " << std::setw(width) << subspace.L() 
+          << " " << std::setw(width) << subspace.S() 
+          << " " << std::setw(width) << subspace.J() 
+          << " " << std::setw(width) << subspace.T() 
+          << " " << std::setw(width) << subspace.g()
+          << " " << "N"  // (MODIFICATION for subspacing by N)
+          << " " << std::setw(width) << subspace.N()  // (MODIFICATION for subspacing by N)
+          << " " << "dim"
+          << " " << std::setw(width) << subspace.size()
+          << " " << std::endl;
       }
 
     return os.str();
@@ -1016,7 +967,7 @@ namespace basis {
   {
     for (int bra_subspace_index=0; bra_subspace_index<space.size(); ++bra_subspace_index)
       for (int ket_subspace_index=0; ket_subspace_index<space.size(); ++ket_subspace_index)
-	{
+        {
 
           // enforce canonical ordering
           if (
@@ -1036,7 +987,7 @@ namespace basis {
           allowed &= ((ket_subspace.g()+g0+bra_subspace.g())%2==0);
 
           // push sector
-	  if (allowed)
+          if (allowed)
             PushSector(SectorType(bra_subspace_index,ket_subspace_index,bra_subspace,ket_subspace));
         }
   }
