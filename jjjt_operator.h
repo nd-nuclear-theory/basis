@@ -37,17 +37,17 @@ namespace basis {
   // two-body JJJT operator -- gather N blocks
   ////////////////////////////////////////////////////////////////
 
-  void GatherOperatorTwoBodyNJJJTToTwoBodyJJJT(
+  void GatherOperatorTwoBodyJJJTNToTwoBodyJJJT(
       const basis::OperatorLabelsJT& operator_labels,
-      const basis::TwoBodySpaceNJJJT& two_body_njjjt_space,
-      const std::array<basis::TwoBodySectorsNJJJT,3>& two_body_njjjt_component_sectors,
-      const std::array<basis::MatrixVector,3>& two_body_njjjt_component_matrices,
+      const basis::TwoBodySpaceJJJTN& two_body_jjjtn_space,
+      const std::array<basis::TwoBodySectorsJJJTN,3>& two_body_jjjtn_component_sectors,
+      const std::array<basis::MatrixVector,3>& two_body_jjjtn_component_matrices,
       const basis::TwoBodySpaceJJJT& two_body_jjjt_space,
       std::array<basis::TwoBodySectorsJJJT,3>& two_body_jjjt_component_sectors,
       std::array<basis::MatrixVector,3>& two_body_jjjt_component_matrices
     );
   // Assemble two-body representation of operator in JJJT basis, from
-  // two-body representation in NJJJT basis, i.e., gathering the
+  // two-body representation in JJJTN basis, i.e., gathering the
   // matrix elements from different N blocks.
   //
   // See notes on "internal representation of an operator in JT
@@ -59,9 +59,9 @@ namespace basis {
   //
   // Arguments:
   //   operator_labels (basis::OperatorLabejjjt) : tensorial properties of operator
-  //   two_body_njjjt_space (...) : source space
-  //   two_body_njjjt_component_sectors (...) : source sectors
-  //   two_body_njjjt_component_matrices (...) : source matrices
+  //   two_body_jjjtn_space (...) : source space
+  //   two_body_jjjtn_component_sectors (...) : source sectors
+  //   two_body_jjjtn_component_matrices (...) : source matrices
   //   two_body_jjjt_space (...) : target space
   //   two_body_jjjt_component_sectors (..., output) : target sectors
   //   two_body_jjjt_component_matrices (..., output) : target matrices

@@ -195,7 +195,7 @@ void test_relative_cm_n()
 
   std::cout << "Relative-c.m. space" << std::endl;
   int Nmax = 2;
-  basis::RelativeCMSpaceNLSJT space(Nmax);
+  basis::RelativeCMSpaceLSJTN space(Nmax);
   std::cout << space.DebugStr();
 
   // then set up allowed sectors
@@ -203,15 +203,15 @@ void test_relative_cm_n()
   int J0 = 2;  // try: J0=0 for interaction, J0=2 for quadrupole operator
   int T0 = 0;
   int g0 = 0;
-  basis::RelativeCMSectorsNLSJT sectors(space,J0,T0,g0);
+  basis::RelativeCMSectorsLSJTN sectors(space,J0,T0,g0);
 
   std::cout << " J0 " << J0 << " T0 " << T0 << " g0 " << g0 << std::endl;
   for (int sector_index=0; sector_index < sectors.size(); ++sector_index)
     {
       int bra_subspace_index = sectors.GetSector(sector_index).bra_subspace_index();
-      const basis::RelativeCMSubspaceNLSJT& bra_subspace = sectors.GetSector(sector_index).bra_subspace();
+      const basis::RelativeCMSubspaceLSJTN& bra_subspace = sectors.GetSector(sector_index).bra_subspace();
       int ket_subspace_index = sectors.GetSector(sector_index).ket_subspace_index();
-      const basis::RelativeCMSubspaceNLSJT& ket_subspace = sectors.GetSector(sector_index).ket_subspace();
+      const basis::RelativeCMSubspaceLSJTN& ket_subspace = sectors.GetSector(sector_index).ket_subspace();
 
       std::cout 
         << " sector " 
@@ -323,7 +323,7 @@ void test_two_body_n()
 
   // example subspace
   std::cout << "Example subspace" << std::endl;
-  basis::TwoBodySubspaceNLSJT subspace(0,0,0,0,0,2);  // LSJTg Nmax
+  basis::TwoBodySubspaceLSJTN subspace(0,0,0,0,0,2);  // LSJTg Nmax
   std::cout << subspace.DebugStr();
 
 
@@ -333,7 +333,7 @@ void test_two_body_n()
 
   std::cout << "Two-body space" << std::endl;
   int Nmax = 2;
-  basis::TwoBodySpaceNLSJT space(Nmax);
+  basis::TwoBodySpaceLSJTN space(Nmax);
   std::cout << space.DebugStr();
 
   // then set up allowed sectors
@@ -341,15 +341,15 @@ void test_two_body_n()
   int J0 = 2;  // try: J0=0 for interaction, J0=2 for quadrupole operator
   int T0 = 0;
   int g0 = 0;
-  basis::TwoBodySectorsNLSJT sectors(space,J0,T0,g0);
+  basis::TwoBodySectorsLSJTN sectors(space,J0,T0,g0);
 
   std::cout << " J0 " << J0 << " T0 " << T0 << " g0 " << g0 << std::endl;
   for (int sector_index=0; sector_index < sectors.size(); ++sector_index)
     {
       int bra_subspace_index = sectors.GetSector(sector_index).bra_subspace_index();
-      const basis::TwoBodySubspaceNLSJT& bra_subspace = sectors.GetSector(sector_index).bra_subspace();
+      const basis::TwoBodySubspaceLSJTN& bra_subspace = sectors.GetSector(sector_index).bra_subspace();
       int ket_subspace_index = sectors.GetSector(sector_index).ket_subspace_index();
-      const basis::TwoBodySubspaceNLSJT& ket_subspace = sectors.GetSector(sector_index).ket_subspace();
+      const basis::TwoBodySubspaceLSJTN& ket_subspace = sectors.GetSector(sector_index).ket_subspace();
 
       std::cout 
         << " sector " 

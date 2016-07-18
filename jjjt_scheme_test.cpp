@@ -93,7 +93,7 @@ void test_two_body_n()
 
   // example subspace
   std::cout << "Example subspace" << std::endl;
-  basis::TwoBodySubspaceNJJJT subspace(0,1,0,6);
+  basis::TwoBodySubspaceJJJTN subspace(0,1,0,6);
   std::cout << subspace.DebugStr();
 
 
@@ -103,7 +103,7 @@ void test_two_body_n()
 
   std::cout << "Two-body space" << std::endl;
   int Nmax = 2;
-  basis::TwoBodySpaceNJJJT space(Nmax);
+  basis::TwoBodySpaceJJJTN space(Nmax);
   std::cout << space.DebugStr();
 
   // then set up allowed sectors
@@ -111,15 +111,15 @@ void test_two_body_n()
   int J0 = 2;  // try: J0=0 for interaction, J0=2 for quadrupole operator
   int T0 = 0;
   int g0 = 0;
-  basis::TwoBodySectorsNJJJT sectors(space,J0,T0,g0);
+  basis::TwoBodySectorsJJJTN sectors(space,J0,T0,g0);
 
   std::cout << " J0 " << J0 << " T0 " << T0 << " g0 " << g0 << std::endl;
   for (int sector_index=0; sector_index < sectors.size(); ++sector_index)
     {
       int bra_subspace_index = sectors.GetSector(sector_index).bra_subspace_index();
-      const basis::TwoBodySubspaceNJJJT& bra_subspace = sectors.GetSector(sector_index).bra_subspace();
+      const basis::TwoBodySubspaceJJJTN& bra_subspace = sectors.GetSector(sector_index).bra_subspace();
       int ket_subspace_index = sectors.GetSector(sector_index).ket_subspace_index();
-      const basis::TwoBodySubspaceNJJJT& ket_subspace = sectors.GetSector(sector_index).ket_subspace();
+      const basis::TwoBodySubspaceJJJTN& ket_subspace = sectors.GetSector(sector_index).ket_subspace();
 
       std::cout 
         << " sector " 

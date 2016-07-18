@@ -321,14 +321,14 @@ namespace basis {
   ////////////////////////////////////////////////////////////////
 
   inline
-  void RecastLabelsTwoBodyLSJTToTwoBodyNLSJT(
+  void RecastLabelsTwoBodyLSJTToTwoBodyLSJTN(
       const TwoBodySubspaceLSJTLabels& two_body_lsjt_subspace_labels,
       const TwoBodyStateLSJTLabels& two_body_lsjt_state_labels,
-      TwoBodySubspaceNLSJTLabels& two_body_nlsjt_subspace_labels,
-      TwoBodyStateNLSJTLabels& two_body_nlsjt_state_labels
+      TwoBodySubspaceLSJTNLabels& two_body_lsjtn_subspace_labels,
+      TwoBodyStateLSJTNLabels& two_body_lsjtn_state_labels
     )
   // Recast labels for (subspace,state) from TwoBodyLSJT scheme to
-  // TwoBodyNLSJT scheme.
+  // TwoBodyLSJTN scheme.
   //
   // This direction of conversion (from target labels to source
   // labels) is as needed for looking up the source matrix element.
@@ -347,8 +347,8 @@ namespace basis {
   // Arguments:
   //   two_body_lsjt_subspace_labels (...) : source subspace labels
   //   two_body_lsjt_state_labels (...) : source state labels
-  //   two_body_nlsjt_subspace_labels (...,output) : target subspace labels
-  //   two_body_nlsjt_state_labels (...,output) : target state labels
+  //   two_body_lsjtn_subspace_labels (...,output) : target subspace labels
+  //   two_body_lsjtn_state_labels (...,output) : target state labels
   {
     // extract labels
     int L, S, J, T, g;
@@ -358,15 +358,15 @@ namespace basis {
 
     // repackage labels
     int N = N1+N2;
-    two_body_nlsjt_subspace_labels = TwoBodySubspaceNLSJTLabels(L,S,J,T,g,N);
-    two_body_nlsjt_state_labels = two_body_lsjt_state_labels;
+    two_body_lsjtn_subspace_labels = TwoBodySubspaceLSJTNLabels(L,S,J,T,g,N);
+    two_body_lsjtn_state_labels = two_body_lsjt_state_labels;
   }
 
-  void GatherOperatorTwoBodyNLSJTToTwoBodyLSJT(
+  void GatherOperatorTwoBodyLSJTNToTwoBodyLSJT(
       const basis::OperatorLabelsJT& operator_labels,
-      const basis::TwoBodySpaceNLSJT& two_body_nlsjt_space,
-      const std::array<basis::TwoBodySectorsNLSJT,3>& two_body_nlsjt_component_sectors,
-      const std::array<basis::MatrixVector,3>& two_body_nlsjt_component_matrices,
+      const basis::TwoBodySpaceLSJTN& two_body_lsjtn_space,
+      const std::array<basis::TwoBodySectorsLSJTN,3>& two_body_lsjtn_component_sectors,
+      const std::array<basis::MatrixVector,3>& two_body_lsjtn_component_matrices,
       const basis::TwoBodySpaceLSJT& two_body_lsjt_space,
       std::array<basis::TwoBodySectorsLSJT,3>& two_body_lsjt_component_sectors,
       std::array<basis::MatrixVector,3>& two_body_lsjt_component_matrices
@@ -415,23 +415,23 @@ namespace basis {
                   = two_body_lsjt_bra.subspace().labels();
                 TwoBodyStateLSJTLabels two_body_lsjt_state_labels_bra
                   = two_body_lsjt_bra.labels();
-                TwoBodySubspaceNLSJTLabels two_body_nlsjt_subspace_labels_bra;
-                TwoBodyStateNLSJTLabels two_body_nlsjt_state_labels_bra;
-                RecastLabelsTwoBodyLSJTToTwoBodyNLSJT(
+                TwoBodySubspaceLSJTNLabels two_body_lsjtn_subspace_labels_bra;
+                TwoBodyStateLSJTNLabels two_body_lsjtn_state_labels_bra;
+                RecastLabelsTwoBodyLSJTToTwoBodyLSJTN(
                     two_body_lsjt_subspace_labels_bra,
                     two_body_lsjt_state_labels_bra,
-                    two_body_nlsjt_subspace_labels_bra,
-                    two_body_nlsjt_state_labels_bra
+                    two_body_lsjtn_subspace_labels_bra,
+                    two_body_lsjtn_state_labels_bra
                   );
 
                 // extract source bra indices
-                int two_body_nlsjt_subspace_index_bra
-                  = two_body_nlsjt_space.LookUpSubspaceIndex(
-                      two_body_nlsjt_subspace_labels_bra
+                int two_body_lsjtn_subspace_index_bra
+                  = two_body_lsjtn_space.LookUpSubspaceIndex(
+                      two_body_lsjtn_subspace_labels_bra
                     );
-                int two_body_nlsjt_state_index_bra
-                  = two_body_nlsjt_space.GetSubspace(two_body_nlsjt_subspace_index_bra).LookUpStateIndex(
-                      two_body_nlsjt_state_labels_bra
+                int two_body_lsjtn_state_index_bra
+                  = two_body_lsjtn_space.GetSubspace(two_body_lsjtn_subspace_index_bra).LookUpStateIndex(
+                      two_body_lsjtn_state_labels_bra
                     );
 
                 // extract source ket labels
@@ -439,41 +439,41 @@ namespace basis {
                   = two_body_lsjt_ket.subspace().labels();
                 TwoBodyStateLSJTLabels two_body_lsjt_state_labels_ket
                   = two_body_lsjt_ket.labels();
-                TwoBodySubspaceNLSJTLabels two_body_nlsjt_subspace_labels_ket;
-                TwoBodyStateNLSJTLabels two_body_nlsjt_state_labels_ket;
-                RecastLabelsTwoBodyLSJTToTwoBodyNLSJT(
+                TwoBodySubspaceLSJTNLabels two_body_lsjtn_subspace_labels_ket;
+                TwoBodyStateLSJTNLabels two_body_lsjtn_state_labels_ket;
+                RecastLabelsTwoBodyLSJTToTwoBodyLSJTN(
                     two_body_lsjt_subspace_labels_ket,
                     two_body_lsjt_state_labels_ket,
-                    two_body_nlsjt_subspace_labels_ket,
-                    two_body_nlsjt_state_labels_ket
+                    two_body_lsjtn_subspace_labels_ket,
+                    two_body_lsjtn_state_labels_ket
                   );
 
                 // extract source ket indices
-                int two_body_nlsjt_subspace_index_ket
-                  = two_body_nlsjt_space.LookUpSubspaceIndex(
-                      two_body_nlsjt_subspace_labels_ket
+                int two_body_lsjtn_subspace_index_ket
+                  = two_body_lsjtn_space.LookUpSubspaceIndex(
+                      two_body_lsjtn_subspace_labels_ket
                     );
-                int two_body_nlsjt_state_index_ket
-                  = two_body_nlsjt_space.GetSubspace(two_body_nlsjt_subspace_index_ket).LookUpStateIndex(
-                      two_body_nlsjt_state_labels_ket
+                int two_body_lsjtn_state_index_ket
+                  = two_body_lsjtn_space.GetSubspace(two_body_lsjtn_subspace_index_ket).LookUpStateIndex(
+                      two_body_lsjtn_state_labels_ket
                     );
 
                 // // debugging
-                // const TwoBodySubspaceNLSJT& two_body_nlsjt_subspace_bra
-                //   = two_body_nlsjt_space.GetSubspace(two_body_nlsjt_subspace_index_bra);
-                // const TwoBodySubspaceNLSJT& two_body_nlsjt_subspace_ket
-                //   = two_body_nlsjt_space.GetSubspace(two_body_nlsjt_subspace_index_ket);
+                // const TwoBodySubspaceLSJTN& two_body_lsjtn_subspace_bra
+                //   = two_body_lsjtn_space.GetSubspace(two_body_lsjtn_subspace_index_bra);
+                // const TwoBodySubspaceLSJTN& two_body_lsjtn_subspace_ket
+                //   = two_body_lsjtn_space.GetSubspace(two_body_lsjtn_subspace_index_ket);
                 // std::cout << " pre-lookup "
-                //           << " " << two_body_nlsjt_subspace_index_bra
-                //           << " " << two_body_nlsjt_subspace_index_ket
+                //           << " " << two_body_lsjtn_subspace_index_bra
+                //           << " " << two_body_lsjtn_subspace_index_ket
                 //           << " " << ";"
-                //           << " " << two_body_nlsjt_state_index_bra
-                //           << " " << two_body_nlsjt_state_index_ket
+                //           << " " << two_body_lsjtn_state_index_bra
+                //           << " " << two_body_lsjtn_state_index_ket
                 //           << " " << ";"
-                //           << " " << two_body_nlsjt_subspace_bra.LabelStr()
-                //           << " " << two_body_nlsjt_subspace_ket.LabelStr()
-                //           << " " << two_body_nlsjt_subspace_bra.size()
-                //           << " " << two_body_nlsjt_subspace_ket.size()
+                //           << " " << two_body_lsjtn_subspace_bra.LabelStr()
+                //           << " " << two_body_lsjtn_subspace_ket.LabelStr()
+                //           << " " << two_body_lsjtn_subspace_bra.size()
+                //           << " " << two_body_lsjtn_subspace_ket.size()
                 //           << std::endl;
 
                 // // canonicalize indices for matrix element lookup
@@ -496,10 +496,10 @@ namespace basis {
                 // // we are filling in a *lower* triangle matrix element
                 // // of a diagonal target sector.  Then we must ensure
                 // // that we look up a canonical (upper triangular)
-                // // NLSJT sector.
+                // // LSJTN sector.
                 // //
                 // // If the matrix element happens to fall within a
-                // // diagonal NLSJT subblocks, canonicalization of the
+                // // diagonal LSJTN subblocks, canonicalization of the
                 // // state indices should not actually be necessary,
                 // // since the Moshinsky transformation machinery up
                 // // until this point has actually been populating the
@@ -517,26 +517,26 @@ namespace basis {
                 // 
                 // bool swapped_subspaces, swapped_states;
                 // basis::CanonicalizeIndices(
-                //     two_body_nlsjt_subspace_index_bra,two_body_nlsjt_subspace_index_ket,
+                //     two_body_lsjtn_subspace_index_bra,two_body_lsjtn_subspace_index_ket,
                 //     swapped_subspaces,
-                //     two_body_nlsjt_state_index_bra,two_body_nlsjt_state_index_ket,
+                //     two_body_lsjtn_state_index_bra,two_body_lsjtn_state_index_ket,
                 //     swapped_states
                 //   );
 
                 // look up matrix element
-                int two_body_nlsjt_sector_index
-                  = two_body_nlsjt_component_sectors[T0].LookUpSectorIndex(
-                      two_body_nlsjt_subspace_index_bra,
-                      two_body_nlsjt_subspace_index_ket
+                int two_body_lsjtn_sector_index
+                  = two_body_lsjtn_component_sectors[T0].LookUpSectorIndex(
+                      two_body_lsjtn_subspace_index_bra,
+                      two_body_lsjtn_subspace_index_ket
                     );
 
-                const Eigen::MatrixXd& two_body_nlsjt_matrix
-                  = two_body_nlsjt_component_matrices[T0][two_body_nlsjt_sector_index];
-                double two_body_nlsjt_matrix_element = two_body_nlsjt_matrix(
-                    two_body_nlsjt_state_index_bra,two_body_nlsjt_state_index_ket
+                const Eigen::MatrixXd& two_body_lsjtn_matrix
+                  = two_body_lsjtn_component_matrices[T0][two_body_lsjtn_sector_index];
+                double two_body_lsjtn_matrix_element = two_body_lsjtn_matrix(
+                    two_body_lsjtn_state_index_bra,two_body_lsjtn_state_index_ket
                   );
 
-                two_body_lsjt_matrix(bra_index,ket_index) = two_body_nlsjt_matrix_element;
+                two_body_lsjt_matrix(bra_index,ket_index) = two_body_lsjtn_matrix_element;
 
               }
         }

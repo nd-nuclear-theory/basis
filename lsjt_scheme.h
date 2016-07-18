@@ -57,7 +57,12 @@
   7/13/16 (mac): Fix relative enumeration.
   7/16/16 (mac):
     - Add debug strings for TwoBodyLSJT basis.
-    - Move N to least significant subspace label in NLSJT bases.
+    - Move N to least significant subspace label in LSJTN bases.
+  7/17/16 (mac):
+    - Rename NLSJT to LSJTN.
+    - Remove unnecessary complication of matching subspace Nmax
+      to g.
+    
 
 ****************************************************************/
 
@@ -538,29 +543,29 @@ namespace basis {
   ////////////////////////////////////////////////////////////////  
 
   // Modification for subspacing by N is by lexical replacement LSJT
-  // -> NLSJT plus specific mods as flagged by MODIFICATION comments
+  // -> LSJTN plus specific mods as flagged by MODIFICATION comments
   // in code.
 
   // labels
 
-  typedef std::tuple<int,int,int,int,int,int> RelativeCMSubspaceNLSJTLabels;  // (MODIFICATION for subspacing by N)
-  typedef std::tuple<int,int,int,int> RelativeCMStateNLSJTLabels;
+  typedef std::tuple<int,int,int,int,int,int> RelativeCMSubspaceLSJTNLabels;  // (MODIFICATION for subspacing by N)
+  typedef std::tuple<int,int,int,int> RelativeCMStateLSJTNLabels;
 
   //subspace
   
-  class RelativeCMSubspaceNLSJT
-    : public BaseSubspace<RelativeCMSubspaceNLSJTLabels,RelativeCMStateNLSJTLabels>
+  class RelativeCMSubspaceLSJTN
+    : public BaseSubspace<RelativeCMSubspaceLSJTNLabels,RelativeCMStateLSJTNLabels>
     {
     
       public:
 
       // constructor
 
-      RelativeCMSubspaceNLSJT() {};
+      RelativeCMSubspaceLSJTN() {};
       // default constructor -- provided since required for certain
       // purposes by STL container classes (e.g., std::vector::resize)
 
-      RelativeCMSubspaceNLSJT(int L, int S, int J, int T, int g, int N);  // (MODIFICATION for subspacing by N)
+      RelativeCMSubspaceLSJTN(int L, int S, int J, int T, int g, int N);  // (MODIFICATION for subspacing by N)
 
       // accessors
 
@@ -591,19 +596,19 @@ namespace basis {
 
   // state
 
-  class RelativeCMStateNLSJT
-    : public BaseState<RelativeCMSubspaceNLSJT>
+  class RelativeCMStateLSJTN
+    : public BaseState<RelativeCMSubspaceLSJTN>
   {
     
     public:
 
     // pass-through constructors
 
-    RelativeCMStateNLSJT(const SubspaceType& subspace, int index)
+    RelativeCMStateLSJTN(const SubspaceType& subspace, int index)
       // Construct state by index.
       : BaseState (subspace, index) {}
 
-    RelativeCMStateNLSJT(const SubspaceType& subspace, const StateLabelsType& state_labels)
+    RelativeCMStateLSJTN(const SubspaceType& subspace, const StateLabelsType& state_labels)
       // Construct state by reverse lookup on labels.
       : BaseState (subspace, state_labels) {}
 
@@ -626,19 +631,19 @@ namespace basis {
 
   // space
 
-  class RelativeCMSpaceNLSJT
-    : public BaseSpace<RelativeCMSubspaceNLSJT>
+  class RelativeCMSpaceLSJTN
+    : public BaseSpace<RelativeCMSubspaceLSJTN>
   {
     
     public:
 
     // constructor
 
-    RelativeCMSpaceNLSJT() {};
+    RelativeCMSpaceLSJTN() {};
     // default constructor -- provided since required for certain
     // purposes by STL container classes (e.g., std::vector::resize)
 
-    RelativeCMSpaceNLSJT(int Nmax);
+    RelativeCMSpaceLSJTN(int Nmax);
     // Enumerate all subspaces up to a given Nmax cutoff.
 
     // accessors
@@ -655,21 +660,21 @@ namespace basis {
 
   // sectors
 
-  class RelativeCMSectorsNLSJT
-    : public BaseSectors<RelativeCMSpaceNLSJT>
+  class RelativeCMSectorsLSJTN
+    : public BaseSectors<RelativeCMSpaceLSJTN>
   {
 
     public:
 
     // constructor
 
-    RelativeCMSectorsNLSJT() {};
+    RelativeCMSectorsLSJTN() {};
     // default constructor -- provided since required for certain
     // purposes by STL container classes (e.g., std::vector::resize)
 
 
-    RelativeCMSectorsNLSJT(
-        const RelativeCMSpaceNLSJT& space,
+    RelativeCMSectorsLSJTN(
+        const RelativeCMSpaceLSJTN& space,
         int J0, int T0, int g0,
         basis::SectorDirection sector_direction = basis::SectorDirection::kCanonical
       );
@@ -941,30 +946,30 @@ namespace basis {
   ////////////////////////////////////////////////////////////////  
 
   // Modification for subspacing by N is by lexical replacement LSJT
-  // -> NLSJT plus specific mods as flagged by MODIFICATION comments
+  // -> LSJTN plus specific mods as flagged by MODIFICATION comments
   // in code.
 
 
   // labels
 
-  typedef std::tuple<int,int,int,int,int,int> TwoBodySubspaceNLSJTLabels;  // (MODIFICATION for subspacing by N)
-  typedef std::tuple<int,int,int,int> TwoBodyStateNLSJTLabels;
+  typedef std::tuple<int,int,int,int,int,int> TwoBodySubspaceLSJTNLabels;  // (MODIFICATION for subspacing by N)
+  typedef std::tuple<int,int,int,int> TwoBodyStateLSJTNLabels;
 
   //subspace
 
-  class TwoBodySubspaceNLSJT
-    : public BaseSubspace<TwoBodySubspaceNLSJTLabels,TwoBodyStateNLSJTLabels>
+  class TwoBodySubspaceLSJTN
+    : public BaseSubspace<TwoBodySubspaceLSJTNLabels,TwoBodyStateLSJTNLabels>
     {
     
       public:
 
       // constructor
 
-      TwoBodySubspaceNLSJT() {};
+      TwoBodySubspaceLSJTN() {};
       // default constructor -- provided since required for certain
       // purposes by STL container classes (e.g., std::vector::resize)
 
-      TwoBodySubspaceNLSJT(int L, int S, int J, int T, int g, int N);  // (MODIFICATION for subspacing by N)
+      TwoBodySubspaceLSJTN(int L, int S, int J, int T, int g, int N);  // (MODIFICATION for subspacing by N)
       // Set up indexing in Nmax truncation.
 
       // accessors
@@ -993,19 +998,19 @@ namespace basis {
 
   // state
 
-  class TwoBodyStateNLSJT
-    : public BaseState<TwoBodySubspaceNLSJT>
+  class TwoBodyStateLSJTN
+    : public BaseState<TwoBodySubspaceLSJTN>
   {
     
     public:
 
     // pass-through constructors
 
-    TwoBodyStateNLSJT(const SubspaceType& subspace, int index)
+    TwoBodyStateLSJTN(const SubspaceType& subspace, int index)
       // Construct state by index.
       : BaseState (subspace, index) {}
 
-    TwoBodyStateNLSJT(const SubspaceType& subspace, const StateLabelsType& state_labels)
+    TwoBodyStateLSJTN(const SubspaceType& subspace, const StateLabelsType& state_labels)
       // Construct state by reverse lookup on labels.
       : BaseState (subspace, state_labels) {}
 
@@ -1028,19 +1033,19 @@ namespace basis {
 
   // space
 
-  class TwoBodySpaceNLSJT
-    : public BaseSpace<TwoBodySubspaceNLSJT>
+  class TwoBodySpaceLSJTN
+    : public BaseSpace<TwoBodySubspaceLSJTN>
   {
     
     public:
 
     // constructor
 
-    TwoBodySpaceNLSJT() {};
+    TwoBodySpaceLSJTN() {};
     // default constructor -- provided since required for certain
     // purposes by STL container classes (e.g., std::vector::resize)
 
-    TwoBodySpaceNLSJT(int Nmax);
+    TwoBodySpaceLSJTN(int Nmax);
     // Enumerate all subspaces up to a given Nmax cutoff.
 
     // accessors
@@ -1057,20 +1062,20 @@ namespace basis {
 
   // sectors
 
-  class TwoBodySectorsNLSJT
-    : public BaseSectors<TwoBodySpaceNLSJT>
+  class TwoBodySectorsLSJTN
+    : public BaseSectors<TwoBodySpaceLSJTN>
   {
 
     public:
 
     // constructor
 
-    TwoBodySectorsNLSJT() {};
+    TwoBodySectorsLSJTN() {};
     // default constructor -- provided since required for certain
     // purposes by STL container classes (e.g., std::vector::resize)
 
-    TwoBodySectorsNLSJT(
-        const TwoBodySpaceNLSJT& space,
+    TwoBodySectorsLSJTN(
+        const TwoBodySpaceLSJTN& space,
         int J0, int T0, int g0,
         basis::SectorDirection sector_direction = basis::SectorDirection::kCanonical
       );

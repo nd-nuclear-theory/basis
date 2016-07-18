@@ -29,6 +29,10 @@
   7/16/16 (mac):
     - Add debug strings.
     - Move N to least significant subspace label in NLSJT basis.
+  7/17/16 (mac):
+    - Rename NJJJT to JJJTN.
+    - Remove unnecessary complication of matching subspace Nmax
+      to g.
 
 ****************************************************************/
 
@@ -338,30 +342,30 @@ namespace basis {
   ////////////////////////////////////////////////////////////////  
 
   // Modification for subspacing by N is by lexical replacement JJJT
-  // -> NJJJT plus specific mods as flagged by MODIFICATION comments
+  // -> JJJTN plus specific mods as flagged by MODIFICATION comments
   // in code.
 
 
   // labels
 
-  typedef std::tuple<int,int,int,int> TwoBodySubspaceNJJJTLabels;  // (MODIFICATION for subspacing by N)
-  typedef std::tuple<int,HalfInt,int,HalfInt> TwoBodyStateNJJJTLabels;
+  typedef std::tuple<int,int,int,int> TwoBodySubspaceJJJTNLabels;  // (MODIFICATION for subspacing by N)
+  typedef std::tuple<int,HalfInt,int,HalfInt> TwoBodyStateJJJTNLabels;
 
   // subspace
 
-  class TwoBodySubspaceNJJJT
-    : public BaseSubspace<TwoBodySubspaceNJJJTLabels,TwoBodyStateNJJJTLabels>
+  class TwoBodySubspaceJJJTN
+    : public BaseSubspace<TwoBodySubspaceJJJTNLabels,TwoBodyStateJJJTNLabels>
     {
     
       public:
 
       // constructor
 
-      TwoBodySubspaceNJJJT() {};
+      TwoBodySubspaceJJJTN() {};
       // default constructor -- provided since required for certain
       // purposes by STL container classes (e.g., std::vector::resize)
 
-      TwoBodySubspaceNJJJT(int J, int T, int g, int N);  // (MODIFICATION for subspacing by N)
+      TwoBodySubspaceJJJTN(int J, int T, int g, int N);  // (MODIFICATION for subspacing by N)
       // Set up indexing in Nmax truncation.
 
       // accessors
@@ -388,19 +392,19 @@ namespace basis {
 
   // state
 
-  class TwoBodyStateNJJJT
-    : public BaseState<TwoBodySubspaceNJJJT>
+  class TwoBodyStateJJJTN
+    : public BaseState<TwoBodySubspaceJJJTN>
   {
     
     public:
 
     // pass-through constructors
 
-    TwoBodyStateNJJJT(const SubspaceType& subspace, int index)
+    TwoBodyStateJJJTN(const SubspaceType& subspace, int index)
       // Construct state by index.
       : BaseState (subspace, index) {}
 
-    TwoBodyStateNJJJT(const SubspaceType& subspace, const StateLabelsType& state_labels)
+    TwoBodyStateJJJTN(const SubspaceType& subspace, const StateLabelsType& state_labels)
       // Construct state by reverse lookup on labels.
       : BaseState (subspace, state_labels) {}
 
@@ -434,19 +438,19 @@ namespace basis {
 
   // space
 
-  class TwoBodySpaceNJJJT
-    : public BaseSpace<TwoBodySubspaceNJJJT>
+  class TwoBodySpaceJJJTN
+    : public BaseSpace<TwoBodySubspaceJJJTN>
   {
     
     public:
 
     // constructor
 
-    TwoBodySpaceNJJJT() {};
+    TwoBodySpaceJJJTN() {};
     // default constructor -- provided since required for certain
     // purposes by STL container classes (e.g., std::vector::resize)
 
-    TwoBodySpaceNJJJT(int Nmax);
+    TwoBodySpaceJJJTN(int Nmax);
     // Enumerate all subspaces up to a given Nmax cutoff.
 
     // accessors
@@ -464,20 +468,20 @@ namespace basis {
 
   // sectors
 
-  class TwoBodySectorsNJJJT
-    : public BaseSectors<TwoBodySpaceNJJJT>
+  class TwoBodySectorsJJJTN
+    : public BaseSectors<TwoBodySpaceJJJTN>
   {
 
     public:
 
     // constructor
 
-    TwoBodySectorsNJJJT() {};
+    TwoBodySectorsJJJTN() {};
     // default constructor -- provided since required for certain
     // purposes by STL container classes (e.g., std::vector::resize)
 
-    TwoBodySectorsNJJJT(
-        const TwoBodySpaceNJJJT& space,
+    TwoBodySectorsJJJTN(
+        const TwoBodySpaceJJJTN& space,
         int J0, int T0, int g0,
         basis::SectorDirection sector_direction = basis::SectorDirection::kCanonical
       );

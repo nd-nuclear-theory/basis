@@ -68,7 +68,7 @@ namespace basis {
     bool valid = true;
       
     // truncation
-    valid &= ((Nmax()%2)==g());
+    // valid &= ((Nmax()%2)==g());
 
     return valid;
   }
@@ -134,9 +134,9 @@ namespace basis {
 		
 		// downshift Nmax to match parity of subspace
 		// required to pass label validity tests
-		int Nmax_subspace = Nmax - (Nmax-g)%2;
+		// int Nmax_subspace = Nmax - (Nmax-g)%2;
 		    
-		TwoBodySubspaceJJJT subspace(J,T,g,Nmax_subspace);
+		TwoBodySubspaceJJJT subspace(J,T,g,Nmax);
 
 		if (subspace.size()!=0)
 		  PushSubspace(subspace);
@@ -209,7 +209,7 @@ namespace basis {
   // two-body states in jjJT scheme -- subspaced by N
   ////////////////////////////////////////////////////////////////
 
-  TwoBodySubspaceNJJJT::TwoBodySubspaceNJJJT(int J, int T, int g, int N)
+  TwoBodySubspaceJJJTN::TwoBodySubspaceJJJTN(int J, int T, int g, int N)
   {
 
     // set values (MODIFICATION for subspacing by N)
@@ -251,7 +251,7 @@ namespace basis {
         }
   }
 
-  bool TwoBodySubspaceNJJJT::ValidLabels() const
+  bool TwoBodySubspaceJJJTN::ValidLabels() const
   {
     bool valid = true;
       
@@ -261,7 +261,7 @@ namespace basis {
     return valid;
   }
 
-  std::string TwoBodySubspaceNJJJT::LabelStr() const
+  std::string TwoBodySubspaceJJJTN::LabelStr() const
   {
     std::ostringstream os;
 
@@ -278,7 +278,7 @@ namespace basis {
     return os.str();
   }
 
-  std::string TwoBodySubspaceNJJJT::DebugStr() const
+  std::string TwoBodySubspaceJJJTN::DebugStr() const
   {
 
     std::ostringstream os;
@@ -287,7 +287,7 @@ namespace basis {
 
     for (int state_index=0; state_index<size(); ++state_index)
       {
-        TwoBodyStateNJJJT state(*this,state_index);
+        TwoBodyStateJJJTN state(*this,state_index);
 
         os
 	  << " " << "index"
@@ -307,7 +307,7 @@ namespace basis {
   }
 
 
-  TwoBodySpaceNJJJT::TwoBodySpaceNJJJT(int Nmax)
+  TwoBodySpaceJJJTN::TwoBodySpaceJJJTN(int Nmax)
   {
 
     // save Nmax
@@ -322,14 +322,14 @@ namespace basis {
               // iterate over total oscillator quanta (MODIFICATION for subspacing by N)
               for (int N = g; N <= Nmax; N +=2)
                 {	
-                  TwoBodySubspaceNJJJT subspace(J,T,g,N);  // (MODIFICATION for subspacing by N)
+                  TwoBodySubspaceJJJTN subspace(J,T,g,N);  // (MODIFICATION for subspacing by N)
 
                   if (subspace.size()!=0)
                     PushSubspace(subspace);
                 }
   }
 
-  std::string TwoBodySpaceNJJJT::DebugStr() const
+  std::string TwoBodySpaceJJJTN::DebugStr() const
   {
 
     std::ostringstream os;
@@ -358,8 +358,8 @@ namespace basis {
   }
 
 
-  TwoBodySectorsNJJJT::TwoBodySectorsNJJJT(
-      const TwoBodySpaceNJJJT& space,
+  TwoBodySectorsJJJTN::TwoBodySectorsJJJTN(
+      const TwoBodySpaceJJJTN& space,
       int J0, int T0, int g0,
       basis::SectorDirection sector_direction
     )

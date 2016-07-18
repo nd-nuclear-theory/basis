@@ -54,7 +54,7 @@ namespace basis {
     // antisymmetry
     valid &= ((L()+S()+T())%2 == 1);
     // truncation
-    valid &= ((Nmax()%2)==g());
+    // valid &= ((Nmax()%2)==g());
 
     return valid;
   }
@@ -121,9 +121,9 @@ namespace basis {
 	      {
 		// downshift Nmax to match parity of subspace
 		// required to pass label validity tests
-		int Nmax_subspace = Nmax - (Nmax-g)%2;
+		// int Nmax_subspace = Nmax - (Nmax-g)%2;
 
-		RelativeSubspaceLSJT subspace(L,S,J,T,g,Nmax_subspace);
+		RelativeSubspaceLSJT subspace(L,S,J,T,g,Nmax);
 		assert(subspace.size()!=0);
 		PushSubspace(subspace);
 	      }
@@ -267,7 +267,7 @@ namespace basis {
     valid &= am::AllowedTriangle(L(),S(),J());
 
     // truncation
-    valid &= ((Nmax()%2)==g());
+    // valid &= ((Nmax()%2)==g());
 
     return valid;
   }
@@ -336,9 +336,9 @@ namespace basis {
 			
 			// downshift Nmax to match parity of subspace
 			// required to pass label validity tests
-			int Nmax_subspace = Nmax - (Nmax-g)%2;
+			// int Nmax_subspace = Nmax - (Nmax-g)%2;
 		    
-			RelativeCMSubspaceLSJT subspace(L,S,J,T,g,Nmax_subspace);
+			RelativeCMSubspaceLSJT subspace(L,S,J,T,g,Nmax);
 			if (subspace.size()!=0)
 			  PushSubspace(subspace);
 		      }
@@ -411,7 +411,7 @@ namespace basis {
   // relative-cm states in LSJT scheme -- subspaced by N
   ////////////////////////////////////////////////////////////////
 
-  RelativeCMSubspaceNLSJT::RelativeCMSubspaceNLSJT(int L, int S, int J, int T, int g, int N)
+  RelativeCMSubspaceLSJTN::RelativeCMSubspaceLSJTN(int L, int S, int J, int T, int g, int N)
   {
 
     // set values (MODIFICATION for subspacing by N)
@@ -449,7 +449,7 @@ namespace basis {
         }
   }
 
-  bool RelativeCMSubspaceNLSJT::ValidLabels() const
+  bool RelativeCMSubspaceLSJTN::ValidLabels() const
   {
     bool valid = true;
       
@@ -462,7 +462,7 @@ namespace basis {
     return valid;
   }
 
-  std::string RelativeCMSubspaceNLSJT::LabelStr() const
+  std::string RelativeCMSubspaceLSJTN::LabelStr() const
   {
     std::ostringstream os;
 
@@ -482,7 +482,7 @@ namespace basis {
   }
 
 
-  std::string RelativeCMSubspaceNLSJT::DebugStr() const
+  std::string RelativeCMSubspaceLSJTN::DebugStr() const
   {
 
     std::ostringstream os;
@@ -491,7 +491,7 @@ namespace basis {
 
     for (int state_index=0; state_index<size(); ++state_index)
       {
-        RelativeCMStateNLSJT state(*this,state_index);
+        RelativeCMStateLSJTN state(*this,state_index);
 
         os
 	  << " " << "index"
@@ -507,7 +507,7 @@ namespace basis {
     return os.str();
   }
 
-  RelativeCMSpaceNLSJT::RelativeCMSpaceNLSJT(int Nmax)
+  RelativeCMSpaceLSJTN::RelativeCMSpaceLSJTN(int Nmax)
   {
     // save Nmax
     Nmax_ = Nmax;
@@ -526,13 +526,13 @@ namespace basis {
                       // iterate over total oscillator quanta (MODIFICATION for subspacing by N)
                       for (int N = g; N <= Nmax; N+=2)
                         {                      
-                          RelativeCMSubspaceNLSJT subspace(L,S,J,T,g,N); // (MODIFICATION for subspacing by N)
+                          RelativeCMSubspaceLSJTN subspace(L,S,J,T,g,N); // (MODIFICATION for subspacing by N)
                           if (subspace.size()!=0)
                             PushSubspace(subspace);
                         }
   }
 
-  std::string RelativeCMSpaceNLSJT::DebugStr() const
+  std::string RelativeCMSpaceLSJTN::DebugStr() const
   {
 
     std::ostringstream os;
@@ -562,8 +562,8 @@ namespace basis {
 
   }
 
-  RelativeCMSectorsNLSJT::RelativeCMSectorsNLSJT(
-      const RelativeCMSpaceNLSJT& space,
+  RelativeCMSectorsLSJTN::RelativeCMSectorsLSJTN(
+      const RelativeCMSpaceLSJTN& space,
       int J0, int T0, int g0,
       basis::SectorDirection sector_direction
     )
@@ -650,7 +650,7 @@ namespace basis {
     valid &= am::AllowedTriangle(L(),S(),J());
 
     // truncation
-    valid &= ((Nmax()%2)==g());
+    // valid &= ((Nmax()%2)==g());
 
     return valid;
   }
@@ -718,9 +718,9 @@ namespace basis {
 			
 			// downshift Nmax to match parity of subspace
 			// required to pass label validity tests
-			int Nmax_subspace = Nmax - (Nmax-g)%2;
+			// int Nmax_subspace = Nmax - (Nmax-g)%2;
 		    
-			TwoBodySubspaceLSJT subspace(L,S,J,T,g,Nmax_subspace);
+			TwoBodySubspaceLSJT subspace(L,S,J,T,g,Nmax);
 			// std::cout 
 			//    << std::setw(3) << L 
 			// 	  << std::setw(3) << S 
@@ -803,7 +803,7 @@ namespace basis {
   // two-body states in LSJT scheme -- subspaced by N
   ////////////////////////////////////////////////////////////////
 
-  TwoBodySubspaceNLSJT::TwoBodySubspaceNLSJT(int L, int S, int J, int T, int g, int N)
+  TwoBodySubspaceLSJTN::TwoBodySubspaceLSJTN(int L, int S, int J, int T, int g, int N)
   {
 
     // set values (MODIFICATION for subspacing by N)
@@ -845,7 +845,7 @@ namespace basis {
         }
   }
 
-  bool TwoBodySubspaceNLSJT::ValidLabels() const
+  bool TwoBodySubspaceLSJTN::ValidLabels() const
   {
     bool valid = true;
       
@@ -858,7 +858,7 @@ namespace basis {
     return valid;
   }
 
-  std::string TwoBodySubspaceNLSJT::LabelStr() const
+  std::string TwoBodySubspaceLSJTN::LabelStr() const
   {
     std::ostringstream os;
 
@@ -877,7 +877,7 @@ namespace basis {
     return os.str();
   }
 
-  std::string TwoBodySubspaceNLSJT::DebugStr() const
+  std::string TwoBodySubspaceLSJTN::DebugStr() const
   {
 
     std::ostringstream os;
@@ -886,7 +886,7 @@ namespace basis {
 
     for (int state_index=0; state_index<size(); ++state_index)
       {
-        TwoBodyStateNLSJT state(*this,state_index);
+        TwoBodyStateLSJTN state(*this,state_index);
 
         os
 	  << " " << "index"
@@ -904,7 +904,7 @@ namespace basis {
   }
 
 
-  TwoBodySpaceNLSJT::TwoBodySpaceNLSJT(int Nmax)
+  TwoBodySpaceLSJTN::TwoBodySpaceLSJTN(int Nmax)
   {
     // save Nmax
     Nmax_ = Nmax;
@@ -923,13 +923,13 @@ namespace basis {
                       // iterate over total oscillator quanta (MODIFICATION for subspacing by N)
                       for (int N = g; N <= Nmax; N+=2)
                         {
-                          TwoBodySubspaceNLSJT subspace(L,S,J,T,g,N);  // (MODIFICATION for subspacing by N)
+                          TwoBodySubspaceLSJTN subspace(L,S,J,T,g,N);  // (MODIFICATION for subspacing by N)
                           if (subspace.size()!=0)
                             PushSubspace(subspace);
                         }
   }
   
-  std::string TwoBodySpaceNLSJT::DebugStr() const
+  std::string TwoBodySpaceLSJTN::DebugStr() const
   {
 
     std::ostringstream os;
@@ -959,8 +959,8 @@ namespace basis {
 
   }
 
-  TwoBodySectorsNLSJT::TwoBodySectorsNLSJT(
-      const TwoBodySpaceNLSJT& space,
+  TwoBodySectorsLSJTN::TwoBodySectorsLSJTN(
+      const TwoBodySpaceLSJTN& space,
       int J0, int T0, int g0,
       basis::SectorDirection sector_direction
     )

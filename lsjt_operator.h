@@ -7,7 +7,7 @@
 
   A few functions which provide simple "bookkeeping" operations on
   operators, such as ConstructIdentityOperatorRelativeLSJT or
-  GatherBlocksTwoBodyNLSJTToTwoBodyLSJT are included here.  These
+  GatherBlocksTwoBodyLSJTNToTwoBodyLSJT are included here.  These
   provide examples of the coding idioms required to work with
   JT-coupled operators (looping over T0 components, looking up matrix
   elements, etc.).  But functions which have more mathematical content
@@ -38,7 +38,7 @@
     - Define OperatorLabelsJT and add documentation on operators.
     - Incorporate some basic LSJT operator construction and
       manipulation functions.
-  7/13/16 (mac): Revise code for NLSJT->LSJT gathering operation.
+  7/13/16 (mac): Revise code for LSJTN->LSJT gathering operation.
 
 ****************************************************************/
 
@@ -213,7 +213,7 @@ namespace basis {
   //     enumerations for each isospin component (T0=0,1,2) of the
   //     operator -- Here, tSectorsType represents the indexing
   //     Sectors type for the particular basis being used, e.g.,
-  //     RelativeCMSectorsNLSJT.  In general, the sector enumerations
+  //     RelativeCMSectorsLSJTN.  In general, the sector enumerations
   //     should contain "upper trianglar" sectors only (see notes on
   //     relative LSJT file format).
   //
@@ -234,7 +234,7 @@ namespace basis {
   // and can be ignored.
   // 
   // A function which works with this operator *might* also need
-  // access to the full space definition (e.g., RelativeCMSSpaceNLSJT)
+  // access to the full space definition (e.g., RelativeCMSSpaceLSJTN)
   // to look up subspaces directly by their labels, etc., if the
   // required information is not all readily available through
   // component_sectors.
@@ -473,17 +473,17 @@ namespace basis {
   // two-body LSJT operator -- gather N blocks
   ////////////////////////////////////////////////////////////////
 
-  void GatherOperatorTwoBodyNLSJTToTwoBodyLSJT(
+  void GatherOperatorTwoBodyLSJTNToTwoBodyLSJT(
       const basis::OperatorLabelsJT& operator_labels,
-      const basis::TwoBodySpaceNLSJT& two_body_nlsjt_space,
-      const std::array<basis::TwoBodySectorsNLSJT,3>& two_body_nlsjt_component_sectors,
-      const std::array<basis::MatrixVector,3>& two_body_nlsjt_component_matrices,
+      const basis::TwoBodySpaceLSJTN& two_body_lsjtn_space,
+      const std::array<basis::TwoBodySectorsLSJTN,3>& two_body_lsjtn_component_sectors,
+      const std::array<basis::MatrixVector,3>& two_body_lsjtn_component_matrices,
       const basis::TwoBodySpaceLSJT& two_body_lsjt_space,
       std::array<basis::TwoBodySectorsLSJT,3>& two_body_lsjt_component_sectors,
       std::array<basis::MatrixVector,3>& two_body_lsjt_component_matrices
     );
   // Assemble two-body representation of operator in LSJT basis, from
-  // two-body representation in NLSJT basis, i.e., gathering the
+  // two-body representation in LSJTN basis, i.e., gathering the
   // matrix elements from different N blocks.
   //
   // See notes on "internal representation of an operator in JT
@@ -495,9 +495,9 @@ namespace basis {
   //
   // Arguments:
   //   operator_labels (basis::OperatorLabelsJT) : tensorial properties of operator
-  //   two_body_nlsjt_space (...) : source space
-  //   two_body_nlsjt_component_sectors (...) : source sectors
-  //   two_body_nlsjt_component_matrices (...) : source matrices
+  //   two_body_lsjtn_space (...) : source space
+  //   two_body_lsjtn_component_sectors (...) : source sectors
+  //   two_body_lsjtn_component_matrices (...) : source matrices
   //   two_body_lsjt_space (...) : target space
   //   two_body_lsjt_component_sectors (..., output) : target sectors
   //   two_body_lsjt_component_matrices (..., output) : target matrices

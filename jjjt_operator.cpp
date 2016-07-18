@@ -15,14 +15,14 @@ namespace basis {
   ////////////////////////////////////////////////////////////////
 
   inline
-  void RecastLabelsTwoBodyJJJTToTwoBodyNJJJT(
+  void RecastLabelsTwoBodyJJJTToTwoBodyJJJTN(
       const TwoBodySubspaceJJJTLabels& two_body_jjjt_subspace_labels,
       const TwoBodyStateJJJTLabels& two_body_jjjt_state_labels,
-      TwoBodySubspaceNJJJTLabels& two_body_njjjt_subspace_labels,
-      TwoBodyStateNJJJTLabels& two_body_njjjt_state_labels
+      TwoBodySubspaceJJJTNLabels& two_body_jjjtn_subspace_labels,
+      TwoBodyStateJJJTNLabels& two_body_jjjtn_state_labels
     )
   // Recast labels for (subspace,state) from TwoBodyJJJT scheme to
-  // TwoBodyNJJJT scheme.
+  // TwoBodyJJJTN scheme.
   //
   // This direction of conversion (from target labels to source
   // labels) is as needed for looking up the source matrix element.
@@ -41,8 +41,8 @@ namespace basis {
   // Arguments:
   //   two_body_jjjt_subspace_labels (...) : source subspace labels
   //   two_body_jjjt_state_labels (...) : source state labels
-  //   two_body_njjjt_subspace_labels (...,output) : target subspace labels
-  //   two_body_njjjt_state_labels (...,output) : target state labels
+  //   two_body_jjjtn_subspace_labels (...,output) : target subspace labels
+  //   two_body_jjjtn_state_labels (...,output) : target state labels
   {
     // extract labels
     int J, T, g;
@@ -53,15 +53,15 @@ namespace basis {
 
     // repackage labels
     int N = N1+N2;
-    two_body_njjjt_subspace_labels = TwoBodySubspaceNJJJTLabels(J,T,g,N);
-    two_body_njjjt_state_labels = two_body_jjjt_state_labels;
+    two_body_jjjtn_subspace_labels = TwoBodySubspaceJJJTNLabels(J,T,g,N);
+    two_body_jjjtn_state_labels = two_body_jjjt_state_labels;
   }
 
-  void GatherOperatorTwoBodyNJJJTToTwoBodyJJJT(
+  void GatherOperatorTwoBodyJJJTNToTwoBodyJJJT(
       const basis::OperatorLabelsJT& operator_labels,
-      const basis::TwoBodySpaceNJJJT& two_body_njjjt_space,
-      const std::array<basis::TwoBodySectorsNJJJT,3>& two_body_njjjt_component_sectors,
-      const std::array<basis::MatrixVector,3>& two_body_njjjt_component_matrices,
+      const basis::TwoBodySpaceJJJTN& two_body_jjjtn_space,
+      const std::array<basis::TwoBodySectorsJJJTN,3>& two_body_jjjtn_component_sectors,
+      const std::array<basis::MatrixVector,3>& two_body_jjjtn_component_matrices,
       const basis::TwoBodySpaceJJJT& two_body_jjjt_space,
       std::array<basis::TwoBodySectorsJJJT,3>& two_body_jjjt_component_sectors,
       std::array<basis::MatrixVector,3>& two_body_jjjt_component_matrices
@@ -110,23 +110,23 @@ namespace basis {
                   = two_body_jjjt_bra.subspace().labels();
                 TwoBodyStateJJJTLabels two_body_jjjt_state_labels_bra
                   = two_body_jjjt_bra.labels();
-                TwoBodySubspaceNJJJTLabels two_body_njjjt_subspace_labels_bra;
-                TwoBodyStateNJJJTLabels two_body_njjjt_state_labels_bra;
-                RecastLabelsTwoBodyJJJTToTwoBodyNJJJT(
+                TwoBodySubspaceJJJTNLabels two_body_jjjtn_subspace_labels_bra;
+                TwoBodyStateJJJTNLabels two_body_jjjtn_state_labels_bra;
+                RecastLabelsTwoBodyJJJTToTwoBodyJJJTN(
                     two_body_jjjt_subspace_labels_bra,
                     two_body_jjjt_state_labels_bra,
-                    two_body_njjjt_subspace_labels_bra,
-                    two_body_njjjt_state_labels_bra
+                    two_body_jjjtn_subspace_labels_bra,
+                    two_body_jjjtn_state_labels_bra
                   );
 
                 // extract source bra indices
-                int two_body_njjjt_subspace_index_bra
-                  = two_body_njjjt_space.LookUpSubspaceIndex(
-                      two_body_njjjt_subspace_labels_bra
+                int two_body_jjjtn_subspace_index_bra
+                  = two_body_jjjtn_space.LookUpSubspaceIndex(
+                      two_body_jjjtn_subspace_labels_bra
                     );
-                int two_body_njjjt_state_index_bra
-                  = two_body_njjjt_space.GetSubspace(two_body_njjjt_subspace_index_bra).LookUpStateIndex(
-                      two_body_njjjt_state_labels_bra
+                int two_body_jjjtn_state_index_bra
+                  = two_body_jjjtn_space.GetSubspace(two_body_jjjtn_subspace_index_bra).LookUpStateIndex(
+                      two_body_jjjtn_state_labels_bra
                     );
 
                 // extract source ket labels
@@ -134,39 +134,39 @@ namespace basis {
                   = two_body_jjjt_ket.subspace().labels();
                 TwoBodyStateJJJTLabels two_body_jjjt_state_labels_ket
                   = two_body_jjjt_ket.labels();
-                TwoBodySubspaceNJJJTLabels two_body_njjjt_subspace_labels_ket;
-                TwoBodyStateNJJJTLabels two_body_njjjt_state_labels_ket;
-                RecastLabelsTwoBodyJJJTToTwoBodyNJJJT(
+                TwoBodySubspaceJJJTNLabels two_body_jjjtn_subspace_labels_ket;
+                TwoBodyStateJJJTNLabels two_body_jjjtn_state_labels_ket;
+                RecastLabelsTwoBodyJJJTToTwoBodyJJJTN(
                     two_body_jjjt_subspace_labels_ket,
                     two_body_jjjt_state_labels_ket,
-                    two_body_njjjt_subspace_labels_ket,
-                    two_body_njjjt_state_labels_ket
+                    two_body_jjjtn_subspace_labels_ket,
+                    two_body_jjjtn_state_labels_ket
                   );
 
                 // extract source ket indices
-                int two_body_njjjt_subspace_index_ket
-                  = two_body_njjjt_space.LookUpSubspaceIndex(
-                      two_body_njjjt_subspace_labels_ket
+                int two_body_jjjtn_subspace_index_ket
+                  = two_body_jjjtn_space.LookUpSubspaceIndex(
+                      two_body_jjjtn_subspace_labels_ket
                     );
-                int two_body_njjjt_state_index_ket
-                  = two_body_njjjt_space.GetSubspace(two_body_njjjt_subspace_index_ket).LookUpStateIndex(
-                      two_body_njjjt_state_labels_ket
+                int two_body_jjjtn_state_index_ket
+                  = two_body_jjjtn_space.GetSubspace(two_body_jjjtn_subspace_index_ket).LookUpStateIndex(
+                      two_body_jjjtn_state_labels_ket
                     );
 
                 // look up matrix element
-                int two_body_njjjt_sector_index
-                  = two_body_njjjt_component_sectors[T0].LookUpSectorIndex(
-                      two_body_njjjt_subspace_index_bra,
-                      two_body_njjjt_subspace_index_ket
+                int two_body_jjjtn_sector_index
+                  = two_body_jjjtn_component_sectors[T0].LookUpSectorIndex(
+                      two_body_jjjtn_subspace_index_bra,
+                      two_body_jjjtn_subspace_index_ket
                     );
 
-                const Eigen::MatrixXd& two_body_njjjt_matrix
-                  = two_body_njjjt_component_matrices[T0][two_body_njjjt_sector_index];
-                double two_body_njjjt_matrix_element = two_body_njjjt_matrix(
-                    two_body_njjjt_state_index_bra,two_body_njjjt_state_index_ket
+                const Eigen::MatrixXd& two_body_jjjtn_matrix
+                  = two_body_jjjtn_component_matrices[T0][two_body_jjjtn_sector_index];
+                double two_body_jjjtn_matrix_element = two_body_jjjtn_matrix(
+                    two_body_jjjtn_state_index_bra,two_body_jjjtn_state_index_ket
                   );
 
-                two_body_jjjt_matrix(bra_index,ket_index) = two_body_njjjt_matrix_element;
+                two_body_jjjt_matrix(bra_index,ket_index) = two_body_jjjtn_matrix_element;
 
               }
         }
