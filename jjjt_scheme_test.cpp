@@ -16,7 +16,7 @@
 // test code
 ////////////////////////////////////////////////////////////////
 
-void test_two_body()
+void TestTwoBody()
 {
 
   ////////////////////////////////////////////////////////////////
@@ -28,6 +28,7 @@ void test_two_body()
   // example subspace
   std::cout << "Example subspace" << std::endl;
   basis::TwoBodySubspaceJJJT subspace(0,1,0,6);
+  std::cout << subspace.LabelStr() << std::endl;
   std::cout << subspace.DebugStr();
 
 
@@ -82,7 +83,7 @@ void test_two_body()
     }
 }
 
-void test_two_body_n()
+void TestTwoBodyN()
 {
 
   ////////////////////////////////////////////////////////////////
@@ -93,7 +94,8 @@ void test_two_body_n()
 
   // example subspace
   std::cout << "Example subspace" << std::endl;
-  basis::TwoBodySubspaceJJJTN subspace(0,1,0,6);
+  basis::TwoBodySubspaceJJJTN subspace(0,1,0,6,6);
+  std::cout << subspace.LabelStr() << std::endl;
   std::cout << subspace.DebugStr();
 
 
@@ -155,8 +157,8 @@ void test_two_body_n()
 int main(int argc, char **argv)
 {
 
-  test_two_body();
-  test_two_body_n();
+  TestTwoBody();
+  TestTwoBodyN();
 
   // termination
   return 0;

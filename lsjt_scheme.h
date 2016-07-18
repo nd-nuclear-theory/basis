@@ -62,7 +62,7 @@
     - Rename NLSJT to LSJTN.
     - Remove unnecessary complication of matching subspace Nmax
       to g.
-    
+    - Add one-body (square) truncation on two-body bases.
 
 ****************************************************************/
 
@@ -155,7 +155,7 @@ namespace basis {
       // purposes by STL container classes (e.g., std::vector::resize)
 
       RelativeSubspaceLSJT(int L, int S, int J, int T, int g, int Nmax);
-      // Set up indexing in Nmax truncation.
+      // Set up indexing.
 
       // accessors
  
@@ -714,7 +714,8 @@ namespace basis {
   //
   // Note that ordering of subspaces is lexicographic by (L,S,J,g).
   //
-  // Truncation of the space is by the two-body Nmax.
+  // Truncation of the space is by the one-body N1max or two-body
+  // N2max.
   //
   ////////////////////////////////////////////////////////////////
   //
@@ -777,8 +778,11 @@ namespace basis {
       // default constructor -- provided since required for certain
       // purposes by STL container classes (e.g., std::vector::resize)
 
-      TwoBodySubspaceLSJT(int L, int S, int J, int T, int g, int Nmax);
-      // Set up indexing in Nmax truncation.
+      TwoBodySubspaceLSJT(
+          int L, int S, int J, int T, int g,
+          int truncation_cutoff, int truncation_rank=2
+        );
+      // Set up indexing.
 
       // accessors
 
@@ -787,7 +791,8 @@ namespace basis {
       int J() const {return std::get<2>(labels_);}
       int T() const {return std::get<3>(labels_);}
       int g() const {return std::get<4>(labels_);}
-      int Nmax() const {return Nmax_;}
+      int N1max() const {return N1max_;}
+      int N2max() const {return N2max_;}
 
       // diagnostic strings
       std::string LabelStr() const;
@@ -801,7 +806,7 @@ namespace basis {
       bool ValidLabels() const;
 
       // truncation
-      int Nmax_;
+      int N1max_, N2max_;
     };
 
   // state
@@ -853,18 +858,19 @@ namespace basis {
     // default constructor -- provided since required for certain
     // purposes by STL container classes (e.g., std::vector::resize)
 
-    TwoBodySpaceLSJT(int Nmax);
+    TwoBodySpaceLSJT(int truncation_cutoff, int truncation_rank=2);
     // Enumerate all subspaces up to a given Nmax cutoff.
 
     // accessors
-    int Nmax() const {return Nmax_;}
+    int N1max() const {return N1max_;}
+    int N2max() const {return N2max_;}
 
     // diagnostic string
     std::string DebugStr() const;
 
     private:
     // truncation
-    int Nmax_;
+    int N1max_, N2max_;
 
   };
 
@@ -924,7 +930,8 @@ namespace basis {
   //
   // Note that ordering of subspaces is lexicographic by (L,S,J,T,g,N).  (MODIFICATION for subspacing by N)
   //
-  // Truncation of the space is by the two-body Nmax.
+  // Truncation of the space is by the one-body N1max or two-body
+  // N2max.
   //
   ////////////////////////////////////////////////////////////////
   //
@@ -969,8 +976,11 @@ namespace basis {
       // default constructor -- provided since required for certain
       // purposes by STL container classes (e.g., std::vector::resize)
 
-      TwoBodySubspaceLSJTN(int L, int S, int J, int T, int g, int N);  // (MODIFICATION for subspacing by N)
-      // Set up indexing in Nmax truncation.
+      TwoBodySubspaceLSJTN(
+          int L, int S, int J, int T, int g, int N,  // (MODIFICATION for subspacing by N)
+          int truncation_cutoff, int truncation_rank=2
+        );
+      // Set up indexing.
 
       // accessors
 
@@ -980,6 +990,8 @@ namespace basis {
       int T() const {return std::get<3>(labels_);}
       int g() const {return std::get<4>(labels_);}
       int N() const {return std::get<5>(labels_);}  // (MODIFICATION for subspacing by N)
+      int N1max() const {return N1max_;}
+      int N2max() const {return N2max_;}
 
       // diagnostic strings
       std::string LabelStr() const;
@@ -993,6 +1005,7 @@ namespace basis {
       bool ValidLabels() const;
 
       // truncation
+      int N1max_, N2max_;
       int N_;  // (MODIFICATION for subspacing by N)
     };
 
@@ -1045,18 +1058,19 @@ namespace basis {
     // default constructor -- provided since required for certain
     // purposes by STL container classes (e.g., std::vector::resize)
 
-    TwoBodySpaceLSJTN(int Nmax);
+    TwoBodySpaceLSJTN(int truncation_cutoff, int truncation_rank=2);
     // Enumerate all subspaces up to a given Nmax cutoff.
 
     // accessors
-    int Nmax() const {return Nmax_;}
+    int N1max() const {return N1max_;}
+    int N2max() const {return N2max_;}
 
     // diagnostic string
     std::string DebugStr() const;
 
     private:
     // truncation
-    int Nmax_;
+    int N1max_, N2max_;
 
   };
 

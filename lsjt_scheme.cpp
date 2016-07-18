@@ -600,46 +600,64 @@ namespace basis {
   // two-body states in LSJT scheme
   ////////////////////////////////////////////////////////////////
 
-  TwoBodySubspaceLSJT::TwoBodySubspaceLSJT(int L, int S, int J, int T, int g, int Nmax)
+  TwoBodySubspaceLSJT::TwoBodySubspaceLSJT(
+      int L, int S, int J, int T, int g, int truncation_cutoff, int truncation_rank
+    )
   {
 
-    // set values
+    // set labels
     labels_ = SubspaceLabelsType(L,S,J,T,g);
-    Nmax_ = Nmax;
+
+    // save truncation
+    N1max_ = truncation_cutoff;
+    if (truncation_rank==1)
+        N2max_ = 2*truncation_cutoff;
+    else if (truncation_rank==2)
+        N2max_ = truncation_cutoff;
 
     // validate subspace labels
     assert(ValidLabels()); 
 
     // set up indexing
     // iterate over total oscillator quanta
-    for (int N = g; N <= Nmax; N +=2)
+    for (int N = g; N <= N2max_; N +=2)
       // iterate over oscillator (Nl) orbitals for particle 1
-      for (int N1 = 0; N1 <= N; ++N1)
-	for (int l1 = N1%2; l1 <= N1; l1 +=2) 
-	  {
-	    // iterate over oscillator (Nl) orbitals for particle 2
-	    // subject to given total N
-	    int N2 = N - N1;
+      //
+      // Constraints:
+      //   0 <= N1 <= N1max
+      //   0 <= N2 <= N1max
+      //   N1+N2=N
+      // ==>  N-min(N1max,N) <= N1 <= min(N1max,N)
+      {
+        int N1_lower = N-std::min(N1max_,N);
+        int N1_upper = std::min(N1max_,N);
+        for (int N1 = N1_lower; N1 <= N1_upper; ++N1)
+          for (int l1 = N1%2; l1 <= N1; l1 +=2) 
+            {
+              // iterate over oscillator (Nl) orbitals for particle 2
+              // subject to given total N
+              int N2 = N - N1;
             
-	    for (int l2 = N2%2; l2 <= N2; l2 +=2) 
-	      {
+              for (int l2 = N2%2; l2 <= N2; l2 +=2) 
+                {
 
-                // impose canonical ordering on single-particle states
-                if (!( std::make_pair(N1,l1) <= std::make_pair(N2,l2) ))
-                  continue;
+                  // impose canonical ordering on single-particle states
+                  if (!( std::make_pair(N1,l1) <= std::make_pair(N2,l2) ))
+                    continue;
 
-		// impose triangularity
-		if (!(am::AllowedTriangle(l1,l2,L)))
-		  continue;
+                  // impose triangularity
+                  if (!(am::AllowedTriangle(l1,l2,L)))
+                    continue;
 
-		// impose antisymmetry
-		if ((N1==N2)&&(l1==l2)&&(!((L+S+T)%2==1)))
-		  continue;
+                  // impose antisymmetry
+                  if ((N1==N2)&&(l1==l2)&&(!((L+S+T)%2==1)))
+                    continue;
 
-		// keep surviving states
-		PushStateLabels(StateLabelsType(N1,l1,N2,l2)); 
-	      }
-	  }
+                  // keep surviving states
+                  PushStateLabels(StateLabelsType(N1,l1,N2,l2)); 
+                }
+            }
+      }
   }
 
   bool TwoBodySubspaceLSJT::ValidLabels() const
@@ -698,13 +716,18 @@ namespace basis {
 
   }
 
-  TwoBodySpaceLSJT::TwoBodySpaceLSJT(int Nmax)
+  TwoBodySpaceLSJT::TwoBodySpaceLSJT(int truncation_cutoff, int truncation_rank)
   {
-    // save Nmax
-    Nmax_ = Nmax;
+
+    // save truncation
+    N1max_ = truncation_cutoff;
+    if (truncation_rank==1)
+        N2max_ = 2*truncation_cutoff;
+    else if (truncation_rank==2)
+        N2max_ = truncation_cutoff;
 
     // iterate over L
-    for (int L=0; L<=Nmax; ++L)
+    for (int L=0; L<=N2max_; ++L)
 	// iterate over S
 	for (int S=0; S<=1; ++S)
 	    // iterate over J
@@ -720,16 +743,7 @@ namespace basis {
 			// required to pass label validity tests
 			// int Nmax_subspace = Nmax - (Nmax-g)%2;
 		    
-			TwoBodySubspaceLSJT subspace(L,S,J,T,g,Nmax);
-			// std::cout 
-			//    << std::setw(3) << L 
-			// 	  << std::setw(3) << S 
-			// 	  << std::setw(3) << T 
-			// 	  << std::setw(3) << J 
-			// 	  << std::setw(3) << g 
-			// 	  << std::setw(3) << Nmax_for_subspace 
-			// 	  << std::setw(3) << subspace.size()
-			// 	  << std::endl;
+			TwoBodySubspaceLSJT subspace(L,S,J,T,g,truncation_cutoff,truncation_rank);
 			if (subspace.size()!=0)
 			  PushSubspace(subspace);
 		      }
@@ -755,8 +769,9 @@ namespace basis {
 	  << " " << std::setw(width) << subspace.J() 
 	  << " " << std::setw(width) << subspace.T() 
 	  << " " << std::setw(width) << subspace.g()
-	  << " " << "Nmax"
-	  << " " << std::setw(width) << subspace.Nmax()
+	  << " " << "N1max N2max"
+	  << " " << std::setw(width) << subspace.N1max()
+	  << " " << std::setw(width) << subspace.N2max()
 	  << " " << "dim"
 	  << " " << std::setw(width) << subspace.size()
 	  << " " << std::endl;
@@ -803,12 +818,22 @@ namespace basis {
   // two-body states in LSJT scheme -- subspaced by N
   ////////////////////////////////////////////////////////////////
 
-  TwoBodySubspaceLSJTN::TwoBodySubspaceLSJTN(int L, int S, int J, int T, int g, int N)
+  TwoBodySubspaceLSJTN::TwoBodySubspaceLSJTN(
+      int L, int S, int J, int T, int g, int N,
+      int truncation_cutoff, int truncation_rank
+    )
   {
 
-    // set values (MODIFICATION for subspacing by N)
+    // set labels (MODIFICATION for subspacing by N)
     labels_ = SubspaceLabelsType(L,S,J,T,g,N);
     N_ = N;
+
+    // save truncation
+    N1max_ = truncation_cutoff;
+    if (truncation_rank==1)
+        N2max_ = 2*truncation_cutoff;
+    else if (truncation_rank==2)
+        N2max_ = truncation_cutoff;
 
     // validate subspace labels
     assert(ValidLabels()); 
@@ -817,7 +842,15 @@ namespace basis {
     // iterate over total oscillator quanta -- omit (MODIFICATION for subspacing by N)
     // for (int N = g; N <= Nmax; N +=2)
     // iterate over oscillator (Nl) orbitals for particle 1
-    for (int N1 = 0; N1 <= N; ++N1)
+    //
+    // Constraints:
+    //   0 <= N1 <= N1max
+    //   0 <= N2 <= N1max
+    //   N1+N2=N
+    // ==>  N-min(N1max,N) <= N1 <= min(N1max,N)
+    int N1_lower = N-std::min(N1max_,N);
+    int N1_upper = std::min(N1max_,N);
+    for (int N1 = N1_lower; N1 <= N1_upper; ++N1)
       for (int l1 = N1%2; l1 <= N1; l1 +=2) 
         {
           // iterate over oscillator (Nl) orbitals for particle 2
@@ -904,13 +937,17 @@ namespace basis {
   }
 
 
-  TwoBodySpaceLSJTN::TwoBodySpaceLSJTN(int Nmax)
+  TwoBodySpaceLSJTN::TwoBodySpaceLSJTN(int truncation_cutoff, int truncation_rank)
   {
-    // save Nmax
-    Nmax_ = Nmax;
+    // save truncation
+    N1max_ = truncation_cutoff;
+    if (truncation_rank==1)
+        N2max_ = 2*truncation_cutoff;
+    else if (truncation_rank==2)
+        N2max_ = truncation_cutoff;
 
     // iterate over L
-    for (int L=0; L<=Nmax; ++L)
+    for (int L=0; L<=N2max_; ++L)
 	// iterate over S
 	for (int S=0; S<=1; ++S)
 	    // iterate over J
@@ -921,9 +958,11 @@ namespace basis {
 		    // iterate over g
 		    for (int g=0; g<=1; ++g)
                       // iterate over total oscillator quanta (MODIFICATION for subspacing by N)
-                      for (int N = g; N <= Nmax; N+=2)
+                      for (int N = g; N <= N2max_; N+=2)
                         {
-                          TwoBodySubspaceLSJTN subspace(L,S,J,T,g,N);  // (MODIFICATION for subspacing by N)
+                          TwoBodySubspaceLSJTN subspace(
+                              L,S,J,T,g,N,truncation_cutoff,truncation_rank
+                            );  // (MODIFICATION for subspacing by N)
                           if (subspace.size()!=0)
                             PushSubspace(subspace);
                         }
@@ -950,6 +989,9 @@ namespace basis {
           << " " << std::setw(width) << subspace.g()
           << " " << "N"  // (MODIFICATION for subspacing by N)
           << " " << std::setw(width) << subspace.N()  // (MODIFICATION for subspacing by N)
+	  << " " << "N1max N2max"
+	  << " " << std::setw(width) << subspace.N1max()
+	  << " " << std::setw(width) << subspace.N2max()
           << " " << "dim"
           << " " << std::setw(width) << subspace.size()
           << " " << std::endl;

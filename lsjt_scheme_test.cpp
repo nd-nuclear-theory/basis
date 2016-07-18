@@ -15,7 +15,7 @@
 // test code
 ////////////////////////////////////////////////////////////////
 
-void test_relative()
+void TestRelative()
 {
   ////////////////////////////////////////////////////////////////
   // relative basis tests
@@ -112,7 +112,7 @@ void test_relative()
 
 }
 
-void test_relative_cm()
+void TestRelativeCM()
 {
   ////////////////////////////////////////////////////////////////
   // relative-cm basis tests
@@ -181,7 +181,7 @@ void test_relative_cm()
     }
 }
 
-void test_relative_cm_n()
+void TestRelativeCMN()
 {
   ////////////////////////////////////////////////////////////////
   // relative-cm basis tests -- subspaced by N
@@ -244,7 +244,7 @@ void test_relative_cm_n()
     }
 }
 
-void test_two_body()
+void TestTwoBody()
 {
   ////////////////////////////////////////////////////////////////
   // two-body basis tests
@@ -255,6 +255,7 @@ void test_two_body()
   // example subspace
   std::cout << "Example subspace" << std::endl;
   basis::TwoBodySubspaceLSJT subspace(0,0,0,0,0,2);  // LSJTg Nmax
+  std::cout << subspace.LabelStr() << std::endl;
   std::cout << subspace.DebugStr();
 
 
@@ -313,7 +314,77 @@ void test_two_body()
     }
 }
 
-void test_two_body_n()
+void TestTwoBodyN1max()
+{
+  ////////////////////////////////////////////////////////////////
+  // two-body basis tests
+  ////////////////////////////////////////////////////////////////
+
+  std::cout << "Two-body basis (N1max)" << std::endl;
+
+  // example subspace
+  std::cout << "Example subspace" << std::endl;
+  basis::TwoBodySubspaceLSJT subspace(0,0,0,0,0,4,1);  // LSJTg N1max rank=1
+  std::cout << subspace.LabelStr() << std::endl;
+  std::cout << subspace.DebugStr();
+
+
+  // spaces and sectors
+
+  // first set up space
+
+  std::cout << "Two-body space" << std::endl;
+  int N1max = 4;
+  basis::TwoBodySpaceLSJT space(N1max,1);
+  std::cout << space.DebugStr();
+
+  // then set up allowed sectors
+  std::cout << "Two-body operator sectors" << std::endl;
+  int J0 = 0;  // try: J0=0 for interaction, J0=2 for quadrupole operator
+  int T0 = 0;
+  int g0 = 0;
+  basis::TwoBodySectorsLSJT sectors(space,J0,T0,g0);
+
+  std::cout << " J0 " << J0 << " T0 " << T0 << " g0 " << g0 << std::endl;
+  for (int sector_index=0; sector_index < sectors.size(); ++sector_index)
+    {
+      int bra_subspace_index = sectors.GetSector(sector_index).bra_subspace_index();
+      const basis::TwoBodySubspaceLSJT& bra_subspace = sectors.GetSector(sector_index).bra_subspace();
+      int ket_subspace_index = sectors.GetSector(sector_index).ket_subspace_index();
+      const basis::TwoBodySubspaceLSJT& ket_subspace = sectors.GetSector(sector_index).ket_subspace();
+
+      std::cout 
+        << " sector " 
+        << std::setw(3) << sector_index 
+        << "     "
+        << " index "
+        << std::setw(3) << bra_subspace_index
+        << " LSJTg "
+        << std::setw(3) << bra_subspace.L() 
+        << std::setw(3) << bra_subspace.S() 
+        << std::setw(3) << bra_subspace.J() 
+        << std::setw(3) << bra_subspace.T() 
+        << std::setw(3) << bra_subspace.g()
+        // << std::setw(3) << bra_subspace.Nmax()
+        << " dim "
+        << std::setw(3) << bra_subspace.size()
+        << "     "
+        << " index "
+        << std::setw(3) << ket_subspace_index
+        << " LSJTg "
+        << std::setw(3) << ket_subspace.L() 
+        << std::setw(3) << ket_subspace.S() 
+        << std::setw(3) << ket_subspace.J() 
+        << std::setw(3) << ket_subspace.T() 
+        << std::setw(3) << ket_subspace.g()
+        // << std::setw(3) << ket_subspace.Nmax()
+        << " dim "
+        << std::setw(3) << ket_subspace.size()
+        << std::endl;
+    }
+}
+
+void TestTwoBodyN()
 {
   ////////////////////////////////////////////////////////////////
   // two-body basis tests -- subspaced by N
@@ -323,9 +394,9 @@ void test_two_body_n()
 
   // example subspace
   std::cout << "Example subspace" << std::endl;
-  basis::TwoBodySubspaceLSJTN subspace(0,0,0,0,0,2);  // LSJTg Nmax
+  basis::TwoBodySubspaceLSJTN subspace(0,0,0,0,0,2,2);  // LSJTg Nmax
+  std::cout << subspace.LabelStr() << std::endl;
   std::cout << subspace.DebugStr();
-
 
   // spaces and sectors
 
@@ -390,15 +461,15 @@ void test_two_body_n()
 int main(int argc, char **argv)
 {
 
-  test_relative();
+  TestRelative();
 
-  test_relative_cm();
+  TestRelativeCM();
 
-  test_relative_cm_n();
+  TestRelativeCMN();
 
-  test_two_body();
-
-  test_two_body_n();
+  TestTwoBody();
+  TestTwoBodyN1max();
+  TestTwoBodyN();
 
   // termination
   return 0;

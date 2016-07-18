@@ -21,46 +21,65 @@ namespace basis {
   // two-body states in jjJT scheme
   ////////////////////////////////////////////////////////////////
 
-  TwoBodySubspaceJJJT::TwoBodySubspaceJJJT(int J, int T, int g, int Nmax)
+  TwoBodySubspaceJJJT::TwoBodySubspaceJJJT(
+      int J, int T, int g,
+      int truncation_cutoff, int truncation_rank
+    )
   {
 
-    // set values
+    // set labels
     labels_ = SubspaceLabelsType(J,T,g);
-    Nmax_ = Nmax;
+
+    // save truncation
+    N1max_ = truncation_cutoff;
+    if (truncation_rank==1)
+        N2max_ = 2*truncation_cutoff;
+    else if (truncation_rank==2)
+        N2max_ = truncation_cutoff;
 
     // validate subspace labels
     assert(ValidLabels()); 
 
     // set up indexing
     // iterate over total oscillator quanta
-    for (int N = g; N <= Nmax; N +=2)
+    for (int N = g; N <= N2max_; N +=2)
       // iterate over oscillator (Nj) orbitals for particle 1
-      for (int N1 = 0; N1 <= N; ++N1)
-	for (HalfInt j1 = HalfInt(1,2); j1 <= N1+HalfInt(1,2); j1 +=1) 
-	  {
-	    // iterate over oscillator (Nj) orbitals for particle 2
-	    // subject to given total N
-	    int N2 = N - N1;
+      //
+      // Constraints:
+      //   0 <= N1 <= N1max
+      //   0 <= N2 <= N1max
+      //   N1+N2=N
+      // ==>  N-min(N1max,N) <= N1 <= min(N1max,N)
+      {
+        int N1_lower = N-std::min(N1max_,N);
+        int N1_upper = std::min(N1max_,N);
+        for (int N1 = N1_lower; N1 <= N1_upper; ++N1)
+          for (HalfInt j1 = HalfInt(1,2); j1 <= N1+HalfInt(1,2); j1 +=1) 
+            {
+              // iterate over oscillator (Nj) orbitals for particle 2
+              // subject to given total N
+              int N2 = N - N1;
 
-	    for (HalfInt j2 = HalfInt(1,2); j2 <= N2+HalfInt(1,2); j2 +=1) 
-	      {
+              for (HalfInt j2 = HalfInt(1,2); j2 <= N2+HalfInt(1,2); j2 +=1) 
+                {
 
-                // impose canonical ordering on single-particle states
-                if (!( std::make_pair(N1,j1) <= std::make_pair(N2,j2) ))
-                  continue;
+                  // impose canonical ordering on single-particle states
+                  if (!( std::make_pair(N1,j1) <= std::make_pair(N2,j2) ))
+                    continue;
 
-		// impose triangularity
-		if (!(am::AllowedTriangle(j1,j2,J)))
-		  continue;
+                  // impose triangularity
+                  if (!(am::AllowedTriangle(j1,j2,J)))
+                    continue;
 
-		// impose antisymmetry
-		if ((N1==N2)&&(j1==j2)&&(!((J+T)%2==1)))
-		  continue;
+                  // impose antisymmetry
+                  if ((N1==N2)&&(j1==j2)&&(!((J+T)%2==1)))
+                    continue;
 
-		// keep surviving states
-		PushStateLabels(StateLabelsType(N1,j1,N2,j2)); 
-	      }
-	  }
+                  // keep surviving states
+                  PushStateLabels(StateLabelsType(N1,j1,N2,j2)); 
+                }
+            }
+      }
   }
 
   bool TwoBodySubspaceJJJT::ValidLabels() const
@@ -94,7 +113,7 @@ namespace basis {
 
     std::ostringstream os;
 
-    const int lw = 3;
+    const int width = 3;
 
     for (int state_index=0; state_index<size(); ++state_index)
       {
@@ -102,14 +121,14 @@ namespace basis {
 
         os
 	  << " " << "index"
-	  << " " << std::setw(lw) << state_index
+	  << " " << std::setw(width) << state_index
 	  << " " << "N1 l1 j1 N2 l2 j2"
-	  << " " << std::setw(lw) << state.N1()
-	  << " " << std::setw(lw) << state.l1()
-	  << " " << std::setw(lw) << state.j1()
-	  << " " << std::setw(lw) << state.N2()
-	  << " " << std::setw(lw) << state.l2()
-	  << " " << std::setw(lw) << state.j2()
+	  << " " << std::setw(width) << state.N1()
+	  << " " << std::setw(width) << state.l1()
+	  << " " << std::setw(width) << state.j1()
+	  << " " << std::setw(width) << state.N2()
+	  << " " << std::setw(width) << state.l2()
+	  << " " << std::setw(width) << state.j2()
           << std::endl;
       }
 
@@ -118,14 +137,18 @@ namespace basis {
   }
 
 
-  TwoBodySpaceJJJT::TwoBodySpaceJJJT(int Nmax)
+  TwoBodySpaceJJJT::TwoBodySpaceJJJT(int truncation_cutoff, int truncation_rank)
   {
 
-    // save Nmax
-    Nmax_ = Nmax;
+    // save truncation
+    N1max_ = truncation_cutoff;
+    if (truncation_rank==1)
+        N2max_ = 2*truncation_cutoff;
+    else if (truncation_rank==2)
+        N2max_ = truncation_cutoff;
 
     // iterate over J
-    for (int J=0; J<=Nmax+1; ++J)
+    for (int J=0; J<=N2max_+1; ++J)
 	// iterate over T
 	for (int T=0; T<=1; ++T)
 	    // iterate over g
@@ -136,7 +159,7 @@ namespace basis {
 		// required to pass label validity tests
 		// int Nmax_subspace = Nmax - (Nmax-g)%2;
 		    
-		TwoBodySubspaceJJJT subspace(J,T,g,Nmax);
+		TwoBodySubspaceJJJT subspace(J,T,g,truncation_cutoff,truncation_rank);
 
 		if (subspace.size()!=0)
 		  PushSubspace(subspace);
@@ -148,22 +171,23 @@ namespace basis {
 
     std::ostringstream os;
 
-    const int lw = 3;
+    const int width = 3;
 
     for (int subspace_index=0; subspace_index<size(); ++subspace_index)
       {
 	const SubspaceType& subspace = GetSubspace(subspace_index);
 	os
 	  << " " << "index"
-	  << " " << std::setw(lw) << subspace_index
+	  << " " << std::setw(width) << subspace_index
 	  << " " << "JTg"
-	  << " " << std::setw(lw) << subspace.J() 
-	  << " " << std::setw(lw) << subspace.T() 
-	  << " " << std::setw(lw) << subspace.g()
-	  << " " << "Nmax"
-	  << " " << std::setw(lw) << subspace.Nmax()
+	  << " " << std::setw(width) << subspace.J() 
+	  << " " << std::setw(width) << subspace.T() 
+	  << " " << std::setw(width) << subspace.g()
+	  << " " << "N1max N2max"
+	  << " " << std::setw(width) << subspace.N1max()
+	  << " " << std::setw(width) << subspace.N2max()
 	  << " " << "dim"
-	  << " " << std::setw(lw) << subspace.size()
+	  << " " << std::setw(width) << subspace.size()
 	  << " " << std::endl;
       }
 
@@ -209,21 +233,39 @@ namespace basis {
   // two-body states in jjJT scheme -- subspaced by N
   ////////////////////////////////////////////////////////////////
 
-  TwoBodySubspaceJJJTN::TwoBodySubspaceJJJTN(int J, int T, int g, int N)
+  TwoBodySubspaceJJJTN::TwoBodySubspaceJJJTN(
+      int J, int T, int g, int N,
+      int truncation_cutoff, int truncation_rank
+    )
   {
 
-    // set values (MODIFICATION for subspacing by N)
+    // set labels (MODIFICATION for subspacing by N)
     labels_ = SubspaceLabelsType(J,T,g,N);
     N_ = N;
 
-    // validate subspace labels
+    // save truncation
+    N1max_ = truncation_cutoff;
+    if (truncation_rank==1)
+        N2max_ = 2*truncation_cutoff;
+    else if (truncation_rank==2)
+        N2max_ = truncation_cutoff;
+
+   // validate subspace labels
     assert(ValidLabels()); 
 
     // set up indexing
     // iterate over total oscillator quanta -- omit (MODIFICATION for subspacing by N)
     // for (int N = g; N <= Nmax; N +=2)
     // iterate over oscillator (Nj) orbitals for particle 1
-    for (int N1 = 0; N1 <= N; ++N1)
+    //
+    // Constraints:
+    //   0 <= N1 <= N1max
+    //   0 <= N2 <= N1max
+    //   N1+N2=N
+    // ==>  N-min(N1max,N) <= N1 <= min(N1max,N)
+    int N1_lower = N-std::min(N1max_,N);
+    int N1_upper = std::min(N1max_,N);
+    for (int N1 = N1_lower; N1 <= N1_upper; ++N1)
       for (HalfInt j1 = HalfInt(1,2); j1 <= N1+HalfInt(1,2); j1 +=1) 
         {
           // iterate over oscillator (Nj) orbitals for particle 2
@@ -283,7 +325,7 @@ namespace basis {
 
     std::ostringstream os;
 
-    const int lw = 3;
+    const int width = 3;
 
     for (int state_index=0; state_index<size(); ++state_index)
       {
@@ -291,14 +333,14 @@ namespace basis {
 
         os
 	  << " " << "index"
-	  << " " << std::setw(lw) << state_index
+	  << " " << std::setw(width) << state_index
 	  << " " << "N1 l1 j1 N2 l2 j2"
-	  << " " << std::setw(lw) << state.N1()
-	  << " " << std::setw(lw) << state.l1()
-	  << " " << std::setw(lw) << state.j1()
-	  << " " << std::setw(lw) << state.N2()
-	  << " " << std::setw(lw) << state.l2()
-	  << " " << std::setw(lw) << state.j2()
+	  << " " << std::setw(width) << state.N1()
+	  << " " << std::setw(width) << state.l1()
+	  << " " << std::setw(width) << state.j1()
+	  << " " << std::setw(width) << state.N2()
+	  << " " << std::setw(width) << state.l2()
+	  << " " << std::setw(width) << state.j2()
           << std::endl;
       }
 
@@ -307,22 +349,28 @@ namespace basis {
   }
 
 
-  TwoBodySpaceJJJTN::TwoBodySpaceJJJTN(int Nmax)
+  TwoBodySpaceJJJTN::TwoBodySpaceJJJTN(int truncation_cutoff, int truncation_rank)
   {
+    // save truncation
+    N1max_ = truncation_cutoff;
+    if (truncation_rank==1)
+        N2max_ = 2*truncation_cutoff;
+    else if (truncation_rank==2)
+        N2max_ = truncation_cutoff;
 
-    // save Nmax
-    Nmax_ = Nmax;
 
     // iterate over J
-    for (int J=0; J<=Nmax+1; ++J)
+    for (int J=0; J<=N2max_+1; ++J)
 	// iterate over T
 	for (int T=0; T<=1; ++T)
 	    // iterate over g
 	    for (int g=0; g<=1; ++g)
               // iterate over total oscillator quanta (MODIFICATION for subspacing by N)
-              for (int N = g; N <= Nmax; N +=2)
+              for (int N = g; N <= N2max_; N +=2)
                 {	
-                  TwoBodySubspaceJJJTN subspace(J,T,g,N);  // (MODIFICATION for subspacing by N)
+                  TwoBodySubspaceJJJTN subspace(
+                      J,T,g,N,truncation_cutoff,truncation_rank
+                    );  // (MODIFICATION for subspacing by N)
 
                   if (subspace.size()!=0)
                     PushSubspace(subspace);
@@ -334,22 +382,25 @@ namespace basis {
 
     std::ostringstream os;
 
-    const int lw = 3;
+    const int width = 3;
 
     for (int subspace_index=0; subspace_index<size(); ++subspace_index)
       {
 	const SubspaceType& subspace = GetSubspace(subspace_index);
 	os
 	  << " " << "index"
-	  << " " << std::setw(lw) << subspace_index
+	  << " " << std::setw(width) << subspace_index
 	  << " " << "JTg"
-	  << " " << std::setw(lw) << subspace.J() 
-	  << " " << std::setw(lw) << subspace.T() 
-	  << " " << std::setw(lw) << subspace.g()
+	  << " " << std::setw(width) << subspace.J() 
+	  << " " << std::setw(width) << subspace.T() 
+	  << " " << std::setw(width) << subspace.g()
 	  << " " << "N"  // (MODIFICATION for subspacing by N)
-	  << " " << std::setw(lw) << subspace.N()  // (MODIFICATION for subspacing by N)
+	  << " " << std::setw(width) << subspace.N()  // (MODIFICATION for subspacing by N)
+	  << " " << "N1max N2max"
+	  << " " << std::setw(width) << subspace.N1max()
+	  << " " << std::setw(width) << subspace.N2max()
 	  << " " << "dim"
-	  << " " << std::setw(lw) << subspace.size()
+	  << " " << std::setw(width) << subspace.size()
 	  << " " << std::endl;
       }
 
