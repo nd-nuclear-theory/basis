@@ -217,7 +217,7 @@ namespace basis {
 	      const basis::TwoBodyStateJJJT bra(bra_subspace,bra_index);
 	      const basis::TwoBodyStateJJJT ket(ket_subspace,ket_index);
 
-              // extract matrix element factor
+              // determine matrix element normalization factor
               double conversion_factor = 1.;
               if (conversion_mode == basis::NormalizationConversion::kASToNAS)
                 {
@@ -233,6 +233,8 @@ namespace basis {
                   if ((ket.N1()==ket.N2())&&(ket.l1()==ket.l2())&&(ket.j1()==ket.j2()))
                     conversion_factor *= sqrt(2.);
                 }
+
+              // extract matrix element
               const double matrix_element = conversion_factor*matrices[sector_index](bra_index,ket_index);
 
               // generate output line
@@ -267,7 +269,7 @@ namespace basis {
 	    
 	    }
 
-      };
+      }
   }
 
   ////////////////////////////////////////////////////////////////

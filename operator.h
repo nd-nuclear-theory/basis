@@ -20,6 +20,7 @@
   7/9/16 (mac): Add support for canonicalizing indices in matrix
     element lookup.
   7/12/16 (mac): Add diagonal constant operator.
+  7/19/16 (mac): Extract AS/NAS conversion enum to many_body.h.
 
 ****************************************************************/
 
@@ -39,15 +40,6 @@ namespace basis {
   ////////////////////////////////////////////////////////////////
 
   typedef std::vector<Eigen::MatrixXd> MatrixVector;
-
-  ////////////////////////////////////////////////////////////////
-  // conversion flag enum
-  ////////////////////////////////////////////////////////////////
-
-  enum class NormalizationConversion {kNone, kASToNAS, kNASToAS};
-  // Used as value for a mode parameter to requests on-the-fly
-  // conversion between antisymmetrized (AS) and normalized
-  // antisymmetrized (NAS) matrix elements on input/output.
 
   ////////////////////////////////////////////////////////////////
   // zero operator

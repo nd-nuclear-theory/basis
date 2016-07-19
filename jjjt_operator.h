@@ -67,7 +67,7 @@ namespace basis {
   //   two_body_jjjt_component_matrices (..., output) : target matrices
 
   ////////////////////////////////////////////////////////////////
-  // two-body LSJT operator output
+  // two-body JJJT operator output
   ////////////////////////////////////////////////////////////////
 
   // Note that the primary intention of the output for two-body

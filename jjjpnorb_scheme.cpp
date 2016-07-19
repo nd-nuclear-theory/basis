@@ -13,7 +13,7 @@
 
 #include "am/am.h"
 
-#include "jjjpn_scheme_general.h"
+#include "jjjpnorb_scheme.h"
 
 namespace basis {
 

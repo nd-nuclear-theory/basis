@@ -25,8 +25,7 @@ void TestRelative()
 
   // subspace construction
 
-  // RelativeSubspaceLSJT(0,0,0,0,0,0);  // should violate assertion due to T
-  // RelativeSubspaceLSJT(0,0,0,1,0,7);  // should violate assertion due to Nmax
+  // RelativeSubspaceLSJT(0,0,0,0,0,basis::Rank::kTwoBody,0);  // should violate assertion due to T
   basis::RelativeSubspaceLSJT subspace(0,0,0,1,0,6);  // LSJTg N_max
   std::cout << subspace.LabelStr() << std::endl;
   std::cout << subspace.DebugStr();
@@ -254,7 +253,7 @@ void TestTwoBody()
 
   // example subspace
   std::cout << "Example subspace" << std::endl;
-  basis::TwoBodySubspaceLSJT subspace(0,0,0,0,0,2);  // LSJTg Nmax
+  basis::TwoBodySubspaceLSJT subspace(0,0,0,0,0,basis::Rank::kTwoBody,2);  // LSJTg Nmax
   std::cout << subspace.LabelStr() << std::endl;
   std::cout << subspace.DebugStr();
 
@@ -265,7 +264,7 @@ void TestTwoBody()
 
   std::cout << "Two-body space" << std::endl;
   int Nmax = 2;
-  basis::TwoBodySpaceLSJT space(Nmax);
+  basis::TwoBodySpaceLSJT space(basis::Rank::kTwoBody,Nmax);
   std::cout << space.DebugStr();
 
   // then set up allowed sectors
@@ -324,7 +323,7 @@ void TestTwoBodyN1max()
 
   // example subspace
   std::cout << "Example subspace" << std::endl;
-  basis::TwoBodySubspaceLSJT subspace(0,0,0,0,0,4,1);  // LSJTg N1max rank=1
+  basis::TwoBodySubspaceLSJT subspace(0,0,0,0,0,basis::Rank::kOneBody,4);  // LSJTg N1max rank=1
   std::cout << subspace.LabelStr() << std::endl;
   std::cout << subspace.DebugStr();
 
@@ -335,7 +334,7 @@ void TestTwoBodyN1max()
 
   std::cout << "Two-body space" << std::endl;
   int N1max = 4;
-  basis::TwoBodySpaceLSJT space(N1max,1);
+  basis::TwoBodySpaceLSJT space(basis::Rank::kOneBody,N1max);
   std::cout << space.DebugStr();
 
   // then set up allowed sectors
@@ -394,7 +393,7 @@ void TestTwoBodyN()
 
   // example subspace
   std::cout << "Example subspace" << std::endl;
-  basis::TwoBodySubspaceLSJTN subspace(0,0,0,0,0,2,2);  // LSJTg Nmax
+  basis::TwoBodySubspaceLSJTN subspace(0,0,0,0,0,2,basis::Rank::kTwoBody,2);  // LSJTgN Nmax
   std::cout << subspace.LabelStr() << std::endl;
   std::cout << subspace.DebugStr();
 
@@ -404,7 +403,7 @@ void TestTwoBodyN()
 
   std::cout << "Two-body space" << std::endl;
   int Nmax = 2;
-  basis::TwoBodySpaceLSJTN space(Nmax);
+  basis::TwoBodySpaceLSJTN space(basis::Rank::kTwoBody,Nmax);
   std::cout << space.DebugStr();
 
   // then set up allowed sectors

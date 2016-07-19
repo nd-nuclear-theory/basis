@@ -1,8 +1,16 @@
 /****************************************************************
-  jjjpn_scheme_general.h
+  jjjpnorb_scheme.h
 
-  Defines general single-particle orbital sets and two-body state
-  indexing in jjJpn coupling scheme.
+  Defines two-body state indexing in jjJpn coupling scheme, based on
+  general single-particle orbital sets.
+
+  Nomenclature: The "orb" in the filename flags that these definitions
+  are for general orbitals, rather than oscillator orbitals (compare,
+  e.g., lsjt_scheme.h or jjjt_scheme.h).  However, we do not propagate
+  this "orb" nomenclature to the actual typedefs and function names
+  defined in this file.  Naming conflicts would therefore arise if we
+  were to wish to define a traditional "jjjpn_scheme" with hard-coded
+  (N,j) orbital labels, in the spirit of jjjt_scheme.
 
   Language: C++11
                                  
@@ -13,8 +21,8 @@
 
 ****************************************************************/
 
-#ifndef JJJPN_SCHEME_GENERAL_H_
-#define JJJPN_SCHEME_GENERAL_H_
+#ifndef JJJPNORB_SCHEME_H_
+#define JJJPNORB_SCHEME_H_
 
 #include <array>
 #include <string>
@@ -22,7 +30,7 @@
 #include "am/halfint.h"
 
 #include "basis/indexing.h"
-
+#include "basis/many_body.h"
 
 namespace basis {
 
@@ -264,8 +272,8 @@ namespace basis {
 
   // enumerated type for two-body state species
   //
-  // Note: Follows same sequence as MFDn, but MFDn uses 1-based
-  // numbering.
+  // Note: Ordering of pp/nn/pn labels follows the same sequence as
+  // used in MFDn.  However, note that MFDn uses 1-based numbering.
 
   enum class TwoBodySpeciesPN {kPP=0,kNN=1,kPN=2};
 
@@ -278,9 +286,14 @@ namespace basis {
     WeightMax() {};
     // default constructor
 
-    WeightMax(int N1max, int N2max)
+    WeightMax(basis::Rank truncation_rank, int truncation_cutoff)
     // Set conventional oscillator one-body/two-body trunctation.
     {
+      // extract one-body and two-body cutoffs
+      int N1max, N2max;
+      std::tie(N1max,N2max) = basis::TwoBodyCutoffs(truncation_rank,truncation_cutoff);
+
+      // save cutoffs
       one_body[0] = N1max;
       one_body[1] = N1max;
       two_body[0] = N2max;

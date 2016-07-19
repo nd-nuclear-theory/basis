@@ -45,6 +45,7 @@
 #include "am/halfint.h"
 
 #include "basis/indexing.h"
+#include "basis/many_body.h"
 
 
 namespace basis {
@@ -144,7 +145,7 @@ namespace basis {
 
       TwoBodySubspaceJJJT(
           int J, int T, int g,
-          int truncation_cutoff, int truncation_rank=2
+          basis::Rank truncation_rank, int truncation_cutoff
         );
       // Set up indexing.
 
@@ -231,8 +232,8 @@ namespace basis {
     // default constructor -- provided since required for certain
     // purposes by STL container classes (e.g., std::vector::resize)
 
-    TwoBodySpaceJJJT(int truncation_cutoff, int truncation_rank=2);
-    // Enumerate all subspaces up to a given Nmax cutoff.
+    TwoBodySpaceJJJT(basis::Rank truncation_rank, int truncation_cutoff);
+    // Enumerate subspaces. 
 
     // accessors
     int N1max() const {return N1max_;}
@@ -375,9 +376,8 @@ namespace basis {
 
       TwoBodySubspaceJJJTN(
           int J, int T, int g, int N,  // (MODIFICATION for subspacing by N)
-          int truncation_cutoff, int truncation_rank=2
+          basis::Rank truncation_rank, int truncation_cutoff
         );
-
       // Set up indexing.
 
       // accessors
@@ -465,8 +465,8 @@ namespace basis {
     // default constructor -- provided since required for certain
     // purposes by STL container classes (e.g., std::vector::resize)
 
-    TwoBodySpaceJJJTN(int truncation_cutoff, int truncation_rank=2);
-    // Enumerate all subspaces up to a given Nmax cutoff.
+    TwoBodySpaceJJJTN(basis::Rank truncation_rank, int truncation_cutoff);
+    // Enumerate subspaces.
 
     // accessors
     int N1max() const {return N1max_;}

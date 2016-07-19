@@ -27,7 +27,7 @@ void TestTwoBody()
 
   // example subspace
   std::cout << "Example subspace" << std::endl;
-  basis::TwoBodySubspaceJJJT subspace(0,1,0,6);
+  basis::TwoBodySubspaceJJJT subspace(0,1,0,basis::Rank::kTwoBody,6);  // JTg Nmax
   std::cout << subspace.LabelStr() << std::endl;
   std::cout << subspace.DebugStr();
 
@@ -38,7 +38,7 @@ void TestTwoBody()
 
   std::cout << "Two-body space" << std::endl;
   int Nmax = 2;
-  basis::TwoBodySpaceJJJT space(Nmax);
+  basis::TwoBodySpaceJJJT space(basis::Rank::kTwoBody,Nmax);
   std::cout << space.DebugStr();
 
   // then set up allowed sectors
@@ -94,7 +94,7 @@ void TestTwoBodyN()
 
   // example subspace
   std::cout << "Example subspace" << std::endl;
-  basis::TwoBodySubspaceJJJTN subspace(0,1,0,6,6);
+  basis::TwoBodySubspaceJJJTN subspace(0,1,0,6,basis::Rank::kTwoBody,6);  // JTgN Nmax
   std::cout << subspace.LabelStr() << std::endl;
   std::cout << subspace.DebugStr();
 
@@ -105,7 +105,7 @@ void TestTwoBodyN()
 
   std::cout << "Two-body space" << std::endl;
   int Nmax = 2;
-  basis::TwoBodySpaceJJJTN space(Nmax);
+  basis::TwoBodySpaceJJJTN space(basis::Rank::kTwoBody,Nmax);
   std::cout << space.DebugStr();
 
   // then set up allowed sectors

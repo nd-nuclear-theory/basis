@@ -601,19 +601,14 @@ namespace basis {
   ////////////////////////////////////////////////////////////////
 
   TwoBodySubspaceLSJT::TwoBodySubspaceLSJT(
-      int L, int S, int J, int T, int g, int truncation_cutoff, int truncation_rank
+      int L, int S, int J, int T, int g,
+      basis::Rank truncation_rank, int truncation_cutoff
     )
   {
 
     // set labels
     labels_ = SubspaceLabelsType(L,S,J,T,g);
-
-    // save truncation
-    N1max_ = truncation_cutoff;
-    if (truncation_rank==1)
-        N2max_ = 2*truncation_cutoff;
-    else if (truncation_rank==2)
-        N2max_ = truncation_cutoff;
+    std::tie(N1max_,N2max_) = basis::TwoBodyCutoffs(truncation_rank,truncation_cutoff);
 
     // validate subspace labels
     assert(ValidLabels()); 
@@ -716,15 +711,11 @@ namespace basis {
 
   }
 
-  TwoBodySpaceLSJT::TwoBodySpaceLSJT(int truncation_cutoff, int truncation_rank)
+  TwoBodySpaceLSJT::TwoBodySpaceLSJT(basis::Rank truncation_rank, int truncation_cutoff)
   {
 
     // save truncation
-    N1max_ = truncation_cutoff;
-    if (truncation_rank==1)
-        N2max_ = 2*truncation_cutoff;
-    else if (truncation_rank==2)
-        N2max_ = truncation_cutoff;
+    std::tie(N1max_,N2max_) = basis::TwoBodyCutoffs(truncation_rank,truncation_cutoff);
 
     // iterate over L
     for (int L=0; L<=N2max_; ++L)
@@ -743,7 +734,7 @@ namespace basis {
 			// required to pass label validity tests
 			// int Nmax_subspace = Nmax - (Nmax-g)%2;
 		    
-			TwoBodySubspaceLSJT subspace(L,S,J,T,g,truncation_cutoff,truncation_rank);
+			TwoBodySubspaceLSJT subspace(L,S,J,T,g,truncation_rank,truncation_cutoff);
 			if (subspace.size()!=0)
 			  PushSubspace(subspace);
 		      }
@@ -820,20 +811,14 @@ namespace basis {
 
   TwoBodySubspaceLSJTN::TwoBodySubspaceLSJTN(
       int L, int S, int J, int T, int g, int N,
-      int truncation_cutoff, int truncation_rank
+      basis::Rank truncation_rank, int truncation_cutoff
     )
   {
 
     // set labels (MODIFICATION for subspacing by N)
     labels_ = SubspaceLabelsType(L,S,J,T,g,N);
     N_ = N;
-
-    // save truncation
-    N1max_ = truncation_cutoff;
-    if (truncation_rank==1)
-        N2max_ = 2*truncation_cutoff;
-    else if (truncation_rank==2)
-        N2max_ = truncation_cutoff;
+    std::tie(N1max_,N2max_) = basis::TwoBodyCutoffs(truncation_rank,truncation_cutoff);
 
     // validate subspace labels
     assert(ValidLabels()); 
@@ -937,14 +922,10 @@ namespace basis {
   }
 
 
-  TwoBodySpaceLSJTN::TwoBodySpaceLSJTN(int truncation_cutoff, int truncation_rank)
+  TwoBodySpaceLSJTN::TwoBodySpaceLSJTN(basis::Rank truncation_rank, int truncation_cutoff)
   {
     // save truncation
-    N1max_ = truncation_cutoff;
-    if (truncation_rank==1)
-        N2max_ = 2*truncation_cutoff;
-    else if (truncation_rank==2)
-        N2max_ = truncation_cutoff;
+    std::tie(N1max_,N2max_) = basis::TwoBodyCutoffs(truncation_rank,truncation_cutoff);
 
     // iterate over L
     for (int L=0; L<=N2max_; ++L)
@@ -961,7 +942,7 @@ namespace basis {
                       for (int N = g; N <= N2max_; N+=2)
                         {
                           TwoBodySubspaceLSJTN subspace(
-                              L,S,J,T,g,N,truncation_cutoff,truncation_rank
+                              L,S,J,T,g,N,truncation_rank,truncation_cutoff
                             );  // (MODIFICATION for subspacing by N)
                           if (subspace.size()!=0)
                             PushSubspace(subspace);

@@ -154,7 +154,7 @@ void WriteTestTwoBody(const std::string& filename)
 
   // set up space
   int Nmax = 2;
-  basis::TwoBodySpaceLSJT space(Nmax);
+  basis::TwoBodySpaceLSJT space(basis::Rank::kTwoBody,Nmax);
 
   // set up operator containers
   //

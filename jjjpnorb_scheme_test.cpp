@@ -1,5 +1,5 @@
 /****************************************************************
-  jjjpn_scheme_general_test.cpp
+  jjjpnorb_scheme_test.cpp
 
   Mark A. Caprio
   University of Notre Dame
@@ -10,7 +10,7 @@
 #include <iomanip>
 #include <iostream>
 
-#include "jjjpn_scheme_general.h"
+#include "jjjpnorb_scheme.h"
 
 ////////////////////////////////////////////////////////////////
 // test code
@@ -65,11 +65,11 @@ void test_two_body_Nmax()
 
   // example subspace
   std::cout << "Example subspace" << std::endl;
-  std::cout << "  basis::TwoBodySpeciesPN::kPN,2,0,basis::WeightMax(2,4)" << std::endl;
+  std::cout << "  basis::TwoBodySpeciesPN::kPN,2,0,basis::WeightMax(basis::Rank::kOneBody,2)" << std::endl;
   basis::TwoBodySubspaceJJJPN subspace(
       orbital_space,
       basis::TwoBodySpeciesPN::kPN,2,0,
-      basis::WeightMax(2,4)
+      basis::WeightMax(basis::Rank::kOneBody,2)
     );
   std::cout << subspace.DebugStr();
   std::cout << "Orbital subspace sizes"
@@ -80,10 +80,10 @@ void test_two_body_Nmax()
   // set up space
 
   std::cout << "Two-body space" << std::endl;
-  std::cout << "      basis::WeightMax(2,2)" << std::endl;
+  std::cout << "      basis::WeightMax(basis::Rank::kTwoBody,2)" << std::endl;
   basis::TwoBodySpaceJJJPN space(
       orbital_space,
-      basis::WeightMax(2,2)
+      basis::WeightMax(basis::Rank::kTwoBody,2)
     );
   std::cout << space.DebugStr();
 

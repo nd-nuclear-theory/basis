@@ -63,6 +63,7 @@
     - Remove unnecessary complication of matching subspace Nmax
       to g.
     - Add one-body (square) truncation on two-body bases.
+  7/19/16 (mac): Adapt to use Rank enum.
 
 ****************************************************************/
 
@@ -72,6 +73,7 @@
 #include <string>
 
 #include "basis/indexing.h"
+#include "basis/many_body.h"
 
 namespace basis {
 
@@ -780,7 +782,7 @@ namespace basis {
 
       TwoBodySubspaceLSJT(
           int L, int S, int J, int T, int g,
-          int truncation_cutoff, int truncation_rank=2
+          basis::Rank truncation_rank, int truncation_cutoff
         );
       // Set up indexing.
 
@@ -858,7 +860,7 @@ namespace basis {
     // default constructor -- provided since required for certain
     // purposes by STL container classes (e.g., std::vector::resize)
 
-    TwoBodySpaceLSJT(int truncation_cutoff, int truncation_rank=2);
+    TwoBodySpaceLSJT(basis::Rank truncation_rank, int truncation_cutoff);
     // Enumerate all subspaces up to a given Nmax cutoff.
 
     // accessors
@@ -978,7 +980,7 @@ namespace basis {
 
       TwoBodySubspaceLSJTN(
           int L, int S, int J, int T, int g, int N,  // (MODIFICATION for subspacing by N)
-          int truncation_cutoff, int truncation_rank=2
+          basis::Rank truncation_rank, int truncation_cutoff
         );
       // Set up indexing.
 
@@ -1058,7 +1060,7 @@ namespace basis {
     // default constructor -- provided since required for certain
     // purposes by STL container classes (e.g., std::vector::resize)
 
-    TwoBodySpaceLSJTN(int truncation_cutoff, int truncation_rank=2);
+    TwoBodySpaceLSJTN(basis::Rank truncation_rank, int truncation_cutoff);
     // Enumerate all subspaces up to a given Nmax cutoff.
 
     // accessors
