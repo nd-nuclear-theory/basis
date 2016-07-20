@@ -9,7 +9,8 @@ modules_h = indexing
 
 # modules -- header-plus-object 
 ##modules_ho = jt_scheme
-modules_ho = many_body lsjt_scheme lsjt_operator jjjt_scheme jjjt_operator
+modules_ho = operator many_body
+modules_ho += lsjt_scheme lsjt_operator jjjt_scheme jjjt_operator
 modules_ho += jjjpnorb_scheme jjjpnorb_operator
 
 # programs

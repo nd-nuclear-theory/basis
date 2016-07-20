@@ -237,7 +237,7 @@ void IdentityTest()
   // ...
 
   // try out deletion
-  ClearOperatorJT(relative_component_sectors,relative_component_matrices);
+  basis::ClearOperatorJT(relative_component_sectors,relative_component_matrices);
 
 }
 

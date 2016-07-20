@@ -20,7 +20,9 @@
   7/9/16 (mac): Add support for canonicalizing indices in matrix
     element lookup.
   7/12/16 (mac): Add diagonal constant operator.
-  7/19/16 (mac): Extract AS/NAS conversion enum to many_body.h.
+  7/19/16 (mac):
+   - Extract AS/NAS conversion enum to many_body.h.
+   - Add diagnostic function AllocatedEntries.
 
 ****************************************************************/
 
@@ -40,6 +42,23 @@ namespace basis {
   ////////////////////////////////////////////////////////////////
 
   typedef std::vector<Eigen::MatrixXd> MatrixVector;
+
+  ////////////////////////////////////////////////////////////////
+  // storage diagnostic
+  ////////////////////////////////////////////////////////////////
+  std::size_t AllocatedEntries(const MatrixVector& matrices);
+    // Count entries in a vector of matrices.
+    //
+    // This may be larger than the nominal number of matrix elements
+    // defining the operator, if only upper-triangle matrix elements
+    // are relevant for the operator, since full square/rectangular
+    // matrices are always allocated.
+    //
+    // Arguments:
+    //   matrices (basis::MatrixVector) : vector of matrices
+    //
+    // Returns:
+    //   (std::size_t) : number of allocated matrix entries
 
   ////////////////////////////////////////////////////////////////
   // zero operator
