@@ -38,7 +38,6 @@ namespace basis {
   // Example:
   //    int N1max, N2max;
   //    std::tie(N1max,N2max) = basis::TwoBodyCutoffs(truncation_rank,truncation_cutoff);
-
   //
   // Arguments:
   //   truncation_rank (basis::Rank) : many-body rank (kOneBody or kTwoBody)

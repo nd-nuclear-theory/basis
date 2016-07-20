@@ -236,6 +236,9 @@ void IdentityTest()
   // and now it would be nice to inspect the contents, wouldn't it,
   // ...
 
+  // try out deletion
+  ClearOperatorJT(relative_component_sectors,relative_component_matrices);
+
 }
 
 ////////////////////////////////////////////////////////////////

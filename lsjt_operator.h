@@ -328,6 +328,25 @@ namespace basis {
   //   matrices (basis::MatrixVector, output) :  matrices defining operator
 
   ////////////////////////////////////////////////////////////////
+  // clearing operator data 
+  ////////////////////////////////////////////////////////////////
+    template <typename tJTSectors>
+      void ClearOperatorJT(
+          std::array<tJTSectors,3> component_sectors,
+          std::array<basis::MatrixVector,3> component_matrices
+        )
+    // Delete all sector and matrix data for all isospin components of
+    // an operator in **JT scheme.
+      {
+        for (int T0=0; T0<=2; ++T0)
+          {
+            component_sectors[T0] = tJTSectors();
+            component_matrices[T0].resize(0);
+          }
+      }
+
+      
+  ////////////////////////////////////////////////////////////////
   // operator matrix element canonicalizaton
   ////////////////////////////////////////////////////////////////
 
