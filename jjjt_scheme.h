@@ -34,6 +34,7 @@
     - Remove unnecessary complication of matching subspace Nmax
       to g.
     - Add one-body (square) truncation on two-body bases.
+  7/19/16 (mac): Use enum Rank for truncation rank.
 
 ****************************************************************/
 

@@ -239,7 +239,7 @@ namespace basis {
 
               // generate output line
               const int width = 3;
-              const int precision = 16;
+              const int precision = 8;  // for approximately single precision output
               os << std::setprecision(precision);
 	      os 
 		<< " " << std::setw(width) << T0

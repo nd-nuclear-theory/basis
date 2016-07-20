@@ -18,6 +18,10 @@
   University of Notre Dame
 
   7/7/16 (mac): Created, building on code from jjjt_scheme.
+  7/19/16 (mac):
+   - Add default constructors.
+   - Use enum Rank for truncation rank.
+   - Add two-body species code definitions.
 
 ****************************************************************/
 
@@ -277,6 +281,18 @@ namespace basis {
 
   enum class TwoBodySpeciesPN {kPP=0,kNN=1,kPN=2};
 
+  // notational definitions for two-body state species
+  //
+  // Use of these arrays requires conversion of the TwoBodySpeciesPN to int.
+  //
+  // Example:
+  //   basis::TwoBodySpeciesPN two_body_species;
+  //   ...
+  //   os << basis::kTwoBodySpeciesPNCodeTz[int(two_body_species)];
+  extern const std::array<int,3> kTwoBodySpeciesPNCodeTz;  // {+1,-1,0} -- "up quark is positive" convention
+  extern const std::array<int,3> kTwoBodySpeciesPNCodeDecimal;  // {11,22,12} -- used by MFDn
+  extern const std::array<const char*,3> kTwoBodySpeciesPNCodeChar;  // {"pp","nn","pn"}
+
   // maximum weight collection
   struct WeightMax
   {
@@ -320,11 +336,17 @@ namespace basis {
       public:
 
       // constructor
+
+      TwoBodySubspaceJJJPN() {};
+      // default constructor -- provided since required for certain
+      // purposes by STL container classes (e.g., std::vector::resize)
+
       TwoBodySubspaceJJJPN(
           const OrbitalSpacePN& orbital_space,
           TwoBodySpeciesPN two_body_species, int J, int g,
           const WeightMax& weight_max
         );
+      // Set up indexing.
 
       // accessors
       TwoBodySpeciesPN two_body_species() const {return std::get<0>(labels_);}
@@ -387,10 +409,16 @@ namespace basis {
     public:
 
     // constructor
+
+    TwoBodySpaceJJJPN() {};
+    // default constructor -- provided since required for certain
+    // purposes by STL container classes (e.g., std::vector::resize)
+
     TwoBodySpaceJJJPN(
           const OrbitalSpacePN orbital_space,
           const WeightMax& weight_max
       );
+    // Enumerate subspaces.
 
     // accessors
       const WeightMax& weight_max() const {return weight_max_;}
@@ -413,6 +441,10 @@ namespace basis {
     public:
 
     // constructor
+
+    TwoBodySectorsJJJPN() {};
+    // default constructor -- provided since required for certain
+    // purposes by STL container classes (e.g., std::vector::resize)
 
     TwoBodySectorsJJJPN(
         const TwoBodySpaceJJJPN& space,

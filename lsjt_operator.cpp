@@ -104,7 +104,7 @@ namespace basis {
 	    
               // generate output line
               const int width = 3;
-              const int precision = 16;
+              const int precision = 14;  // less than 16 to provide some roundoff and avoid ugliness on doubles
               os << std::setprecision(precision);
 	      os 
 		<< " " << std::setw(width) << T0
@@ -609,7 +609,7 @@ namespace basis {
 
               // generate output line
               const int width = 3;
-              const int precision = 16;
+              const int precision = 8;  // for approximately single precision output
               os << std::setprecision(precision);
 	      os 
 		<< " " << std::setw(width) << T0

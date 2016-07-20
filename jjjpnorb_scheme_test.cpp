@@ -16,7 +16,20 @@
 // test code
 ////////////////////////////////////////////////////////////////
 
-void test_orbitals_Nmax(const std::string& filename)
+void TestNotation()
+{
+  std::cout << "Notation" << std::endl;
+  for (basis::TwoBodySpeciesPN two_body_species
+         : {basis::TwoBodySpeciesPN::kPP,basis::TwoBodySpeciesPN::kNN,basis::TwoBodySpeciesPN::kPN})
+    std::cout
+      << " " << basis::kTwoBodySpeciesPNCodeTz[int(two_body_species)]
+      << " " << basis::kTwoBodySpeciesPNCodeDecimal[int(two_body_species)]
+      << " " << basis::kTwoBodySpeciesPNCodeChar[int(two_body_species)];
+  std::cout << std::endl;
+}
+
+
+void TestOrbitalsNmax(const std::string& filename)
 {
 
   ////////////////////////////////////////////////////////////////
@@ -50,7 +63,7 @@ void test_orbitals_Nmax(const std::string& filename)
 
 }
 
-void test_two_body_Nmax()
+void TestTwoBodyNmax()
 {
 
   ////////////////////////////////////////////////////////////////
@@ -78,7 +91,6 @@ void test_two_body_Nmax()
             << std::endl;
 
   // set up space
-
   std::cout << "Two-body space" << std::endl;
   std::cout << "      basis::WeightMax(basis::Rank::kTwoBody,2)" << std::endl;
   basis::TwoBodySpaceJJJPN space(
@@ -87,7 +99,7 @@ void test_two_body_Nmax()
     );
   std::cout << space.DebugStr();
 
-  // then set up allowed sectors
+  // set up allowed sectors
   std::cout << "Two-body operator sectors" << std::endl;
   int J0 = 0;  // try: J0=0 for interaction, J0=2 for quadrupole operator
   int g0 = 0;
@@ -133,9 +145,11 @@ void test_two_body_Nmax()
 int main(int argc, char **argv)
 {
 
-  std::string filename("test/jjjpn_scheme_general_test_orbitals_Nmax04.dat");
-  test_orbitals_Nmax(filename);
-  test_two_body_Nmax();
+  TestNotation();
+
+  std::string filename("test/jjjpnorb_scheme_test_orbitals_Nmax04.dat");
+  TestOrbitalsNmax(filename);
+  TestTwoBodyNmax();
 
   // termination
   return 0;

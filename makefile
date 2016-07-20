@@ -15,7 +15,7 @@ modules_ho += jjjpnorb_scheme jjjpnorb_operator
 # programs
 ##programs = jt_scheme_test
 programs = lsjt_scheme_test lsjt_operator_test jjjt_scheme_test
-programs += jjjpnorb_scheme_test
+programs += jjjpnorb_scheme_test jjjpnorb_operator_test
 ##programs += write_lsjt_relative
 CC := $(CXX)
 

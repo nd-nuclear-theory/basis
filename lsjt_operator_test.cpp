@@ -1,8 +1,8 @@
 /****************************************************************
   lsjt_operator_test.cpp
 
-  Mark A. Caprio, University of Notre Dame.
-  See interaction_lsjt.h for documentation.
+  Mark A. Caprio
+  University of Notre Dame
 
 ****************************************************************/
 
