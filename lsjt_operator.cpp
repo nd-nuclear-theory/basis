@@ -8,6 +8,8 @@
 
 #include "lsjt_operator.h"
 
+#include <fstream>
+
 namespace basis {
 
   ////////////////////////////////////////////////////////////////
@@ -215,6 +217,77 @@ namespace basis {
 
       }
   }
+
+void ReadRelativeOperatorLSJT(
+    const std::string& relative_filename,
+    basis::RelativeSpaceLSJT& relative_space,
+    basis::OperatorLabelsJT& operator_labels,
+    std::array<basis::RelativeSectorsLSJT,3>& relative_component_sectors,
+    std::array<basis::MatrixVector,3>& relative_component_matrices,
+    bool verbose
+  )
+// FUTURE: change to line-based input with std::getline for easier debugging
+// FUTURE: check file status on open
+{
+
+  // open stream for reading
+  if (verbose)
+    {
+      std::cout << "  Relative operator file: " << relative_filename << std::endl;
+    }
+  std::ifstream is(relative_filename.c_str());
+
+  // read header parameters
+  basis::RelativeOperatorParametersLSJT operator_parameters;
+  basis::ReadRelativeOperatorParametersLSJT(is,operator_parameters);
+  operator_labels = static_cast<basis::OperatorLabelsJT>(operator_parameters);
+  if (verbose)
+    {
+      std::cout
+        << " "
+        << " J0 " << operator_parameters.J0
+        << " g0 " << operator_parameters.g0
+        << " T0_min " << operator_parameters.T0_min
+        << " T0_max " << operator_parameters.T0_max
+        << " symmetry " << int(operator_parameters.symmetry_phase_mode)
+        << std::endl
+        << " "
+        << " Nmax " << operator_parameters.Nmax
+        << " Jmax " << operator_parameters.Jmax
+        << std::endl;
+    }
+
+  // set up relative space
+  relative_space = basis::RelativeSpaceLSJT(
+      operator_parameters.Nmax,operator_parameters.Jmax
+    );
+  
+  // populate sectors and matrices
+  for (int T0=operator_parameters.T0_min; T0<=operator_parameters.T0_max; ++T0)
+    // for each isospin component
+    {
+      // enumerate sectors
+      relative_component_sectors[T0]
+        = basis::RelativeSectorsLSJT(relative_space,operator_labels.J0,T0,operator_labels.g0);
+
+      // read matrices
+      basis::ReadRelativeOperatorComponentLSJT(
+          is,
+          T0,
+          relative_component_sectors[T0],relative_component_matrices[T0]
+        );
+    }
+
+  // write diagnostics
+  if (verbose)
+    {
+      std::cout << "  Allocated matrix elements:";
+      for (int T0=operator_parameters.T0_min; T0<=operator_parameters.T0_max; ++T0)
+        std::cout << " " << basis::AllocatedEntries(relative_component_matrices[T0]);
+      std::cout << std::endl;
+    }
+
+}
 
   ////////////////////////////////////////////////////////////////
   // operator matrix element canonicalizaton

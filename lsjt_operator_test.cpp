@@ -241,6 +241,21 @@ void IdentityTest()
 
 }
 
+void ReadTestWithReadRelativeOperator(const std::string& filename)
+{
+  basis::RelativeSpaceLSJT relative_space;
+  basis::OperatorLabelsJT operator_labels;
+  std::array<basis::RelativeSectorsLSJT,3> relative_component_sectors;
+  std::array<basis::MatrixVector,3> relative_component_matrices;
+  ReadRelativeOperatorLSJT(
+      filename,
+      relative_space,
+      operator_labels,relative_component_sectors,relative_component_matrices,
+      true  // verbose
+    );
+
+}
+
 ////////////////////////////////////////////////////////////////
 // main
 ////////////////////////////////////////////////////////////////
@@ -248,11 +263,12 @@ void IdentityTest()
 int main(int argc, char **argv)
 {
 
-  std::string relative_filename("test/lsjt_operator_test_relative_identity_Nmax02.dat");
+  std::string relative_filename("lsjt_operator_test_relative_identity_Nmax02.dat");
   WriteTestRelative(relative_filename);
   ReadTestRelative(relative_filename);
+  ReadTestWithReadRelativeOperator(relative_filename);
  
-  std::string two_body_filename("test/lsjt_operator_test_two_body_identity_nas_Nmax02.dat");
+  std::string two_body_filename("lsjt_operator_test_two_body_identity_nas_Nmax02.dat");
   WriteTestTwoBody(two_body_filename);
 
   IdentityTest();

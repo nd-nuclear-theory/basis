@@ -39,6 +39,7 @@
     - Incorporate some basic LSJT operator construction and
       manipulation functions.
   7/13/16 (mac): Revise code for LSJTN->LSJT gathering operation.
+  7/20/16 (mac): Add ReadRelativeOperatorLSJT.
 
 ****************************************************************/
 
@@ -326,6 +327,25 @@ namespace basis {
   //   T0 (int) : isospin for this isospin component
   //   sector (basis::RelativeSectorsLSJT) :  sectors defining operator
   //   matrices (basis::MatrixVector, output) :  matrices defining operator
+
+  void ReadRelativeOperatorLSJT(
+      const std::string& relative_filename,
+      basis::RelativeSpaceLSJT& relative_space,
+      basis::OperatorLabelsJT& operator_labels,
+      std::array<basis::RelativeSectorsLSJT,3>& relative_component_sectors,
+      std::array<basis::MatrixVector,3>& relative_component_matrices,
+      bool verbose
+    );
+  // Set up and read relative operator.
+  //
+  // Arguments:
+  //   parameters (Parameters) : includes tensorial properties of operator
+  //      choice of operator to use 
+  //   relative_space (..., output) : target space, based on parameters in file
+  //   operator_labels (basis::OperatorLabelsJT, output) : operator labels, from file 
+  //   relative_component_sectors (..., output) : target sectors
+  //   relative_component_matrices (..., output) : target matrices
+  //   verbose (bool) : whether or not to include diagnostic output
 
   ////////////////////////////////////////////////////////////////
   // clearing operator data 
