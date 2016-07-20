@@ -22,6 +22,7 @@
    - Add default constructors.
    - Use enum Rank for truncation rank.
    - Add two-body species code definitions.
+   - Add GetOrbital accessors.
 
 ****************************************************************/
 
@@ -397,6 +398,10 @@ namespace basis {
     // state label accessors
     int index1() const {return std::get<0>(GetStateLabels());}
     int index2() const {return std::get<1>(GetStateLabels());}
+
+    // state retrieval
+    const OrbitalStatePN GetOrbital1() const {return OrbitalStatePN(orbital_subspace1(),index1());}
+    const OrbitalStatePN GetOrbital2() const {return OrbitalStatePN(orbital_subspace2(),index2());}
 
   };
 
