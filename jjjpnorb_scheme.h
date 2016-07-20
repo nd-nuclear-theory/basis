@@ -393,7 +393,7 @@ namespace basis {
     int J() const {return Subspace().J();}
     int g() const {return Subspace().g();}
     const OrbitalSubspacePN& orbital_subspace1() const {return Subspace().orbital_subspace1();}
-    const OrbitalSubspacePN& orbital_subspace2() const {return Subspace().orbital_subspace1();}
+    const OrbitalSubspacePN& orbital_subspace2() const {return Subspace().orbital_subspace2();}
 
     // state label accessors
     int index1() const {return std::get<0>(GetStateLabels());}
