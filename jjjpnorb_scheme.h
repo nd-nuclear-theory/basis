@@ -23,7 +23,9 @@
    - Use enum Rank for truncation rank.
    - Add two-body species code definitions.
    - Add GetOrbital accessors.
-  7/22/16 (mac): Fix reference error in TwoBodySpaceJJJPN.
+  7/22/16 (mac):
+   - Fix reference error in TwoBodySpaceJJJPN.
+   - Add debugging strings.
 
 ****************************************************************/
 
@@ -126,8 +128,11 @@ namespace basis {
       int Nmax() const {return Nmax_;}  // only meaningful if oscillator scheme constructor used
       const std::vector<double>& weights() const {return weights_;}
       
-      // diagnostic string
+      // diagnostic strings
+      std::string LabelStr() const;
+      // Provide string representation of subspace labels.
       std::string DebugStr() const;
+      // Dump subspace contents.
 
       private:
 
@@ -358,8 +363,11 @@ namespace basis {
       const OrbitalSubspacePN& orbital_subspace1() const {return *orbital_subspace1_ptr_;}
       const OrbitalSubspacePN& orbital_subspace2() const {return *orbital_subspace2_ptr_;}
 
-      // diagnostic string
+      // diagnostic strings
+      std::string LabelStr() const;
+      // Provide string representation of subspace labels.
       std::string DebugStr() const;
+      // Dump subspace contents.
 
       private:
 

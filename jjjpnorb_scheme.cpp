@@ -46,6 +46,19 @@ namespace basis {
         }
   }
 
+  std::string OrbitalSubspacePN::LabelStr() const
+  {
+    std::ostringstream os;
+
+    const int width = 0;  // for now, no fixed width
+
+    os << "["
+       << " " << std::setw(width) << int(orbital_species())
+       << " " << "]";
+
+    return os.str();
+  }
+
   std::string OrbitalSubspacePN::DebugStr() const
   {
 
@@ -254,6 +267,21 @@ namespace basis {
         }
   }
   
+  std::string TwoBodySubspaceJJJPN::LabelStr() const
+  {
+    std::ostringstream os;
+
+    const int width = 0;  // for now, no fixed width
+
+    os << "["
+       << " " << std::setw(width) << kTwoBodySpeciesPNCodeTz[int(two_body_species())]
+       << " " << std::setw(width) << J() 
+       << " " << std::setw(width) << g()
+       << " " << "]";
+
+    return os.str();
+  }
+
   std::string TwoBodySubspaceJJJPN::DebugStr() const
   {
 
