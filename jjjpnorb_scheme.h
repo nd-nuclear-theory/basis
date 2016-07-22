@@ -412,6 +412,9 @@ namespace basis {
     const OrbitalStatePN GetOrbital1() const {return OrbitalStatePN(orbital_subspace1(),index1());}
     const OrbitalStatePN GetOrbital2() const {return OrbitalStatePN(orbital_subspace2(),index2());}
 
+    // diagnostic string
+    std::string LabelStr() const;
+
   };
 
   // space

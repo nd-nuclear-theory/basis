@@ -319,6 +319,30 @@ namespace basis {
 
   }
 
+  std::string TwoBodyStateJJJPN::LabelStr() const
+  {
+    std::ostringstream os;
+
+    const int width = 0;  // for now, no fixed width
+
+    os << "["
+       << " " << std::setw(width) << kTwoBodySpeciesPNCodeTz[int(two_body_species())]
+       << " " << std::setw(width) << J() 
+       << " " << std::setw(width) << g()
+       << " " << ";"
+       << " " << std::setw(width) << index1()
+       << " " << std::setw(width) << index2()
+       << " " << "("
+       << " " << std::setw(width) << GetOrbital1().N()
+       << " " << std::setw(width) << GetOrbital1().j()
+       << " " << std::setw(width) << GetOrbital2().N()
+       << " " << std::setw(width) << GetOrbital2().j()
+       << " " << ")"
+       << " " << "]";
+
+    return os.str();
+  }
+
 
   TwoBodySpaceJJJPN::TwoBodySpaceJJJPN(
       const OrbitalSpacePN& orbital_space,
