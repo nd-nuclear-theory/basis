@@ -334,8 +334,10 @@ namespace basis {
        << " " << std::setw(width) << index2()
        << " " << "("
        << " " << std::setw(width) << GetOrbital1().N()
+       << " " << std::setw(width) << GetOrbital1().l()
        << " " << std::setw(width) << GetOrbital1().j()
        << " " << std::setw(width) << GetOrbital2().N()
+       << " " << std::setw(width) << GetOrbital2().l()
        << " " << std::setw(width) << GetOrbital2().j()
        << " " << ")"
        << " " << "]";

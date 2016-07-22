@@ -23,6 +23,7 @@
   7/19/16 (mac):
    - Extract AS/NAS conversion enum to many_body.h.
    - Add diagnostic function AllocatedEntries.
+  7/22/16 (mac): Revise syntax for CanonicalizeIndices.
 
 ****************************************************************/
 
@@ -249,13 +250,16 @@ namespace basis {
 
   inline
   void CanonicalizeIndices(
-      int& bra_subspace_index, int& ket_subspace_index,
+      int& subspace_index_bra, int& subspace_index_ket,
       bool& swapped_subspaces, 
-      int& bra_state_index, int& ket_state_index,
+      int& state_index_bra, int& state_index_ket,
       bool& swapped_states
     )
   // Convert subspace and state indices for a matrix element to
   // canonical ("upper triangle") indices.
+  //
+  // DEPRECATED: In-place modification of indices is confusing for
+  // debugging, since the side effects may not be appreciated.
   //
   // Note: For specific indexing schemes, it might be more convenient
   // to define a customized "canonicalizaton" function, which, rather
@@ -264,30 +268,86 @@ namespace basis {
   // the swaps.
   //
   // Arguments:
-  //    bra_subspace_index, ket_subspace_index (int, input/output) :
+  //    subspace_index_bra, subspace_index_ket (int, input/output) :
   //      sector bra and ket subspace indices, possibly to be swapped
   //    swapped_subspaces (bool, output) : whether or not subspace
   //      indices were swapped (off-diagonal sectors)
-  //    bra_state_index, ket_state_index (int, input/output) :
+  //    state_index_bra, state_index_ket (int, input/output) :
   //      bra and ket state indices, possibly to be swapped if sector
   //      is diagonal sector
   //    swapped_states (bool, output) : whether or not state
   //      indices were swapped (diagonal sectors)
   {
     // process subspace indices (off-diagonal sectors)
-    swapped_subspaces = !(bra_subspace_index <= ket_subspace_index);
+    swapped_subspaces = !(subspace_index_bra <= subspace_index_ket);
     if (swapped_subspaces)
       {
-        std::swap(bra_subspace_index,ket_subspace_index);
-        std::swap(bra_state_index,ket_state_index);  // so index stays with sector
+        std::swap(subspace_index_bra,subspace_index_ket);
+        std::swap(state_index_bra,state_index_ket);  // so index stays with sector
       }
 
     // process state indices (diagonal sectors)
-    swapped_states = (bra_subspace_index == ket_subspace_index) 
-      & !(bra_state_index <= ket_state_index);
+    swapped_states = (subspace_index_bra == subspace_index_ket) 
+      & !(state_index_bra <= state_index_ket);
     if (swapped_states)
-      std::swap(bra_state_index,ket_state_index);
+      std::swap(state_index_bra,state_index_ket);
   }
+
+  inline
+    std::tuple<int,int,int,int,bool>
+    CanonicalizeIndices(
+        int subspace_index_bra, int subspace_index_ket,
+        int state_index_bra, int state_index_ket
+      )
+    // Convert subspace and state indices for a matrix element to
+    // canonical ("upper triangle") indices.
+    //
+    // Note: For specific indexing schemes, it might be more convenient
+    // to define a customized "canonicalizaton" function, which, rather
+    // than simply flagging the swaps through boolean variable, actually
+    // calculates any necessary phase an dimension factors arising from
+    // the swaps.
+    //
+    // Arguments:
+    //   subspace_index_bra, subspace_index_ket (int) :
+    //     naive sector bra and ket subspace indices, possibly to be swapped
+    //   state_index_bra, state_index_ket (int) :
+    //     naive bra and ket state indices, possibly to be swapped if sector
+    //     is diagonal
+    //
+    // Returns:
+    //   (std::tuple<int,int,int,int,bool>) : canonicalized indices and swap
+    //      flag as:
+    //
+    //        subspace_index_bra,subspace_index_ket,
+    //        state_index_bra,state_index_ket,
+    //        swapped_subspaces
+    {
+      // Note: We use the local copies of the indices (on the stack)
+      // as working variables.  Slightly unnerving.
+
+      // process subspace indices (off-diagonal sectors)
+      bool swapped_subspaces = !(subspace_index_bra <= subspace_index_ket);
+      if (swapped_subspaces)
+        {
+          std::swap(subspace_index_bra,subspace_index_ket);
+          std::swap(state_index_bra,state_index_ket);  // so index stays with sector
+        }
+
+      // process state indices (diagonal sectors)
+      bool swapped_states = (subspace_index_bra == subspace_index_ket) 
+        & !(state_index_bra <= state_index_ket);
+      if (swapped_states)
+        std::swap(state_index_bra,state_index_ket);
+
+      // bundle return values
+      return std::tuple<int,int,int,int,bool>(
+          subspace_index_bra,subspace_index_ket,
+          state_index_bra,state_index_ket,
+          swapped_subspaces
+        );
+    }
+
 
 
   ////////////////////////////////////////////////////////////////
