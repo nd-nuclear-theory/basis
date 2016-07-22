@@ -23,6 +23,7 @@
    - Use enum Rank for truncation rank.
    - Add two-body species code definitions.
    - Add GetOrbital accessors.
+  7/22/16 (mac): Fix reference error in TwoBodySpaceJJJPN.
 
 ****************************************************************/
 
@@ -420,7 +421,7 @@ namespace basis {
     // purposes by STL container classes (e.g., std::vector::resize)
 
     TwoBodySpaceJJJPN(
-          const OrbitalSpacePN orbital_space,
+          const OrbitalSpacePN& orbital_space,
           const WeightMax& weight_max
       );
     // Enumerate subspaces.

@@ -293,7 +293,7 @@ namespace basis {
 
 
   TwoBodySpaceJJJPN::TwoBodySpaceJJJPN(
-      const OrbitalSpacePN orbital_space,
+      const OrbitalSpacePN& orbital_space,
       const WeightMax& weight_max
     )
   {
