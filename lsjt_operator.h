@@ -7,7 +7,7 @@
 
   A few functions which provide simple "bookkeeping" operations on
   operators, such as ConstructIdentityOperatorRelativeLSJT or
-  GatherBlocksTwoBodyLSJTNToTwoBodyLSJT are included here.  These
+  GatherOperatorTwoBodyLSJTNToTwoBodyLSJT are included here.  These
   provide examples of the coding idioms required to work with
   JT-coupled operators (looping over T0 components, looking up matrix
   elements, etc.).  But functions which have more mathematical content
@@ -41,6 +41,7 @@
   7/13/16 (mac): Revise code for LSJTN->LSJT gathering operation.
   7/20/16 (mac): Add ReadRelativeOperatorLSJT.
   7/22/16 (mac): Revise syntax for CanonicalizeIndicesLSJT.
+  7/25/16 (mac): Add WriteRelativeOperatorLSJT.
 
 ****************************************************************/
 
@@ -208,8 +209,9 @@ namespace basis {
   //
   //     For a RelativeLSJT operator, one can use the daughter type
   //     RelativeOperatorParametersLSJT, which contains additional
-  //     fields describing the relative file format and Nmax and Jmax
-  //     truncation.
+  //     fields describing the Nmax and Jmax truncation.  This
+  //     daughter type is primarily for internal use by the relative
+  //     operator file I/O functions (and may otherwise be ignored).
   //
   //   component_sectors (std::array<tSectorsType,3>) : the sector
   //     enumerations for each isospin component (T0=0,1,2) of the
@@ -259,14 +261,23 @@ namespace basis {
 
   struct RelativeOperatorParametersLSJT
     : OperatorLabelsJT
-  // Parameters for relative operator storage, corresponding to the
-  // contents of a relative LSJT operator file header.
+  // Parameters for relative operator storage.
   //
   // Contains operator tensorial properties (inherited from
-  // OperatorLabelsJT), plus file format version and truncation
-  // information.
+  // OperatorLabelsJT), plus relative basis truncation parameters.
   {
-    int version;
+
+    RelativeOperatorParametersLSJT()
+      // default constructor
+      : Nmax(0), Jmax(0)
+      {}
+
+    RelativeOperatorParametersLSJT(
+        const basis::OperatorLabelsJT& operator_labels, int Nmax_, int Jmax_)
+      // Construct using given operator labels, plus given version and basis parameters.
+      : OperatorLabelsJT(operator_labels), Nmax(Nmax_), Jmax(Jmax_)
+      {}
+
     int Nmax, Jmax;
   };
 
@@ -343,9 +354,28 @@ namespace basis {
   //   parameters (Parameters) : includes tensorial properties of operator
   //      choice of operator to use 
   //   relative_space (..., output) : target space, based on parameters in file
-  //   operator_labels (basis::OperatorLabelsJT, output) : operator labels, from file 
+  //   operator_labels (basis::OperatorLabelsJT, output) : operator labels, from file
   //   relative_component_sectors (..., output) : target sectors
   //   relative_component_matrices (..., output) : target matrices
+  //   verbose (bool) : whether or not to include diagnostic output
+
+  void WriteRelativeOperatorLSJT(
+      const std::string& relative_filename,
+      const basis::RelativeSpaceLSJT& relative_space,
+      const basis::OperatorLabelsJT& operator_labels,
+      const std::array<basis::RelativeSectorsLSJT,3>& relative_component_sectors,
+      const std::array<basis::MatrixVector,3>& relative_component_matrices,
+      bool verbose
+    );
+  // Set up and read relative operator.
+  //
+  // Arguments:
+  //   parameters (Parameters) : includes tensorial properties of operator
+  //      choice of operator to use 
+  //   relative_space (...) : target space
+  //   operator_labels (basis::OperatorLabelsJT) : operator labels
+  //   relative_component_sectors (..., output) : source sectors
+  //   relative_component_matrices (..., output) : source matrices
   //   verbose (bool) : whether or not to include diagnostic output
 
   ////////////////////////////////////////////////////////////////

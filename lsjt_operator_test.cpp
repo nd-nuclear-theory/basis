@@ -15,7 +15,9 @@
 // test parts
 ////////////////////////////////////////////////////////////////
 
-void WriteTestRelative(const std::string& filename)
+void WriteTestRelativeManual(const std::string& filename)
+// "Manual" test of writing...  Supplanted by use of
+// WriteRelativeOperatorLSJT().
 {
   ////////////////////////////////////////////////////////////////
   // defining operator
@@ -25,8 +27,6 @@ void WriteTestRelative(const std::string& filename)
 
   // set operator and file header parameters
   basis::RelativeOperatorParametersLSJT operator_parameters;
-  // file format
-  operator_parameters.version=1;
   // operator tensorial parameters
   operator_parameters.J0=0;
   operator_parameters.g0=0;
@@ -94,7 +94,52 @@ void WriteTestRelative(const std::string& filename)
   ofile << os.str();
 }
 
-void ReadTestRelative(const std::string& filename)
+void WriteTestRelative(const std::string& filename)
+// Write using WriteRelativeOperatorLSJT().
+{
+  ////////////////////////////////////////////////////////////////
+  // defining operator
+  ////////////////////////////////////////////////////////////////
+
+  std::cout << "Setup" << std::endl;
+
+  // set tensorial labels
+  basis::OperatorLabelsJT operator_labels;
+  operator_labels.J0=0;
+  operator_labels.g0=0;
+  operator_labels.symmetry_phase_mode=basis::SymmetryPhaseMode::kHermitian;
+  operator_labels.T0_min=0;
+  operator_labels.T0_max=2;
+
+  // set basis parameters
+  int Nmax=2;
+  int Jmax = Nmax+1;
+
+  // set up relative space
+  basis::RelativeSpaceLSJT relative_space(Nmax,Jmax);
+
+  // populate operator containers
+  std::array<basis::RelativeSectorsLSJT,3> relative_component_sectors;
+  std::array<basis::MatrixVector,3> relative_component_matrices;
+  basis::ConstructIdentityOperatorRelativeLSJT(
+      operator_labels,
+      relative_space,
+      relative_component_sectors,
+      relative_component_matrices
+    );
+
+  basis::WriteRelativeOperatorLSJT(
+      filename,
+      relative_space,
+      operator_labels,relative_component_sectors,relative_component_matrices,
+      true  // verbose
+    );
+
+}
+
+void ReadTestRelativeManual(const std::string& filename)
+// "Manual" test of reading...  Supplanted by use of
+// ReadRelativeOperatorLSJT().
 {
   ////////////////////////////////////////////////////////////////
   // read test
@@ -139,6 +184,57 @@ void ReadTestRelative(const std::string& filename)
           component_sectors[T0],component_matrices[T0]
         );
     }
+}
+
+
+void IdentityTestOLD()
+{
+  ////////////////////////////////////////////////////////////////
+  // construct relative identity operator
+  ////////////////////////////////////////////////////////////////
+
+  // define operator properties
+  int Nmax_relative = 4;
+  int Jmax_relative = Nmax_relative+1;
+
+  basis::OperatorLabelsJT operator_labels;
+  operator_labels.J0 = 0;
+  operator_labels.g0 = 0;
+  operator_labels.T0_min = 0;
+  operator_labels.T0_max = 2;
+  operator_labels.symmetry_phase_mode = basis::SymmetryPhaseMode::kHermitian;
+
+  // define space and operator containers
+  basis::RelativeSpaceLSJT relative_space(Nmax_relative,Jmax_relative);
+  std::array<basis::RelativeSectorsLSJT,3> relative_component_sectors;
+  std::array<basis::MatrixVector,3> relative_component_matrices;
+
+  // do construction
+  ConstructIdentityOperatorRelativeLSJT(
+      operator_labels,
+      relative_space,relative_component_sectors,relative_component_matrices
+    );
+
+  // and now it would be nice to inspect the contents, wouldn't it,
+  // ...
+
+  // try out deletion
+  basis::ClearOperatorJT(relative_component_sectors,relative_component_matrices);
+
+}
+
+void ReadTestRelative(const std::string& filename)
+{
+  basis::RelativeSpaceLSJT relative_space;
+  basis::OperatorLabelsJT operator_labels;
+  std::array<basis::RelativeSectorsLSJT,3> relative_component_sectors;
+  std::array<basis::MatrixVector,3> relative_component_matrices;
+  basis::ReadRelativeOperatorLSJT(
+      filename,
+      relative_space,
+      operator_labels,relative_component_sectors,relative_component_matrices,
+      true  // verbose
+    );
 }
 
 void WriteTestTwoBody(const std::string& filename)
@@ -205,57 +301,6 @@ void WriteTestTwoBody(const std::string& filename)
   ofile << os.str();
 }
 
-void IdentityTest()
-{
-  ////////////////////////////////////////////////////////////////
-  // construct relative identity operator
-  ////////////////////////////////////////////////////////////////
-
-  // define operator properties
-  int Nmax_relative = 4;
-  int Jmax_relative = Nmax_relative+1;
-
-  basis::OperatorLabelsJT operator_labels;
-  operator_labels.J0 = 0;
-  operator_labels.g0 = 0;
-  operator_labels.T0_min = 0;
-  operator_labels.T0_max = 2;
-  operator_labels.symmetry_phase_mode = basis::SymmetryPhaseMode::kHermitian;
-
-  // define space and operator containers
-  basis::RelativeSpaceLSJT relative_space(Nmax_relative,Jmax_relative);
-  std::array<basis::RelativeSectorsLSJT,3> relative_component_sectors;
-  std::array<basis::MatrixVector,3> relative_component_matrices;
-
-  // do construction
-  ConstructIdentityOperatorRelativeLSJT(
-      operator_labels,
-      relative_space,relative_component_sectors,relative_component_matrices
-    );
-
-  // and now it would be nice to inspect the contents, wouldn't it,
-  // ...
-
-  // try out deletion
-  basis::ClearOperatorJT(relative_component_sectors,relative_component_matrices);
-
-}
-
-void ReadTestWithReadRelativeOperator(const std::string& filename)
-{
-  basis::RelativeSpaceLSJT relative_space;
-  basis::OperatorLabelsJT operator_labels;
-  std::array<basis::RelativeSectorsLSJT,3> relative_component_sectors;
-  std::array<basis::MatrixVector,3> relative_component_matrices;
-  ReadRelativeOperatorLSJT(
-      filename,
-      relative_space,
-      operator_labels,relative_component_sectors,relative_component_matrices,
-      true  // verbose
-    );
-
-}
-
 ////////////////////////////////////////////////////////////////
 // main
 ////////////////////////////////////////////////////////////////
@@ -266,12 +311,9 @@ int main(int argc, char **argv)
   std::string relative_filename("lsjt_operator_test_relative_identity_Nmax02.dat");
   WriteTestRelative(relative_filename);
   ReadTestRelative(relative_filename);
-  ReadTestWithReadRelativeOperator(relative_filename);
  
   std::string two_body_filename("lsjt_operator_test_two_body_identity_nas_Nmax02.dat");
   WriteTestTwoBody(two_body_filename);
-
-  IdentityTest();
 
   // termination
   return 0;

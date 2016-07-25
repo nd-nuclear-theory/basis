@@ -93,7 +93,8 @@ namespace basis {
 		<< " " << std::setw(width) << ket.g()
 		<< " " << std::setw(width) << kTwoBodySpeciesPNCodeTz[int(ket.two_body_species())]
 		<< " " << "    "
-		<< " " << std::showpoint << std::scientific << matrix_element
+		<< " " << std::showpoint << std::scientific << std::setw(width+precision+5)
+                << matrix_element
 		<< std::endl;
 	    
 	    }

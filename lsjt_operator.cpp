@@ -21,14 +21,14 @@ namespace basis {
       const basis::RelativeOperatorParametersLSJT& parameters
     )
   {
-    assert(parameters.version==1);
+    int version = 1;
     os 
       << "# RELATIVE LSJT" << std::endl
       << "#   version" << std::endl
       << "#   J0 g0 T0_min T0_max symmetry_phase_mode  [P0=(-)^g0]" << std::endl
       << "#   Nmax Jmax" << std::endl
       << "#   T0   N' L' S' J' T'   N L S J T   JT-RME" << std::endl
-      << " " << parameters.version << std::endl
+      << " " << version << std::endl
       << " " << parameters.J0 << " " << parameters.g0
       << " " << parameters.T0_min << " " << parameters.T0_max
       << " " << int(parameters.symmetry_phase_mode) << std::endl
@@ -43,10 +43,11 @@ namespace basis {
 
     std::string line;
 
-    // line 1: version -- and gobble any comment lines
+    // line 1: version -- but first gobble any comment lines
     while (std::getline(is,line), line[0]=='#') {};
-    std::stringstream(line) >> parameters.version;
-    assert(parameters.version==1);
+    int version;
+    std::stringstream(line) >> version;
+    assert(version==1);
     
     // line 2: operator tensor properties
     std::getline(is,line);
@@ -226,14 +227,16 @@ namespace basis {
       std::array<basis::MatrixVector,3>& relative_component_matrices,
       bool verbose
     )
-  // FUTURE: change to line-based input with std::getline for easier debugging
+  // FUTURE: change to line-based input with std::getline and parsing checks for easier debugging
   // FUTURE: check file status on open
   {
 
     // open stream for reading
     if (verbose)
       {
-        std::cout << "  Relative operator file: " << relative_filename << std::endl;
+        std::cout
+          << "  Reading relative operator file..." << std::endl
+          << "    Filename: " << relative_filename << std::endl;
       }
     std::ifstream is(relative_filename.c_str());
 
@@ -244,14 +247,14 @@ namespace basis {
     if (verbose)
       {
         std::cout
-          << " "
+          << "    Operator properties:"
           << " J0 " << operator_parameters.J0
           << " g0 " << operator_parameters.g0
           << " T0_min " << operator_parameters.T0_min
           << " T0_max " << operator_parameters.T0_max
           << " symmetry " << int(operator_parameters.symmetry_phase_mode)
           << std::endl
-          << " "
+          << "    Truncation:"
           << " Nmax " << operator_parameters.Nmax
           << " Jmax " << operator_parameters.Jmax
           << std::endl;
@@ -285,6 +288,61 @@ namespace basis {
         for (int T0=operator_parameters.T0_min; T0<=operator_parameters.T0_max; ++T0)
           std::cout << " " << basis::AllocatedEntries(relative_component_matrices[T0]);
         std::cout << std::endl;
+      }
+
+  }
+
+  void WriteRelativeOperatorLSJT(
+      const std::string& relative_filename,
+      const basis::RelativeSpaceLSJT& relative_space,
+      const basis::OperatorLabelsJT& operator_labels,
+      const std::array<basis::RelativeSectorsLSJT,3>& relative_component_sectors,
+      const std::array<basis::MatrixVector,3>& relative_component_matrices,
+      bool verbose
+    )
+  // FUTURE: check file status on open
+  {
+
+    // open stream for writing
+    if (verbose)
+      {
+        std::cout
+          << "  Writing relative operator file..." << std::endl
+          << "    Filename: " << relative_filename << std::endl;
+      }
+    std::ofstream os(relative_filename.c_str());
+
+    // set up full operator file parameters
+    int Nmax = relative_space.Nmax();
+    int Jmax = relative_space.Jmax();
+    RelativeOperatorParametersLSJT operator_parameters(operator_labels,Nmax,Jmax);
+    if (verbose)
+      {
+        std::cout
+          << "    Operator properties:"
+          << " J0 " << operator_parameters.J0
+          << " g0 " << operator_parameters.g0
+          << " T0_min " << operator_parameters.T0_min
+          << " T0_max " << operator_parameters.T0_max
+          << " symmetry " << int(operator_parameters.symmetry_phase_mode)
+          << std::endl
+          << "    Truncation:"
+          << " Nmax " << operator_parameters.Nmax
+          << " Jmax " << operator_parameters.Jmax
+          << std::endl;
+      }
+
+    // write header parameters
+    basis::WriteRelativeOperatorParametersLSJT(os,operator_parameters);
+
+    // write matrices
+    for (int T0=operator_parameters.T0_min; T0<=operator_parameters.T0_max; ++T0)
+      {
+        basis::WriteRelativeOperatorComponentLSJT(
+            os,
+            T0,
+            relative_component_sectors[T0],relative_component_matrices[T0]
+          );
       }
 
   }
