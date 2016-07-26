@@ -284,7 +284,11 @@ namespace basis {
     // write diagnostics
     if (verbose)
       {
-        std::cout << "  Allocated matrix elements:";
+        std::cout << "  Matrix elements:";
+        for (int T0=operator_parameters.T0_min; T0<=operator_parameters.T0_max; ++T0)
+          std::cout << " " << basis::UpperTriangularEntries(relative_component_sectors[T0]);
+        std::cout << std::endl;
+        std::cout << "  Allocated:";
         for (int T0=operator_parameters.T0_min; T0<=operator_parameters.T0_max; ++T0)
           std::cout << " " << basis::AllocatedEntries(relative_component_matrices[T0]);
         std::cout << std::endl;

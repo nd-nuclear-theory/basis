@@ -83,7 +83,7 @@ namespace basis {
         {
           // make reference to sector for convenience
           const typename tSectors::SectorType& sector
-            = sectors.getSector(sector_index);
+            = sectors.GetSector(sector_index);
 
           // count sector entries
           int sector_entries = 0;
@@ -91,7 +91,7 @@ namespace basis {
             // diagonal sector
             {
               int dimension = sector.ket_subspace().size();
-              sector_entries = dimension*(dimension+1);
+              sector_entries = dimension*(dimension+1)/2;
             }
           else if (sector.IsUpperTriangle())
             // upper triangle sector (but not diagonal)
