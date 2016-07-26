@@ -87,6 +87,7 @@
     subspace and state, deprecating subspace GetSubspaceLabels() and 
     state GetStateLabels().  Add subspace() accessor to state, deprecating
     Subspace().
+  7/25/16 (mac): Add utility member function IsUpperTriangle.
 
 ****************************************************************/
 
@@ -598,6 +599,12 @@ namespace basis {
       // Test if sector is diagonal (i.e., within a single subspace).
       {
         return (bra_subspace_index()==ket_subspace_index());
+      }
+
+      inline bool IsUpperTriangle() const
+      // Test if sector is in upper triangle (includes diagonal).
+      {
+        return (bra_subspace_index()<=ket_subspace_index());
       }
 
       private:

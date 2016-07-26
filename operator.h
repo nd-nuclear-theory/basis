@@ -24,6 +24,7 @@
    - Extract AS/NAS conversion enum to many_body.h.
    - Add diagnostic function AllocatedEntries.
   7/22/16 (mac): Revise syntax for CanonicalizeIndices.
+  7/25/16 (mac): Add diagnostic function UpperTriangularEntries.
 
 ****************************************************************/
 
@@ -45,7 +46,7 @@ namespace basis {
   typedef std::vector<Eigen::MatrixXd> MatrixVector;
 
   ////////////////////////////////////////////////////////////////
-  // storage diagnostic
+  // storage diagnostics
   ////////////////////////////////////////////////////////////////
   std::size_t AllocatedEntries(const MatrixVector& matrices);
     // Count entries in a vector of matrices.
@@ -60,6 +61,51 @@ namespace basis {
     //
     // Returns:
     //   (std::size_t) : number of allocated matrix entries
+
+
+  template <typename tSectors>
+    int UpperTriangularEntries(
+        const tSectors& sectors
+      )
+    // Count entries in the upper triangular portion of a set of sectors.
+    //
+    // Lower triangular sectors are ignored.  In diagonal sectors,
+    // only upper-triangular entries are counted.
+    //
+    // Arguments:
+    //   sectors (tSectors) : container for sectors
+    //
+    // Returns:
+    //   (std::size_t) : number of upper triangular matrix entries
+    {
+      int total_entries = 0;
+      for (int sector_index=0; sector_index<sectors.size(); ++sector_index)
+        {
+          // make reference to sector for convenience
+          const typename tSectors::SectorType& sector
+            = sectors.getSector(sector_index);
+
+          // count sector entries
+          int sector_entries = 0;
+          if (sector.IsDiagonal())
+            // diagonal sector
+            {
+              int dimension = sector.ket_subspace().size();
+              sector_entries = dimension*(dimension+1);
+            }
+          else if (sector.IsUpperTriangle())
+            // upper triangle sector (but not diagonal)
+            {
+              int bra_dimension = sector.bra_subspace().size();
+              int ket_dimension = sector.ket_subspace().size();
+              sector_entries = bra_dimension*ket_dimension;
+            }
+          
+          total_entries += sector_entries;
+        }
+
+      return total_entries;
+    }
 
   ////////////////////////////////////////////////////////////////
   // zero operator

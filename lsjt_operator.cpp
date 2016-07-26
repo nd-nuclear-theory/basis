@@ -235,8 +235,8 @@ namespace basis {
     if (verbose)
       {
         std::cout
-          << "  Reading relative operator file..." << std::endl
-          << "    Filename: " << relative_filename << std::endl;
+          << "Reading relative operator file..." << std::endl
+          << "  Filename: " << relative_filename << std::endl;
       }
     std::ifstream is(relative_filename.c_str());
 
@@ -247,14 +247,14 @@ namespace basis {
     if (verbose)
       {
         std::cout
-          << "    Operator properties:"
+          << "  Operator properties:"
           << " J0 " << operator_parameters.J0
           << " g0 " << operator_parameters.g0
           << " T0_min " << operator_parameters.T0_min
           << " T0_max " << operator_parameters.T0_max
           << " symmetry " << int(operator_parameters.symmetry_phase_mode)
           << std::endl
-          << "    Truncation:"
+          << "  Truncation:"
           << " Nmax " << operator_parameters.Nmax
           << " Jmax " << operator_parameters.Jmax
           << std::endl;
@@ -289,7 +289,6 @@ namespace basis {
           std::cout << " " << basis::AllocatedEntries(relative_component_matrices[T0]);
         std::cout << std::endl;
       }
-
   }
 
   void WriteRelativeOperatorLSJT(
@@ -307,8 +306,8 @@ namespace basis {
     if (verbose)
       {
         std::cout
-          << "  Writing relative operator file..." << std::endl
-          << "    Filename: " << relative_filename << std::endl;
+          << "Writing relative operator file..." << std::endl
+          << "  Filename: " << relative_filename << std::endl;
       }
     std::ofstream os(relative_filename.c_str());
 
@@ -319,14 +318,14 @@ namespace basis {
     if (verbose)
       {
         std::cout
-          << "    Operator properties:"
+          << "  Operator properties:"
           << " J0 " << operator_parameters.J0
           << " g0 " << operator_parameters.g0
           << " T0_min " << operator_parameters.T0_min
           << " T0_max " << operator_parameters.T0_max
           << " symmetry " << int(operator_parameters.symmetry_phase_mode)
           << std::endl
-          << "    Truncation:"
+          << "  Truncation:"
           << " Nmax " << operator_parameters.Nmax
           << " Jmax " << operator_parameters.Jmax
           << std::endl;
