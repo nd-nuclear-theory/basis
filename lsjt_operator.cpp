@@ -613,6 +613,88 @@ namespace basis {
 
   }
 
+
+  ////////////////////////////////////////////////////////////////
+  // relative-cm LSJT operator output
+  ////////////////////////////////////////////////////////////////
+
+  void WriteRelativeCMOperatorComponentLSJT(
+      std::ostream& os,
+      int T0,
+      const basis::RelativeCMSectorsLSJT& sectors,
+      const basis::MatrixVector& matrices
+    )
+  {
+
+    // iterate over sectors
+    for (int sector_index = 0; sector_index < sectors.size(); ++sector_index)
+      {
+
+        // extract sector
+	const typename RelativeCMSectorsLSJT::SectorType& sector = sectors.GetSector(sector_index);
+	const typename RelativeCMSectorsLSJT::SubspaceType& bra_subspace = sector.bra_subspace();
+	const typename RelativeCMSectorsLSJT::SubspaceType& ket_subspace = sector.ket_subspace();
+
+        // verify that sector is canonical
+        //
+        // This is a check that the caller's sector construction
+        // followed the specification that only "upper triangle"
+        // sectors are stored.
+        assert(sector.bra_subspace_index()<=sector.ket_subspace_index());
+
+	// iterate over matrix elements
+	for (int bra_index=0; bra_index<bra_subspace.size(); ++bra_index)
+	  for (int ket_index=0; ket_index<ket_subspace.size(); ++ket_index)
+	    {
+
+              // diagonal sector: restrict to upper triangle
+              if (sector.IsDiagonal())
+                if (!(bra_index<=ket_index))
+                  continue;
+
+              // define states
+	      const basis::RelativeCMStateLSJT bra(bra_subspace,bra_index);
+	      const basis::RelativeCMStateLSJT ket(ket_subspace,ket_index);
+
+              // extract matrix element
+              const double matrix_element = matrices[sector_index](bra_index,ket_index);
+
+              // generate output line
+              const int width = 3;
+              const int precision = 8;  // for approximately single precision output
+              os << std::setprecision(precision);
+	      os 
+		<< " " << std::setw(width) << T0
+		<< " " << "  "
+		<< " " << std::setw(width) << bra.Nr()
+		<< " " << std::setw(width) << bra.lr()
+		<< " " << std::setw(width) << bra.Nc()
+		<< " " << std::setw(width) << bra.lc()
+		<< " " << std::setw(width) << bra.L() 
+		<< " " << std::setw(width) << bra.S() 
+		<< " " << std::setw(width) << bra.J() 
+		<< " " << std::setw(width) << bra.T() 
+		<< " " << std::setw(width) << bra.g()
+		<< " " << "    "
+		<< " " << std::setw(width) << ket.Nr()
+		<< " " << std::setw(width) << ket.lr()
+		<< " " << std::setw(width) << ket.Nc()
+		<< " " << std::setw(width) << ket.lc()
+		<< " " << std::setw(width) << ket.L() 
+		<< " " << std::setw(width) << ket.S() 
+		<< " " << std::setw(width) << ket.J() 
+		<< " " << std::setw(width) << ket.T() 
+		<< " " << std::setw(width) << ket.g()
+		<< " " << "    "
+		<< " " << std::showpoint << std::scientific << matrix_element
+		<< std::endl;
+	    
+	    }
+
+      };
+  }
+
+
   ////////////////////////////////////////////////////////////////
   // two-body LSJT operator output
   ////////////////////////////////////////////////////////////////

@@ -237,6 +237,63 @@ void ReadTestRelative(const std::string& filename)
     );
 }
 
+void WriteTestRelativeCM(const std::string& filename)
+{
+  ////////////////////////////////////////////////////////////////
+  // defining operator
+  ////////////////////////////////////////////////////////////////
+
+  std::cout << "Setup" << std::endl;
+
+  // set up space
+  int Nmax = 2;
+  basis::RelativeCMSpaceLSJT space(Nmax);
+
+  // set up operator containers
+  //
+  // These are vectors to store information for T0=0/1/2 components.
+  std::array<basis::RelativeCMSectorsLSJT,3> component_sectors;
+  std::array<basis::MatrixVector,3> component_matrices;
+
+  // populate operator containers
+  int J0 = 0;
+  int g0 = 0;
+  int T0_min=0;
+  int T0_max=0;
+  for (int T0=T0_min; T0<=T0_max; ++T0)
+    // for each isospin component
+    {
+
+      // enumerate sectors
+      component_sectors[T0] = basis::RelativeCMSectorsLSJT(space,J0,T0,g0);
+      std::cout << " T0 " << T0 << " size " << component_sectors[T0].size() << std::endl;
+          
+      // populate matrices
+      if (T0==0)
+        basis::SetOperatorToIdentity(component_sectors[T0],component_matrices[T0]);
+      else
+        basis::SetOperatorToZero(component_sectors[T0],component_matrices[T0]);
+    }
+
+  // set up stream for output
+  std::ostringstream os;
+
+  // write matrices
+  for (int T0=T0_min; T0<=T0_max; ++T0)
+    {
+      basis::WriteRelativeCMOperatorComponentLSJT(
+          os,
+          T0,
+          component_sectors[T0],component_matrices[T0]
+        );
+    }
+
+  // dump to file
+  std::ofstream ofile(filename.c_str());
+  ofile << os.str();
+
+}
+
 void WriteTestTwoBody(const std::string& filename)
 {
   ////////////////////////////////////////////////////////////////
@@ -261,7 +318,9 @@ void WriteTestTwoBody(const std::string& filename)
   // populate operator containers
   int J0 = 0;
   int g0 = 0;
-  for (int T0=0; T0<=2; ++T0)
+  int T0_min=0;
+  int T0_max=0;
+  for (int T0=T0_min; T0<=T0_max; ++T0)
     // for each isospin component
     {
 
@@ -276,16 +335,10 @@ void WriteTestTwoBody(const std::string& filename)
         basis::SetOperatorToZero(component_sectors[T0],component_matrices[T0]);
     }
 
-  ////////////////////////////////////////////////////////////////
-  // write test
-  ////////////////////////////////////////////////////////////////
-
   // set up stream for output
   std::ostringstream os;
 
   // write matrices
-  int T0_min=0;
-  int T0_max=2;
   for (int T0=T0_min; T0<=T0_max; ++T0)
     {
       basis::WriteTwoBodyOperatorComponentLSJT(
@@ -311,6 +364,9 @@ int main(int argc, char **argv)
   std::string relative_filename("lsjt_operator_test_relative_identity_Nmax02.dat");
   WriteTestRelative(relative_filename);
   ReadTestRelative(relative_filename);
+
+  std::string relative_cm_filename("lsjt_operator_test_relative_cm_identity_Nmax02.dat");
+  WriteTestRelativeCM(relative_cm_filename);
  
   std::string two_body_filename("lsjt_operator_test_two_body_identity_nas_Nmax02.dat");
   WriteTestTwoBody(two_body_filename);

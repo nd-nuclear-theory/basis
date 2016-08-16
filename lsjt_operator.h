@@ -42,6 +42,7 @@
   7/20/16 (mac): Add ReadRelativeOperatorLSJT.
   7/22/16 (mac): Revise syntax for CanonicalizeIndicesLSJT.
   7/25/16 (mac): Add WriteRelativeOperatorLSJT.
+  8/16/16 (mac): Add WriteRelativeCMOperatorComponentLSJT.
 
 ****************************************************************/
 
@@ -653,6 +654,47 @@ namespace basis {
   //   two_body_lsjt_component_matrices (..., output) : target matrices
 
   ////////////////////////////////////////////////////////////////
+  // relative-cm LSJT operator output
+  ////////////////////////////////////////////////////////////////
+
+  // Note that the primary intention of the output for relative-cm
+  // operators is for diagnostic purposes.
+  //
+  // Data lines are of the form:
+  //
+  //   T0  Nr' lr' Nc' lc' L' S' J' T' g'  Nr lr Nc lc L S J T g  JT-RME
+  //
+  // Although the g label is redundant (it can be deduced from l1 and
+  // l2), it is included to make the sector structure more easily
+  // apparent to a human reader.
+  //
+  // Iteration follows the usual scheme within the basis module:
+  // sectors are lexicographic by (bra,ket) subspace indices, then
+  // matrix elements within a sector are lexicographic by (bra,ket)
+  // state indices.
+  //
+  // Note: The concept of AS or NAS matrix elements does not apply in
+  // relative-cm states, so no normalization conversion is needed.
+
+  void WriteRelativeCMOperatorComponentLSJT(
+      std::ostream& os,
+      int T0,
+      const basis::RelativeCMSectorsLSJT& sectors,
+      const basis::MatrixVector& matrices
+    );
+  // Write single isospin component of a relative-cm operator in LSJT
+  // scheme.
+  //
+  // Side effect: The floating point precision attribute of the output
+  // stream is modified.
+  //
+  // Arguments:
+  //   os (std::ostream) : text-mode output stream
+  //   T0 (int) : isospin for this isospin component
+  //   sectors (basis::RelativeCMSectorsLSJT) : sectors defining operator
+  //   matrices (basis::MatrixVector) : matrices defining operator
+
+  ////////////////////////////////////////////////////////////////
   // two-body LSJT operator output
   ////////////////////////////////////////////////////////////////
 
@@ -693,7 +735,7 @@ namespace basis {
   // Arguments:
   //   os (std::ostream) : text-mode output stream
   //   T0 (int) : isospin for this isospin component
-  //   sector (basis::TwoBodySectorsLSJT) : sectors defining operator
+  //   sectors (basis::TwoBodySectorsLSJT) : sectors defining operator
   //   matrices (basis::MatrixVector) : matrices defining operator
   //   conversion (basis::NormalizationConversion) : specifies any 
   //     conversion between AS and NAS for output
