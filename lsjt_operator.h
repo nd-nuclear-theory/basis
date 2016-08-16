@@ -42,7 +42,8 @@
   7/20/16 (mac): Add ReadRelativeOperatorLSJT.
   7/22/16 (mac): Revise syntax for CanonicalizeIndicesLSJT.
   7/25/16 (mac): Add WriteRelativeOperatorLSJT.
-  8/16/16 (mac): Add WriteRelativeCMOperatorComponentLSJT.
+  8/16/16 (mac): Add WriteRelativeCMOperatorComponentLSJT and 
+    corresponding gather function.
 
 ****************************************************************/
 
@@ -597,7 +598,6 @@ namespace basis {
 
   }
 
-
   ////////////////////////////////////////////////////////////////
   // relative LSJT operator construction
   ////////////////////////////////////////////////////////////////
@@ -619,6 +619,39 @@ namespace basis {
   //   relative_space (...) : target space
   //   relative_component_sectors (..., output) : target sectors
   //   relative_component_matrices (..., output) : target matrices
+
+  ////////////////////////////////////////////////////////////////
+  // relative-cm LSJT operator -- gather N blocks
+  ////////////////////////////////////////////////////////////////
+
+  void GatherOperatorRelativeCMLSJTNToRelativeCMLSJT(
+      const basis::OperatorLabelsJT& operator_labels,
+      const basis::RelativeCMSpaceLSJTN& relative_cm_lsjtn_space,
+      const std::array<basis::RelativeCMSectorsLSJTN,3>& relative_cm_lsjtn_component_sectors,
+      const std::array<basis::MatrixVector,3>& relative_cm_lsjtn_component_matrices,
+      const basis::RelativeCMSpaceLSJT& relative_cm_lsjt_space,
+      std::array<basis::RelativeCMSectorsLSJT,3>& relative_cm_lsjt_component_sectors,
+      std::array<basis::MatrixVector,3>& relative_cm_lsjt_component_matrices
+    );
+  // Assemble relative-cm representation of operator in LSJT basis,
+  // from relative-cm representation in LSJTN basis, i.e., gathering
+  // the matrix elements from different N blocks.
+  //
+  // See notes on "internal representation of an operator in JT
+  // scheme" in lsjt_operator.h for the general principles of how the
+  // operators are represented.
+  //
+  // Symmetry: The lower triangle of diagonal sectors is
+  // zero-initialized, but not populated.
+  //
+  // Arguments:
+  //   operator_labels (basis::OperatorLabelsJT) : tensorial properties of operator
+  //   relative_cm_lsjtn_space (...) : source space
+  //   relative_cm_lsjtn_component_sectors (...) : source sectors
+  //   relative_cm_lsjtn_component_matrices (...) : source matrices
+  //   relative_cm_lsjt_space (...) : target space
+  //   relative_cm_lsjt_component_sectors (..., output) : target sectors
+  //   relative_cm_lsjt_component_matrices (..., output) : target matrices
 
   ////////////////////////////////////////////////////////////////
   // two-body LSJT operator -- gather N blocks

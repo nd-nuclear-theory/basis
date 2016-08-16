@@ -386,6 +386,211 @@ namespace basis {
   }
 
   ////////////////////////////////////////////////////////////////
+  // relative-cm LSJT operator manipulation
+  ////////////////////////////////////////////////////////////////
+
+  inline
+  void RecastLabelsRelativeCMLSJTToRelativeCMLSJTN(
+      const RelativeCMSubspaceLSJTLabels& relative_cm_lsjt_subspace_labels,
+      const RelativeCMStateLSJTLabels& relative_cm_lsjt_state_labels,
+      RelativeCMSubspaceLSJTNLabels& relative_cm_lsjtn_subspace_labels,
+      RelativeCMStateLSJTNLabels& relative_cm_lsjtn_state_labels
+    )
+  // Recast labels for (subspace,state) from RelativeCMLSJT scheme to
+  // RelativeCMLSJTN scheme.
+  //
+  // This direction of conversion (from target labels to source
+  // labels) is as needed for looking up the source matrix element.
+  //
+  // This switches N from being the most-significant state label (that
+  // is, least-rapidly-varying in the lexicographic ordering scheme),
+  // to being the least-significant subspace label (that is,
+  // most-rapidly-varying):
+  //
+  //   (L,S,J,T,g) : ([N],N1,l1,N2,l2) -> (L,S,J,T,g,N) : (N1,l1,N2,l2)
+  //
+  // As a state label, N is actually an implicit label, not stored,
+  // but effectively the first label for ordering purposes.  Its value
+  // may be recovered as N1+N2.
+  //
+  // Arguments:
+  //   relative_cm_lsjt_subspace_labels (...) : source subspace labels
+  //   relative_cm_lsjt_state_labels (...) : source state labels
+  //   relative_cm_lsjtn_subspace_labels (...,output) : target subspace labels
+  //   relative_cm_lsjtn_state_labels (...,output) : target state labels
+  {
+    // extract labels
+    int L, S, J, T, g;
+    std::tie(L,S,J,T,g) = relative_cm_lsjt_subspace_labels;
+    int Nr, lr, Nc, lc;
+    std::tie(Nr,lr,Nc,lc) = relative_cm_lsjt_state_labels;
+
+    // repackage labels
+    int N = Nr+Nc;
+    relative_cm_lsjtn_subspace_labels = RelativeCMSubspaceLSJTNLabels(L,S,J,T,g,N);
+    relative_cm_lsjtn_state_labels = relative_cm_lsjt_state_labels;
+  }
+
+
+  void GatherOperatorRelativeCMLSJTNToRelativeCMLSJT(
+      const basis::OperatorLabelsJT& operator_labels,
+      const basis::RelativeCMSpaceLSJTN& relative_cm_lsjtn_space,
+      const std::array<basis::RelativeCMSectorsLSJTN,3>& relative_cm_lsjtn_component_sectors,
+      const std::array<basis::MatrixVector,3>& relative_cm_lsjtn_component_matrices,
+      const basis::RelativeCMSpaceLSJT& relative_cm_lsjt_space,
+      std::array<basis::RelativeCMSectorsLSJT,3>& relative_cm_lsjt_component_sectors,
+      std::array<basis::MatrixVector,3>& relative_cm_lsjt_component_matrices
+    )
+  {
+    for (int T0=operator_labels.T0_min; T0<=operator_labels.T0_max; ++T0)
+      // for each isospin component
+      {
+
+        // enumerate sectors
+        relative_cm_lsjt_component_sectors[T0]
+          = basis::RelativeCMSectorsLSJT(relative_cm_lsjt_space,operator_labels.J0,T0,operator_labels.g0);
+
+        // populate matrices
+        relative_cm_lsjt_component_matrices[T0].resize(relative_cm_lsjt_component_sectors[T0].size());
+        for (int sector_index=0; sector_index<relative_cm_lsjt_component_sectors[T0].size(); ++sector_index)
+          {
+            // retrieve target sector
+            const basis::RelativeCMSectorsLSJT::SectorType& relative_cm_lsjt_sector
+              = relative_cm_lsjt_component_sectors[T0].GetSector(sector_index);
+
+            // initialize matrix
+            Eigen::MatrixXd& relative_cm_lsjt_matrix = relative_cm_lsjt_component_matrices[T0][sector_index];
+            relative_cm_lsjt_matrix = Eigen::MatrixXd::Zero(
+                relative_cm_lsjt_sector.bra_subspace().size(),
+                relative_cm_lsjt_sector.ket_subspace().size()
+              );
+
+            // populate matrix elements
+            for (int bra_index = 0; bra_index < relative_cm_lsjt_sector.bra_subspace().size(); ++bra_index)
+              for (int ket_index = 0; ket_index < relative_cm_lsjt_sector.ket_subspace().size(); ++ket_index)
+                // for each target matrix element
+                {
+                
+                  // ensure canonical matrix element if diagonal sector
+                  if (relative_cm_lsjt_sector.IsDiagonal())
+                    if (!(bra_index<=ket_index))
+                      continue;
+
+                  // retrieve target states
+                  basis::RelativeCMStateLSJT relative_cm_lsjt_bra(relative_cm_lsjt_sector.bra_subspace(),bra_index);
+                  basis::RelativeCMStateLSJT relative_cm_lsjt_ket(relative_cm_lsjt_sector.ket_subspace(),ket_index);
+                
+                  // extract source bra labels
+                  RelativeCMSubspaceLSJTLabels relative_cm_lsjt_subspace_labels_bra
+                    = relative_cm_lsjt_bra.subspace().labels();
+                  RelativeCMStateLSJTLabels relative_cm_lsjt_state_labels_bra
+                    = relative_cm_lsjt_bra.labels();
+                  RelativeCMSubspaceLSJTNLabels relative_cm_lsjtn_subspace_labels_bra;
+                  RelativeCMStateLSJTNLabels relative_cm_lsjtn_state_labels_bra;
+                  RecastLabelsRelativeCMLSJTToRelativeCMLSJTN(
+                      relative_cm_lsjt_subspace_labels_bra,
+                      relative_cm_lsjt_state_labels_bra,
+                      relative_cm_lsjtn_subspace_labels_bra,
+                      relative_cm_lsjtn_state_labels_bra
+                    );
+
+                  // extract source bra indices
+                  int relative_cm_lsjtn_subspace_index_bra
+                    = relative_cm_lsjtn_space.LookUpSubspaceIndex(
+                        relative_cm_lsjtn_subspace_labels_bra
+                      );
+                  int relative_cm_lsjtn_state_index_bra
+                    = relative_cm_lsjtn_space.GetSubspace(relative_cm_lsjtn_subspace_index_bra).LookUpStateIndex(
+                        relative_cm_lsjtn_state_labels_bra
+                      );
+
+                  // extract source ket labels
+                  RelativeCMSubspaceLSJTLabels relative_cm_lsjt_subspace_labels_ket
+                    = relative_cm_lsjt_ket.subspace().labels();
+                  RelativeCMStateLSJTLabels relative_cm_lsjt_state_labels_ket
+                    = relative_cm_lsjt_ket.labels();
+                  RelativeCMSubspaceLSJTNLabels relative_cm_lsjtn_subspace_labels_ket;
+                  RelativeCMStateLSJTNLabels relative_cm_lsjtn_state_labels_ket;
+                  RecastLabelsRelativeCMLSJTToRelativeCMLSJTN(
+                      relative_cm_lsjt_subspace_labels_ket,
+                      relative_cm_lsjt_state_labels_ket,
+                      relative_cm_lsjtn_subspace_labels_ket,
+                      relative_cm_lsjtn_state_labels_ket
+                    );
+
+                  // extract source ket indices
+                  int relative_cm_lsjtn_subspace_index_ket
+                    = relative_cm_lsjtn_space.LookUpSubspaceIndex(
+                        relative_cm_lsjtn_subspace_labels_ket
+                      );
+                  int relative_cm_lsjtn_state_index_ket
+                    = relative_cm_lsjtn_space.GetSubspace(relative_cm_lsjtn_subspace_index_ket).LookUpStateIndex(
+                        relative_cm_lsjtn_state_labels_ket
+                      );
+
+                  // // debugging
+                  // const RelativeCMSubspaceLSJTN& relative_cm_lsjtn_subspace_bra
+                  //   = relative_cm_lsjtn_space.GetSubspace(relative_cm_lsjtn_subspace_index_bra);
+                  // const RelativeCMSubspaceLSJTN& relative_cm_lsjtn_subspace_ket
+                  //   = relative_cm_lsjtn_space.GetSubspace(relative_cm_lsjtn_subspace_index_ket);
+                  // std::cout << " pre-lookup "
+                  //           << " " << relative_cm_lsjtn_subspace_index_bra
+                  //           << " " << relative_cm_lsjtn_subspace_index_ket
+                  //           << " " << ";"
+                  //           << " " << relative_cm_lsjtn_state_index_bra
+                  //           << " " << relative_cm_lsjtn_state_index_ket
+                  //           << " " << ";"
+                  //           << " " << relative_cm_lsjtn_subspace_bra.LabelStr()
+                  //           << " " << relative_cm_lsjtn_subspace_ket.LabelStr()
+                  //           << " " << relative_cm_lsjtn_subspace_bra.size()
+                  //           << " " << relative_cm_lsjtn_subspace_ket.size()
+                  //           << std::endl;
+
+                  // Note on canonicalization of indices for lookup
+                  // (or lack thereof)
+                  //
+                  // Matrix elements which are canonical by LSJT
+                  // sector, and ordered by N within a LSJT sector,
+                  // should also be canonical by (LSJT;N) sector.
+                  // That is, the upper triangle of a matrix with
+                  // basis states ordered by
+                  //
+                  //   (L,S,J,T,g) : ([N],N1,l1,N2,l2)
+                  //
+                  // or
+                  //
+                  //   (L,S,J,T,g,N) : (N1,l1,N2,l2)
+                  //
+                  // should be identical.
+                  //
+                  // So canonicalization would only be necessary if we
+                  // were to fill in a *lower* triangle matrix element
+                  // of a diagonal target sector.  Then we would have
+                  // to ensure that we look up a canonical (upper
+                  // triangular) LSJTN sector.
+
+                  // look up matrix element
+                  int relative_cm_lsjtn_sector_index
+                    = relative_cm_lsjtn_component_sectors[T0].LookUpSectorIndex(
+                        relative_cm_lsjtn_subspace_index_bra,
+                        relative_cm_lsjtn_subspace_index_ket
+                      );
+
+                  const Eigen::MatrixXd& relative_cm_lsjtn_matrix
+                    = relative_cm_lsjtn_component_matrices[T0][relative_cm_lsjtn_sector_index];
+                  double relative_cm_lsjtn_matrix_element = relative_cm_lsjtn_matrix(
+                      relative_cm_lsjtn_state_index_bra,relative_cm_lsjtn_state_index_ket
+                    );
+
+                  relative_cm_lsjt_matrix(bra_index,ket_index) = relative_cm_lsjtn_matrix_element;
+
+                }
+          }
+      }
+
+  }
+
+  ////////////////////////////////////////////////////////////////
   // two-body LSJT operator manipulation
   ////////////////////////////////////////////////////////////////
 
@@ -430,6 +635,7 @@ namespace basis {
     two_body_lsjtn_subspace_labels = TwoBodySubspaceLSJTNLabels(L,S,J,T,g,N);
     two_body_lsjtn_state_labels = two_body_lsjt_state_labels;
   }
+
 
   void GatherOperatorTwoBodyLSJTNToTwoBodyLSJT(
       const basis::OperatorLabelsJT& operator_labels,
@@ -527,70 +733,28 @@ namespace basis {
                         two_body_lsjtn_state_labels_ket
                       );
 
-                  // // debugging
-                  // const TwoBodySubspaceLSJTN& two_body_lsjtn_subspace_bra
-                  //   = two_body_lsjtn_space.GetSubspace(two_body_lsjtn_subspace_index_bra);
-                  // const TwoBodySubspaceLSJTN& two_body_lsjtn_subspace_ket
-                  //   = two_body_lsjtn_space.GetSubspace(two_body_lsjtn_subspace_index_ket);
-                  // std::cout << " pre-lookup "
-                  //           << " " << two_body_lsjtn_subspace_index_bra
-                  //           << " " << two_body_lsjtn_subspace_index_ket
-                  //           << " " << ";"
-                  //           << " " << two_body_lsjtn_state_index_bra
-                  //           << " " << two_body_lsjtn_state_index_ket
-                  //           << " " << ";"
-                  //           << " " << two_body_lsjtn_subspace_bra.LabelStr()
-                  //           << " " << two_body_lsjtn_subspace_ket.LabelStr()
-                  //           << " " << two_body_lsjtn_subspace_bra.size()
-                  //           << " " << two_body_lsjtn_subspace_ket.size()
-                  //           << std::endl;
-
-                  // // canonicalize indices for matrix element lookup
-                  // //
-                  // // Matrix elements which are canonical by
-                  // // LSJT sector, and ordered by N within a LSJT sector,
-                  // // should also be canonical by (LSJT;N) sector.  That
-                  // // is, the upper triangle of a matrix with basis
-                  // // states ordered by
-                  // //
-                  // //   (L,S,J,T,g) : ([N],N1,l1,N2,l2)
-                  // //
-                  // // or
-                  // //
-                  // //   (L,S,J,T,g,N) : (N1,l1,N2,l2)
-                  // //
-                  // // should be identical.
-                  // //
-                  // // So canonicalization should only be necessary when
-                  // // we are filling in a *lower* triangle matrix element
-                  // // of a diagonal target sector.  Then we must ensure
-                  // // that we look up a canonical (upper triangular)
-                  // // LSJTN sector.
-                  // //
-                  // // If the matrix element happens to fall within a
-                  // // diagonal LSJTN subblocks, canonicalization of the
-                  // // state indices should not actually be necessary,
-                  // // since the Moshinsky transformation machinery up
-                  // // until this point has actually been populating the
-                  // // full (square) matrices for the diagonal sectors.
-                  // //
-                  // // Note that no canonicalization factor is needed.
-                  // // Since N is the least significant subspace label
-                  // // in the lexicographic ordering, canonical
-                  // // swaps will never entail swapping subspace LSJT
-                  // // labels, just the N labels.
-                  // //
-                  // // Maybe a saner alternative is just to look up upper
-                  // // triangular matrix elements, then brute force
-                  // // symmetrize all LSJT diagonal sectors.
-                  // 
-                  // bool swapped_subspaces, swapped_states;
-                  // basis::CanonicalizeIndices(
-                  //     two_body_lsjtn_subspace_index_bra,two_body_lsjtn_subspace_index_ket,
-                  //     swapped_subspaces,
-                  //     two_body_lsjtn_state_index_bra,two_body_lsjtn_state_index_ket,
-                  //     swapped_states
-                  //   );
+                  // Note on canonicalization of indices for lookup
+                  // (or lack thereof)
+                  //
+                  // Matrix elements which are canonical by LSJT
+                  // sector, and ordered by N within a LSJT sector,
+                  // should also be canonical by (LSJT;N) sector.
+                  // That is, the upper triangle of a matrix with
+                  // basis states ordered by
+                  //
+                  //   (L,S,J,T,g) : ([N],N1,l1,N2,l2)
+                  //
+                  // or
+                  //
+                  //   (L,S,J,T,g,N) : (N1,l1,N2,l2)
+                  //
+                  // should be identical.
+                  //
+                  // So canonicalization would only be necessary if we
+                  // were to fill in a *lower* triangle matrix element
+                  // of a diagonal target sector.  Then we would have
+                  // to ensure that we look up a canonical (upper
+                  // triangular) LSJTN sector.
 
                   // look up matrix element
                   int two_body_lsjtn_sector_index
