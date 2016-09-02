@@ -27,23 +27,25 @@ namespace basis {
   ////////////////////////////////////////////////////////////////
 
   // Note that the primary intention of this output for two-body
-  // operators in JJJPN scheme is for diagnostic purposes.
-  //
-  // Other more specialized formats are used by MFDn.
+  // operators in JJJPN scheme is for diagnostic purposes.  It is
+  // based on the preliminary specification for the text version of
+  // the MFDn Version 15 h2 format.
   //
   // Data lines are of the form:
   //
   //   i1' i2' J' g' Tz'   i1 i2 J g Tz   JT-RME
   //
   // The single particle orbital indices (i1,i2,...) may be written
-  // either 0-based (native) or 1-based (e.g., MFDn convention).
+  // either 0-based (native) or 1-based (e.g., MFDn convention), as
+  // controlled by the parameter indexing_base.
   //
   // The isospin projection Tz is defined under the convention that
-  // protons (or up quarks) are positive.
+  // protons (or up quarks) are positive, i.e., "pp" -> +1, "pn" -> 0,
+  // and "nn" -> -1.
   //
-  // Although the g label is redundant (it can be deduced from the
-  // orbitals), it is included to make the sector structure more
-  // easily apparent to a human reader.
+  // Although the parity grade label g is redundant (it can be deduced
+  // from the l values of the orbitals), it is included to make the
+  // sector structure more easily apparent to a human reader.
   //
   // Iteration follows the usual scheme within the basis module:
   // sectors are lexicographic by (bra,ket) subspace indices, then
