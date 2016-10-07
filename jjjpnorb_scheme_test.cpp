@@ -63,6 +63,52 @@ void TestOrbitalsNmax(const std::string& filename)
 
 }
 
+void TestLJOrbitalsNmax(const std::string& filename)
+{
+  std::cout << "Orbitals -- Nmax scheme -- lj-subspaces" << std::endl;
+
+  // set up space
+  std::cout << "Space" << std::endl;
+  int Nmax = 4;
+  basis::OrbitalSpaceLJPN space(Nmax);
+  std::cout << space.DebugStr();
+
+  // check subspaces
+  std::cout << "Subspaces" << std::endl;
+  for (int subspace_index=0; subspace_index<space.size(); ++subspace_index)
+    {
+      const basis::OrbitalSubspaceLJPN& subspace = space.GetSubspace(subspace_index);
+
+      std::cout << " index " << subspace_index
+                << " species " << int(subspace.orbital_species())
+                << " l " << int(subspace.l())
+                << " j " << subspace.j().Str()
+                << std::endl;
+
+      std::cout << subspace.DebugStr();
+    }
+
+  // check file output
+  std::ofstream os(filename.c_str());
+  os << space.OrbitalDefinitionStr();
+
+}
+
+void TestLJSectors() {
+  const int width = 3;
+  std::cout << "Sectors -- Nmax scheme -- lj-subspaces" << std::endl;
+
+  // set up space
+  std::cout << "Space" << std::endl;
+  int Nmax = 4;
+  basis::OrbitalSpaceLJPN space(Nmax);
+  std::cout << space.DebugStr();
+
+  std::cout << "Sectors -- all-to-all" << std::endl;
+  basis::OrbitalSectorsLJPN sectors(space);
+  std::cout << sectors.DebugStr();
+}
+
 void TestTwoBodyNmax()
 {
 
@@ -113,15 +159,15 @@ void TestTwoBodyNmax()
       int ket_subspace_index = sectors.GetSector(sector_index).ket_subspace_index();
       const basis::TwoBodySubspaceJJJPN& ket_subspace = sectors.GetSector(sector_index).ket_subspace();
 
-      std::cout 
-        << " sector " 
-        << std::setw(3) << sector_index 
+      std::cout
+        << " sector "
+        << std::setw(3) << sector_index
         << "     "
         << " index "
         << std::setw(3) << bra_subspace_index
         << " sJg "
         << std::setw(3) << int(bra_subspace.two_body_species())
-        << std::setw(3) << bra_subspace.J() 
+        << std::setw(3) << bra_subspace.J()
         << std::setw(3) << bra_subspace.g()
         << " dim "
         << std::setw(3) << bra_subspace.size()
@@ -130,7 +176,7 @@ void TestTwoBodyNmax()
         << std::setw(3) << ket_subspace_index
         << " sJg "
         << std::setw(3) << int(ket_subspace.two_body_species())
-        << std::setw(3) << ket_subspace.J() 
+        << std::setw(3) << ket_subspace.J()
         << std::setw(3) << ket_subspace.g()
         << " dim "
         << std::setw(3) << ket_subspace.size()
@@ -149,6 +195,11 @@ int main(int argc, char **argv)
 
   std::string filename("test/jjjpnorb_scheme_test_orbitals_Nmax04.dat");
   TestOrbitalsNmax(filename);
+  std::string filename2("test/ljpn_scheme_test_orbitals_Nmax04.dat");
+  TestLJOrbitalsNmax(filename2);
+
+  TestLJSectors();
+
   TestTwoBodyNmax();
 
   // termination
