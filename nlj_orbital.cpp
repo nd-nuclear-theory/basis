@@ -10,12 +10,126 @@
 #include <iomanip>  // for debugging output
 #include <iostream>
 #include <sstream>
+#include <set>
 
 #include "am/am.h"
+#include "mcutils/parsing.h"
 
 #include "nlj_orbital.h"
 
 namespace basis {
+
+  ////////////////////////////////////////////////////////////////
+  // single-particle definition file parsing
+  ////////////////////////////////////////////////////////////////
+
+  std::vector<OrbitalPNInfo> ParseOrbitalPNStream(std::istream& is)
+  // Read orbital definitions from a stream.
+  //
+  // Arguments:
+  //   is (std::istream, input) :
+  //     input stream containing MFDn-formatted orbital definitions
+  // Returns:
+  //   (std::vector<OrbitalPNInfo>) : list of flattened orbital parameters
+  {
+
+    // set up line counter for use in error messages
+    std::string line;
+    int line_count = 0;
+
+
+    // line 1: version -- but first gobble any comment lines
+    while (std::getline(is,line), line[0]=='#') {++line_count;};
+
+    {
+      ++line_count;
+      std::istringstream line_stream(line);
+      int version;
+      line_stream >> version;
+      ParsingCheck(line_stream,line_count,line);
+      assert(version==15055);
+    }
+
+    // line 2: number of p,n orbitals
+    int num_orbitals_p, num_orbitals_n;
+    {
+      ++line_count;
+      std::getline(is,line);
+      std::istringstream line_stream(line);
+      line_stream >> num_orbitals_p >> num_orbitals_n;
+      ParsingCheck(line_stream,line_count,line);
+    }
+
+    // lines 3+: orbital definitions
+    std::vector<OrbitalPNInfo> states;
+    int num_orbitals_p_extracted=0, num_orbitals_n_extracted=0;
+    while ( getline(is, line)) {
+      // count line
+      ++line_count;
+
+      // set up for parsing
+      std::istringstream line_stream(line);
+      if (line.size() == 0)
+        continue;
+
+      int index, n, l, twice_j, orbital_species_raw;
+      double weight;
+      line_stream >> index
+                  >> n >> l >> twice_j
+                  >> orbital_species_raw >> weight;
+      ParsingCheck(line_stream,line_count,line);
+
+      HalfInt j(twice_j,2);
+      OrbitalSpeciesPN orbital_species = static_cast<OrbitalSpeciesPN>(orbital_species_raw-1);
+
+      // count orbitals by type
+      num_orbitals_p_extracted += int(orbital_species == OrbitalSpeciesPN::kP);
+      num_orbitals_n_extracted += int(orbital_species == OrbitalSpeciesPN::kN);
+
+      OrbitalPNInfo state(orbital_species,n,l,j,weight);
+      states.push_back(state);
+    }
+    assert(num_orbitals_p==num_orbitals_p_extracted);
+    assert(num_orbitals_n==num_orbitals_n_extracted);
+    return states;
+  }
+
+  // std::vector<OrbitalPNInfo> ParseOrbitalPNStream(std::istream& buf) {
+  //   std::istream filtered_inp(&buf);
+  //
+  //   int version;
+  //   filtered_inp >> version;
+  //   assert(version==15055);
+  //
+  //   int pmax,nmax;
+  //   filtered_inp >> pmax >> nmax;
+  //
+  //   int index, n, l, twice_j, orbital_species_raw;
+  //   double weight;
+  //
+  //   std::vector<OrbitalPNInfo> states;
+  //
+  //   while (!(filtered_inp.eof() || filtered_inp.bad())) {
+  //     filtered_inp >> index >> n >> l >> twice_j >> orbital_species_raw >> weight;
+  //     filtered_inp.ignore(1024, '\n');
+  //
+  //     HalfInt j(twice_j,2);
+  //     OrbitalSpeciesPN orbital_species = static_cast<OrbitalSpeciesPN>(orbital_species_raw-1);
+  //     // if (orbspec == 1) {
+  //     //   orbital_species = OrbitalSpeciesPN::kP;
+  //     // } else if (orbspec == 2) {
+  //     //   orbital_species = OrbitalSpeciesPN::kN;
+  //     // }
+  //     // OrbitalSpeciesPN orbital_species = orbspec-1 ? OrbitalSpeciesPN::kP : OrbitalSpeciesPN::kN;
+  //
+  //     OrbitalPNInfo state(orbital_species,n,l,j,weight);
+  //     states.push_back(state);
+  //     std::cout << index << std::endl;
+  //   }
+  //   std::cout << pmax << " " << nmax << " " << states.size() << std::endl;
+  //   assert(pmax+nmax == states.size());
+  //   return states;
+  // }
 
   ////////////////////////////////////////////////////////////////
   // single-particle orbitals
@@ -198,11 +312,11 @@ namespace basis {
 
   OrbitalSubspaceLJPN::OrbitalSubspaceLJPN(OrbitalSpeciesPN orbital_species,
                                            int l, HalfInt j,
-                                           std::vector<OrbitalPNInfo> const &states) {
+                                           std::vector<OrbitalPNInfo>& states) {
     labels_ = SubspaceLabelsType(orbital_species,l,j);
     weight_max_ = 0.0;
     Nmax_ = -1;
-    for (const OrbitalPNInfo& state : states) {
+    for (auto&& state : states) {
       if (state.orbital_species == orbital_species
           && state.l == l && state.j == j) {
         PushStateLabels(StateLabelsType(state.n));
@@ -269,8 +383,9 @@ namespace basis {
     }
   }
 
-  OrbitalSpaceLJPN::OrbitalSpaceLJPN(std::vector<OrbitalPNInfo> const &states) {
-    for (const OrbitalPNInfo& state : states) {
+  OrbitalSpaceLJPN::OrbitalSpaceLJPN(std::vector<OrbitalPNInfo>& states) {
+    for (int state_index=0; state_index<states.size(); ++state_index) {
+      OrbitalPNInfo state = states[state_index];
       OrbitalSubspaceLJPNLabels labels(state.orbital_species,state.l,state.j);
       if (!ContainsSubspace(labels)) {
         OrbitalSubspaceLJPN subspace(state.orbital_species,state.l,state.j,states);

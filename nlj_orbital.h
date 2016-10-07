@@ -30,6 +30,7 @@
 #include <string>
 
 #include "am/halfint.h"
+#include "mcutils/parsing.h"
 
 #include "basis/indexing.h"
 #include "basis/many_body.h"
@@ -110,7 +111,12 @@ namespace basis {
     int l;
     HalfInt j;
     double weight;
+
+    OrbitalPNInfo(OrbitalSpeciesPN os, int n, int l, HalfInt j, double weight)
+      : orbital_species(os), n(n), l(l), j(j), weight(weight) {}
   };
+
+  std::vector<OrbitalPNInfo> ParseOrbitalPNStream(std::istream& is);
 
   // subspace
 
@@ -300,7 +306,7 @@ namespace basis {
       // truncation.
 
       OrbitalSubspaceLJPN(OrbitalSpeciesPN orbital_species, int l, HalfInt j,
-        std::vector<OrbitalPNInfo> const &states);
+        const std::vector<OrbitalPNInfo>& states);
       // Set up indexing for a list of states.
 
       // accessors
@@ -378,8 +384,8 @@ namespace basis {
     // Set up indexing and weights in traditional oscillator Nmax
     // truncation.
 
-    OrbitalSpaceLJPN(std::vector<OrbitalPNInfo> const &states);
-    // Set up indexing for a list of states. TODO
+    OrbitalSpaceLJPN(const std::vector<OrbitalPNInfo>& states);
+    // Set up indexing for a list of states.
 
     // accessors
     double weight_max() const {return weight_max_;}

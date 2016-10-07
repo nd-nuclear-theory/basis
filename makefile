@@ -40,6 +40,6 @@ include $(COMMON_MAKE_DIR)/common.mk
 CC := $(CXX)
 
 # external libraries
-LDFLAGS += -L../am
-LDLIBS +=  -lam -lgsl
+LDFLAGS += -L../am -L../mcutils
+LDLIBS +=  -lam -lmcutils -lmcutils -lgsl
 
