@@ -312,7 +312,7 @@ namespace basis {
 
   OrbitalSubspaceLJPN::OrbitalSubspaceLJPN(OrbitalSpeciesPN orbital_species,
                                            int l, HalfInt j,
-                                           std::vector<OrbitalPNInfo>& states) {
+                                           const std::vector<OrbitalPNInfo>& states) {
     labels_ = SubspaceLabelsType(orbital_species,l,j);
     weight_max_ = 0.0;
     Nmax_ = -1;
@@ -383,15 +383,29 @@ namespace basis {
     }
   }
 
-  OrbitalSpaceLJPN::OrbitalSpaceLJPN(std::vector<OrbitalPNInfo>& states) {
-    for (int state_index=0; state_index<states.size(); ++state_index) {
-      OrbitalPNInfo state = states[state_index];
-      OrbitalSubspaceLJPNLabels labels(state.orbital_species,state.l,state.j);
-      if (!ContainsSubspace(labels)) {
-        OrbitalSubspaceLJPN subspace(state.orbital_species,state.l,state.j,states);
+  OrbitalSpaceLJPN::OrbitalSpaceLJPN(const std::vector<OrbitalPNInfo>& states)
+  {
+
+    // collect (l,j) subspace labels sorted in canonical order
+    std::set<OrbitalSubspaceLJPNLabels> subspace_labels_set;
+    for (int state_index=0; state_index<states.size(); ++state_index)
+      {
+        OrbitalPNInfo state = states[state_index];
+        OrbitalSubspaceLJPNLabels labels(state.orbital_species,state.l,state.j);
+        subspace_labels_set.insert(labels);
+      }
+
+    // construct subspaces
+    for (const OrbitalSubspaceLJPNLabels& labels : subspace_labels_set)
+      {
+        OrbitalSpeciesPN orbital_species;
+        int l;
+        HalfInt j;
+        std::tie(orbital_species,l,j) = labels;
+        OrbitalSubspaceLJPN subspace(orbital_species,l,j,states);
         PushSubspace(subspace);
       }
-    }
+    
   }
 
   std::string OrbitalSpaceLJPN::DebugStr() const {
@@ -526,7 +540,8 @@ namespace basis {
     }
   }
 
-  std::string OrbitalSectorsLJPN::DebugStr() const {
+  std::string OrbitalSectorsLJPN::DebugStr() const
+  {
     std::ostringstream os;
     int width = 3;
 
@@ -535,15 +550,15 @@ namespace basis {
       // os << sector_index+1 << sector.DebugStr();
       const basis::BaseSector<basis::OrbitalSubspaceLJPN>& sector =
         GetSector(sector_index);
-      os << std::setw(width) << sector_index+1
+      os << std::setw(width) << sector_index
          << " bra " << std::setw(width) << sector.bra_subspace_index() + 1
-            << " (" << sector.bra_subspace().l()
-            << ", " << sector.bra_subspace().j().Str()
-            << ", " << int(sector.bra_subspace().orbital_species())+1 << ")"
+         << " (" << sector.bra_subspace().l()
+         << ", " << sector.bra_subspace().j().Str()
+         << ", " << int(sector.bra_subspace().orbital_species())+1 << ")"
          << " ket " << std::setw(width) << sector.ket_subspace_index() + 1
-            << " (" << sector.ket_subspace().l()
-            << ", " << sector.ket_subspace().j().Str()
-            << ", " << int(sector.ket_subspace().orbital_species())+1 << ")"
+         << " (" << sector.ket_subspace().l()
+         << ", " << sector.ket_subspace().j().Str()
+         << ", " << int(sector.ket_subspace().orbital_species())+1 << ")"
          << std::endl;
     }
     return os.str();
