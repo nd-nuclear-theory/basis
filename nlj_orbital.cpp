@@ -216,6 +216,34 @@ namespace basis {
       }
   }
 
+  bool OrbitalSpacePN::IsOscillatorLike()
+  {
+
+    bool is_oscillator_like = true;
+
+    // first check if subspaces are populated, else weight_max is nonsense
+    is_oscillator_like &= ((GetSubspace(0).size()!=0)&&(GetSubspace(1).size()!=0));
+    if (!is_oscillator_like)
+      return false;
+
+    // see if can extract viable Nmax
+    is_oscillator_like &= ((GetSubspace(0).size()!=0)&&(GetSubspace(1).size()!=0));
+    double weight_max_p = GetSubspace(0).weight_max();
+    double weight_max_n = GetSubspace(1).weight_max();
+    int Nmax = int(weight_max_p);
+    is_oscillator_like &= (Nmax == weight_max_p); // check integer weight
+    is_oscillator_like &= (Nmax >=0 ); // check positive weight
+    is_oscillator_like &= (weight_max_p == weight_max_n); // check proton and neutron consistent
+    if (!is_oscillator_like)
+      return false;
+
+    // TODO check all orbital labels and weights against Nmax-constructed space
+
+    // orbitals are oscillator like!
+    Nmax_ = Nmax;
+    return true;
+  }
+
   std::string OrbitalSpacePN::DebugStr() const
   {
 

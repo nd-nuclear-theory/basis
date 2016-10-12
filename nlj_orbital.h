@@ -208,6 +208,13 @@ namespace basis {
     double weight_max() const {return weight_max_;}
     int Nmax() const {return Nmax_;}  // only meaningful if oscillator scheme constructor used
 
+    // test for truncation scheme
+    bool IsOscillatorLike();
+    // Test if labeling and weights match Nmax(=Nmax_p=Nmax_n)
+    // oscillator truncation.  If so, set Nmax accordingly.
+    //
+    // TODO finish implementation
+
     // diagnostic string
     std::string DebugStr() const;
 
