@@ -20,6 +20,7 @@
   9/28/16 (mac,pjf): Break out into nlj_orbital.
   10/6/16 (pjf): Add LJPN classes
   10/7/16 (pjf): Add LJPN sectors and general constructors
+  10/13/16 (mac): Add default constructors.
 
 ****************************************************************/
 
@@ -128,6 +129,10 @@ namespace basis {
 
       // constructor
 
+      OrbitalSubspacePN();
+      // default constructor -- provided since required for certain
+      // purposes by STL container classes (e.g., std::vector::resize)
+
       OrbitalSubspacePN(OrbitalSpeciesPN orbital_species, int Nmax);
       // Set up indexing and weights in traditional oscillator Nmax
       // truncation.
@@ -199,6 +204,10 @@ namespace basis {
     public:
 
     // constructor
+
+    OrbitalSpacePN();
+    // default constructor -- provided since required for certain
+    // purposes by STL container classes (e.g., std::vector::resize)
 
     OrbitalSpacePN(int Nmax);
     // Set up indexing and weights in traditional oscillator Nmax
@@ -308,6 +317,11 @@ namespace basis {
       public:
 
       // constructor
+
+      OrbitalSubspaceLJPN();
+      // default constructor -- provided since required for certain
+      // purposes by STL container classes (e.g., std::vector::resize)
+
       OrbitalSubspaceLJPN(OrbitalSpeciesPN orbital_species, int l, HalfInt j, int Nmax);
       // Set up indexing and weights in traditional oscillator Nmax
       // truncation.
@@ -386,6 +400,10 @@ namespace basis {
     public:
 
     // constructor
+
+    OrbitalSpaceLJPN();
+    // default constructor -- provided since required for certain
+    // purposes by STL container classes (e.g., std::vector::resize)
 
     OrbitalSpaceLJPN(int Nmax);
     // Set up indexing and weights in traditional oscillator Nmax
