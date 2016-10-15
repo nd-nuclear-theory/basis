@@ -27,6 +27,7 @@
    - Fix reference error in TwoBodySpaceJJJPN.
    - Add debugging strings.
   9/28/16 (mac,pjf): Extract orbital definitions into nlj_orbital.
+  10/14/16 (mac): Add constructors for WeightMax.
 
 ****************************************************************/
 
@@ -135,8 +136,31 @@ namespace basis {
     WeightMax() {};
     // default constructor
 
+    WeightMax(double wp, double wn, double wpp, double wnn, double wpn)
+    // trivial constructor
+    {
+      one_body[0] = wp;
+      one_body[1] = wn;
+      two_body[0] = wpp;
+      two_body[1] = wnn;
+      two_body[2] = wpn;
+    }
+
+    WeightMax(int N1max, int N2max)
+    // Set conventional oscillator one-body/two-body truncation from
+    // separate N1max and N2max.
+    {
+      one_body[0] = N1max;
+      one_body[1] = N1max;
+      two_body[0] = N2max;
+      two_body[1] = N2max;
+      two_body[2] = N2max;
+    }
+
     WeightMax(basis::Rank truncation_rank, int truncation_cutoff)
-    // Set conventional oscillator one-body/two-body trunctation.
+    // Set conventional oscillator one-body/two-body truncation from
+    // either a given one-body truncation or a given two-body
+    // truncation.
     {
       // extract one-body and two-body cutoffs
       int N1max, N2max;
