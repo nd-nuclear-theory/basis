@@ -40,7 +40,7 @@ namespace basis {
         // This is a check that the caller's sector construction
         // followed the specification that only "upper triangle"
         // sectors are stored.
-        assert(sector.bra_subspace_index()<=sector.ket_subspace_index());
+        assert(sector.IsUpperTriangle());
 
 	// iterate over matrix elements
 	for (int bra_index=0; bra_index<bra_subspace.size(); ++bra_index)
@@ -52,7 +52,7 @@ namespace basis {
                 if (!(bra_index<=ket_index))
                   continue;
 
-              // define states
+              // retrieve states
 	      const basis::TwoBodyStateJJJPN bra(bra_subspace,bra_index);
 	      const basis::TwoBodyStateJJJPN ket(ket_subspace,ket_index);
 

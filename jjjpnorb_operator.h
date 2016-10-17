@@ -11,6 +11,7 @@
   University of Notre Dame
 
   7/19/16 (mac): Created, adapting code from jjjt_operator.
+  10/15/16 (mac): Update to use new sector method IsUpperTriangle().
 
 ****************************************************************/
 
