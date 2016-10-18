@@ -184,7 +184,8 @@ namespace basis {
   }
 
   OrbitalSubspacePN::OrbitalSubspacePN(OrbitalSpeciesPN orbital_species,
-                                       const std::vector<OrbitalPNInfo>& states) {
+                                       const std::vector<OrbitalPNInfo>& states)
+  {
     labels_ = SubspaceLabelsType(orbital_species);
     weight_max_ = 0.0;
     Nmax_ = -1; // TODO call IsOscillatorLike_()
@@ -192,7 +193,7 @@ namespace basis {
       if (state.orbital_species == orbital_species) {
         PushStateLabels(StateLabelsType(state.n,state.l,state.j));
         weights_.push_back(state.weight);
-        if (state.weight>weight_max_) weight_max_ = state.weight;
+        weight_max_ = std::max(weight_max_,state.weight);
       }
     }
   }
@@ -281,12 +282,25 @@ namespace basis {
 
   OrbitalSpacePN::OrbitalSpacePN(const std::vector<OrbitalPNInfo>& states)
   {
-    // iterate over species
-    // construct subspaces
-    for (OrbitalSpeciesPN orbital_species : {OrbitalSpeciesPN::kP,OrbitalSpeciesPN::kN})
+    weight_max_ = 0.0;
+    Nmax_ = -1; // TODO call IsOscillatorLike_()
+    // collect orbital_species subspace labels sorted in canonical order
+    std::set<OrbitalSubspacePNLabels> subspace_labels_set;
+    for (int state_index=0; state_index<states.size(); ++state_index)
       {
+        OrbitalPNInfo state = states[state_index];
+        OrbitalSubspacePNLabels labels(state.orbital_species);
+        subspace_labels_set.insert(labels);
+      }
+
+    // construct subspaces
+    for (const OrbitalSubspacePNLabels& labels : subspace_labels_set)
+      {
+        OrbitalSpeciesPN orbital_species;
+        std::tie(orbital_species) = labels;
         OrbitalSubspacePN subspace(orbital_species,states);
         PushSubspace(subspace);
+        weight_max_ = std::max(weight_max_,subspace.weight_max());
       }
 
   }
@@ -399,7 +413,7 @@ namespace basis {
           && state.l == l && state.j == j) {
         PushStateLabels(StateLabelsType(state.n));
         weights_.push_back(state.weight);
-        if (state.weight>weight_max_) weight_max_ = state.weight;
+        weight_max_ = std::max(weight_max_,state.weight);
       }
     }
   }
@@ -490,6 +504,8 @@ namespace basis {
 
   OrbitalSpaceLJPN::OrbitalSpaceLJPN(const std::vector<OrbitalPNInfo>& states)
   {
+    weight_max_ = 0.0;
+    Nmax_ = -1; // TODO call IsOscillatorLike_()
 
     // collect (l,j) subspace labels sorted in canonical order
     std::set<OrbitalSubspaceLJPNLabels> subspace_labels_set;
@@ -509,6 +525,7 @@ namespace basis {
         std::tie(orbital_species,l,j) = labels;
         OrbitalSubspaceLJPN subspace(orbital_species,l,j,states);
         PushSubspace(subspace);
+        weight_max_ = std::max(weight_max_,subspace.weight_max());
       }
 
   }
