@@ -94,42 +94,65 @@ namespace basis {
     return states;
   }
 
-  // std::vector<OrbitalPNInfo> ParseOrbitalPNStream(std::istream& buf) {
-  //   std::istream filtered_inp(&buf);
+  std::string OrbitalDefinitionStr(const std::vector<OrbitalPNInfo>& orbitals)
+  // Output orbital info as a string suitable for MFDn version 15.
   //
-  //   int version;
-  //   filtered_inp >> version;
-  //   assert(version==15055);
-  //
-  //   int pmax,nmax;
-  //   filtered_inp >> pmax >> nmax;
-  //
-  //   int index, n, l, twice_j, orbital_species_raw;
-  //   double weight;
-  //
-  //   std::vector<OrbitalPNInfo> states;
-  //
-  //   while (!(filtered_inp.eof() || filtered_inp.bad())) {
-  //     filtered_inp >> index >> n >> l >> twice_j >> orbital_species_raw >> weight;
-  //     filtered_inp.ignore(1024, '\n');
-  //
-  //     HalfInt j(twice_j,2);
-  //     OrbitalSpeciesPN orbital_species = static_cast<OrbitalSpeciesPN>(orbital_species_raw-1);
-  //     // if (orbspec == 1) {
-  //     //   orbital_species = OrbitalSpeciesPN::kP;
-  //     // } else if (orbspec == 2) {
-  //     //   orbital_species = OrbitalSpeciesPN::kN;
-  //     // }
-  //     // OrbitalSpeciesPN orbital_species = orbspec-1 ? OrbitalSpeciesPN::kP : OrbitalSpeciesPN::kN;
-  //
-  //     OrbitalPNInfo state(orbital_species,n,l,j,weight);
-  //     states.push_back(state);
-  //     std::cout << index << std::endl;
-  //   }
-  //   std::cout << pmax << " " << nmax << " " << states.size() << std::endl;
-  //   assert(pmax+nmax == states.size());
-  //   return states;
-  // }
+  // Arguments:
+  //   orbitals (const std::vector<OrbitalPNInfo>&, input) :
+  //     list of flattened orbital parameters
+  // Returns:
+  //   (std::string) output stream containing MFDn-formatted orbital definitions
+  {
+
+      std::ostringstream header;
+      std::ostringstream body;
+      std::ostringstream os;
+
+      // header comments
+      header << "# MFDn SPorbital file" << std::endl;
+      header << "#   version" << std::endl;
+      header << "#   norb_p norb_n" << std::endl;
+      header << "#   index n l 2*j species weight" << std::endl;
+
+      // header line 1: version
+      int version = 15055;
+      header << version << std::endl;
+
+      // data
+      const int width = 3;
+      const int precision = 8;
+      // orbital indices
+      int p_index = 0;
+      int n_index = 0;
+      int output_index = 0;
+      for (const OrbitalPNInfo& state: orbitals)
+        {
+          // iterate over states
+          if (state.orbital_species == OrbitalSpeciesPN::kP) {
+            output_index = ++p_index;
+          } else if (state.orbital_species == OrbitalSpeciesPN::kN) {
+            output_index = ++n_index;
+          }
+
+          body << " " << std::setw(width) << output_index
+               << " " << std::setw(width) << state.n
+               << " " << std::setw(width) << state.l
+               << " " << std::setw(width) << TwiceValue(state.j)
+               << " " << std::setw(width) << int(state.orbital_species)+1 // 1-based
+               << " " << std::fixed << std::setw(width+1+precision)
+               << std::setprecision(precision) << state.weight
+               << std::endl;
+        }
+
+      // header line 2: dimensions
+      header << p_index << " " << n_index << std::endl;
+
+      // assemble file
+      os << header.str() << body.str();
+
+      return os.str();
+
+    }
 
   ////////////////////////////////////////////////////////////////
   // single-particle orbitals
@@ -158,6 +181,20 @@ namespace basis {
           // save oscillator quantum number as weight
           weights_.push_back(double(N));
         }
+  }
+
+  OrbitalSubspacePN::OrbitalSubspacePN(OrbitalSpeciesPN orbital_species,
+                                       const std::vector<OrbitalPNInfo>& states) {
+    labels_ = SubspaceLabelsType(orbital_species);
+    weight_max_ = 0.0;
+    Nmax_ = -1; // TODO call IsOscillatorLike_()
+    for (const OrbitalPNInfo& state : states) {
+      if (state.orbital_species == orbital_species) {
+        PushStateLabels(StateLabelsType(state.n,state.l,state.j));
+        weights_.push_back(state.weight);
+        if (state.weight>weight_max_) weight_max_ = state.weight;
+      }
+    }
   }
 
   std::string OrbitalSubspacePN::LabelStr() const
@@ -200,6 +237,32 @@ namespace basis {
 
   }
 
+  std::vector<OrbitalPNInfo> OrbitalSubspacePN::OrbitalInfo() const
+  {
+    std::vector<OrbitalPNInfo> orbitals;
+
+    for (int state_index=0; state_index<size(); ++state_index)
+      {
+        OrbitalStatePN state(*this,state_index);
+        orbitals.push_back(state.OrbitalInfo());
+      }
+
+    return orbitals;
+
+  }
+
+  OrbitalPNInfo OrbitalStatePN::OrbitalInfo() const
+  {
+    OrbitalPNInfo orbital;
+
+    orbital.orbital_species = orbital_species();
+    orbital.n = n();
+    orbital.l = l();
+    orbital.j = j();
+    orbital.weight = weight();
+
+    return orbital;
+  }
 
   OrbitalSpacePN::OrbitalSpacePN(int Nmax)
   {
@@ -214,6 +277,18 @@ namespace basis {
         OrbitalSubspacePN subspace(orbital_species,Nmax);
         PushSubspace(subspace);
       }
+  }
+
+  OrbitalSpacePN::OrbitalSpacePN(const std::vector<OrbitalPNInfo>& states)
+  {
+    // iterate over species
+    // construct subspaces
+    for (OrbitalSpeciesPN orbital_species : {OrbitalSpeciesPN::kP,OrbitalSpeciesPN::kN})
+      {
+        OrbitalSubspacePN subspace(orbital_species,states);
+        PushSubspace(subspace);
+      }
+
   }
 
   bool OrbitalSpacePN::IsOscillatorLike()
@@ -269,53 +344,28 @@ namespace basis {
 
   }
 
-
-  std::string OrbitalSpacePN::OrbitalDefinitionStr() const
+  std::vector<OrbitalPNInfo> OrbitalSpacePN::OrbitalInfo() const
   {
+    std::vector<OrbitalPNInfo> orbitals;
 
-    std::ostringstream os;
-
-    // header comments
-    os << "# MFDn SPorbital file" << std::endl;
-    os << "#   version" << std::endl;
-    os << "#   norb_p norb_n" << std::endl;
-    os << "#   index n l 2*j species weight" << std::endl;
-
-    // header line 1: version
-    int version = 15055;
-    os << version << std::endl;
-
-    // header line 2: dimensions
-    os << GetSubspace(0).size() << " " << GetSubspace(1).size() << std::endl;
-
-    // data
-    const int width = 3;
-    const int precision = 8;
     for (int subspace_index=0; subspace_index<size(); ++subspace_index)
       {
-        // retrieve subspace
-	const SubspaceType& subspace = GetSubspace(subspace_index);
+        const SubspaceType& subspace = GetSubspace(subspace_index);
+        std::vector<OrbitalPNInfo> subspace_orbitals;
 
-        // iterate over states
-        for (int state_index=0; state_index<subspace.size(); ++state_index)
-          {
-            OrbitalStatePN state(subspace,state_index);
+        // get orbitals for subspace and append to vector
+        subspace_orbitals = subspace.OrbitalInfo();
+        orbitals.insert(orbitals.end(),
+                        subspace_orbitals.begin(),
+                        subspace_orbitals.end()
+                       );
 
-            os
-              << " " << std::setw(width) << state.index()+1  // 1-based
-              << " " << std::setw(width) << state.n()
-              << " " << std::setw(width) << state.l()
-              << " " << std::setw(width) << TwiceValue(state.j())
-              << " " << std::setw(width) << int(state.orbital_species())+1 // 1-based
-              << " " << std::fixed << std::setw(width+1+precision)
-              << std::setprecision(precision) << state.weight()
-              << std::endl;
-          }
       }
 
-    return os.str();
+    return orbitals;
 
   }
+
 
   ////////////////////////////////////////////////////////////////
   // single-particle orbitals - lj subspaces
@@ -393,6 +443,33 @@ namespace basis {
 
   }
 
+  std::vector<OrbitalPNInfo> OrbitalSubspaceLJPN::OrbitalInfo() const
+  {
+    std::vector<OrbitalPNInfo> orbitals;
+
+    for (int state_index=0; state_index<size(); ++state_index)
+      {
+        OrbitalStateLJPN state(*this,state_index);
+        orbitals.push_back(state.OrbitalInfo());
+      }
+
+    return orbitals;
+
+  }
+
+  OrbitalPNInfo OrbitalStateLJPN::OrbitalInfo() const
+  {
+    OrbitalPNInfo orbital;
+
+    orbital.orbital_species = orbital_species();
+    orbital.n = n();
+    orbital.l = l();
+    orbital.j = j();
+    orbital.weight = weight();
+
+    return orbital;
+  }
+
   OrbitalSpaceLJPN::OrbitalSpaceLJPN(int Nmax) {
     // save truncation
     weight_max_ = double(Nmax);
@@ -433,7 +510,7 @@ namespace basis {
         OrbitalSubspaceLJPN subspace(orbital_species,l,j,states);
         PushSubspace(subspace);
       }
-    
+
   }
 
   std::string OrbitalSpaceLJPN::DebugStr() const {
@@ -459,61 +536,25 @@ namespace basis {
 
   }
 
-  std::string OrbitalSpaceLJPN::OrbitalDefinitionStr() const {
+  std::vector<OrbitalPNInfo> OrbitalSpaceLJPN::OrbitalInfo() const
+  {
+    std::vector<OrbitalPNInfo> orbitals;
 
-    std::ostringstream header;
-    std::ostringstream body;
-    std::ostringstream os;
-
-    // header comments
-    header << "# MFDn SPorbital file" << std::endl;
-    header << "#   version" << std::endl;
-    header << "#   norb_p norb_n" << std::endl;
-    header << "#   index n l 2*j species weight" << std::endl;
-
-    // header line 1: version
-    int version = 15055;
-    header << version << std::endl;
-
-    // data
-    const int width = 3;
-    const int precision = 8;
-    // orbital indices
-    int p_index = 0;
-    int n_index = 0;
-    int output_index = 0;
     for (int subspace_index=0; subspace_index<size(); ++subspace_index)
-    {
-      // retrieve subspace
-      const SubspaceType& subspace = GetSubspace(subspace_index);
+      {
+        const SubspaceType& subspace = GetSubspace(subspace_index);
+        std::vector<OrbitalPNInfo> subspace_orbitals;
 
-      // iterate over states
-      for (int state_index=0; state_index<subspace.size(); ++state_index) {
-        OrbitalStateLJPN state(subspace,state_index);
-        if (state.orbital_species() == OrbitalSpeciesPN::kP) {
-          output_index = ++p_index;
-        } else if (state.orbital_species() == OrbitalSpeciesPN::kN) {
-          output_index = ++n_index;
-        }
+        // get orbitals for subspace and append to vector
+        subspace_orbitals = subspace.OrbitalInfo();
+        orbitals.insert(orbitals.end(),
+                        subspace_orbitals.begin(),
+                        subspace_orbitals.end()
+                       );
 
-        body << " " << std::setw(width) << output_index
-             << " " << std::setw(width) << state.n()
-             << " " << std::setw(width) << state.l()
-             << " " << std::setw(width) << TwiceValue(state.j())
-             << " " << std::setw(width) << int(state.orbital_species())+1 // 1-based
-             << " " << std::fixed << std::setw(width+1+precision)
-             << std::setprecision(precision) << state.weight()
-             << std::endl;
       }
-    }
 
-    // header line 2: dimensions
-    header << p_index << " " << n_index << std::endl;
-
-    // assemble file
-    os << header.str() << body.str();
-
-    return os.str();
+    return orbitals;
 
   }
 

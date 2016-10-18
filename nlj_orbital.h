@@ -21,6 +21,7 @@
   10/6/16 (pjf): Add LJPN classes
   10/7/16 (pjf): Add LJPN sectors and general constructors
   10/13/16 (mac): Add default constructors.
+  10/18/16 (pjf): Add PN general constructors and serializers (OrbitalInfo).
 
 ****************************************************************/
 
@@ -40,6 +41,43 @@ namespace basis {
 
   ////////////////////////////////////////////////////////////////
   // single-particle orbitals
+  ////////////////////////////////////////////////////////////////
+
+  // enumerated type for orbital species
+  //
+  // Note: Follows same sequence as MFDn, but MFDn uses 1-based
+  // numbering.
+
+  enum class OrbitalSpeciesPN {kP=0,kN=1};
+
+  // flattened state container
+
+  struct OrbitalPNInfo
+  {
+    OrbitalSpeciesPN orbital_species;
+    int n;
+    int l;
+    HalfInt j;
+    double weight;
+
+    OrbitalPNInfo() = default;
+    // default constructor
+
+    OrbitalPNInfo(OrbitalSpeciesPN os, int n, int l, HalfInt j, double weight)
+      : orbital_species(os), n(n), l(l), j(j), weight(weight) {};
+  };
+
+  std::vector<OrbitalPNInfo> ParseOrbitalPNStream(std::istream& is);
+
+  // orbital tabulation
+  std::string OrbitalDefinitionStr(const std::vector<OrbitalPNInfo>& orbitals);
+  // Generate orbital tabulation suitable for output as an MFDn
+  // Version 15 orbital file.
+  //
+  // See Pieter Maris's README_SPorbitals_2016June20.txt.
+
+  ////////////////////////////////////////////////////////////////
+  // PN subspacing
   ////////////////////////////////////////////////////////////////
 
   ////////////////////////////////////////////////////////////////
@@ -91,33 +129,11 @@ namespace basis {
   //
   ////////////////////////////////////////////////////////////////
 
-  // enumerated type for orbital species
-  //
-  // Note: Follows same sequence as MFDn, but MFDn uses 1-based
-  // numbering.
-
-  enum class OrbitalSpeciesPN {kP=0,kN=1};
-
   // labels
 
   typedef std::tuple<OrbitalSpeciesPN> OrbitalSubspacePNLabels;
   typedef std::tuple<int,int,HalfInt> OrbitalStatePNLabels;
 
-  // flattened state container
-
-  struct OrbitalPNInfo
-  {
-    OrbitalSpeciesPN orbital_species;
-    int n;
-    int l;
-    HalfInt j;
-    double weight;
-
-    OrbitalPNInfo(OrbitalSpeciesPN os, int n, int l, HalfInt j, double weight)
-      : orbital_species(os), n(n), l(l), j(j), weight(weight) {}
-  };
-
-  std::vector<OrbitalPNInfo> ParseOrbitalPNStream(std::istream& is);
 
   // subspace
 
@@ -136,6 +152,13 @@ namespace basis {
       OrbitalSubspacePN(OrbitalSpeciesPN orbital_species, int Nmax);
       // Set up indexing and weights in traditional oscillator Nmax
       // truncation.
+
+      OrbitalSubspacePN(OrbitalSpeciesPN orbital_species,
+        const std::vector<OrbitalPNInfo>& states);
+      // Set up indexing for a list of states.
+
+      // produce flattened orbital information
+      std::vector<OrbitalPNInfo> OrbitalInfo() const;
 
       // accessors
 
@@ -178,8 +201,11 @@ namespace basis {
       // Construct state by reverse lookup on labels.
       : BaseState (subspace, state_labels) {}
 
+    // produce flattened orbital information
+    OrbitalPNInfo OrbitalInfo() const;
+
     // pass-through accessors
-    OrbitalSpeciesPN orbital_species() {return Subspace().orbital_species();}
+    OrbitalSpeciesPN orbital_species() const {return Subspace().orbital_species();}
 
     // state label accessors
     int n() const {return std::get<0>(GetStateLabels());}
@@ -213,6 +239,12 @@ namespace basis {
     // Set up indexing and weights in traditional oscillator Nmax
     // truncation.
 
+    OrbitalSpacePN(const std::vector<OrbitalPNInfo>& states);
+    // Set up indexing for a list of states.
+
+    // produce flattened orbital information
+    std::vector<OrbitalPNInfo> OrbitalInfo() const;
+
     // accessors
     double weight_max() const {return weight_max_;}
     int Nmax() const {return Nmax_;}  // only meaningful if oscillator scheme constructor used
@@ -227,8 +259,11 @@ namespace basis {
     // diagnostic string
     std::string DebugStr() const;
 
-    // orbital tabulation
-    std::string OrbitalDefinitionStr() const;
+    // orbital tabulation -- DEPRECATED in favor of basis::OrbitalDefinitionStr
+    std::string OrbitalDefinitionStr() const
+    {
+      return basis::OrbitalDefinitionStr(OrbitalInfo());
+    };
     // Generate orbital tabulation suitable for output as an MFDn
     // Version 15 orbital file.
     //
@@ -251,7 +286,7 @@ namespace basis {
 
 
   ////////////////////////////////////////////////////////////////
-  // single-particle orbitals - lj subspaces
+  // LJPN subspacing
   ////////////////////////////////////////////////////////////////
 
   ////////////////////////////////////////////////////////////////
@@ -330,6 +365,9 @@ namespace basis {
         const std::vector<OrbitalPNInfo>& states);
       // Set up indexing for a list of states.
 
+      // produce flattened orbital information
+      std::vector<OrbitalPNInfo> OrbitalInfo() const;
+
       // accessors
 
       OrbitalSpeciesPN orbital_species() const {return std::get<0>(labels_);}
@@ -374,8 +412,11 @@ namespace basis {
       // Construct state by reverse lookup on labels.
       : BaseState (subspace, state_labels) {}
 
+    // produce flattened orbital information
+    OrbitalPNInfo OrbitalInfo() const;
+
     // pass-through accessors
-    OrbitalSpeciesPN orbital_species() {return Subspace().orbital_species();}
+    OrbitalSpeciesPN orbital_species() const {return Subspace().orbital_species();}
     int l() const {return Subspace().l();}
     HalfInt j() const {return Subspace().j();}
     int g() const {return l()%2;}
@@ -417,11 +458,17 @@ namespace basis {
     int Nmax() const {return Nmax_;}  // only meaningful if oscillator scheme
                                       // constructor used
 
+    // produce flattened orbital information
+    std::vector<OrbitalPNInfo> OrbitalInfo() const;
+
     // diagnostic string
     std::string DebugStr() const;
 
-    // orbital tabulation
-    std::string OrbitalDefinitionStr() const;
+    // orbital tabulation -- DEPRECATED in favor of basis::OrbitalDefinitionStr
+    std::string OrbitalDefinitionStr() const
+    {
+      return basis::OrbitalDefinitionStr(OrbitalInfo());
+    };
     // Generate orbital tabulation suitable for output as an MFDn
     // Version 15 orbital file.
     //
