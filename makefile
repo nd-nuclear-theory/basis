@@ -17,10 +17,11 @@ modules_ho += jjjpnorb_scheme jjjpnorb_operator nlj_orbital
 ##programs = jt_scheme_test
 programs = lsjt_scheme_test lsjt_operator_test jjjt_scheme_test
 programs += jjjpnorb_scheme_test jjjpnorb_operator_test
+programs += nlj_orbital_test
 ##programs += write_lsjt_relative
 CC := $(CXX)
 
-CXXFLAGS = -std=c++11
+CXXFLAGS += -std=c++11
 
 # set flag for linking to FORTRAN
 # need_fortran = 
