@@ -65,6 +65,18 @@ namespace basis {
 
     OrbitalPNInfo(OrbitalSpeciesPN os, int n, int l, HalfInt j, double weight)
       : orbital_species(os), n(n), l(l), j(j), weight(weight) {};
+
+    static const double WEIGHT_TOLERANCE = 1e-8;
+    inline bool operator==(const OrbitalPNInfo& rhs) const
+    {
+      bool equiv = true;
+      equiv &= (this->orbital_species==rhs.orbital_species);
+      equiv &= (this->n==rhs.n);
+      equiv &= (this->l==rhs.l);
+      equiv &= (this->j==rhs.j);
+      equiv &= (abs(this->weight-rhs.weight)<WEIGHT_TOLERANCE);
+      return equiv;
+    }
   };
 
   std::vector<OrbitalPNInfo> ParseOrbitalPNStream(std::istream& is);
@@ -164,7 +176,9 @@ namespace basis {
 
       OrbitalSpeciesPN orbital_species() const {return std::get<0>(labels_);}
       double weight_max() const {return weight_max_;}
-      int Nmax() const {return Nmax_;}  // only meaningful if oscillator scheme constructor used
+      bool is_oscillator_like() const {return is_oscillator_like_;}
+      int Nmax() const {assert(is_oscillator_like()); return Nmax_;}
+      // only meaningful if oscillator scheme constructor used
       const std::vector<double>& weights() const {return weights_;}
 
       // diagnostic strings
@@ -177,7 +191,12 @@ namespace basis {
 
       // truncation
       double weight_max_;
+      bool is_oscillator_like_;
       int Nmax_;  // only meaningful if oscillator scheme constructor used
+
+      // test for truncation scheme
+      bool IsOscillatorLike_() const;
+      // Test if labeling and weights match oscillator truncation.
 
       // weights
       std::vector<double> weights_;
@@ -247,14 +266,9 @@ namespace basis {
 
     // accessors
     double weight_max() const {return weight_max_;}
-    int Nmax() const {return Nmax_;}  // only meaningful if oscillator scheme constructor used
-
-    // test for truncation scheme
-    bool IsOscillatorLike();
-    // Test if labeling and weights match Nmax(=Nmax_p=Nmax_n)
-    // oscillator truncation.  If so, set Nmax accordingly.
-    //
-    // TODO finish implementation
+    bool is_oscillator_like() const {return is_oscillator_like_;}
+    int Nmax() const {assert(is_oscillator_like()); return Nmax_;}
+    // only meaningful if oscillator scheme constructor used
 
     // diagnostic string
     std::string DebugStr() const;
@@ -274,7 +288,13 @@ namespace basis {
 
     // truncation
     double weight_max_;
+    bool is_oscillator_like_;
     int Nmax_;  // only meaningful if oscillator scheme constructor used
+
+    // test for truncation scheme
+    bool IsOscillatorLike_() const;
+    // Test if labeling and weights match oscillator truncation for
+    // all subspaces.
 
   };
 
