@@ -1,5 +1,5 @@
 /****************************************************************
-  nlj_orbital.h
+  @file nlj_orbital.h
 
   Defines general single-particle orbital sets.
 
@@ -8,20 +8,25 @@
   Mark A. Caprio
   University of Notre Dame
 
-  7/7/16 (mac): Created (jjjpnorb_scheme), building on code from jjjt_scheme.
-  7/19/16 (mac):
+  + 7/7/16 (mac): Created (jjjpnorb_scheme), building on code from jjjt_scheme.
+  + 7/19/16 (mac):
    - Add default constructors.
    - Use enum Rank for truncation rank.
    - Add two-body species code definitions.
    - Add GetOrbital accessors.
-  7/22/16 (mac):
+  + 7/22/16 (mac):
    - Fix reference error in TwoBodySpaceJJJPN.
    - Add debugging strings.
-  9/28/16 (mac,pjf): Break out into nlj_orbital.
-  10/6/16 (pjf): Add LJPN classes
-  10/7/16 (pjf): Add LJPN sectors and general constructors
-  10/13/16 (mac): Add default constructors.
-  10/18/16 (pjf): Add PN general constructors and serializers (OrbitalInfo).
+  + 9/28/16 (mac,pjf): Break out into nlj_orbital.
+  + 10/6/16 (pjf): Add LJPN classes
+  + 10/7/16 (pjf): Add LJPN sectors and general constructors
+  + 10/13/16 (mac): Add default constructors.
+  + 10/18/16 (pjf):
+   - Add general constructors and serializers for Orbital*PN (OrbitalPNInfo).
+   - Refactor OrbitalDefinitionStr out of spaces.
+   - Add oscillator-likeness tests to OrbitalSpacePN and OrbitalSubspacePN.
+   - Add == operator for OrbitalPNInfo.
+  + 10/19/16 (pjf): Update documentation to Doxygen format.
 
 ****************************************************************/
 
@@ -43,15 +48,19 @@ namespace basis {
   // single-particle orbitals
   ////////////////////////////////////////////////////////////////
 
-  // enumerated type for orbital species
-  //
-  // Note: Follows same sequence as MFDn, but MFDn uses 1-based
-  // numbering.
-
+  /**
+   * Enumerated type for orbital species
+   *
+   * Note: Follows same sequence as MFDn, but MFDn uses 1-based
+   * numbering.
+   */
   enum class OrbitalSpeciesPN {kP=0,kN=1};
 
-  // flattened state container
-
+  /**
+   * A flattened orbital container.
+   *
+   * All quantum numbers used by MFDn are contained in this simple struct.
+   */
   struct OrbitalPNInfo
   {
     OrbitalSpeciesPN orbital_species;
@@ -89,57 +98,57 @@ namespace basis {
   // See Pieter Maris's README_SPorbitals_2016June20.txt.
 
   ////////////////////////////////////////////////////////////////
-  // PN subspacing
+  /// @defgroup pn-subspaces PN Subspaces
+  /// Single particle orbitals divided into subspaces with definite
+  /// orbital species.
+  ///
+  /// ## Labeling ##
+  ///
+  /// subspace labels: (species)
+  ///
+  ///  * species (enum): species (kP=0 for proton, kN=1 for neutron)
+  ///
+  /// state labels within subspace: (n,l,j)
+  ///
+  ///  * n (int): radial quantum number (0,1,...)
+  ///  * l (int): orbital angular momentum
+  ///  * j (HalfInt): total angular momentum
+  ///
+  /// The parity for each orbital is deduced from the l quantum number:
+  ///
+  ///  * g (int): grade (=0,1) for the parity P, given by g~l
+  ///
+  /// Each orbital (state) also has a floating point "weight"
+  /// associated with it:
+  ///
+  ///  * weight (double): orbital weight
+  ///
+  /// This quantity is not considered a "label", since it is not used
+  /// for lookup purposes.  In a traditional oscillator scheme, the
+  /// weight is set to the oscillator quantum number w -> N=2n+l.
+  ///
+  /// The hard-coded oscillator quantum number is also deduced from the
+  /// n and l quantum numbers, as an integer, to be used only when the
+  /// orbitals are known to be oscillator orbitals:
+  ///
+  ///  * N (int): oscillator quanta (N=2n+l)
+  ///
   ////////////////////////////////////////////////////////////////
-
+  ///
+  /// ## Subspaces ##
+  ///
+  /// Within the full space, subspaces are ordered by:
+  ///    * enumerated species
+  ///
   ////////////////////////////////////////////////////////////////
-  //
-  // Labeling
-  //
-  // subspace labels: (species)
-  //
-  //   species (enum): species (kP=0 for proton, kN=1 for neutron)
-  //
-  // state labels within subspace: (n,l,j)
-  //
-  //   n (int): radial quantum number (0,1,...)
-  //   l (int): orbital angular momentum
-  //   j (HalfInt): total angular momentum
-  //
-  // The parity for each orbital is deduced from the l quantum number:
-  //
-  //   g (int): grade (=0,1) for the parity P, given by g~l
-  //
-  // Each orbital (state) also has a floating point "weight"
-  // associated with it:
-  //
-  //   weight (double): orbital weight
-  //
-  // This quantity is not considered a "label", since it is not used
-  // for lookup purposes.  In a traditional oscillator scheme, the
-  // weight is set to the oscillator quantum number w -> N=2n+l.
-  //
-  // The hard-coded oscillator quantum number is also deduced from the
-  // n and l quantum numbers, as an integer, to be used only when the
-  // orbitals are known to be oscillator orbitals:
-  //
-  //   N (int): oscillator quanta (N=2n+l)
-  //
+  ///
+  /// ## States ##
+  ///
+  /// Within a subspace, the states are ordered by:
+  ///   * lexicographically increasing (n,l,j)
+  ///
   ////////////////////////////////////////////////////////////////
-  //
-  // Subspaces
-  //
-  // Within the full space, subspaces are ordered by:
-  //    -- enumerated species
-  //
-  ////////////////////////////////////////////////////////////////
-  //
-  // States
-  //
-  // Within a subspace, the states are ordered by:
-  //   -- lexicographically increasing (n,l,j)
-  //
-  ////////////////////////////////////////////////////////////////
+  /// @{
 
   // labels
 
@@ -273,15 +282,12 @@ namespace basis {
     // diagnostic string
     std::string DebugStr() const;
 
-    // orbital tabulation -- DEPRECATED in favor of basis::OrbitalDefinitionStr
+    /// orbital tabulation
+    /// @deprecated Use basis::OrbitalDefinitionStr instead
     std::string OrbitalDefinitionStr() const
     {
       return basis::OrbitalDefinitionStr(OrbitalInfo());
     };
-    // Generate orbital tabulation suitable for output as an MFDn
-    // Version 15 orbital file.
-    //
-    // See Pieter Maris's README_SPorbitals_2016June20.txt.
 
 
     private:
@@ -301,62 +307,63 @@ namespace basis {
   // sectors -- not applicable
 
   ////////////////////////////////////////////////////////////////
+  /// @}
   ////////////////////////////////////////////////////////////////
 
 
 
   ////////////////////////////////////////////////////////////////
-  // LJPN subspacing
+  /// @defgroup ljpn-subspaces LJPN Subspaces
+  /// Single particle orbitals divided into subspaces with definite l, j and
+  /// orbital species.
+  ///
+  /// ## Labeling ##
+  ///
+  /// subspace labels: (species,l,j)
+  ///
+  ///  * species (enum): species (kP=0 for proton, kN=1 for neutron)
+  ///  * l (int): orbital angular momentum
+  ///  * j (HalfInt): total angular momentum
+  ///
+  /// state labels within subspace: (n,l,j)
+  ///
+  ///  * n (int): radial quantum number (0,1,...)
+  ///
+  /// The parity for each orbital is deduced from the l quantum number:
+  ///
+  ///  * g (int): grade (=0,1) for the parity P, given by g~l
+  ///
+  /// Each orbital (state) also has a floating point "weight"
+  /// associated with it:
+  ///
+  ///  * weight (double): orbital weight
+  ///
+  /// This quantity is not considered a "label", since it is not used
+  /// for lookup purposes.  In a traditional oscillator scheme, the
+  /// weight is set to the oscillator quantum number w -> N=2n+l.
+  ///
+  /// The hard-coded oscillator quantum number is also deduced from the
+  /// n and l quantum numbers, as an integer, to be used only when the
+  /// orbitals are known to be oscillator orbitals:
+  ///
+  ///   *N (int): oscillator quanta (N=2n+l)
+  ///
   ////////////////////////////////////////////////////////////////
-
+  ///
+  /// ## Subspaces ##
+  ///
+  /// Within the full space, subspaces are ordered by:
+  ///    * lexicographically increasing (species,l,j)
+  ///
   ////////////////////////////////////////////////////////////////
-  //
-  // Labeling
-  //
-  // subspace labels: (species,l,j)
-  //
-  //   species (enum): species (kP=0 for proton, kN=1 for neutron)
-  //   l (int): orbital angular momentum
-  //   j (HalfInt): total angular momentum
-  //
-  // state labels within subspace: (n,l,j)
-  //
-  //   n (int): radial quantum number (0,1,...)
-  //
-  // The parity for each orbital is deduced from the l quantum number:
-  //
-  //   g (int): grade (=0,1) for the parity P, given by g~l
-  //
-  // Each orbital (state) also has a floating point "weight"
-  // associated with it:
-  //
-  //   weight (double): orbital weight
-  //
-  // This quantity is not considered a "label", since it is not used
-  // for lookup purposes.  In a traditional oscillator scheme, the
-  // weight is set to the oscillator quantum number w -> N=2n+l.
-  //
-  // The hard-coded oscillator quantum number is also deduced from the
-  // n and l quantum numbers, as an integer, to be used only when the
-  // orbitals are known to be oscillator orbitals:
-  //
-  //   N (int): oscillator quanta (N=2n+l)
-  //
+  ///
+  /// ## States ##
+  ///
+  /// Within a subspace, the states are ordered by:
+  ///   * increasing n
+  ///
   ////////////////////////////////////////////////////////////////
-  //
-  // Subspaces
-  //
-  // Within the full space, subspaces are ordered by:
-  //    -- lexicographically increasing (species,l,j)
-  //
-  ////////////////////////////////////////////////////////////////
-  //
-  // States
-  //
-  // Within a subspace, the states are ordered by:
-  //   -- increasing n
-  //
-  ////////////////////////////////////////////////////////////////
+  /// @{
 
   // labels
 
@@ -484,15 +491,12 @@ namespace basis {
     // diagnostic string
     std::string DebugStr() const;
 
-    // orbital tabulation -- DEPRECATED in favor of basis::OrbitalDefinitionStr
+    /// orbital tabulation
+    /// @deprecated Use basis::OrbitalDefinitionStr instead
     std::string OrbitalDefinitionStr() const
     {
       return basis::OrbitalDefinitionStr(OrbitalInfo());
     };
-    // Generate orbital tabulation suitable for output as an MFDn
-    // Version 15 orbital file.
-    //
-    // See Pieter Maris's README_SPorbitals_2016June20.txt.
 
 
     private:
@@ -504,15 +508,6 @@ namespace basis {
   };
 
   // sectors
-  // class OrbitalSectorLJPN
-  // : public BaseSector<OrbitalSubspaceLJPN>
-  // {
-  // public:
-  //
-  //   OrbitalSectorLJPN();
-  //
-  //   std::string DebugStr() const;
-  // };
 
   class OrbitalSectorsLJPN
     : public BaseSectors<OrbitalSpaceLJPN>
@@ -549,6 +544,7 @@ namespace basis {
   };
 
   ////////////////////////////////////////////////////////////////
+  /// @}
   ////////////////////////////////////////////////////////////////
 } // namespace
 
