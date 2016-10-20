@@ -527,6 +527,8 @@ namespace basis {
    * of orbitals.
    *
    * @param[in] orbital_species species type for subspace
+   * @param[in] l orbital angular momentum quantum number
+   * @param[in] j total angular momentum quantum number
    * @param[in] states vector of orbitals
    */
   OrbitalSubspaceLJPN::OrbitalSubspaceLJPN(OrbitalSpeciesPN orbital_species,
