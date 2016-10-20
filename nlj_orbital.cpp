@@ -23,14 +23,7 @@ namespace basis {
   // single-particle definition file parsing
   ////////////////////////////////////////////////////////////////
 
-  std::vector<OrbitalPNInfo> ParseOrbitalPNStream(std::istream& is)
-  // Read orbital definitions from a stream.
-  //
-  // Arguments:
-  //   is (std::istream, input) :
-  //     input stream containing MFDn-formatted orbital definitions
-  // Returns:
-  //   (std::vector<OrbitalPNInfo>) : list of flattened orbital parameters
+  std::vector<OrbitalPNInfo> ParseOrbitalPNStream(std::istream& is, bool standalone)
   {
 
     // set up line counter for use in error messages
@@ -38,121 +31,130 @@ namespace basis {
     int line_count = 0;
 
 
-    // line 1: version -- but first gobble any comment lines
-    while (std::getline(is,line), line[0]=='#') {++line_count;};
-
-    {
-      ++line_count;
-      std::istringstream line_stream(line);
-      int version;
-      line_stream >> version;
-      ParsingCheck(line_stream,line_count,line);
-      assert(version==15055);
-    }
-
-    // line 2: number of p,n orbitals
     int num_orbitals_p, num_orbitals_n;
-    {
-      ++line_count;
-      std::getline(is,line);
-      std::istringstream line_stream(line);
-      line_stream >> num_orbitals_p >> num_orbitals_n;
-      ParsingCheck(line_stream,line_count,line);
-    }
+    if (standalone)
+      {
+        // line 1: version -- but first gobble any comment lines
+        while (std::getline(is,line), line[0]=='#') {++line_count;};
+        {
+          ++line_count;
+          std::istringstream line_stream(line);
+          int version;
+          line_stream >> version;
+          ParsingCheck(line_stream,line_count,line);
+          assert(version==15055);
+        }
+
+        // line 2: number of p,n orbitals
+        {
+          ++line_count;
+          std::getline(is,line);
+          std::istringstream line_stream(line);
+          line_stream >> num_orbitals_p >> num_orbitals_n;
+          ParsingCheck(line_stream,line_count,line);
+        }
+      }
 
     // lines 3+: orbital definitions
     std::vector<OrbitalPNInfo> states;
     int num_orbitals_p_extracted=0, num_orbitals_n_extracted=0;
-    while ( getline(is, line)) {
-      // count line
-      ++line_count;
+    while ( getline(is,line))
+      {
+        // count line
+        ++line_count;
 
-      // set up for parsing
-      std::istringstream line_stream(line);
-      if (line.size() == 0)
-        continue;
+        // set up for parsing
+        std::istringstream line_stream(line);
+        if (line.size() == 0)
+          continue;
 
-      int index, n, l, twice_j, orbital_species_raw;
-      double weight;
-      line_stream >> index
-                  >> n >> l >> twice_j
-                  >> orbital_species_raw >> weight;
-      ParsingCheck(line_stream,line_count,line);
+        int index, n, l, twice_j, orbital_species_raw;
+        double weight;
+        line_stream >> index
+                    >> n >> l >> twice_j
+                    >> orbital_species_raw >> weight;
+        ParsingCheck(line_stream,line_count,line);
 
-      HalfInt j(twice_j,2);
-      OrbitalSpeciesPN orbital_species = static_cast<OrbitalSpeciesPN>(orbital_species_raw-1);
+        HalfInt j(twice_j,2);
+        OrbitalSpeciesPN orbital_species = static_cast<OrbitalSpeciesPN>(orbital_species_raw-1);
 
-      // count orbitals by type
-      num_orbitals_p_extracted += int(orbital_species == OrbitalSpeciesPN::kP);
-      num_orbitals_n_extracted += int(orbital_species == OrbitalSpeciesPN::kN);
+        // count orbitals by type
+        num_orbitals_p_extracted += int(orbital_species == OrbitalSpeciesPN::kP);
+        num_orbitals_n_extracted += int(orbital_species == OrbitalSpeciesPN::kN);
 
-      OrbitalPNInfo state(orbital_species,n,l,j,weight);
-      states.push_back(state);
-    }
-    assert(num_orbitals_p==num_orbitals_p_extracted);
-    assert(num_orbitals_n==num_orbitals_n_extracted);
+        OrbitalPNInfo state(orbital_species,n,l,j,weight);
+        states.push_back(state);
+      }
+
+    if (standalone)
+      {
+        assert(num_orbitals_p==num_orbitals_p_extracted);
+        assert(num_orbitals_n==num_orbitals_n_extracted);
+      }
+
     return states;
   }
 
-  std::string OrbitalDefinitionStr(const std::vector<OrbitalPNInfo>& orbitals)
-  // Output orbital info as a string suitable for MFDn version 15.
-  //
-  // Arguments:
-  //   orbitals (const std::vector<OrbitalPNInfo>&, input) :
-  //     list of flattened orbital parameters
-  // Returns:
-  //   (std::string) output stream containing MFDn-formatted orbital definitions
+  std::string OrbitalDefinitionStr(const std::vector<OrbitalPNInfo>& orbitals, bool standalone)
   {
 
-      std::ostringstream header;
-      std::ostringstream body;
-      std::ostringstream os;
+    std::ostringstream header;
+    std::ostringstream body;
+    std::ostringstream os;
 
-      // header comments
-      header << "# MFDn SPorbital file" << std::endl;
-      header << "#   version" << std::endl;
-      header << "#   norb_p norb_n" << std::endl;
-      header << "#   index n l 2*j species weight" << std::endl;
-
-      // header line 1: version
-      int version = 15055;
-      header << version << std::endl;
-
-      // data
-      const int width = 3;
-      const int precision = 8;
-      // orbital indices
-      int p_index = 0;
-      int n_index = 0;
-      int output_index = 0;
-      for (const OrbitalPNInfo& state: orbitals)
-        {
-          // iterate over states
-          if (state.orbital_species == OrbitalSpeciesPN::kP) {
-            output_index = ++p_index;
-          } else if (state.orbital_species == OrbitalSpeciesPN::kN) {
-            output_index = ++n_index;
-          }
-
-          body << " " << std::setw(width) << output_index
-               << " " << std::setw(width) << state.n
-               << " " << std::setw(width) << state.l
-               << " " << std::setw(width) << TwiceValue(state.j)
-               << " " << std::setw(width) << int(state.orbital_species)+1 // 1-based
-               << " " << std::fixed << std::setw(width+1+precision)
-               << std::setprecision(precision) << state.weight
-               << std::endl;
+    // construct body
+    const int width = 3;
+    const int precision = 8;
+    // orbital indices
+    int p_index = 0;
+    int n_index = 0;
+    int output_index = 0;
+    for (const OrbitalPNInfo& state: orbitals)
+      {
+        // iterate over states
+        if (state.orbital_species == OrbitalSpeciesPN::kP) {
+          output_index = ++p_index;
+        } else if (state.orbital_species == OrbitalSpeciesPN::kN) {
+          output_index = ++n_index;
         }
 
-      // header line 2: dimensions
-      header << p_index << " " << n_index << std::endl;
+        body << " " << std::setw(width) << output_index
+             << " " << std::setw(width) << state.n
+             << " " << std::setw(width) << state.l
+             << " " << std::setw(width) << TwiceValue(state.j)
+             << " " << std::setw(width) << int(state.orbital_species)+1 // 1-based
+             << " " << std::fixed << std::setw(width+1+precision)
+             << std::setprecision(precision) << state.weight
+             << std::endl;
+      }
 
-      // assemble file
-      os << header.str() << body.str();
+    // construct header
+    //
+    // We defer constructing the header until after constructing the
+    // body, since we need statistics obtained while constructing the
+    // body.
+    if (standalone)
+      {
+        // header comments
+        header << "# MFDn SPorbital file" << std::endl;
+        header << "#   version" << std::endl;
+        header << "#   norb_p norb_n" << std::endl;
+        header << "#   index n l 2*j species weight" << std::endl;
 
-      return os.str();
+        // header line 1: version
+        int version = 15055;
+        header << version << std::endl;
 
-    }
+        // header line 2: dimensions
+        header << p_index << " " << n_index << std::endl;
+      }
+
+    // assemble file
+    os << header.str() << body.str();
+
+    return os.str();
+
+  }
 
   ////////////////////////////////////////////////////////////////
   // single-particle orbitals

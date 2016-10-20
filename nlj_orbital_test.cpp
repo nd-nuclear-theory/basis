@@ -45,16 +45,16 @@ void TestOrbitalsNmax(const std::string& filename)
     }
 
   // check file output
-  std::ofstream os(filename.c_str());
-  os << space.OrbitalDefinitionStr();
+  std::ofstream os(filename);
+  os << basis::OrbitalDefinitionStr(space.OrbitalInfo(),true);
 
 }
 
 void TestOrbitalsRead(const std::string& filename) {
   std::cout << "Read Orbitals" << std::endl;
 
-  std::ifstream is(filename.c_str());
-  std::vector<basis::OrbitalPNInfo> states = basis::ParseOrbitalPNStream(is);
+  std::ifstream is(filename);
+  std::vector<basis::OrbitalPNInfo> states = basis::ParseOrbitalPNStream(is,true);
   basis::OrbitalSpacePN space(states);
   std::cout << space.DebugStr();
 
@@ -99,16 +99,16 @@ void TestLJOrbitalsNmax(const std::string& filename)
     }
 
   // check file output
-  std::ofstream os(filename.c_str());
-  os << space.OrbitalDefinitionStr();
+  std::ofstream os(filename);
+  os << basis::OrbitalDefinitionStr(space.OrbitalInfo(),true);
 
 }
 
 void TestLJOrbitalsRead(const std::string& filename) {
   std::cout << "Read Orbitals -- lj-subspaces" << std::endl;
 
-  std::ifstream is(filename.c_str());
-  std::vector<basis::OrbitalPNInfo> states = basis::ParseOrbitalPNStream(is);
+  std::ifstream is(filename);
+  std::vector<basis::OrbitalPNInfo> states = basis::ParseOrbitalPNStream(is,true);
   basis::OrbitalSpaceLJPN space(states);
   std::cout << space.DebugStr();
 

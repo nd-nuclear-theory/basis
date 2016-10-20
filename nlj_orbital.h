@@ -22,7 +22,9 @@
   10/7/16 (pjf): Add LJPN sectors and general constructors
   10/13/16 (mac): Add default constructors.
   10/18/16 (pjf): Add PN general constructors and serializers (OrbitalInfo).
-  10/19/16 (mac): Add default constructors yet again.
+  10/19/16 (mac):
+    - Add default constructors yet again.
+    - Make orbital I/O switchable between standalone and embedded modes.
 
 ****************************************************************/
 
@@ -68,14 +70,31 @@ namespace basis {
       : orbital_species(os), n(n), l(l), j(j), weight(weight) {};
   };
 
-  std::vector<OrbitalPNInfo> ParseOrbitalPNStream(std::istream& is);
+  // orbital I/O
 
-  // orbital tabulation
-  std::string OrbitalDefinitionStr(const std::vector<OrbitalPNInfo>& orbitals);
-  // Generate orbital tabulation suitable for output as an MFDn
-  // Version 15 orbital file.
+  std::vector<OrbitalPNInfo> ParseOrbitalPNStream(std::istream& is, bool standalone);
+  // Read orbital definitions from a stream.
   //
-  // See Pieter Maris's README_SPorbitals_2016June20.txt.
+  // Arguments:
+  //   is (std::istream, input) :
+  //     input stream containing MFDn-formatted orbital definitions
+  //   standalone (bool): whether or not to expect initial comments and version number
+  //     as for standalone orbital file
+  //
+  // Returns:
+  //   (std::vector<OrbitalPNInfo>) : list of flattened orbital parameters
+
+  std::string OrbitalDefinitionStr(const std::vector<OrbitalPNInfo>& orbitals, bool standalone = false);
+  // Output orbital info as a string suitable for MFDn version 15.
+  //
+  // Arguments:
+  //   orbitals (const std::vector<OrbitalPNInfo>&, input) :
+  //     list of flattened orbital parameters
+  //   standalone (bool, optional): whether or not to include initial comments and version number
+  //     as for standalone orbital file
+  //
+  // Returns:
+  //   (std::string) output stream containing MFDn-formatted orbital definitions
 
   ////////////////////////////////////////////////////////////////
   // PN subspacing
@@ -146,7 +165,7 @@ namespace basis {
 
       // constructor
 
-      OrbitalSubspacePN() {};
+      OrbitalSubspacePN() = default;
       // default constructor -- provided since required for certain
       // purposes by STL container classes (e.g., std::vector::resize)
 
@@ -232,7 +251,7 @@ namespace basis {
 
     // constructor
 
-    OrbitalSpacePN() {};
+    OrbitalSpacePN() = default;
     // default constructor -- provided since required for certain
     // purposes by STL container classes (e.g., std::vector::resize)
 
@@ -259,17 +278,6 @@ namespace basis {
 
     // diagnostic string
     std::string DebugStr() const;
-
-    // orbital tabulation -- DEPRECATED in favor of basis::OrbitalDefinitionStr
-    std::string OrbitalDefinitionStr() const
-    {
-      return basis::OrbitalDefinitionStr(OrbitalInfo());
-    };
-    // Generate orbital tabulation suitable for output as an MFDn
-    // Version 15 orbital file.
-    //
-    // See Pieter Maris's README_SPorbitals_2016June20.txt.
-
 
     private:
 
@@ -354,7 +362,7 @@ namespace basis {
 
       // constructor
 
-      OrbitalSubspaceLJPN() {};
+      OrbitalSubspaceLJPN() = default;
       // default constructor -- provided since required for certain
       // purposes by STL container classes (e.g., std::vector::resize)
 
@@ -443,7 +451,7 @@ namespace basis {
 
     // constructor
 
-    OrbitalSpaceLJPN() {};
+    OrbitalSpaceLJPN() = default;
     // default constructor -- provided since required for certain
     // purposes by STL container classes (e.g., std::vector::resize)
 
@@ -464,17 +472,6 @@ namespace basis {
 
     // diagnostic string
     std::string DebugStr() const;
-
-    // orbital tabulation -- DEPRECATED in favor of basis::OrbitalDefinitionStr
-    std::string OrbitalDefinitionStr() const
-    {
-      return basis::OrbitalDefinitionStr(OrbitalInfo());
-    };
-    // Generate orbital tabulation suitable for output as an MFDn
-    // Version 15 orbital file.
-    //
-    // See Pieter Maris's README_SPorbitals_2016June20.txt.
-
 
     private:
 
@@ -503,7 +500,7 @@ namespace basis {
 
     // constructor
 
-    OrbitalSectorsLJPN() {};
+    OrbitalSectorsLJPN() = default;
     // default constructor -- provided since required for certain
     // purposes by STL container classes (e.g., std::vector::resize)
 
