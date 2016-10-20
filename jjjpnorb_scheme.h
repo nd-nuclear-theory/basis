@@ -28,6 +28,7 @@
    - Add debugging strings.
   9/28/16 (mac,pjf): Extract orbital definitions into nlj_orbital.
   10/14/16 (mac): Add constructors for WeightMax.
+  10/14/16 (mac): Store operator properties with TwoBodySectorsJJJPN.
 
 ****************************************************************/
 
@@ -324,6 +325,15 @@ namespace basis {
     //
     // TODO: add possibility of delta Tz
 
+    // accessors
+    int J0() const {return J0_;};
+    int g0() const {return g0_;};
+    int Tz0() const {return Tz0_;};
+
+    private:
+
+    // operator properties
+    int J0_, g0_, Tz0_;
   };
 
 

@@ -266,6 +266,7 @@ namespace basis {
       int J0, int g0,
       basis::SectorDirection sector_direction
     )
+    : J0_(J0), g0_(g0), Tz0_(0)
   {
     for (int bra_subspace_index=0; bra_subspace_index<space.size(); ++bra_subspace_index)
       for (int ket_subspace_index=0; ket_subspace_index<space.size(); ++ket_subspace_index)
