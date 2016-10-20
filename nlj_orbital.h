@@ -22,6 +22,7 @@
   10/7/16 (pjf): Add LJPN sectors and general constructors
   10/13/16 (mac): Add default constructors.
   10/18/16 (pjf): Add PN general constructors and serializers (OrbitalInfo).
+  10/19/16 (mac): Add default constructors yet again.
 
 ****************************************************************/
 
@@ -145,7 +146,7 @@ namespace basis {
 
       // constructor
 
-      OrbitalSubspacePN();
+      OrbitalSubspacePN() {};
       // default constructor -- provided since required for certain
       // purposes by STL container classes (e.g., std::vector::resize)
 
@@ -231,7 +232,7 @@ namespace basis {
 
     // constructor
 
-    OrbitalSpacePN();
+    OrbitalSpacePN() {};
     // default constructor -- provided since required for certain
     // purposes by STL container classes (e.g., std::vector::resize)
 
@@ -353,7 +354,7 @@ namespace basis {
 
       // constructor
 
-      OrbitalSubspaceLJPN();
+      OrbitalSubspaceLJPN() {};
       // default constructor -- provided since required for certain
       // purposes by STL container classes (e.g., std::vector::resize)
 
@@ -442,7 +443,7 @@ namespace basis {
 
     // constructor
 
-    OrbitalSpaceLJPN();
+    OrbitalSpaceLJPN() {};
     // default constructor -- provided since required for certain
     // purposes by STL container classes (e.g., std::vector::resize)
 
@@ -502,7 +503,7 @@ namespace basis {
 
     // constructor
 
-    OrbitalSectorsLJPN();
+    OrbitalSectorsLJPN() {};
     // default constructor -- provided since required for certain
     // purposes by STL container classes (e.g., std::vector::resize)
 
