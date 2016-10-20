@@ -45,11 +45,11 @@ namespace basis {
     weight_max_ = weight_max;
 
     // identify orbital subspaces
-    OrbitalSpeciesPN orbital_species1 = 
+    OrbitalSpeciesPN orbital_species1 =
       (two_body_species==TwoBodySpeciesPN::kPP) || (two_body_species==TwoBodySpeciesPN::kPN)
       ? OrbitalSpeciesPN::kP : OrbitalSpeciesPN::kN;
-    OrbitalSpeciesPN orbital_species2 = 
-      (two_body_species==TwoBodySpeciesPN::kPP) 
+    OrbitalSpeciesPN orbital_species2 =
+      (two_body_species==TwoBodySpeciesPN::kPP)
       ? OrbitalSpeciesPN::kP : OrbitalSpeciesPN::kN;
     orbital_subspace1_ptr_ = &(orbital_space.GetSubspace(int(orbital_species1)));
     orbital_subspace2_ptr_ = &(orbital_space.GetSubspace(int(orbital_species2)));
@@ -99,16 +99,16 @@ namespace basis {
           //           << " " << w1_max
           //           << " " << w2_max
           //           << " " << w_max
-          //           << " " << weight_allowed 
+          //           << " " << weight_allowed
           //           << std::endl;
           if (!weight_allowed)
             continue;
 
           // keep surviving states
-          PushStateLabels(StateLabelsType(index1,index2)); 
+          PushStateLabels(StateLabelsType(index1,index2));
         }
   }
-  
+
   std::string TwoBodySubspaceJJJPN::LabelStr() const
   {
     std::ostringstream os;
@@ -117,7 +117,7 @@ namespace basis {
 
     os << "["
        << " " << std::setw(width) << kTwoBodySpeciesPNCodeTz[int(two_body_species())]
-       << " " << std::setw(width) << J() 
+       << " " << std::setw(width) << J()
        << " " << std::setw(width) << g()
        << " " << "]";
 
@@ -142,18 +142,18 @@ namespace basis {
         OrbitalStatePN orbital2(state.orbital_subspace2(),state.index2());
 
         os
-	  << " " << "index"
-	  << " " << std::setw(width) << state_index
-	  << " " << "index1 index2"
-	  << " " << std::setw(width) << state.index1()
-	  << " " << std::setw(width) << state.index2()
-	  << " " << "nlj1 nlj2"
-	  << " " << std::setw(width) << orbital1.n()
-	  << " " << std::setw(width) << orbital1.l()
-	  << " " << std::setw(width+2) << orbital1.j().Str()
-	  << " " << std::setw(width) << orbital2.n()
-	  << " " << std::setw(width) << orbital2.l()
-	  << " " << std::setw(width+2) << orbital2.j().Str()
+          << " " << "index"
+          << " " << std::setw(width) << state_index
+          << " " << "index1 index2"
+          << " " << std::setw(width) << state.index1()
+          << " " << std::setw(width) << state.index2()
+          << " " << "nlj1 nlj2"
+          << " " << std::setw(width) << orbital1.n()
+          << " " << std::setw(width) << orbital1.l()
+          << " " << std::setw(width+2) << orbital1.j().Str()
+          << " " << std::setw(width) << orbital2.n()
+          << " " << std::setw(width) << orbital2.l()
+          << " " << std::setw(width+2) << orbital2.j().Str()
           << std::endl;
       }
 
@@ -169,7 +169,7 @@ namespace basis {
 
     os << "["
        << " " << std::setw(width) << kTwoBodySpeciesPNCodeTz[int(two_body_species())]
-       << " " << std::setw(width) << J() 
+       << " " << std::setw(width) << J()
        << " " << std::setw(width) << g()
        << " " << ";"
        << " " << std::setw(width) << index1()
@@ -202,14 +202,14 @@ namespace basis {
     for (int subspace_index=0; subspace_index<orbital_space.size(); ++subspace_index)
       {
         // retrieve subspace
-	const OrbitalSubspacePN& subspace = orbital_space.GetSubspace(subspace_index);
+        const OrbitalSubspacePN& subspace = orbital_space.GetSubspace(subspace_index);
 
         // iterate over states
         for (int state_index=0; state_index<subspace.size(); ++state_index)
           {
             OrbitalStatePN state(subspace,state_index);
             jmax = std::max(jmax,state.j());
-          }        
+          }
       }
     int Jmax = TwiceValue(jmax);
 
@@ -243,17 +243,17 @@ namespace basis {
 
     for (int subspace_index=0; subspace_index<size(); ++subspace_index)
       {
-	const SubspaceType& subspace = GetSubspace(subspace_index);
-	os
-	  << " " << "index"
-	  << " " << std::setw(width) << subspace_index
-	  << " " << "sJg"
+        const SubspaceType& subspace = GetSubspace(subspace_index);
+        os
+          << " " << "index"
+          << " " << std::setw(width) << subspace_index
+          << " " << "sJg"
           << " " << std::setw(width) << int(subspace.two_body_species())
-	  << " " << std::setw(width) << subspace.J() 
-	  << " " << std::setw(width) << subspace.g() 
-	  << " " << "dim"
-	  << " " << std::setw(width) << subspace.size()
-	  << " " << std::endl;
+          << " " << std::setw(width) << subspace.J()
+          << " " << std::setw(width) << subspace.g()
+          << " " << "dim"
+          << " " << std::setw(width) << subspace.size()
+          << " " << std::endl;
       }
 
     return os.str();
@@ -269,7 +269,7 @@ namespace basis {
   {
     for (int bra_subspace_index=0; bra_subspace_index<space.size(); ++bra_subspace_index)
       for (int ket_subspace_index=0; ket_subspace_index<space.size(); ++ket_subspace_index)
-	{
+        {
 
           // enforce canonical ordering
           if (
@@ -294,7 +294,7 @@ namespace basis {
           allowed &= ((ket_subspace.g()+g0+bra_subspace.g())%2==0);
 
           // push sector
-	  if (allowed)
+          if (allowed)
             PushSector(SectorType(bra_subspace_index,ket_subspace_index,bra_subspace,ket_subspace));
         }
   }

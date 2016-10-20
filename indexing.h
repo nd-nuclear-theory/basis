@@ -293,7 +293,7 @@ namespace basis {
         // Construct state, given index index within subspace.
         : subspace_ptr_(&subspace), index_(index)
       {
-	assert(ValidIndex());
+        assert(ValidIndex());
       }
 
       BaseState(const SubspaceType& subspace, const StateLabelsType& state_labels)
@@ -366,7 +366,7 @@ namespace basis {
       //
       //   for (RelativeStateLSJT state(space); state.ValidIndex(); ++state)
       //     {
-      //   	std::cout << state.index() << " " << state.N() << std::endl;
+      //           std::cout << state.index() << " " << state.N() << std::endl;
       //     };
       //
       // This usage requires ValidIndex() to be made public.
@@ -375,8 +375,8 @@ namespace basis {
       // // Construct state, defaulting to 0th state in space.
       // // Meant for use with iterator-style iteration over states.
       //  {
-      //	space_ptr = subspace;
-      //	index_ = 0;
+      //        space_ptr = subspace;
+      //        index_ = 0;
       //  }
 
       // BaseState& operator ++();
@@ -384,8 +384,8 @@ namespace basis {
       // //
       // // Meant for use with iterator-style iteration over states.
       // {
-      // 	++index_;
-      // 	return *this;
+      //         ++index_;
+      //         return *this;
       // }
 
       ////////////////////////////////////////////////////////////////
@@ -458,7 +458,7 @@ namespace basis {
         // trap failed lookup with assert for easier debugging
         assert(ContainsSubspace(subspace_labels));
 
-	return lookup_.at(subspace_labels);
+        return lookup_.at(subspace_labels);
       };
 
       const SubspaceType& LookUpSubspace(const typename SubspaceType::SubspaceLabelsType& labels) const
@@ -468,14 +468,14 @@ namespace basis {
       // If no such labels are found, an exception will result
       // (enforced by LookUpSubspaceIndex).
       {
-	return subspaces_[LookUpSubspaceIndex(labels)];
+        return subspaces_[LookUpSubspaceIndex(labels)];
       };
 
       const SubspaceType& GetSubspace(int i) const
       // Given the index for a subspace, return a reference to the
       // subspace.
       {
-	return subspaces_[i];
+        return subspaces_[i];
       };
 
       ////////////////////////////////////////////////////////////////
@@ -485,7 +485,7 @@ namespace basis {
       int size() const
       // Return the number of subspaces within the space.
       {
-	return subspaces_.size();
+        return subspaces_.size();
       };
 
       int TotalDimension() const
@@ -507,8 +507,8 @@ namespace basis {
       // Create indexing information (in both directions, index <->
       // labels) for a subspace.
       {
-	lookup_[subspace.GetSubspaceLabels()] = subspaces_.size(); // index for lookup
-	subspaces_.push_back(subspace);  // save space
+        lookup_[subspace.GetSubspaceLabels()] = subspaces_.size(); // index for lookup
+        subspaces_.push_back(subspace);  // save space
       };
 
       ////////////////////////////////////////////////////////////////
