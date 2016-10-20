@@ -1,3 +1,4 @@
+/// @file
 /****************************************************************
   operator.h
 
@@ -12,7 +13,7 @@
   directory.
 
   Language: C++11
-                                 
+
   Mark A. Caprio
   University of Notre Dame
 
@@ -100,7 +101,7 @@ namespace basis {
               int ket_dimension = sector.ket_subspace().size();
               sector_entries = bra_dimension*ket_dimension;
             }
-          
+
           total_entries += sector_entries;
         }
 
@@ -297,7 +298,7 @@ namespace basis {
   inline
   void CanonicalizeIndices(
       int& subspace_index_bra, int& subspace_index_ket,
-      bool& swapped_subspaces, 
+      bool& swapped_subspaces,
       int& state_index_bra, int& state_index_ket,
       bool& swapped_states
     )
@@ -333,7 +334,7 @@ namespace basis {
       }
 
     // process state indices (diagonal sectors)
-    swapped_states = (subspace_index_bra == subspace_index_ket) 
+    swapped_states = (subspace_index_bra == subspace_index_ket)
       & !(state_index_bra <= state_index_ket);
     if (swapped_states)
       std::swap(state_index_bra,state_index_ket);
@@ -381,7 +382,7 @@ namespace basis {
         }
 
       // process state indices (diagonal sectors)
-      bool swapped_states = (subspace_index_bra == subspace_index_ket) 
+      bool swapped_states = (subspace_index_bra == subspace_index_ket)
         & !(state_index_bra <= state_index_ket);
       if (swapped_states)
         std::swap(state_index_bra,state_index_ket);

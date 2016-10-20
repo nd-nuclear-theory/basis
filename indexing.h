@@ -1,3 +1,4 @@
+/// @file
 /****************************************************************
   indexing.h
 
@@ -30,7 +31,7 @@
     type, and therefore indirectly on the "subspace" type.
 
     So notice that the hiererchy of dependencies of template
-    definitions 
+    definitions
 
         state <- subspace -> space -> sectors
 
@@ -59,21 +60,21 @@
     boost -- only if INDEXING_HASH enabled
 
   Language: C++11
-                                 
+
   Mark A. Caprio
   University of Notre Dame
 
   11/21/15 (mac): Created (indexing_base.h), abstracted from code in indexing_lsjt.
   3/5/16 (mac): Update header comment.
-  3/9/16 (mac): Relax protection of BaseSpace indexing containers 
+  3/9/16 (mac): Relax protection of BaseSpace indexing containers
     from private to protected to support sp3rlib.
-  3/11/16 (mac): Add subspace size() method and space 
+  3/11/16 (mac): Add subspace size() method and space
     TotalDimension() and ContainsSubspace() methods.
   5/3/16 (mac): Add boost-style hashing option ad hoc on subspace labels.
   6/8/16 (mac): Extract to new basis module:
     - Rename file from indexing_base.h to indexing.h.
     - Change namespace from shell to basis.
-    - Systematize switching between map and unordered_map via INDEXING_HASH 
+    - Systematize switching between map and unordered_map via INDEXING_HASH
       directive.
     - Remove deprecated subspace method Dimension().
   6/16/16 (mac): Fix missing typename qualifier.
@@ -83,8 +84,8 @@
     - Add utility member functions ContainsState, ContainsSector,
       IsDiagonal.
   7/5/16 (mac): Add pass-through typedef StateLabelsType to BaseState.
-  7/13/16 (mac): Clean up accessor naming: Add labels() accessor to 
-    subspace and state, deprecating subspace GetSubspaceLabels() and 
+  7/13/16 (mac): Clean up accessor naming: Add labels() accessor to
+    subspace and state, deprecating subspace GetSubspaceLabels() and
     state GetStateLabels().  Add subspace() accessor to state, deprecating
     Subspace().
   7/25/16 (mac): Add utility member function IsUpperTriangle.
@@ -120,13 +121,13 @@ namespace basis {
   //
   // Template arguments:
   //   tSubspaceLabelsType : tuple for subspace labels, e.g., std::tuple<int,int,int,int,int>
-  //   tStateLabelsType : tuple for state labels, e.g., std::tuple<int> 
+  //   tStateLabelsType : tuple for state labels, e.g., std::tuple<int>
   //
   // Note: Even if only a single integer label is needed, we must use
   // tuple<int> (as opposed to plain int) to make the two forms of the
   // state constructor syntactically distinct.
-  
-  template <typename tSubspaceLabelsType, typename tStateLabelsType> 
+
+  template <typename tSubspaceLabelsType, typename tStateLabelsType>
     class BaseSubspace
   {
 
@@ -136,8 +137,8 @@ namespace basis {
     //  common type definitions
     ////////////////////////////////////////////////////////////////
 
-    typedef tSubspaceLabelsType SubspaceLabelsType; 
-    typedef tStateLabelsType StateLabelsType; 
+    typedef tSubspaceLabelsType SubspaceLabelsType;
+    typedef tStateLabelsType StateLabelsType;
 
     ////////////////////////////////////////////////////////////////
     // general constructors
@@ -195,7 +196,7 @@ namespace basis {
     //
     // If no such labels are found, an exception will result.
     {
-	
+
       // trap failed lookup with assert for easier debugging
       assert(ContainsState(state_labels));
 
@@ -226,7 +227,7 @@ namespace basis {
       state_table_.push_back(state_labels);  // save state
       dimension_++;
     };
-    
+
     ////////////////////////////////////////////////////////////////
     // private storage
     ////////////////////////////////////////////////////////////////
@@ -263,8 +264,8 @@ namespace basis {
   //
   // Template arguments:
   //   tSubspaceType : subspace type in which this state lives
-  
-  template <typename tSubspaceType> 
+
+  template <typename tSubspaceType>
     class BaseState
     {
 
@@ -274,7 +275,7 @@ namespace basis {
       // common typedefs
       ////////////////////////////////////////////////////////////////
 
-      typedef tSubspaceType SubspaceType; 
+      typedef tSubspaceType SubspaceType;
       typedef typename SubspaceType::StateLabelsType StateLabelsType;
 
       ////////////////////////////////////////////////////////////////
@@ -319,14 +320,14 @@ namespace basis {
       const SubspaceType& subspace() const
       // Return reference to subspace in which this state lies.
       {return *subspace_ptr_;}
-      
+
       const SubspaceType& Subspace() const
       // Return reference to subspace in which this state lies.
       //
       // DEPRECATED in favor of subspace().
       {return *subspace_ptr_;}
 
-      const StateLabelsType& labels() const 
+      const StateLabelsType& labels() const
       // Return labels of this state.
       //
       // Note: It is not normally expected that this member function
@@ -337,7 +338,7 @@ namespace basis {
         return Subspace().GetStateLabels(index());
       }
 
-      const StateLabelsType& GetStateLabels() const 
+      const StateLabelsType& GetStateLabels() const
       // Return labels of this state.
       //
       // DEPRECATED in favor of labels().
@@ -435,7 +436,7 @@ namespace basis {
       ////////////////////////////////////////////////////////////////
 
       typedef tSubspaceType SubspaceType;
-      
+
       ////////////////////////////////////////////////////////////////
       // subspace lookup and retrieval
       ////////////////////////////////////////////////////////////////
@@ -453,7 +454,7 @@ namespace basis {
       //
       // If no such labels are found, an exception will result.
       {
-	
+
         // trap failed lookup with assert for easier debugging
         assert(ContainsSubspace(subspace_labels));
 
@@ -555,7 +556,7 @@ namespace basis {
       ////////////////////////////////////////////////////////////////
 
       public:
-      typedef tSubspaceType SubspaceType; 
+      typedef tSubspaceType SubspaceType;
       typedef std::tuple<int,int,int> KeyType;
 
       ////////////////////////////////////////////////////////////////
@@ -563,10 +564,10 @@ namespace basis {
       ////////////////////////////////////////////////////////////////
 
       BaseSector(
-          int bra_subspace_index, int ket_subspace_index, 
+          int bra_subspace_index, int ket_subspace_index,
           const SubspaceType& bra_subspace, const SubspaceType& ket_subspace,
           int multiplicity_index=1
-        ) 
+        )
         : bra_subspace_index_(bra_subspace_index), ket_subspace_index_(ket_subspace_index), multiplicity_index_(multiplicity_index)
       {
         bra_subspace_ptr_ = &bra_subspace;
@@ -703,7 +704,7 @@ namespace basis {
       ////////////////////////////////////////////////////////////////
       // internal storage
       ////////////////////////////////////////////////////////////////
-    
+
       // sectors (accessible by index)
       std::vector<SectorType> sectors_;
 

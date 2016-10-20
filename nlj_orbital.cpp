@@ -1,4 +1,3 @@
-/** @file */
 /****************************************************************
   nlj_orbital.cpp
 
@@ -660,7 +659,7 @@ namespace basis {
   OrbitalSpaceLJPN::OrbitalSpaceLJPN(const std::vector<OrbitalPNInfo>& states)
   {
     weight_max_ = 0.0;
-    Nmax_ = -1; // TODO call IsOscillatorLike_()
+    Nmax_ = -1;
 
     // collect (l,j) subspace labels sorted in canonical order
     std::set<OrbitalSubspaceLJPNLabels> subspace_labels_set;

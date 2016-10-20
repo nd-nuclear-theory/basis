@@ -1,3 +1,4 @@
+/// @file
 /****************************************************************
   jjjpnorb_scheme.h
 
@@ -13,7 +14,7 @@
   (N,j) orbital labels, in the spirit of jjjt_scheme.
 
   Language: C++11
-                                 
+
   Mark A. Caprio
   University of Notre Dame
 
@@ -49,7 +50,7 @@ namespace basis {
   // two-body states in jjJpn scheme with general orbitals
   ////////////////////////////////////////////////////////////////
 
-  ////////////////////////////////////////////////////////////////  
+  ////////////////////////////////////////////////////////////////
   //
   // Labeling
   //
@@ -74,7 +75,7 @@ namespace basis {
   //    -- increasing type (type=pp,nn,pn)
   //    -- increasing J
   //    -- increasing g (g=0,1)
-  // 
+  //
   // Subspaces are pruned to those of nonzero dimension.
   //
   // Note that ordering of subspaces is lexicographic by (type,J,g).
@@ -95,18 +96,18 @@ namespace basis {
   //      if index1==index2
   //
   // This basis is for *identical* particle states:
-  //   -- In the pp/nn subspaces, the labels are subject to 
+  //   -- In the pp/nn subspaces, the labels are subject to
   //      the antisymmetry constraint (J~0) if the orbitals are identical.
   //   -- In the pp/nn subspaces, a canonical (lexicographic) ordering
   //      constraint is applied to the single-particle quantum numbers.
   //      That is, when enumerating the basis, the states
-  //    
+  //
   //        |(index1,index2)...>  and  |(index2,index1)...>
   //
   //      would be redundant, and only the first (for index1<=index2) is
   //      retained.
   //
-  ////////////////////////////////////////////////////////////////  
+  ////////////////////////////////////////////////////////////////
 
   // enumerated type for two-body state species
   //
@@ -174,7 +175,7 @@ namespace basis {
       two_body[2] = N2max;
     }
 
-    // maximum weights 
+    // maximum weights
     std::array<double,2> one_body;
     std::array<double,3> two_body;
   };
@@ -189,7 +190,7 @@ namespace basis {
   class TwoBodySubspaceJJJPN
     : public BaseSubspace<TwoBodySubspaceJJJPNLabels,TwoBodyStateJJJPNLabels>
     {
-    
+
       public:
 
       // constructor
@@ -223,7 +224,7 @@ namespace basis {
 
       // truncation
       WeightMax weight_max_;
-      
+
       // direct access to orbital subspaces
       const OrbitalSubspacePN* orbital_subspace1_ptr_;
       const OrbitalSubspacePN* orbital_subspace2_ptr_;
@@ -234,7 +235,7 @@ namespace basis {
   class TwoBodyStateJJJPN
     : public BaseState<TwoBodySubspaceJJJPN>
   {
-    
+
     public:
 
     // pass-through constructors
@@ -272,7 +273,7 @@ namespace basis {
   class TwoBodySpaceJJJPN
     : public BaseSpace<TwoBodySubspaceJJJPN>
   {
-    
+
     public:
 
     // constructor

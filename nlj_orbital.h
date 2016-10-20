@@ -1,5 +1,6 @@
+/// @file
 /****************************************************************
-  @file nlj_orbital.h
+  nlj_orbital.h
 
   Defines general single-particle orbital sets.
 
