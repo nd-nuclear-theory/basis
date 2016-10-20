@@ -501,6 +501,8 @@ namespace basis {
    * species.
    *
    * @param[in] orbital_species species type for subspace
+   * @param[in] l orbital angular momentum quantum number
+   * @param[in] j total angular momentum quantum number
    * @param[in] Nmax number of oscillator quanta
    */
   OrbitalSubspaceLJPN::OrbitalSubspaceLJPN(OrbitalSpeciesPN orbital_species,
