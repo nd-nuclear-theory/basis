@@ -1,3 +1,4 @@
+/// @file
 /****************************************************************
   lsjt_operator.h
 
@@ -15,7 +16,7 @@
   recoupling, etc.) are deferred to the dedicated Moshinsky code.
 
   Language: C++11
-                                 
+
   Mark A. Caprio
   University of Notre Dame
 
@@ -42,7 +43,7 @@
   7/20/16 (mac): Add ReadRelativeOperatorLSJT.
   7/22/16 (mac): Revise syntax for CanonicalizeIndicesLSJT.
   7/25/16 (mac): Add WriteRelativeOperatorLSJT.
-  8/16/16 (mac): Add WriteRelativeCMOperatorComponentLSJT and 
+  8/16/16 (mac): Add WriteRelativeCMOperatorComponentLSJT and
     corresponding gather function.
 
 ****************************************************************/
@@ -83,22 +84,22 @@ namespace basis {
   //     J0 g0 T0_min T0_max symmetry_phase_mode # operator tensor properties
   //     Nmax Jmax                               # relative basis truncation
   //
-  //   The header may start with one or more contiguous comment lines, 
+  //   The header may start with one or more contiguous comment lines,
   //   which are designated by a hash character in the first column.
-  //  
+  //
   //   Then, the header contains the following fields:
   //
   //     version : file format version (=1)
   //     J0 (int) : angular momentum of operator
   //     g0 (int) : parity grade of operator [P0=(-)^g0] (g0=0,1)
-  //     T0_min T0_max (int) : range of operator isospin components (a two-body operator  
-  //       may in general have components T0=0,1,2 from the coupling of four isospin-1/2 
+  //     T0_min T0_max (int) : range of operator isospin components (a two-body operator
+  //       may in general have components T0=0,1,2 from the coupling of four isospin-1/2
   //       fermionic operators)
   //     symmetry_phase_mode (int) : RESERVED to describe how to obtain phase for lower triangle
   //       (see "Conjugation symmetry" below) (=0)
   //     Nmax (int) : oscillator truncation of relative space (Nmax>=0)
   //     Jmax (int) : additional relative angular momentum truncation of relative space
-  //       (Jmax<=Nmax+1); Jmax=Nmax+1 includes the full relative space at the given 
+  //       (Jmax<=Nmax+1); Jmax=Nmax+1 includes the full relative space at the given
   //       oscillator truncation, but operators may often be truncated at lower partial
   //       waves
   //
@@ -238,7 +239,7 @@ namespace basis {
   // component_sectors[T0] and component_matrices[T0]) consistent.
   // Any unused isospin components will just be default initialized
   // and can be ignored.
-  // 
+  //
   // A function which works with this operator *might* also need
   // access to the full space definition (e.g., RelativeCMSSpaceLSJTN)
   // to look up subspaces directly by their labels, etc., if the
@@ -354,7 +355,7 @@ namespace basis {
   //
   // Arguments:
   //   parameters (Parameters) : includes tensorial properties of operator
-  //      choice of operator to use 
+  //      choice of operator to use
   //   relative_space (..., output) : target space, based on parameters in file
   //   operator_labels (basis::OperatorLabelsJT, output) : operator labels, from file
   //   relative_component_sectors (..., output) : target sectors
@@ -373,7 +374,7 @@ namespace basis {
   //
   // Arguments:
   //   parameters (Parameters) : includes tensorial properties of operator
-  //      choice of operator to use 
+  //      choice of operator to use
   //   relative_space (...) : target space
   //   operator_labels (basis::OperatorLabelsJT) : operator labels
   //   relative_component_sectors (..., output) : source sectors
@@ -381,7 +382,7 @@ namespace basis {
   //   verbose (bool) : whether or not to include diagnostic output
 
   ////////////////////////////////////////////////////////////////
-  // clearing operator data 
+  // clearing operator data
   ////////////////////////////////////////////////////////////////
 
   template <typename tJTSectors>
@@ -399,7 +400,7 @@ namespace basis {
         }
     }
 
-      
+
   ////////////////////////////////////////////////////////////////
   // operator matrix element canonicalizaton
   ////////////////////////////////////////////////////////////////
@@ -420,12 +421,12 @@ namespace basis {
     // operator.h), for use with RelativeLSJT operators.
     //
     // Template parameters:
-    //   tLSJTSpace : type for the LSJT space from which the subspaces are 
+    //   tLSJTSpace : type for the LSJT space from which the subspaces are
     //     drawn (subspaces must provide the T(), J(), and other needed
     //      accessor)
     //
     // Arguments:
-    //    relative_space (basis::RelativeSpaceLSJT) : space, for retrieving 
+    //    relative_space (basis::RelativeSpaceLSJT) : space, for retrieving
     //      subspace quantum numbers to calculate canonicalization factor
     //    bra_subspace_index, ket_subspace_index (int, input/output) :
     //      sector bra and ket subspace indices, possibly to be swapped
@@ -462,7 +463,7 @@ namespace basis {
           (symmetry_phase_mode==basis::SymmetryPhaseMode::kHermitian)
           && (J0==0) && (g0==0)
         );
-    
+
       // case: Hamiltonian-like operator
       //
       // Recall symmetry relation:
@@ -470,7 +471,7 @@ namespace basis {
       //     <a,J,T,g || A_{T0} || a',J,T',g>
       //       = (-)^(T'-T)*Hat(T')/Hat(T)
       //         * <a',J,T',g || A_{T0} || a,J,T,g>
-    
+
       canonicalization_factor = 1.;
       if (swapped_subspaces)
         {
@@ -505,12 +506,12 @@ namespace basis {
   // operator.h), for use with RelativeLSJT operators.
   //
   // Template parameters:
-  //   tLSJTSpace : type for the LSJT space from which the subspaces are 
+  //   tLSJTSpace : type for the LSJT space from which the subspaces are
   //     drawn (subspaces must provide the T(), J(), and other needed
   //      accessor)
   //
   // Arguments:
-  //   relative_space (basis::RelativeSpaceLSJT) : space, for retrieving 
+  //   relative_space (basis::RelativeSpaceLSJT) : space, for retrieving
   //     subspace quantum numbers to calculate canonicalization factor
   //    J0, T0, g0 (int) : operator tensorial properties
   //    symmetry_phase_mode (basis::SymmetryPhaseMode) : operator
@@ -520,7 +521,7 @@ namespace basis {
   //   bra_state_index, ket_state_index (int) :
   //     naive bra and ket state indices, possibly to be swapped if sector
   //     is diagonal sector
-  // 
+  //
   // Returns:
   //   (std::tuple<int,int,int,int,double>) : canonicalized indices and swap
   //      flag as:
@@ -563,7 +564,7 @@ namespace basis {
         (symmetry_phase_mode==basis::SymmetryPhaseMode::kHermitian)
         && (J0==0) && (g0==0)
       );
-    
+
     // case: Hamiltonian-like operator
     //
     // Recall symmetry relation:
@@ -571,7 +572,7 @@ namespace basis {
     //     <a,J,T,g || A_{T0} || a',J,T',g>
     //       = (-)^(T'-T)*Hat(T')/Hat(T)
     //         * <a',J,T',g || A_{T0} || a,J,T,g>
-    
+
     double canonicalization_factor = 1.;
     if (swapped_subspaces)
       {
@@ -770,7 +771,7 @@ namespace basis {
   //   T0 (int) : isospin for this isospin component
   //   sectors (basis::TwoBodySectorsLSJT) : sectors defining operator
   //   matrices (basis::MatrixVector) : matrices defining operator
-  //   conversion (basis::NormalizationConversion) : specifies any 
+  //   conversion (basis::NormalizationConversion) : specifies any
   //     conversion between AS and NAS for output
 
 

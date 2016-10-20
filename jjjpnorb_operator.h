@@ -1,3 +1,4 @@
+/// @file
 /****************************************************************
   jjjpnorb_operator.h
 
@@ -6,7 +7,7 @@
   orbital sets.
 
   Language: C++11
-                                 
+
   Mark A. Caprio
   University of Notre Dame
 
@@ -72,7 +73,7 @@ namespace basis {
   //   os (std::ostream) : text-mode output stream
   //   sector (basis::TwoBodySectorsJJJPN) : sectors defining operator
   //   matrices (basis::MatrixVector) : matrices defining operator
-  //   conversion (basis::NormalizationConversion) : specifies any 
+  //   conversion (basis::NormalizationConversion) : specifies any
   //     conversion between AS and NAS for output
   //   indexing_base (int) : use 0-based or 1-based indexing
 

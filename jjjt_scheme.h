@@ -1,3 +1,4 @@
+/// @file
 /****************************************************************
   jjjt_scheme.h
 
@@ -17,7 +18,7 @@
   of indexing scheme.
 
   Language: C++11
-                                 
+
   Mark A. Caprio
   University of Notre Dame
 
@@ -55,7 +56,7 @@ namespace basis {
   // two-body states in jjJT scheme
   ////////////////////////////////////////////////////////////////
 
-  ////////////////////////////////////////////////////////////////  
+  ////////////////////////////////////////////////////////////////
   //
   // Labeling
   //
@@ -88,9 +89,9 @@ namespace basis {
   //    -- increasing g (g=0,1)
   // subject to:
   //    -- [implicit constraint J=Nmax+1 is excluded for T=1,
-  //       but this is simply enforced by pruning to subspaces of 
+  //       but this is simply enforced by pruning to subspaces of
   //       nonzero dimension]
-  // 
+  //
   // Subspaces are pruned to those of nonzero dimension.
   //
   // Note that ordering of subspaces is lexicographic by (J,T,g).
@@ -112,18 +113,18 @@ namespace basis {
   //   -- antisymmetry constraint J+T~1 if (N1,j1)==(N2,j2)
   //
   // This basis is for *identical* particle states:
-  //   -- The labels are subject to the antisymmetry constraint 
+  //   -- The labels are subject to the antisymmetry constraint
   //      (J+T~1) if the orbitals are identical.
-  //   -- A canonical (lexicographic) ordering constraint is applied to the 
+  //   -- A canonical (lexicographic) ordering constraint is applied to the
   //      single-particle quantum numbers.  That is, when
   //      enumerating the basis, the states
-  //    
+  //
   //        |((N1,j1),(N2,j2))...>  and  |((N2,j2),(N1,j1))...>
   //
   //      would be redundant, and only the first (for (N1,j1)<=(N2,j2)) is
   //      retained.
   //
-  ////////////////////////////////////////////////////////////////  
+  ////////////////////////////////////////////////////////////////
 
   // labels
 
@@ -135,7 +136,7 @@ namespace basis {
   class TwoBodySubspaceJJJT
     : public BaseSubspace<TwoBodySubspaceJJJTLabels,TwoBodyStateJJJTLabels>
     {
-    
+
       public:
 
       // constructor
@@ -178,7 +179,7 @@ namespace basis {
   class TwoBodyStateJJJT
     : public BaseState<TwoBodySubspaceJJJT>
   {
-    
+
     public:
 
     // pass-through constructors
@@ -224,7 +225,7 @@ namespace basis {
   class TwoBodySpaceJJJT
     : public BaseSpace<TwoBodySubspaceJJJT>
   {
-    
+
     public:
 
     // constructor
@@ -234,7 +235,7 @@ namespace basis {
     // purposes by STL container classes (e.g., std::vector::resize)
 
     TwoBodySpaceJJJT(basis::Rank truncation_rank, int truncation_cutoff);
-    // Enumerate subspaces. 
+    // Enumerate subspaces.
 
     // accessors
     int N1max() const {return N1max_;}
@@ -259,7 +260,7 @@ namespace basis {
     public:
 
     // constructor
-    
+
     TwoBodySectorsJJJT() {};
     // default constructor -- provided since required for certain
     // purposes by STL container classes (e.g., std::vector::resize)
@@ -279,7 +280,7 @@ namespace basis {
   // two-body states in jjJT scheme -- subspaced by N
   ////////////////////////////////////////////////////////////////
 
-  ////////////////////////////////////////////////////////////////  
+  ////////////////////////////////////////////////////////////////
   //
   // Labeling
   //
@@ -313,10 +314,10 @@ namespace basis {
   //    -- increasing N (N=0,1,...,Nmax)  (MODIFICATION for subspacing by N)
   // subject to:
   //    -- [implicit constraint J=Nmax+1 is excluded for T=1,
-  //       but this is simply enforced by pruning to subspaces of 
+  //       but this is simply enforced by pruning to subspaces of
   //       nonzero dimension]
   //    -- parity constraint N~g  (MODIFICATION for subspacing by N)
-  // 
+  //
   // Subspaces are pruned to those of nonzero dimension.
   //
   // Note that ordering of subspaces is lexicographic by (J,T,g,N).  (MODIFICATION for subspacing by N)
@@ -338,18 +339,18 @@ namespace basis {
   //   -- antisymmetry constraint J+T~1 if (N1,j1)==(N2,j2)
   //
   // This basis is for *identical* particle states:
-  //   -- The labels are subject to the antisymmetry constraint 
+  //   -- The labels are subject to the antisymmetry constraint
   //      (J+T~1) if the orbitals are identical.
-  //   -- A canonical (lexicographic) ordering constraint is applied to the 
+  //   -- A canonical (lexicographic) ordering constraint is applied to the
   //      single-particle quantum numbers.  That is, when
   //      enumerating the basis, the states
-  //    
+  //
   //        |((N1,j1),(N2,j2))...>  and  |((N2,j2),(N1,j1))...>
   //
   //      would be redundant, and only the first (for (N1,j1)<=(N2,j2)) is
   //      retained.
   //
-  ////////////////////////////////////////////////////////////////  
+  ////////////////////////////////////////////////////////////////
 
   // Modification for subspacing by N is by lexical replacement JJJT
   // -> JJJTN plus specific mods as flagged by MODIFICATION comments
@@ -366,7 +367,7 @@ namespace basis {
   class TwoBodySubspaceJJJTN
     : public BaseSubspace<TwoBodySubspaceJJJTNLabels,TwoBodyStateJJJTNLabels>
     {
-    
+
       public:
 
       // constructor
@@ -411,7 +412,7 @@ namespace basis {
   class TwoBodyStateJJJTN
     : public BaseState<TwoBodySubspaceJJJTN>
   {
-    
+
     public:
 
     // pass-through constructors
@@ -457,7 +458,7 @@ namespace basis {
   class TwoBodySpaceJJJTN
     : public BaseSpace<TwoBodySubspaceJJJTN>
   {
-    
+
     public:
 
     // constructor

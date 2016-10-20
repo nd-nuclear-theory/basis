@@ -8,3 +8,7 @@
 
 # all executables on Cygwin
 *.exe
+
+# Doxygen-generated docs
+doc/html/
+doc/latex/

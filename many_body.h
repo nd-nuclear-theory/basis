@@ -1,10 +1,11 @@
+/// @file
 /****************************************************************
   many_body.h
 
   Provides convenience definitions for many-body indexing schemes.
 
   Language: C++11
-                                 
+
   Mark A. Caprio
   University of Notre Dame
 
@@ -45,7 +46,7 @@ namespace basis {
   //
   // Returns:
   //   (std::tuple<int,int>) : one-body and two-body cutoffs (N1max,N2max)
-  
+
 
   ////////////////////////////////////////////////////////////////
   // many-body normalization conversion flag

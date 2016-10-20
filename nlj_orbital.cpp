@@ -23,6 +23,12 @@ namespace basis {
   // single-particle definition file parsing
   ////////////////////////////////////////////////////////////////
 
+  /**
+   * Read orbital definitions from a stream.
+   *
+   * @param[in] is input stream containing MFDn-formatted orbital definitions
+   * @return list of flattened orbital parameters
+   */
   std::vector<OrbitalPNInfo> ParseOrbitalPNStream(std::istream& is, bool standalone)
   {
 
@@ -95,6 +101,12 @@ namespace basis {
     return states;
   }
 
+  /**
+   * Output orbital info as a string suitable for MFDn version 15.
+   *
+   * @param[in] orbitals list of flattened orbital parameters
+   * @return output stream containing MFDn-formatted orbital definitions
+   */
   std::string OrbitalDefinitionStr(const std::vector<OrbitalPNInfo>& orbitals, bool standalone)
   {
 
@@ -160,12 +172,20 @@ namespace basis {
   // single-particle orbitals
   ////////////////////////////////////////////////////////////////
 
+  /**
+   * Construct an Nmax-truncated single-particle subspace with a particular
+   * species.
+   *
+   * @param[in] orbital_species species type for subspace
+   * @param[in] Nmax number of oscillator quanta
+   */
   OrbitalSubspacePN::OrbitalSubspacePN(OrbitalSpeciesPN orbital_species, int Nmax)
   {
 
     // set values
     labels_ = SubspaceLabelsType(orbital_species);
     weight_max_ = double(Nmax);
+    is_oscillator_like_ = true;
     Nmax_ = Nmax;
 
     // iterate over total oscillator quanta
@@ -185,12 +205,21 @@ namespace basis {
         }
   }
 
+  /**
+   * Construct a subspace with a particular species from a list of orbitals.
+   *
+   * @param[in] orbital_species species type for subspace
+   * @param[in] states vector of orbitals
+   */
   OrbitalSubspacePN::OrbitalSubspacePN(OrbitalSpeciesPN orbital_species,
                                        const std::vector<OrbitalPNInfo>& states)
   {
+
+    // set values
     labels_ = SubspaceLabelsType(orbital_species);
     weight_max_ = 0.0;
-    Nmax_ = -1; // TODO call IsOscillatorLike_()
+
+    // iterate over all states, picking out those which belong to this subspace
     for (const OrbitalPNInfo& state : states) {
       if (state.orbital_species == orbital_species) {
         PushStateLabels(StateLabelsType(state.n,state.l,state.j));
@@ -198,8 +227,51 @@ namespace basis {
         weight_max_ = std::max(weight_max_,state.weight);
       }
     }
+
+    // check if oscillator-like and set Nmax
+    if (IsOscillatorLike_()) {
+      is_oscillator_like_ = true;
+      Nmax_ = int(weight_max_);
+    } else {
+      is_oscillator_like_ = false;
+      Nmax_ = -1;
+    }
+
   }
 
+  /**
+   * Do a deep comparison to oscillator-truncated basis.
+   * @return true if truncation is like Nmax-truncated oscillator
+   */
+  bool OrbitalSubspacePN::IsOscillatorLike_() const
+  {
+    // oscillators have states
+    if (size()==0)
+      return false;
+
+    // maximum weight should be an integer
+    int Nmax = int(weight_max());
+    if (Nmax != weight_max())
+      return false;
+
+    // only positive Nmax is allowed
+    if (Nmax < 0)
+      return false;
+
+    // compare to equivalent Nmax-truncated subspace
+    OrbitalSubspacePN reference_subspace(orbital_species(),Nmax);
+    if (reference_subspace.OrbitalInfo() != OrbitalInfo())
+      return false;
+
+    // if it looks like an oscillator, swims like an oscillator, and quacks
+    // like an oscillator, it's probably like an oscillator
+    return true;
+  }
+
+  /**
+   * Generate a string representation of the subspace labels.
+   * @return subspace labels as a string
+   */
   std::string OrbitalSubspacePN::LabelStr() const
   {
     std::ostringstream os;
@@ -213,6 +285,10 @@ namespace basis {
     return os.str();
   }
 
+  /**
+   * Generate a string representation, useful for debugging.
+   * @return debug string
+   */
   std::string OrbitalSubspacePN::DebugStr() const
   {
 
@@ -220,18 +296,22 @@ namespace basis {
 
     const int width = 3;
 
+    os << "oscillator-like: "
+       << (is_oscillator_like() ? "yes" : "no")
+       << std::endl;
+
     for (int state_index=0; state_index<size(); ++state_index)
       {
         OrbitalStatePN state(*this,state_index);
 
         os
-	  << " " << "index"
-	  << " " << std::setw(width) << state_index
-	  << " " << "nlj"
-	  << " " << std::setw(width) << state.n()
-	  << " " << std::setw(width) << state.l()
-	  << " " << std::setw(width+2) << state.j().Str()
-	  << " " << "weight"
+          << " " << "index"
+          << " " << std::setw(width) << state_index
+          << " " << "nlj"
+          << " " << std::setw(width) << state.n()
+          << " " << std::setw(width) << state.l()
+          << " " << std::setw(width+2) << state.j().Str()
+          << " " << "weight"
           << " " << state.weight()
           << std::endl;
       }
@@ -240,6 +320,11 @@ namespace basis {
 
   }
 
+  /**
+   * Flatten subspace into a vector of OrbitalPNInfo objects.
+   *
+   * @return vector representation of subspace
+   */
   std::vector<OrbitalPNInfo> OrbitalSubspacePN::OrbitalInfo() const
   {
     std::vector<OrbitalPNInfo> orbitals;
@@ -254,6 +339,11 @@ namespace basis {
 
   }
 
+  /**
+   * Flatten state into an OrbitalPNInfo object.
+   *
+   * @return OrbitalPNInfo representation of state
+   */
   OrbitalPNInfo OrbitalStatePN::OrbitalInfo() const
   {
     OrbitalPNInfo orbital;
@@ -267,11 +357,17 @@ namespace basis {
     return orbital;
   }
 
+  /**
+   * Construct an Nmax-truncated single-particle space with species subspaces.
+   *
+   * @param[in] Nmax number of oscillator quanta
+   */
   OrbitalSpacePN::OrbitalSpacePN(int Nmax)
   {
 
     // save truncation
     weight_max_ = double(Nmax);
+    is_oscillator_like_ = true;
     Nmax_ = Nmax;
 
     // iterate over species
@@ -282,10 +378,14 @@ namespace basis {
       }
   }
 
+  /**
+   * Construct a space with species subspaces from a list of orbitals.
+   *
+   * @param[in] states vector of orbitals
+   */
   OrbitalSpacePN::OrbitalSpacePN(const std::vector<OrbitalPNInfo>& states)
   {
     weight_max_ = 0.0;
-    Nmax_ = -1; // TODO call IsOscillatorLike_()
     // collect orbital_species subspace labels sorted in canonical order
     std::set<OrbitalSubspacePNLabels> subspace_labels_set;
     for (int state_index=0; state_index<states.size(); ++state_index)
@@ -305,36 +405,54 @@ namespace basis {
         weight_max_ = std::max(weight_max_,subspace.weight_max());
       }
 
+    // check if oscillator-like and set Nmax
+    if (IsOscillatorLike_()) {
+      is_oscillator_like_ = true;
+      Nmax_ = int(weight_max_);
+    } else {
+      is_oscillator_like_ = false;
+      Nmax_ = -1;
+    }
+
   }
 
-  bool OrbitalSpacePN::IsOscillatorLike()
+  /**
+   * Check if space is truncated like an Nmax oscillator truncation.
+   *
+   * @return true if all subspaces are Nmax truncated with the same Nmax.
+   */
+  bool OrbitalSpacePN::IsOscillatorLike_() const
   {
 
-    bool is_oscillator_like = true;
-
-    // first check if subspaces are populated, else weight_max is nonsense
-    is_oscillator_like &= ((GetSubspace(0).size()!=0)&&(GetSubspace(1).size()!=0));
-    if (!is_oscillator_like)
+    // first check that the space contains subspaces
+    if (size() < 1)
       return false;
+
+    // check if subspaces are individually Nmax truncated
+    for (int subspace_index=0; subspace_index<size(); ++subspace_index)
+      {
+        const SubspaceType& subspace = GetSubspace(subspace_index);
+        if (!subspace.is_oscillator_like())
+          return false;
+      }
 
     // see if can extract viable Nmax
-    is_oscillator_like &= ((GetSubspace(0).size()!=0)&&(GetSubspace(1).size()!=0));
-    double weight_max_p = GetSubspace(0).weight_max();
-    double weight_max_n = GetSubspace(1).weight_max();
-    int Nmax = int(weight_max_p);
-    is_oscillator_like &= (Nmax == weight_max_p); // check integer weight
-    is_oscillator_like &= (Nmax >=0 ); // check positive weight
-    is_oscillator_like &= (weight_max_p == weight_max_n); // check proton and neutron consistent
-    if (!is_oscillator_like)
-      return false;
-
-    // TODO check all orbital labels and weights against Nmax-constructed space
+    int Nmax = GetSubspace(0).Nmax();
+    for (int subspace_index=1; subspace_index<size(); ++subspace_index)
+      {
+        const SubspaceType& subspace = GetSubspace(subspace_index);
+        if (subspace.Nmax() != Nmax)
+          return false;
+      }
 
     // orbitals are oscillator like!
-    Nmax_ = Nmax;
     return true;
   }
 
+  /**
+   * Generate a string representation, useful for debugging.
+   * @return debug string
+   */
   std::string OrbitalSpacePN::DebugStr() const
   {
 
@@ -342,24 +460,31 @@ namespace basis {
 
     const int width = 3;
 
+    os << "oscillator-like: " << (is_oscillator_like() ? "yes" : "no") << std::endl;
+
     for (int subspace_index=0; subspace_index<size(); ++subspace_index)
       {
-	const SubspaceType& subspace = GetSubspace(subspace_index);
+        const SubspaceType& subspace = GetSubspace(subspace_index);
 
-	os
-	  << " " << "index"
-	  << " " << std::setw(width) << subspace_index
-	  << " " << "species"
-	  << " " << std::setw(width) << int(subspace.orbital_species())
-	  << " " << "dim"
-	  << " " << std::setw(width) << subspace.size()
-	  << " " << std::endl;
+        os
+          << " " << "index"
+          << " " << std::setw(width) << subspace_index
+          << " " << "species"
+          << " " << std::setw(width) << int(subspace.orbital_species())
+          << " " << "dim"
+          << " " << std::setw(width) << subspace.size()
+          << " " << std::endl;
       }
 
     return os.str();
 
   }
 
+  /**
+   * Flatten space into a vector of OrbitalPNInfo objects.
+   *
+   * @return vector representation of space
+   */
   std::vector<OrbitalPNInfo> OrbitalSpacePN::OrbitalInfo() const
   {
     std::vector<OrbitalPNInfo> orbitals;
@@ -387,6 +512,15 @@ namespace basis {
   // single-particle orbitals - lj subspaces
   ////////////////////////////////////////////////////////////////
 
+  /**
+   * Construct an Nmax-truncated single-particle subspace with a particular
+   * species.
+   *
+   * @param[in] orbital_species species type for subspace
+   * @param[in] l orbital angular momentum quantum number
+   * @param[in] j total angular momentum quantum number
+   * @param[in] Nmax number of oscillator quanta
+   */
   OrbitalSubspaceLJPN::OrbitalSubspaceLJPN(OrbitalSpeciesPN orbital_species,
                                            int l, HalfInt j, int Nmax) {
     // set values
@@ -404,6 +538,15 @@ namespace basis {
     }
   }
 
+  /**
+   * Construct a subspace with a particular l, j, and species from a list
+   * of orbitals.
+   *
+   * @param[in] orbital_species species type for subspace
+   * @param[in] l orbital angular momentum quantum number
+   * @param[in] j total angular momentum quantum number
+   * @param[in] states vector of orbitals
+   */
   OrbitalSubspaceLJPN::OrbitalSubspaceLJPN(OrbitalSpeciesPN orbital_species,
                                            int l, HalfInt j,
                                            const std::vector<OrbitalPNInfo>& states) {
@@ -421,6 +564,10 @@ namespace basis {
   }
 
 
+  /**
+   * Generate a string representation of the subspace labels.
+   * @return subspace labels as a string
+   */
   std::string OrbitalSubspaceLJPN::LabelStr() const {
     std::ostringstream os;
 
@@ -435,6 +582,10 @@ namespace basis {
     return os.str();
   }
 
+  /**
+   * Generate a string representation, useful for debugging.
+   * @return debug string
+   */
   std::string OrbitalSubspaceLJPN::DebugStr() const {
     std::ostringstream os;
 
@@ -459,6 +610,11 @@ namespace basis {
 
   }
 
+  /**
+   * Flatten subspace into a vector of OrbitalPNInfo objects.
+   *
+   * @return vector representation of subspace
+   */
   std::vector<OrbitalPNInfo> OrbitalSubspaceLJPN::OrbitalInfo() const
   {
     std::vector<OrbitalPNInfo> orbitals;
@@ -473,6 +629,11 @@ namespace basis {
 
   }
 
+  /**
+   * Flatten state into an OrbitalPNInfo object.
+   *
+   * @return OrbitalPNInfo representation of state
+   */
   OrbitalPNInfo OrbitalStateLJPN::OrbitalInfo() const
   {
     OrbitalPNInfo orbital;
@@ -486,6 +647,12 @@ namespace basis {
     return orbital;
   }
 
+  /**
+   * Construct an Nmax-truncated single-particle space divided into LJPN
+   * subspaces.
+   *
+   * @param[in] Nmax number of oscillator quanta
+   */
   OrbitalSpaceLJPN::OrbitalSpaceLJPN(int Nmax) {
     // save truncation
     weight_max_ = double(Nmax);
@@ -504,10 +671,15 @@ namespace basis {
     }
   }
 
+  /**
+   * Construct a space with LJPN subspaces from a list of orbitals.
+   *
+   * @param[in] states vector of orbitals
+   */
   OrbitalSpaceLJPN::OrbitalSpaceLJPN(const std::vector<OrbitalPNInfo>& states)
   {
     weight_max_ = 0.0;
-    Nmax_ = -1; // TODO call IsOscillatorLike_()
+    Nmax_ = -1;
 
     // collect (l,j) subspace labels sorted in canonical order
     std::set<OrbitalSubspaceLJPNLabels> subspace_labels_set;
@@ -532,6 +704,10 @@ namespace basis {
 
   }
 
+  /**
+   * Generate a string representation, useful for debugging.
+   * @return debug string
+   */
   std::string OrbitalSpaceLJPN::DebugStr() const {
 
     std::ostringstream os;
@@ -555,6 +731,11 @@ namespace basis {
 
   }
 
+  /**
+   * Flatten space into a vector of OrbitalPNInfo objects.
+   *
+   * @return vector representation of space
+   */
   std::vector<OrbitalPNInfo> OrbitalSpaceLJPN::OrbitalInfo() const
   {
     std::vector<OrbitalPNInfo> orbitals;
@@ -577,6 +758,13 @@ namespace basis {
 
   }
 
+  /**
+   * Construct all sector pairs ("all-to-all" sector enumeration).
+   *
+   * Sectors are enumerated in lexicographical order by (bra)(ket).
+   * @param[in] space space containing states from which to construct pairs
+   * @param[in] sector_direction
+   */
   OrbitalSectorsLJPN::OrbitalSectorsLJPN(
       const OrbitalSpaceLJPN& space,
       basis::SectorDirection sector_direction)
@@ -598,6 +786,17 @@ namespace basis {
     }
   }
 
+  /**
+   * Construct sector pairs connected by an operator of given
+   * tensorial and parity character ("constrained" sector
+   * enumeration).
+   *
+   * @param[in] space space containing states from which to construct pairs
+   * @param[in] l0 orbital angular momentum constraint
+   * @param[in] j0 total angular momentum constraint
+   * @param[in] g0 parity constraint
+   * @param[in] sector_direction
+   */
   OrbitalSectorsLJPN::OrbitalSectorsLJPN(
       const OrbitalSpaceLJPN& space,
       int l0, int j0, int g0,
@@ -651,24 +850,6 @@ namespace basis {
     }
     return os.str();
   }
-
-  // std::string OrbitalSectorLJPN::DebugStr() const {
-  //   std::ostringstream os;
-  //
-  //   const int width = 3;
-  //
-  //   os << " bra " << std::setw(width) << bra_subspace_index() + 1
-  //        << " (" << bra_subspace().l()
-  //        << ", " << bra_subspace().j().Str()
-  //        << ", " << int(bra_subspace().orbital_species())+1 << ")"
-  //      << " ket " << std::setw(width) << ket_subspace_index() + 1
-  //        << " (" << ket_subspace().l()
-  //        << ", " << ket_subspace().j().Str()
-  //        << ", " << int(ket_subspace().orbital_species())+1 << ")"
-  //     << std::endl;
-  //
-  //   return os.str();
-  // }
 
   ////////////////////////////////////////////////////////////////
   ////////////////////////////////////////////////////////////////

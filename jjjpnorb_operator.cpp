@@ -1,6 +1,6 @@
 /****************************************************************
   jjjpnorb_operator.cpp
-                                 
+
   Mark A. Caprio
   University of Notre Dame
 
@@ -31,9 +31,9 @@ namespace basis {
       {
 
         // extract sector
-	const typename TwoBodySectorsJJJPN::SectorType& sector = sectors.GetSector(sector_index);
-	const typename TwoBodySectorsJJJPN::SubspaceType& bra_subspace = sector.bra_subspace();
-	const typename TwoBodySectorsJJJPN::SubspaceType& ket_subspace = sector.ket_subspace();
+        const typename TwoBodySectorsJJJPN::SectorType& sector = sectors.GetSector(sector_index);
+        const typename TwoBodySectorsJJJPN::SubspaceType& bra_subspace = sector.bra_subspace();
+        const typename TwoBodySectorsJJJPN::SubspaceType& ket_subspace = sector.ket_subspace();
 
         // verify that sector is canonical
         //
@@ -42,10 +42,10 @@ namespace basis {
         // sectors are stored.
         assert(sector.IsUpperTriangle());
 
-	// iterate over matrix elements
-	for (int bra_index=0; bra_index<bra_subspace.size(); ++bra_index)
-	  for (int ket_index=0; ket_index<ket_subspace.size(); ++ket_index)
-	    {
+        // iterate over matrix elements
+        for (int bra_index=0; bra_index<bra_subspace.size(); ++bra_index)
+          for (int ket_index=0; ket_index<ket_subspace.size(); ++ket_index)
+            {
 
               // diagonal sector: restrict to upper triangle
               if (sector.IsDiagonal())
@@ -53,8 +53,8 @@ namespace basis {
                   continue;
 
               // retrieve states
-	      const basis::TwoBodyStateJJJPN bra(bra_subspace,bra_index);
-	      const basis::TwoBodyStateJJJPN ket(ket_subspace,ket_index);
+              const basis::TwoBodyStateJJJPN bra(bra_subspace,bra_index);
+              const basis::TwoBodyStateJJJPN ket(ket_subspace,ket_index);
 
               // determine matrix element normalization factor
               double conversion_factor = 1.;
@@ -80,24 +80,24 @@ namespace basis {
               const int width = 3;
               const int precision = 8;
               os << std::setprecision(precision);
-	      os 
-		<< " " << std::setw(width) << bra.index1() + indexing_base
-		<< " " << std::setw(width) << bra.index2() + indexing_base
-		<< " " << std::setw(width) << bra.J() 
-		<< " " << std::setw(width) << bra.g()
-		<< " " << std::setw(width) << kTwoBodySpeciesPNCodeTz[int(bra.two_body_species())]
-		<< " " << "    "
-		<< " " << std::setw(width) << ket.index1() + indexing_base
-		<< " " << std::setw(width) << ket.index2() + indexing_base
-		<< " " << std::setw(width) << ket.J() 
-		<< " " << std::setw(width) << ket.g()
-		<< " " << std::setw(width) << kTwoBodySpeciesPNCodeTz[int(ket.two_body_species())]
-		<< " " << "    "
-		<< " " << std::showpoint << std::scientific << std::setw(width+precision+5)
+              os
+                << " " << std::setw(width) << bra.index1() + indexing_base
+                << " " << std::setw(width) << bra.index2() + indexing_base
+                << " " << std::setw(width) << bra.J()
+                << " " << std::setw(width) << bra.g()
+                << " " << std::setw(width) << kTwoBodySpeciesPNCodeTz[int(bra.two_body_species())]
+                << " " << "    "
+                << " " << std::setw(width) << ket.index1() + indexing_base
+                << " " << std::setw(width) << ket.index2() + indexing_base
+                << " " << std::setw(width) << ket.J()
+                << " " << std::setw(width) << ket.g()
+                << " " << std::setw(width) << kTwoBodySpeciesPNCodeTz[int(ket.two_body_species())]
+                << " " << "    "
+                << " " << std::showpoint << std::scientific << std::setw(width+precision+5)
                 << matrix_element
-		<< std::endl;
-	    
-	    }
+                << std::endl;
+
+            }
 
       }
   }

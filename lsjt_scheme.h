@@ -1,3 +1,4 @@
+/// @file
 /****************************************************************
   lsjt_scheme.h
 
@@ -17,7 +18,7 @@
   of indexing scheme.
 
   Language: C++11
-                                 
+
   Mark A. Caprio
   University of Notre Dame
 
@@ -38,7 +39,7 @@
   6/27/16 (mac):
     - Add Jr_max cutoff on construction of relative basis.
     - Change relative-c.m. scheme from spectator (Nc,lc) to active (Nc,lc).
-    - Add fixed-N subspaces in relative-c.m. basis for use with Moshinsky 
+    - Add fixed-N subspaces in relative-c.m. basis for use with Moshinsky
       transform block structure.
     - Expand basis indexing comments.
     - Implement canonical ordering constraint on sectors.
@@ -47,7 +48,7 @@
     - Rename labels on relative basis (e.g., J->Jr).
   6/30/16 (mac): Revert labels on relative basis (e.g., Jr->J).
   7/3/16 (mac): Add default constructors for RelativeLSJT basis.
-  7/4/16 (mac): Add fixed-N subspaces in two-body basis for use with 
+  7/4/16 (mac): Add fixed-N subspaces in two-body basis for use with
     Moshinsky transform block structure.
   7/8/16 (mac): Add default constructors for TwoBodyLSJT basis.
   7/9/16 (mac):
@@ -81,7 +82,7 @@ namespace basis {
   // relative states in LSJT scheme
   ////////////////////////////////////////////////////////////////
 
-  ////////////////////////////////////////////////////////////////  
+  ////////////////////////////////////////////////////////////////
   //
   // Labeling
   //
@@ -92,7 +93,7 @@ namespace basis {
   //   J (int): total angular momentum of *relative* motion (=Jr)
   //            (i.e., L coupled to S)
   //   T (int): isospin
-  //   g (int): grade (=0,1) for the parity P of *relative* 
+  //   g (int): grade (=0,1) for the parity P of *relative*
   //            motion (=gr)
   //
   // state labels within subspace: (N)
@@ -113,7 +114,7 @@ namespace basis {
   //   -- triangularity of (L,S,J)
   //   -- parity constraint L~g
   //   -- antisymmetry constraint L+S+T~1
-  // 
+  //
   // Subspaces are asserted to have nonzero dimension (as a sanity
   // check).
   //
@@ -135,7 +136,7 @@ namespace basis {
   // antisymmetry constraint is already applied at the level of
   // selecting the subspace labels L+S+T~1.
   //
-  ////////////////////////////////////////////////////////////////  
+  ////////////////////////////////////////////////////////////////
 
   // labels
 
@@ -147,7 +148,7 @@ namespace basis {
   class RelativeSubspaceLSJT
     : public BaseSubspace<RelativeSubspaceLSJTLabels,RelativeStateLSJTLabels>
     {
-    
+
       public:
 
       // constructor
@@ -160,7 +161,7 @@ namespace basis {
       // Set up indexing.
 
       // accessors
- 
+
       int L() const {return std::get<0>(labels_);}
       int S() const {return std::get<1>(labels_);}
       int J() const {return std::get<2>(labels_);}
@@ -189,7 +190,7 @@ namespace basis {
   class RelativeStateLSJT
     : public BaseState<RelativeSubspaceLSJT>
   {
-    
+
     public:
 
     // pass-through constructors
@@ -221,7 +222,7 @@ namespace basis {
   {
 
     public:
-    
+
     // constructor
 
     RelativeSpaceLSJT() {};
@@ -239,7 +240,7 @@ namespace basis {
     //
     // Arguments:
     //   Nmax (int) : relative oscillator truncation on included subspaces
-    //   Jmax (int) : relative angular momentum truncation on included 
+    //   Jmax (int) : relative angular momentum truncation on included
     //     subspaces (Jmax<=Nmax+1)
 
     // accessors
@@ -299,7 +300,7 @@ namespace basis {
   // relative-cm states in LSJT scheme
   ////////////////////////////////////////////////////////////////
 
-  ////////////////////////////////////////////////////////////////  
+  ////////////////////////////////////////////////////////////////
   //
   // Labeling
   //
@@ -330,7 +331,7 @@ namespace basis {
   //    -- increasing g (g=0,1)
   // subject to:
   //    -- triangularity of (L,S,J)
-  // 
+  //
   // Subspaces are pruned to those of nonzero dimension.
   //
   // Note that ordering of subspaces is lexicographic by (L,S,J,T,g).
@@ -348,13 +349,13 @@ namespace basis {
   // and subject to:
   //   -- triangularity constraint on (lr,lc,L)
   //   -- parity constraint N~g
-  //   -- antisymmetry constraint lr+S+T~1 (or, equivalentsly, 
+  //   -- antisymmetry constraint lr+S+T~1 (or, equivalentsly,
   //      Nr+S+T~1)
   //
   // This basis is for *identical* particle states, as enforced by the
   // antisymmetry constraint on Nr.
   //
-  ////////////////////////////////////////////////////////////////  
+  ////////////////////////////////////////////////////////////////
 
   // labels
 
@@ -362,11 +363,11 @@ namespace basis {
   typedef std::tuple<int,int,int,int> RelativeCMStateLSJTLabels;
 
   //subspace
-  
+
   class RelativeCMSubspaceLSJT
     : public BaseSubspace<RelativeCMSubspaceLSJTLabels,RelativeCMStateLSJTLabels>
     {
-    
+
       public:
 
       // constructor
@@ -407,7 +408,7 @@ namespace basis {
   class RelativeCMStateLSJT
     : public BaseState<RelativeCMSubspaceLSJT>
   {
-    
+
     public:
 
     // pass-through constructors
@@ -442,7 +443,7 @@ namespace basis {
   class RelativeCMSpaceLSJT
     : public BaseSpace<RelativeCMSubspaceLSJT>
   {
-    
+
     public:
 
     // constructor
@@ -496,7 +497,7 @@ namespace basis {
   // relative-cm states in LSJT scheme -- subspaced by N
   ////////////////////////////////////////////////////////////////
 
-  ////////////////////////////////////////////////////////////////  
+  ////////////////////////////////////////////////////////////////
   //
   // Labeling
   //
@@ -518,7 +519,7 @@ namespace basis {
   // subject to:
   //    -- triangularity of (L,S,J)
   //    -- parity constraint N~g  (MODIFICATION for subspacing by N)
-  // 
+  //
   // Subspaces are pruned to those of nonzero dimension.
   //
   // Note that ordering of subspaces is lexicographic by (L,S,J,T,g,N).  (MODIFICATION for subspacing by N)
@@ -536,13 +537,13 @@ namespace basis {
   // and subject to:
   //   -- triangularity constraint on (lr,lc,L)
   //   -- [parity constraint N~g]  (MODIFICATION for subspacing by N)
-  //   -- antisymmetry constraint lr+S+T~1 (or, equivalentsly, 
+  //   -- antisymmetry constraint lr+S+T~1 (or, equivalentsly,
   //      Nr+S+T~1)
   //
   // This basis is for *identical* particle states (see discussion
   // above for non-N version).
   //
-  ////////////////////////////////////////////////////////////////  
+  ////////////////////////////////////////////////////////////////
 
   // Modification for subspacing by N is by lexical replacement LSJT
   // -> LSJTN plus specific mods as flagged by MODIFICATION comments
@@ -554,11 +555,11 @@ namespace basis {
   typedef std::tuple<int,int,int,int> RelativeCMStateLSJTNLabels;
 
   //subspace
-  
+
   class RelativeCMSubspaceLSJTN
     : public BaseSubspace<RelativeCMSubspaceLSJTNLabels,RelativeCMStateLSJTNLabels>
     {
-    
+
       public:
 
       // constructor
@@ -601,7 +602,7 @@ namespace basis {
   class RelativeCMStateLSJTN
     : public BaseState<RelativeCMSubspaceLSJTN>
   {
-    
+
     public:
 
     // pass-through constructors
@@ -636,7 +637,7 @@ namespace basis {
   class RelativeCMSpaceLSJTN
     : public BaseSpace<RelativeCMSubspaceLSJTN>
   {
-    
+
     public:
 
     // constructor
@@ -690,8 +691,8 @@ namespace basis {
   ////////////////////////////////////////////////////////////////
   // two-body states in LSJT scheme
   ////////////////////////////////////////////////////////////////
-  
-  ////////////////////////////////////////////////////////////////  
+
+  ////////////////////////////////////////////////////////////////
   //
   // Labeling
   //
@@ -711,7 +712,7 @@ namespace basis {
   //    -- increasing g (g=0,1)
   // subject to:
   //    -- triangularity of (L,S,J)
-  // 
+  //
   // Subspaces are pruned to those of nonzero dimension.
   //
   // Note that ordering of subspaces is lexicographic by (L,S,J,g).
@@ -734,20 +735,20 @@ namespace basis {
   //
   //
   // This basis is for *identical* particle states:
-  //   -- The labels are subject to the antisymmetry constraint 
+  //   -- The labels are subject to the antisymmetry constraint
   //      (L+S+T~1) if the orbitals are identical.
-  //   -- A canonical (lexicographic) ordering constraint is applied to the 
+  //   -- A canonical (lexicographic) ordering constraint is applied to the
   //      single-particle quantum numbers.  That is, when
   //      enumerating the basis, the states
-  //    
+  //
   //        |((N1,l1),(N2,l2))...>  and  |((N2,l2),(N1,l1))...>
   //
   //      would be redundant, and only the first (for (N1,l1)<=(N2,l2)) is
   //      retained.
   //
-  // Comment: For some applications, it might be more convenient to 
+  // Comment: For some applications, it might be more convenient to
   // an overcomplete basis, in which the states
-  //    
+  //
   //   |(N1,l1)(N2,l2)...>  and  |(N2,l2)(N1,l1)...>
   //
   // are still counted separately in the basis.  That is, *no*
@@ -759,7 +760,7 @@ namespace basis {
   // "swapping" single particle states within the two-body state and
   // applying the relevant phase (~L+S+T+g+1).
   //
-  ////////////////////////////////////////////////////////////////  
+  ////////////////////////////////////////////////////////////////
 
   // labels
 
@@ -771,7 +772,7 @@ namespace basis {
   class TwoBodySubspaceLSJT
     : public BaseSubspace<TwoBodySubspaceLSJTLabels,TwoBodyStateLSJTLabels>
     {
-    
+
       public:
 
       // constructor
@@ -816,7 +817,7 @@ namespace basis {
   class TwoBodyStateLSJT
     : public BaseState<TwoBodySubspaceLSJT>
   {
-    
+
     public:
 
     // pass-through constructors
@@ -851,7 +852,7 @@ namespace basis {
   class TwoBodySpaceLSJT
     : public BaseSpace<TwoBodySubspaceLSJT>
   {
-    
+
     public:
 
     // constructor
@@ -904,8 +905,8 @@ namespace basis {
   ////////////////////////////////////////////////////////////////
   // two-body states in LSJT scheme -- subspaced by N
   ////////////////////////////////////////////////////////////////
-  
-  ////////////////////////////////////////////////////////////////  
+
+  ////////////////////////////////////////////////////////////////
   //
   // Labeling
   //
@@ -927,7 +928,7 @@ namespace basis {
   // subject to:
   //    -- triangularity of (L,S,J)
   //    -- parity constraint N~g  (MODIFICATION for subspacing by N)
-  // 
+  //
   // Subspaces are pruned to those of nonzero dimension.
   //
   // Note that ordering of subspaces is lexicographic by (L,S,J,T,g,N).  (MODIFICATION for subspacing by N)
@@ -952,7 +953,7 @@ namespace basis {
   // This basis is for *identical* particle states (see discussion
   // above for non-N version).
   //
-  ////////////////////////////////////////////////////////////////  
+  ////////////////////////////////////////////////////////////////
 
   // Modification for subspacing by N is by lexical replacement LSJT
   // -> LSJTN plus specific mods as flagged by MODIFICATION comments
@@ -969,7 +970,7 @@ namespace basis {
   class TwoBodySubspaceLSJTN
     : public BaseSubspace<TwoBodySubspaceLSJTNLabels,TwoBodyStateLSJTNLabels>
     {
-    
+
       public:
 
       // constructor
@@ -1016,7 +1017,7 @@ namespace basis {
   class TwoBodyStateLSJTN
     : public BaseState<TwoBodySubspaceLSJTN>
   {
-    
+
     public:
 
     // pass-through constructors
@@ -1051,7 +1052,7 @@ namespace basis {
   class TwoBodySpaceLSJTN
     : public BaseSpace<TwoBodySubspaceLSJTN>
   {
-    
+
     public:
 
     // constructor

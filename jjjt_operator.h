@@ -1,3 +1,4 @@
+/// @file
 /****************************************************************
   jjjt_operator.h
 
@@ -6,7 +7,7 @@
   transformation.
 
   Language: C++11
-                                 
+
   Mark A. Caprio
   University of Notre Dame
 
@@ -111,7 +112,7 @@ namespace basis {
   //   T0 (int) : isospin for this isospin component
   //   sector (basis::TwoBodySectorsJJJT) : sectors defining operator
   //   matrices (basis::MatrixVector) : matrices defining operator
-  //   conversion (basis::NormalizationConversion) : specifies any 
+  //   conversion (basis::NormalizationConversion) : specifies any
   //     conversion between AS and NAS for output
 
 

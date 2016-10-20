@@ -1,3 +1,4 @@
+/// @file
 /****************************************************************
   nlj_orbital.h
 
@@ -8,21 +9,27 @@
   Mark A. Caprio
   University of Notre Dame
 
-  7/7/16 (mac): Created (jjjpnorb_scheme), building on code from jjjt_scheme.
-  7/19/16 (mac):
+  + 7/7/16 (mac): Created (jjjpnorb_scheme), building on code from jjjt_scheme.
+  + 7/19/16 (mac):
    - Add default constructors.
    - Use enum Rank for truncation rank.
    - Add two-body species code definitions.
    - Add GetOrbital accessors.
-  7/22/16 (mac):
+  + 7/22/16 (mac):
    - Fix reference error in TwoBodySpaceJJJPN.
    - Add debugging strings.
-  9/28/16 (mac,pjf): Break out into nlj_orbital.
-  10/6/16 (pjf): Add LJPN classes
-  10/7/16 (pjf): Add LJPN sectors and general constructors
-  10/13/16 (mac): Add default constructors.
-  10/18/16 (pjf): Add PN general constructors and serializers (OrbitalInfo).
-  10/19/16 (mac):
+  + 9/28/16 (mac,pjf): Break out into nlj_orbital.
+  + 10/6/16 (pjf): Add LJPN classes
+  + 10/7/16 (pjf): Add LJPN sectors and general constructors
+  + 10/13/16 (mac): Add default constructors.
+  + 10/18/16 (pjf): Add PN general constructors and serializers (OrbitalInfo).
+  + 10/18/16 (pjf):
+   - Add general constructors and serializers for Orbital*PN (OrbitalPNInfo).
+   - Refactor OrbitalDefinitionStr out of spaces.
+   - Add oscillator-likeness tests to OrbitalSpacePN and OrbitalSubspacePN.
+   - Add == operator for OrbitalPNInfo.
+  + 10/19/16 (pjf): Update documentation to Doxygen format.
+  + 10/19/16 (mac):
     - Add default constructors yet again.
     - Make orbital I/O switchable between standalone and embedded modes.
 
@@ -46,15 +53,19 @@ namespace basis {
   // single-particle orbitals
   ////////////////////////////////////////////////////////////////
 
-  // enumerated type for orbital species
-  //
-  // Note: Follows same sequence as MFDn, but MFDn uses 1-based
-  // numbering.
-
+  /**
+   * Enumerated type for orbital species
+   *
+   * Note: Follows same sequence as MFDn, but MFDn uses 1-based
+   * numbering.
+   */
   enum class OrbitalSpeciesPN {kP=0,kN=1};
 
-  // flattened state container
-
+  /**
+   * A flattened orbital container.
+   *
+   * All quantum numbers used by MFDn are contained in this simple struct.
+   */
   struct OrbitalPNInfo
   {
     OrbitalSpeciesPN orbital_species;
@@ -68,6 +79,18 @@ namespace basis {
 
     OrbitalPNInfo(OrbitalSpeciesPN os, int n, int l, HalfInt j, double weight)
       : orbital_species(os), n(n), l(l), j(j), weight(weight) {};
+
+    static constexpr double kWeightTolerance = 1e-8;
+    inline bool operator==(const OrbitalPNInfo& rhs) const
+    {
+      bool equiv = true;
+      equiv &= (this->orbital_species==rhs.orbital_species);
+      equiv &= (this->n==rhs.n);
+      equiv &= (this->l==rhs.l);
+      equiv &= (this->j==rhs.j);
+      equiv &= (abs(this->weight-rhs.weight)<kWeightTolerance);
+      return equiv;
+    }
   };
 
   // orbital I/O
@@ -97,57 +120,57 @@ namespace basis {
   //   (std::string) output stream containing MFDn-formatted orbital definitions
 
   ////////////////////////////////////////////////////////////////
-  // PN subspacing
+  /// @defgroup pn-subspaces PN Subspaces
+  /// Single particle orbitals divided into subspaces with definite
+  /// orbital species.
+  ///
+  /// ## Labeling ##
+  ///
+  /// subspace labels: (species)
+  ///
+  ///  * species (enum): species (kP=0 for proton, kN=1 for neutron)
+  ///
+  /// state labels within subspace: (n,l,j)
+  ///
+  ///  * n (int): radial quantum number (0,1,...)
+  ///  * l (int): orbital angular momentum
+  ///  * j (HalfInt): total angular momentum
+  ///
+  /// The parity for each orbital is deduced from the l quantum number:
+  ///
+  ///  * g (int): grade (=0,1) for the parity P, given by g~l
+  ///
+  /// Each orbital (state) also has a floating point "weight"
+  /// associated with it:
+  ///
+  ///  * weight (double): orbital weight
+  ///
+  /// This quantity is not considered a "label", since it is not used
+  /// for lookup purposes.  In a traditional oscillator scheme, the
+  /// weight is set to the oscillator quantum number w -> N=2n+l.
+  ///
+  /// The hard-coded oscillator quantum number is also deduced from the
+  /// n and l quantum numbers, as an integer, to be used only when the
+  /// orbitals are known to be oscillator orbitals:
+  ///
+  ///  * N (int): oscillator quanta (N=2n+l)
+  ///
   ////////////////////////////////////////////////////////////////
-
+  ///
+  /// ## Subspaces ##
+  ///
+  /// Within the full space, subspaces are ordered by:
+  ///    * enumerated species
+  ///
   ////////////////////////////////////////////////////////////////
-  //
-  // Labeling
-  //
-  // subspace labels: (species)
-  //
-  //   species (enum): species (kP=0 for proton, kN=1 for neutron)
-  //
-  // state labels within subspace: (n,l,j)
-  //
-  //   n (int): radial quantum number (0,1,...)
-  //   l (int): orbital angular momentum
-  //   j (HalfInt): total angular momentum
-  //
-  // The parity for each orbital is deduced from the l quantum number:
-  //
-  //   g (int): grade (=0,1) for the parity P, given by g~l
-  //
-  // Each orbital (state) also has a floating point "weight"
-  // associated with it:
-  //
-  //   weight (double): orbital weight
-  //
-  // This quantity is not considered a "label", since it is not used
-  // for lookup purposes.  In a traditional oscillator scheme, the
-  // weight is set to the oscillator quantum number w -> N=2n+l.
-  //
-  // The hard-coded oscillator quantum number is also deduced from the
-  // n and l quantum numbers, as an integer, to be used only when the
-  // orbitals are known to be oscillator orbitals:
-  //
-  //   N (int): oscillator quanta (N=2n+l)
-  //
+  ///
+  /// ## States ##
+  ///
+  /// Within a subspace, the states are ordered by:
+  ///   * lexicographically increasing (n,l,j)
+  ///
   ////////////////////////////////////////////////////////////////
-  //
-  // Subspaces
-  //
-  // Within the full space, subspaces are ordered by:
-  //    -- enumerated species
-  //
-  ////////////////////////////////////////////////////////////////
-  //
-  // States
-  //
-  // Within a subspace, the states are ordered by:
-  //   -- lexicographically increasing (n,l,j)
-  //
-  ////////////////////////////////////////////////////////////////
+  /// @{
 
   // labels
 
@@ -184,7 +207,9 @@ namespace basis {
 
       OrbitalSpeciesPN orbital_species() const {return std::get<0>(labels_);}
       double weight_max() const {return weight_max_;}
-      int Nmax() const {return Nmax_;}  // only meaningful if oscillator scheme constructor used
+      bool is_oscillator_like() const {return is_oscillator_like_;}
+      int Nmax() const {assert(is_oscillator_like()); return Nmax_;}
+      // only meaningful if oscillator scheme constructor used
       const std::vector<double>& weights() const {return weights_;}
 
       // diagnostic strings
@@ -197,7 +222,12 @@ namespace basis {
 
       // truncation
       double weight_max_;
+      bool is_oscillator_like_;
       int Nmax_;  // only meaningful if oscillator scheme constructor used
+
+      // test for truncation scheme
+      bool IsOscillatorLike_() const;
+      // Test if labeling and weights match oscillator truncation.
 
       // weights
       std::vector<double> weights_;
@@ -267,14 +297,9 @@ namespace basis {
 
     // accessors
     double weight_max() const {return weight_max_;}
-    int Nmax() const {return Nmax_;}  // only meaningful if oscillator scheme constructor used
-
-    // test for truncation scheme
-    bool IsOscillatorLike();
-    // Test if labeling and weights match Nmax(=Nmax_p=Nmax_n)
-    // oscillator truncation.  If so, set Nmax accordingly.
-    //
-    // TODO finish implementation
+    bool is_oscillator_like() const {return is_oscillator_like_;}
+    int Nmax() const {assert(is_oscillator_like()); return Nmax_;}
+    // only meaningful if oscillator scheme constructor used
 
     // diagnostic string
     std::string DebugStr() const;
@@ -283,69 +308,76 @@ namespace basis {
 
     // truncation
     double weight_max_;
+    bool is_oscillator_like_;
     int Nmax_;  // only meaningful if oscillator scheme constructor used
+
+    // test for truncation scheme
+    bool IsOscillatorLike_() const;
+    // Test if labeling and weights match oscillator truncation for
+    // all subspaces.
 
   };
 
   // sectors -- not applicable
 
   ////////////////////////////////////////////////////////////////
+  /// @}
   ////////////////////////////////////////////////////////////////
 
 
 
   ////////////////////////////////////////////////////////////////
-  // LJPN subspacing
+  /// @defgroup ljpn-subspaces LJPN Subspaces
+  /// Single particle orbitals divided into subspaces with definite l, j and
+  /// orbital species.
+  ///
+  /// ## Labeling ##
+  ///
+  /// subspace labels: (species,l,j)
+  ///
+  ///  * species (enum): species (kP=0 for proton, kN=1 for neutron)
+  ///  * l (int): orbital angular momentum
+  ///  * j (HalfInt): total angular momentum
+  ///
+  /// state labels within subspace: (n,l,j)
+  ///
+  ///  * n (int): radial quantum number (0,1,...)
+  ///
+  /// The parity for each orbital is deduced from the l quantum number:
+  ///
+  ///  * g (int): grade (=0,1) for the parity P, given by g~l
+  ///
+  /// Each orbital (state) also has a floating point "weight"
+  /// associated with it:
+  ///
+  ///  * weight (double): orbital weight
+  ///
+  /// This quantity is not considered a "label", since it is not used
+  /// for lookup purposes.  In a traditional oscillator scheme, the
+  /// weight is set to the oscillator quantum number w -> N=2n+l.
+  ///
+  /// The hard-coded oscillator quantum number is also deduced from the
+  /// n and l quantum numbers, as an integer, to be used only when the
+  /// orbitals are known to be oscillator orbitals:
+  ///
+  ///   *N (int): oscillator quanta (N=2n+l)
+  ///
   ////////////////////////////////////////////////////////////////
-
+  ///
+  /// ## Subspaces ##
+  ///
+  /// Within the full space, subspaces are ordered by:
+  ///    * lexicographically increasing (species,l,j)
+  ///
   ////////////////////////////////////////////////////////////////
-  //
-  // Labeling
-  //
-  // subspace labels: (species,l,j)
-  //
-  //   species (enum): species (kP=0 for proton, kN=1 for neutron)
-  //   l (int): orbital angular momentum
-  //   j (HalfInt): total angular momentum
-  //
-  // state labels within subspace: (n,l,j)
-  //
-  //   n (int): radial quantum number (0,1,...)
-  //
-  // The parity for each orbital is deduced from the l quantum number:
-  //
-  //   g (int): grade (=0,1) for the parity P, given by g~l
-  //
-  // Each orbital (state) also has a floating point "weight"
-  // associated with it:
-  //
-  //   weight (double): orbital weight
-  //
-  // This quantity is not considered a "label", since it is not used
-  // for lookup purposes.  In a traditional oscillator scheme, the
-  // weight is set to the oscillator quantum number w -> N=2n+l.
-  //
-  // The hard-coded oscillator quantum number is also deduced from the
-  // n and l quantum numbers, as an integer, to be used only when the
-  // orbitals are known to be oscillator orbitals:
-  //
-  //   N (int): oscillator quanta (N=2n+l)
-  //
+  ///
+  /// ## States ##
+  ///
+  /// Within a subspace, the states are ordered by:
+  ///   * increasing n
+  ///
   ////////////////////////////////////////////////////////////////
-  //
-  // Subspaces
-  //
-  // Within the full space, subspaces are ordered by:
-  //    -- lexicographically increasing (species,l,j)
-  //
-  ////////////////////////////////////////////////////////////////
-  //
-  // States
-  //
-  // Within a subspace, the states are ordered by:
-  //   -- increasing n
-  //
-  ////////////////////////////////////////////////////////////////
+  /// @{
 
   // labels
 
@@ -482,15 +514,6 @@ namespace basis {
   };
 
   // sectors
-  // class OrbitalSectorLJPN
-  // : public BaseSector<OrbitalSubspaceLJPN>
-  // {
-  // public:
-  //
-  //   OrbitalSectorLJPN();
-  //
-  //   std::string DebugStr() const;
-  // };
 
   class OrbitalSectorsLJPN
     : public BaseSectors<OrbitalSpaceLJPN>
@@ -527,6 +550,7 @@ namespace basis {
   };
 
   ////////////////////////////////////////////////////////////////
+  /// @}
   ////////////////////////////////////////////////////////////////
 } // namespace
 
