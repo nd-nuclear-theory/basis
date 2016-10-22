@@ -32,6 +32,7 @@
   + 10/19/16 (mac):
     - Add default constructors yet again.
     - Make orbital I/O switchable between standalone and embedded modes.
+  + 10/22/16 (mac): Augment debug strings.
 
 ****************************************************************/
 
