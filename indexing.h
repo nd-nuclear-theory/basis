@@ -89,6 +89,7 @@
     state GetStateLabels().  Add subspace() accessor to state, deprecating
     Subspace().
   7/25/16 (mac): Add utility member function IsUpperTriangle.
+  10/22/16 (mac): Start implementing return of sentinel value for failed lookup.
 
 ****************************************************************/
 
@@ -108,6 +109,8 @@
 
 namespace basis {
 
+  static const int kNone = -1;
+  // Flag value for missing target in index lookups.
 
   ////////////////////////////////////////////////////////////////
   // generic subspace
@@ -154,8 +157,6 @@ namespace basis {
 
     const SubspaceLabelsType& labels() const
     // Return the labels of the subspace itself.
-    //
-    // DEPRECATED in favor of labels().
     {
       return labels_;
     }
@@ -164,6 +165,8 @@ namespace basis {
     // Return the labels of the subspace itself.
     //
     // DEPRECATED in favor of labels().
+    //
+    // To fix: grep GetSubspaceLabels -R --include="*.cpp"
     {
       return labels_;
     }
@@ -195,10 +198,17 @@ namespace basis {
     // subspace.
     //
     // If no such labels are found, an exception will result.
+    //
+    // TODO: replace "OrDie" behavior with return of sentinel value
+    // kNone; check how to do this in one step with appropriate map
+    // methods
     {
 
       // trap failed lookup with assert for easier debugging
-      assert(ContainsState(state_labels));
+      // assert(ContainsState(state_labels));
+
+      if (!ContainsState(state_labels))
+        return kNone;
 
       return lookup_.at(state_labels);
     };
@@ -453,22 +463,33 @@ namespace basis {
       // space.
       //
       // If no such labels are found, an exception will result.
+      //
+      // TODO: replace "OrDie" behavior with return of sentinel value
+      // kNone; check how to do this in one step with appropriate map
+      // methods
+
       {
 
         // trap failed lookup with assert for easier debugging
-        assert(ContainsSubspace(subspace_labels));
+        // assert(ContainsSubspace(subspace_labels));
+        
+        if (!ContainsSubspace(subspace_labels))
+          return kNone;
 
         return lookup_.at(subspace_labels);
       };
 
-      const SubspaceType& LookUpSubspace(const typename SubspaceType::SubspaceLabelsType& labels) const
+      const SubspaceType& LookUpSubspace(const typename SubspaceType::SubspaceLabelsType& subspace_labels) const
       // Given the labels for a subspace, retrieve a reference to the
       // subspace.
       //
       // If no such labels are found, an exception will result
       // (enforced by LookUpSubspaceIndex).
       {
-        return subspaces_[LookUpSubspaceIndex(labels)];
+
+        int subspace_index = LookUpSubspaceIndex(subspace_labels);
+        assert(subspace_index!=kNone);
+        return subspaces_[subspace_index];
       };
 
       const SubspaceType& GetSubspace(int i) const
@@ -507,7 +528,7 @@ namespace basis {
       // Create indexing information (in both directions, index <->
       // labels) for a subspace.
       {
-        lookup_[subspace.GetSubspaceLabels()] = subspaces_.size(); // index for lookup
+        lookup_[subspace.labels()] = subspaces_.size(); // index for lookup
         subspaces_.push_back(subspace);  // save space
       };
 
@@ -668,10 +689,17 @@ namespace basis {
       // sector set.
       //
       // If no such labels are found, an exception will result.
+      //
+      // TODO: replace "OrDie" behavior with return of sentinel value
+      // kNone; check how to do this in one step with appropriate map
+      // methods
       {
 
         // trap failed lookup with assert for easier debugging
-        assert(ContainsSector(bra_subspace_index,ket_subspace_index,multiplicity_index));
+        // assert(ContainsSector(bra_subspace_index,ket_subspace_index,multiplicity_index));
+
+        if (!ContainsSector(bra_subspace_index,ket_subspace_index,multiplicity_index))
+          return kNone;
 
         typename SectorType::KeyType key(bra_subspace_index,ket_subspace_index,multiplicity_index);
         return lookup_.at(key);
