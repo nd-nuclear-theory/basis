@@ -192,7 +192,7 @@ namespace basis {
       const OrbitalSpacePN& orbital_space,
       const WeightMax& weight_max
     )
-    : orbital_space_(orbital_space), weight_max_(weight_max)
+    : weight_max_(weight_max) // orbital_space_(orbital_space)
   {
 
     // find putative Jmax from maximal j among orbitals

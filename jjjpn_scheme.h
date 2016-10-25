@@ -33,7 +33,8 @@
   10/25/16 (mac):
     - Rename to jjjpn_scheme.
     - Add Tz0 argument to sectors constructor.
-    - Add reference to orbital_space from space.
+    - Add reference to orbital_space from space (currently disabled due to
+      initializer issues).
 
 ****************************************************************/
 
@@ -294,7 +295,7 @@ namespace basis {
     // Enumerate subspaces.
 
     // accessors
-    const OrbitalSpacePN& orbital_space() {return orbital_space_;}
+    // const OrbitalSpacePN& orbital_space() {return orbital_space_;}
     const WeightMax& weight_max() const {return weight_max_;}
 
     // diagnostic string
@@ -303,7 +304,11 @@ namespace basis {
     private:
     
     // convenience reference to underlying orbitals
-    const OrbitalSpacePN& orbital_space_;
+    //
+    // Caveat: Any reference member interferes with defining a default
+    // constructor, since references must be explicitly initialized.
+
+    // const OrbitalSpacePN& orbital_space_;
 
     // truncation
     WeightMax weight_max_;
