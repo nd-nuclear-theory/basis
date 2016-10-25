@@ -1,5 +1,5 @@
 /****************************************************************
-  jjjpnorb_operator_test.cpp
+  jjjpn_operator_test.cpp
 
   Mark A. Caprio
   University of Notre Dame
@@ -9,7 +9,7 @@
 #include <fstream>
 #include <iomanip>
 
-#include "jjjpnorb_operator.h"
+#include "jjjpn_operator.h"
 
 
 void WriteTest(const std::string& filename)
@@ -39,8 +39,9 @@ void WriteTest(const std::string& filename)
   // populate operator containers
   int J0 = 0;
   int g0 = 0;
+  int Tz0 = 0;
   // enumerate sectors
-  sectors = basis::TwoBodySectorsJJJPN(space,J0,g0);
+  sectors = basis::TwoBodySectorsJJJPN(space,J0,g0,Tz0);
   basis::SetOperatorToIdentity(sectors,matrices);
 
   ////////////////////////////////////////////////////////////////

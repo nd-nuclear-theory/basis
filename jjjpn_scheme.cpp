@@ -1,5 +1,5 @@
 /****************************************************************
-  jjjpn_scheme_general.cpp
+  jjjpn_scheme.cpp
 
   Mark A. Caprio
   University of Notre Dame
@@ -13,7 +13,7 @@
 
 #include "am/am.h"
 
-#include "jjjpnorb_scheme.h"
+#include "jjjpn_scheme.h"
 
 namespace basis {
 
@@ -192,10 +192,8 @@ namespace basis {
       const OrbitalSpacePN& orbital_space,
       const WeightMax& weight_max
     )
+    : orbital_space_(orbital_space), weight_max_(weight_max)
   {
-
-    // save truncation
-    weight_max_ = weight_max;
 
     // find putative Jmax from maximal j among orbitals
     HalfInt jmax=HalfInt(1,2);
@@ -263,11 +261,14 @@ namespace basis {
 
   TwoBodySectorsJJJPN::TwoBodySectorsJJJPN(
       const TwoBodySpaceJJJPN& space,
-      int J0, int g0,
+      int J0, int g0, int Tz0,
       basis::SectorDirection sector_direction
     )
-    : J0_(J0), g0_(g0), Tz0_(0)
+    : J0_(J0), g0_(g0), Tz0_(Tz0)
   {
+
+    assert(sector_direction == basis::SectorDirection::kCanonical);  // enforce canonical until sure we might want otherwise...
+
     for (int bra_subspace_index=0; bra_subspace_index<space.size(); ++bra_subspace_index)
       for (int ket_subspace_index=0; ket_subspace_index<space.size(); ++ket_subspace_index)
         {
@@ -285,7 +286,8 @@ namespace basis {
 
           // enforce particle conservation
           //
-          // FUTURE: to change to fixed delta Tz condition
+          // TODO: upgrade to fixed delta Tz condition
+          assert(Tz0_==0);
           if (!(bra_subspace.two_body_species()==ket_subspace.two_body_species()))
               continue;
 

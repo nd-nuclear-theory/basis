@@ -89,7 +89,7 @@
     state GetStateLabels().  Add subspace() accessor to state, deprecating
     Subspace().
   7/25/16 (mac): Add utility member function IsUpperTriangle.
-  10/22/16 (mac): Start implementing return of sentinel value for failed lookup.
+  10/25/16 (mac): Implement return of flag value for failed lookup.
 
 ****************************************************************/
 
@@ -197,20 +197,17 @@ namespace basis {
     // Given the labels for a state, look up its index within the
     // subspace.
     //
-    // If no such labels are found, an exception will result.
-    //
-    // TODO: replace "OrDie" behavior with return of sentinel value
-    // kNone; check how to do this in one step with appropriate map
-    // methods
+    // If no such labels are found, basis::kNone is returned.
     {
-
-      // trap failed lookup with assert for easier debugging
+      // PREVIOUSLY: trap failed lookup with assert for easier debugging
       // assert(ContainsState(state_labels));
+      // return lookup_.at(state_labels);
 
-      if (!ContainsState(state_labels))
+      auto pos = lookup_.find(state_labels);
+      if (pos==lookup_.end())
         return kNone;
-
-      return lookup_.at(state_labels);
+      else
+        return pos->second;
     };
 
     ////////////////////////////////////////////////////////////////
@@ -320,7 +317,7 @@ namespace basis {
 
           subspace_ptr_ = &subspace;
           index_ = subspace.LookUpStateIndex(state_labels);
-
+          assert(index_!=basis::kNone);
         }
 
       ////////////////////////////////////////////////////////////////
@@ -462,21 +459,18 @@ namespace basis {
       // Given the labels for a subspace, look up its index within the
       // space.
       //
-      // If no such labels are found, an exception will result.
-      //
-      // TODO: replace "OrDie" behavior with return of sentinel value
-      // kNone; check how to do this in one step with appropriate map
-      // methods
-
+      // If no such labels are found, basis::kNone is returned.
       {
 
-        // trap failed lookup with assert for easier debugging
+        // PREVIOUSLY: trap failed lookup with assert for easier debugging
         // assert(ContainsSubspace(subspace_labels));
-        
-        if (!ContainsSubspace(subspace_labels))
-          return kNone;
+        // return lookup_.at(subspace_labels);
 
-        return lookup_.at(subspace_labels);
+        auto pos = lookup_.find(subspace_labels);
+        if (pos==lookup_.end())
+          return kNone;
+        else
+          return pos->second;
       };
 
       const SubspaceType& LookUpSubspace(const typename SubspaceType::SubspaceLabelsType& subspace_labels) const
@@ -688,21 +682,19 @@ namespace basis {
       // Given the labels for a sector, look up its index within the
       // sector set.
       //
-      // If no such labels are found, an exception will result.
-      //
-      // TODO: replace "OrDie" behavior with return of sentinel value
-      // kNone; check how to do this in one step with appropriate map
-      // methods
+      // If no such labels are found, basis::kNone is returned.
       {
 
-        // trap failed lookup with assert for easier debugging
+        // PREVIOUSLY: trap failed lookup with assert for easier debugging
         // assert(ContainsSector(bra_subspace_index,ket_subspace_index,multiplicity_index));
-
-        if (!ContainsSector(bra_subspace_index,ket_subspace_index,multiplicity_index))
-          return kNone;
+        // return lookup_.at(key);
 
         typename SectorType::KeyType key(bra_subspace_index,ket_subspace_index,multiplicity_index);
-        return lookup_.at(key);
+        auto pos = lookup_.find(key);
+        if (pos==lookup_.end())
+          return kNone;
+        else
+          return pos->second;
       };
 
       ////////////////////////////////////////////////////////////////

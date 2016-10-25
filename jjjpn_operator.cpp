@@ -1,12 +1,12 @@
 /****************************************************************
-  jjjpnorb_operator.cpp
+  jjjpn_operator.cpp
 
   Mark A. Caprio
   University of Notre Dame
 
 ****************************************************************/
 
-#include "jjjpnorb_operator.h"
+#include "jjjpn_operator.h"
 
 #include <iomanip>
 #include <iostream>
