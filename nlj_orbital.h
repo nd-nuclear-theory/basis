@@ -32,6 +32,7 @@
   + 10/19/16 (mac):
     - Add default constructors yet again.
     - Make orbital I/O switchable between standalone and embedded modes.
+  + 10/22/16 (mac): Augment debug strings.
   + 10/25/16 (pjf):
     - Fix constrained sector enumeration to use l0max and Tz0.
     - Add sector enumeration between different bra and ket spaces.

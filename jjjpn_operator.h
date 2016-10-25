@@ -1,6 +1,6 @@
 /// @file
 /****************************************************************
-  jjjpnorb_operator.h
+  jjjpn_operator.h
 
   Defines functions for I/O and manipulation of two-body operator
   matrices in jjJpn coupling scheme, based on general single-particle
@@ -11,15 +11,16 @@
   Mark A. Caprio
   University of Notre Dame
 
-  7/19/16 (mac): Created, adapting code from jjjt_operator.
+  7/19/16 (mac): Created, adapting code from jjjt_operator (jjjpnorb_operator).
   10/15/16 (mac): Update to use new sector method IsUpperTriangle().
+  10/25/16 (mac): Rename to jjjpn_operator.
 
 ****************************************************************/
 
-#ifndef JJJPNORB_OPERATOR_H_
-#define JJJPNORB_OPERATOR_H_
+#ifndef JJJPN_OPERATOR_H_
+#define JJJPN_OPERATOR_H_
 
-#include "basis/jjjpnorb_scheme.h"
+#include "basis/jjjpn_scheme.h"
 #include "basis/operator.h"
 
 namespace basis {

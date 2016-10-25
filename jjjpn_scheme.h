@@ -1,6 +1,6 @@
 /// @file
 /****************************************************************
-  jjjpnorb_scheme.h
+  jjjpn_scheme.h
 
   Defines two-body state indexing in jjJpn coupling scheme, based on
   general single-particle orbital sets.
@@ -18,7 +18,7 @@
   Mark A. Caprio
   University of Notre Dame
 
-  7/7/16 (mac): Created, building on code from jjjt_scheme.
+  7/7/16 (mac): Created, building on code from jjjt_scheme (jjjpnorb_scheme).
   7/19/16 (mac):
    - Add default constructors.
    - Use enum Rank for truncation rank.
@@ -30,11 +30,16 @@
   9/28/16 (mac,pjf): Extract orbital definitions into nlj_orbital.
   10/14/16 (mac): Add constructors for WeightMax.
   10/14/16 (mac): Store operator properties with TwoBodySectorsJJJPN.
+  10/25/16 (mac):
+    - Rename to jjjpn_scheme.
+    - Add Tz0 argument to sectors constructor.
+    - Add reference to orbital_space from space (currently disabled due to
+      initializer issues).
 
 ****************************************************************/
 
-#ifndef JJJPNORB_SCHEME_H_
-#define JJJPNORB_SCHEME_H_
+#ifndef JJJPN_SCHEME_H_
+#define JJJPN_SCHEME_H_
 
 #include <array>
 #include <string>
@@ -196,7 +201,7 @@ namespace basis {
 
       // constructor
 
-      TwoBodySubspaceJJJPN() {};
+      TwoBodySubspaceJJJPN() = default;
       // default constructor -- provided since required for certain
       // purposes by STL container classes (e.g., std::vector::resize)
 
@@ -279,7 +284,7 @@ namespace basis {
 
     // constructor
 
-    TwoBodySpaceJJJPN() {};
+    TwoBodySpaceJJJPN() = default;
     // default constructor -- provided since required for certain
     // purposes by STL container classes (e.g., std::vector::resize)
 
@@ -290,12 +295,21 @@ namespace basis {
     // Enumerate subspaces.
 
     // accessors
-      const WeightMax& weight_max() const {return weight_max_;}
+    // const OrbitalSpacePN& orbital_space() {return orbital_space_;}
+    const WeightMax& weight_max() const {return weight_max_;}
 
     // diagnostic string
     std::string DebugStr() const;
 
     private:
+    
+    // convenience reference to underlying orbitals
+    //
+    // Caveat: Any reference member interferes with defining a default
+    // constructor, since references must be explicitly initialized.
+
+    // const OrbitalSpacePN& orbital_space_;
+
     // truncation
     WeightMax weight_max_;
 
@@ -311,20 +325,20 @@ namespace basis {
 
     // constructor
 
-    TwoBodySectorsJJJPN() {};
+    TwoBodySectorsJJJPN() = default;
     // default constructor -- provided since required for certain
     // purposes by STL container classes (e.g., std::vector::resize)
 
     TwoBodySectorsJJJPN(
         const TwoBodySpaceJJJPN& space,
-        int J0, int g0,
+        int J0, int g0, int Tz0,
         basis::SectorDirection sector_direction = basis::SectorDirection::kCanonical
       );
     // Enumerate sector pairs connected by an operator of given
     // tensorial and parity character ("constrained" sector
     // enumeration).
     //
-    // TODO: add possibility of delta Tz
+    // LIMITATIONS: only implemented for Tz0=0
 
     // accessors
     int J0() const {return J0_;};

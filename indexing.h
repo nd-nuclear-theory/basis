@@ -89,6 +89,7 @@
     state GetStateLabels().  Add subspace() accessor to state, deprecating
     Subspace().
   7/25/16 (mac): Add utility member function IsUpperTriangle.
+  10/25/16 (mac): Implement return of flag value for failed lookup.
 
 ****************************************************************/
 
@@ -108,6 +109,8 @@
 
 namespace basis {
 
+  static const int kNone = -1;
+  // Flag value for missing target in index lookups.
 
   ////////////////////////////////////////////////////////////////
   // generic subspace
@@ -154,8 +157,6 @@ namespace basis {
 
     const SubspaceLabelsType& labels() const
     // Return the labels of the subspace itself.
-    //
-    // DEPRECATED in favor of labels().
     {
       return labels_;
     }
@@ -164,6 +165,8 @@ namespace basis {
     // Return the labels of the subspace itself.
     //
     // DEPRECATED in favor of labels().
+    //
+    // To fix: grep GetSubspaceLabels -R --include="*.cpp"
     {
       return labels_;
     }
@@ -194,13 +197,17 @@ namespace basis {
     // Given the labels for a state, look up its index within the
     // subspace.
     //
-    // If no such labels are found, an exception will result.
+    // If no such labels are found, basis::kNone is returned.
     {
+      // PREVIOUSLY: trap failed lookup with assert for easier debugging
+      // assert(ContainsState(state_labels));
+      // return lookup_.at(state_labels);
 
-      // trap failed lookup with assert for easier debugging
-      assert(ContainsState(state_labels));
-
-      return lookup_.at(state_labels);
+      auto pos = lookup_.find(state_labels);
+      if (pos==lookup_.end())
+        return kNone;
+      else
+        return pos->second;
     };
 
     ////////////////////////////////////////////////////////////////
@@ -310,7 +317,7 @@ namespace basis {
 
           subspace_ptr_ = &subspace;
           index_ = subspace.LookUpStateIndex(state_labels);
-
+          assert(index_!=basis::kNone);
         }
 
       ////////////////////////////////////////////////////////////////
@@ -452,23 +459,31 @@ namespace basis {
       // Given the labels for a subspace, look up its index within the
       // space.
       //
-      // If no such labels are found, an exception will result.
+      // If no such labels are found, basis::kNone is returned.
       {
 
-        // trap failed lookup with assert for easier debugging
-        assert(ContainsSubspace(subspace_labels));
+        // PREVIOUSLY: trap failed lookup with assert for easier debugging
+        // assert(ContainsSubspace(subspace_labels));
+        // return lookup_.at(subspace_labels);
 
-        return lookup_.at(subspace_labels);
+        auto pos = lookup_.find(subspace_labels);
+        if (pos==lookup_.end())
+          return kNone;
+        else
+          return pos->second;
       };
 
-      const SubspaceType& LookUpSubspace(const typename SubspaceType::SubspaceLabelsType& labels) const
+      const SubspaceType& LookUpSubspace(const typename SubspaceType::SubspaceLabelsType& subspace_labels) const
       // Given the labels for a subspace, retrieve a reference to the
       // subspace.
       //
       // If no such labels are found, an exception will result
       // (enforced by LookUpSubspaceIndex).
       {
-        return subspaces_[LookUpSubspaceIndex(labels)];
+
+        int subspace_index = LookUpSubspaceIndex(subspace_labels);
+        assert(subspace_index!=kNone);
+        return subspaces_[subspace_index];
       };
 
       const SubspaceType& GetSubspace(int i) const
@@ -507,7 +522,7 @@ namespace basis {
       // Create indexing information (in both directions, index <->
       // labels) for a subspace.
       {
-        lookup_[subspace.GetSubspaceLabels()] = subspaces_.size(); // index for lookup
+        lookup_[subspace.labels()] = subspaces_.size(); // index for lookup
         subspaces_.push_back(subspace);  // save space
       };
 
@@ -667,14 +682,19 @@ namespace basis {
       // Given the labels for a sector, look up its index within the
       // sector set.
       //
-      // If no such labels are found, an exception will result.
+      // If no such labels are found, basis::kNone is returned.
       {
 
-        // trap failed lookup with assert for easier debugging
-        assert(ContainsSector(bra_subspace_index,ket_subspace_index,multiplicity_index));
+        // PREVIOUSLY: trap failed lookup with assert for easier debugging
+        // assert(ContainsSector(bra_subspace_index,ket_subspace_index,multiplicity_index));
+        // return lookup_.at(key);
 
         typename SectorType::KeyType key(bra_subspace_index,ket_subspace_index,multiplicity_index);
-        return lookup_.at(key);
+        auto pos = lookup_.find(key);
+        if (pos==lookup_.end())
+          return kNone;
+        else
+          return pos->second;
       };
 
       ////////////////////////////////////////////////////////////////

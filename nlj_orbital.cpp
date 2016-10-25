@@ -302,8 +302,10 @@ namespace basis {
 
     const int width = 3;
 
-    os << "oscillator-like: "
-       << (is_oscillator_like() ? "yes" : "no")
+    std::string oscillator_like_indicator = (is_oscillator_like() ? "true" : "false");
+    os << " weight_max " << weight_max()
+       << " Nmax " << Nmax()
+       << " (oscillator-like: " << oscillator_like_indicator << ")"
        << std::endl;
 
     for (int state_index=0; state_index<size(); ++state_index)
@@ -466,7 +468,11 @@ namespace basis {
 
     const int width = 3;
 
-    os << "oscillator-like: " << (is_oscillator_like() ? "yes" : "no") << std::endl;
+    std::string oscillator_like_indicator = (is_oscillator_like() ? "true" : "false");
+    os << " weight_max " << weight_max()
+       << " Nmax " << Nmax()
+       << " (oscillator-like: " << oscillator_like_indicator << ")"
+       << std::endl;
 
     for (int subspace_index=0; subspace_index<size(); ++subspace_index)
       {

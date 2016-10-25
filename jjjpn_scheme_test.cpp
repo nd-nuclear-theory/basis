@@ -1,5 +1,5 @@
 /****************************************************************
-  jjjpnorb_scheme_test.cpp
+  jjjpn_scheme_test.cpp
 
   Mark A. Caprio
   University of Notre Dame
@@ -10,7 +10,7 @@
 #include <iomanip>
 #include <iostream>
 
-#include "jjjpnorb_scheme.h"
+#include "jjjpn_scheme.h"
 
 ////////////////////////////////////////////////////////////////
 // test code
@@ -64,12 +64,14 @@ void TestTwoBodyNmax()
       basis::WeightMax(basis::Rank::kTwoBody,2)
     );
   std::cout << space.DebugStr();
+  // std::cout << space.orbital_space().DebugStr();
 
   // set up allowed sectors
   std::cout << "Two-body operator sectors" << std::endl;
   int J0 = 0;  // try: J0=0 for interaction, J0=2 for quadrupole operator
   int g0 = 0;
-  basis::TwoBodySectorsJJJPN sectors(space,J0,g0);
+  int Tz0 = 0;
+  basis::TwoBodySectorsJJJPN sectors(space,J0,g0,Tz0);
 
   std::cout << " J0 " << J0 << " g0 " << g0 << std::endl;
   for (int sector_index=0; sector_index < sectors.size(); ++sector_index)
