@@ -141,6 +141,25 @@ void TestLJSectors() {
   std::cout << "Sectors -- all-to-all" << std::endl;
   basis::OrbitalSectorsLJPN sectors(space);
   std::cout << sectors.DebugStr();
+
+  std::cout << "Sectors -- l0max = 2" << std::endl;
+  basis::OrbitalSectorsLJPN constrained_sectors(space, 2, 0);
+  std::cout << constrained_sectors.DebugStr();
+
+  std::cout << "Bra space" << std::endl;
+  basis::OrbitalSpaceLJPN bra_space(Nmax+2);
+  std::cout << bra_space.DebugStr();
+  std::cout << "Ket space" << std::endl;
+  basis::OrbitalSpaceLJPN ket_space(Nmax);
+  std::cout << ket_space.DebugStr();
+
+  std::cout << "Sectors -- all-to-all distinct spaces" << std::endl;
+  basis::OrbitalSectorsLJPN distinct_space_sectors(bra_space, ket_space);
+  std::cout << distinct_space_sectors.DebugStr();
+
+  std::cout << "Sectors -- distinct spaces, l0max = 2" << std::endl;
+  basis::OrbitalSectorsLJPN constrained_distinct_space_sectors(bra_space, ket_space, 2, 0);
+  std::cout << constrained_distinct_space_sectors.DebugStr();
 }
 
 ////////////////////////////////////////////////////////////////

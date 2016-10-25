@@ -32,6 +32,11 @@
   + 10/19/16 (mac):
     - Add default constructors yet again.
     - Make orbital I/O switchable between standalone and embedded modes.
+  + 10/25/16 (pjf):
+    - Fix constrained sector enumeration to use l0max and Tz0.
+    - Add sector enumeration between different bra and ket spaces.
+    - Define array mappings for orbital species.
+    - Define Tz accessor for states and subspaces.
 
 ****************************************************************/
 
@@ -45,7 +50,6 @@
 #include "mcutils/parsing.h"
 
 #include "basis/indexing.h"
-#include "basis/many_body.h"
 
 namespace basis {
 
@@ -60,6 +64,48 @@ namespace basis {
    * numbering.
    */
   enum class OrbitalSpeciesPN {kP=0,kN=1};
+
+  /**
+   * Notational definition for orbital species conversion to Tz.
+   * Uses "up quark is positive" convention.
+   *
+   * Use of this array requires conversion of the OrbitalSpeciesPN to int.
+   *
+   * Example:
+   * \code
+   *   basis::OrbitalSpeciesPN orbital_species;
+   *   ...
+   *   os << basis::kOrbitalSpeciesPNCodeTz[int(orbital_species)];
+   * \endcode
+   */
+  extern const std::array<HalfInt, 2> kOrbitalSpeciesPNCodeTz;
+  /**
+   * Notational definition for orbital species conversion to MFDn decimal code.
+   * "p" -> 1, "n" -> 2
+   *
+   * Use of this array requires conversion of the OrbitalSpeciesPN to int.
+   *
+   * Example:
+   * \code
+   *   basis::OrbitalSpeciesPN orbital_species;
+   *   ...
+   *   os << basis::kOrbitalSpeciesPNCodeDecimal[int(orbital_species)];
+   * \endcode
+   */
+  extern const std::array<int, 2> kOrbitalSpeciesPNCodeDecimal;
+  /**
+   * Notational definition for orbital species conversion to character name.
+   *
+   * Use of this array requires conversion of the OrbitalSpeciesPN to int.
+   *
+   * Example:
+   * \code
+   *   basis::OrbitalSpeciesPN orbital_species;
+   *   ...
+   *   os << basis::kOrbitalSpeciesPNCodeChar[int(orbital_species)];
+   * \endcode
+   */
+  extern const std::array<const char*, 2> kOrbitalSpeciesPNCodeChar;
 
   /**
    * A flattened orbital container.
@@ -206,6 +252,7 @@ namespace basis {
       // accessors
 
       OrbitalSpeciesPN orbital_species() const {return std::get<0>(labels_);}
+      HalfInt Tz() const {return kOrbitalSpeciesPNCodeTz[int(orbital_species())];}
       double weight_max() const {return weight_max_;}
       bool is_oscillator_like() const {return is_oscillator_like_;}
       int Nmax() const {assert(is_oscillator_like()); return Nmax_;}
@@ -256,6 +303,7 @@ namespace basis {
 
     // pass-through accessors
     OrbitalSpeciesPN orbital_species() const {return Subspace().orbital_species();}
+    HalfInt Tz() const {return Subspace().Tz();}
 
     // state label accessors
     int n() const {return std::get<0>(GetStateLabels());}
@@ -412,6 +460,7 @@ namespace basis {
       // accessors
 
       OrbitalSpeciesPN orbital_species() const {return std::get<0>(labels_);}
+      HalfInt Tz() const {return kOrbitalSpeciesPNCodeTz[int(orbital_species())];}
       int l() const {return std::get<1>(labels_);}
       HalfInt j() const {return std::get<2>(labels_);}
       int g() const {return l()%2;}
@@ -458,6 +507,7 @@ namespace basis {
 
     // pass-through accessors
     OrbitalSpeciesPN orbital_species() const {return Subspace().orbital_species();}
+    HalfInt Tz() const {return Subspace().Tz();}
     int l() const {return Subspace().l();}
     HalfInt j() const {return Subspace().j();}
     int g() const {return l()%2;}
@@ -537,11 +587,27 @@ namespace basis {
 
     OrbitalSectorsLJPN(
         const OrbitalSpaceLJPN& space,
-        int l0, int j0, int g0,
+        int l0max, int Tz0,
         basis::SectorDirection sector_direction = basis::SectorDirection::kCanonical
       );
     // Enumerate sector pairs connected by an operator of given
     // tensorial and parity character ("constrained" sector
+    // enumeration).
+
+    OrbitalSectorsLJPN(
+        const OrbitalSpaceLJPN& bra_space, const OrbitalSpaceLJPN& ket_space
+      );
+    // Enumerate all sector pairs between two spaces ("all-to-all" sector
+    // enumeration).
+    //
+    // Sectors are enumerated in lexicographical order by (bra)(ket).
+
+    OrbitalSectorsLJPN(
+        const OrbitalSpaceLJPN& bra_space, const OrbitalSpaceLJPN& ket_space,
+        int l0max, int Tz0
+      );
+    // Enumerate sector pairs between two spaces connected by an operator of
+    // given tensorial and parity character ("constrained" sector
     // enumeration).
 
     // diagnostic string
@@ -552,6 +618,6 @@ namespace basis {
   ////////////////////////////////////////////////////////////////
   /// @}
   ////////////////////////////////////////////////////////////////
-} // namespace
+}  // namespace basis
 
-#endif
+#endif  // NLJ_ORBITAL_H_
