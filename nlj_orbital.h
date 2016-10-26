@@ -614,6 +614,13 @@ namespace basis {
     // diagnostic string
     std::string DebugStr() const;
 
+    // accessors
+    int l0max() const {return l0max_;}
+    int Tz0() const {return Tz0_;}
+
+   private:
+    // operator properties
+    int l0max_, Tz0_;
   };
 
   ////////////////////////////////////////////////////////////////

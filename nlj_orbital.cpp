@@ -812,6 +812,7 @@ namespace basis {
       const OrbitalSpaceLJPN& space,
       int l0max, int Tz0,
       basis::SectorDirection sector_direction)
+    : l0max_(l0max), Tz0_(Tz0)
   {
     int g0 = l0max%2;
     for (int bra_subspace_index=0; bra_subspace_index<space.size(); ++bra_subspace_index) {
@@ -827,7 +828,7 @@ namespace basis {
 
         bool allowed = true;
         allowed &= (abs(bra_subspace.l()-ket_subspace.l()) <= l0max);
-        // @NOTE sectors also constrained by delta-j <= l0max
+        /// @note sectors also constrained by delta-j <= l0max
         allowed &= (abs(bra_subspace.j()-ket_subspace.j()) <= l0max);
         allowed &= ((ket_subspace.g()+g0+bra_subspace.g())%2==0);
 
@@ -889,7 +890,7 @@ namespace basis {
 
         bool allowed = true;
         allowed &= (abs(bra_subspace.l()-ket_subspace.l()) <= l0max);
-        // @NOTE sectors also constrained by delta-j <= l0max
+        /// @note sectors also constrained by delta-j <= l0max
         allowed &= (abs(bra_subspace.j()-ket_subspace.j()) <= l0max);
         allowed &= (abs(bra_subspace.Tz()-ket_subspace.Tz()) <= Tz0);
         allowed &= ((ket_subspace.g()+g0+bra_subspace.g())%2 == 0);
