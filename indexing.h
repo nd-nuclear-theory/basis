@@ -89,7 +89,9 @@
     state GetStateLabels().  Add subspace() accessor to state, deprecating
     Subspace().
   7/25/16 (mac): Add utility member function IsUpperTriangle.
-  10/25/16 (mac): Implement return of flag value for failed lookup.
+  10/25/16 (mac):
+    - Implement return of flag value for failed lookup.
+    - Provide sector lookup by sector key.
 
 ****************************************************************/
 
@@ -675,10 +677,27 @@ namespace basis {
       // is found within the the sector set.
       {
         typename SectorType::KeyType key(bra_subspace_index,ket_subspace_index,multiplicity_index);
+        return LookUpSectorIndex(key);
+      };
+
+      bool ContainsSector(const typename SectorType::KeyType& key) const
+      // Given the labels for a sector, returns whether or not the sector
+      // is found within the the sector set.
+      {
         return lookup_.count(key);
       };
 
       int LookUpSectorIndex(int bra_subspace_index, int ket_subspace_index, int multiplicity_index=1) const
+      // Given the labels for a sector, look up its index within the
+      // sector set.
+      //
+      // If no such labels are found, basis::kNone is returned.
+      {
+        typename SectorType::KeyType key(bra_subspace_index,ket_subspace_index,multiplicity_index);
+        return LookUpSectorIndex(key);
+      };
+
+      int LookUpSectorIndex(const typename SectorType::KeyType& key) const
       // Given the labels for a sector, look up its index within the
       // sector set.
       //
@@ -689,7 +708,6 @@ namespace basis {
         // assert(ContainsSector(bra_subspace_index,ket_subspace_index,multiplicity_index));
         // return lookup_.at(key);
 
-        typename SectorType::KeyType key(bra_subspace_index,ket_subspace_index,multiplicity_index);
         auto pos = lookup_.find(key);
         if (pos==lookup_.end())
           return kNone;
