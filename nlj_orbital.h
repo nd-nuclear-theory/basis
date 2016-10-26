@@ -138,6 +138,11 @@ namespace basis {
       equiv &= (abs(this->weight-rhs.weight)<kWeightTolerance);
       return equiv;
     }
+
+    friend std::ostream& operator<<(
+      std::ostream &out, const OrbitalPNInfo& orbital_info);
+    friend std::istream& operator>>(
+        std::istream &in, OrbitalPNInfo& orbital_info);
   };
 
   // orbital I/O

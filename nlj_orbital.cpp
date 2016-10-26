@@ -30,6 +30,47 @@ namespace basis {
   ////////////////////////////////////////////////////////////////
 
   /**
+   * Output orbital info as MFDn line. @note Does not include index.
+   */
+  std::ostream& operator<<(std::ostream &out, const OrbitalPNInfo& orbital_info)
+  {
+    const int width = 3;
+    const int precision = 8;
+
+    out << " " << std::setw(width) << orbital_info.n
+        << " " << std::setw(width) << orbital_info.l
+        << " " << std::setw(width) << TwiceValue(orbital_info.j)
+        << " " << std::setw(width) << int(orbital_info.orbital_species)+1  // 1-based
+        << " " << std::fixed << std::setw(width+1+precision)
+        << std::setprecision(precision) << orbital_info.weight
+        << std::endl;
+
+    return out;
+  }
+
+  /**
+   * Input orbital info from MFDn line. @note Does not expect index.
+   */
+  std::istream& operator>>(std::istream &in, OrbitalPNInfo& orbital_info) {
+    int n, l, twice_j, orbital_species_raw;
+    double weight;
+    in >> n >> l >> twice_j >> orbital_species_raw >> weight;
+    if (in.fail()) return in;
+
+    HalfInt j(twice_j, 2);
+    OrbitalSpeciesPN orbital_species =
+      static_cast<OrbitalSpeciesPN>(orbital_species_raw-1);
+
+    orbital_info.n = n;
+    orbital_info.l = l;
+    orbital_info.j = j;
+    orbital_info.orbital_species = orbital_species;
+    orbital_info.weight = weight;
+
+    return in;
+  }
+
+  /**
    * Read orbital definitions from a stream.
    *
    * @param[in] is input stream containing MFDn-formatted orbital definitions
@@ -80,21 +121,16 @@ namespace basis {
         if (line.size() == 0)
           continue;
 
-        int index, n, l, twice_j, orbital_species_raw;
-        double weight;
-        line_stream >> index
-                    >> n >> l >> twice_j
-                    >> orbital_species_raw >> weight;
+        int index;
+        OrbitalPNInfo state;
+        line_stream >> index >> state;
         ParsingCheck(line_stream,line_count,line);
-
-        HalfInt j(twice_j,2);
-        OrbitalSpeciesPN orbital_species = static_cast<OrbitalSpeciesPN>(orbital_species_raw-1);
-
         // count orbitals by type
-        num_orbitals_p_extracted += int(orbital_species == OrbitalSpeciesPN::kP);
-        num_orbitals_n_extracted += int(orbital_species == OrbitalSpeciesPN::kN);
+        num_orbitals_p_extracted +=
+          static_cast<int>(state.orbital_species == OrbitalSpeciesPN::kP);
+        num_orbitals_n_extracted +=
+          static_cast<int>(state.orbital_species == OrbitalSpeciesPN::kN);
 
-        OrbitalPNInfo state(orbital_species,n,l,j,weight);
         states.push_back(state);
       }
 
@@ -136,14 +172,7 @@ namespace basis {
           output_index = ++n_index;
         }
 
-        body << " " << std::setw(width) << output_index
-             << " " << std::setw(width) << state.n
-             << " " << std::setw(width) << state.l
-             << " " << std::setw(width) << TwiceValue(state.j)
-             << " " << std::setw(width) << int(state.orbital_species)+1 // 1-based
-             << " " << std::fixed << std::setw(width+1+precision)
-             << std::setprecision(precision) << state.weight
-             << std::endl;
+        body << " " << std::setw(width) << output_index << state;
       }
 
     // construct header
@@ -904,6 +933,10 @@ namespace basis {
     }
   }
 
+  /**
+   * Generate a string representation, useful for debugging.
+   * @return debug string
+   */
   std::string OrbitalSectorsLJPN::DebugStr() const
   {
     std::ostringstream os;
