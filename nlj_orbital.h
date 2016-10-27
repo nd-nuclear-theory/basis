@@ -38,6 +38,7 @@
     - Add sector enumeration between different bra and ket spaces.
     - Define array mappings for orbital species.
     - Define Tz accessor for states and subspaces.
+  + 10/26/16 (pjf): Add stream operators to OrbitalPNInfo
 
 ****************************************************************/
 
