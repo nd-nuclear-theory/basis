@@ -39,6 +39,7 @@
     - Define array mappings for orbital species.
     - Define Tz accessor for states and subspaces.
   + 10/26/16 (mac): Add equality test for orbitals.
+  + 10/26/16 (pjf): Add stream operators to OrbitalPNInfo
 
 ****************************************************************/
 
@@ -139,6 +140,11 @@ namespace basis {
       equiv &= (abs(this->weight-rhs.weight)<kWeightTolerance);
       return equiv;
     }
+
+    friend std::ostream& operator<<(
+      std::ostream &out, const OrbitalPNInfo& orbital_info);
+    friend std::istream& operator>>(
+        std::istream &in, OrbitalPNInfo& orbital_info);
   };
 
   // orbital I/O
@@ -622,6 +628,13 @@ namespace basis {
     // diagnostic string
     std::string DebugStr() const;
 
+    // accessors
+    int l0max() const {return l0max_;}
+    int Tz0() const {return Tz0_;}
+
+   private:
+    // operator properties
+    int l0max_, Tz0_;
   };
 
   ////////////////////////////////////////////////////////////////

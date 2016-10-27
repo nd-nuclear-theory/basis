@@ -184,6 +184,16 @@ namespace basis {
     // maximum weights
     std::array<double,2> one_body;
     std::array<double,3> two_body;
+
+    // truncation information -- TODO (mac)? but convert to class
+    //
+    // bool is_oscillator_like() const {return is_oscillator_like_;}
+    // int N1max() const {assert(is_oscillator_like()); return N1max_;}
+    // int N2max() const {assert(is_oscillator_like()); return N2max_;}
+    // // only meaningful if oscillator scheme constructor used
+    // bool is_oscillator_like_;
+    // int N1max_, N2max_;  // only meaningful if oscillator scheme constructor used
+
   };
 
   // labels
