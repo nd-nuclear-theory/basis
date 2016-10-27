@@ -38,6 +38,7 @@
     - Add sector enumeration between different bra and ket spaces.
     - Define array mappings for orbital species.
     - Define Tz accessor for states and subspaces.
+  + 10/26/16 (mac): Add equality test for orbitals.
 
 ****************************************************************/
 
@@ -317,6 +318,13 @@ namespace basis {
     // Look up floating-point weight.
     int N() const {return 2*n()+l();}
     // Calculate hard-coded oscillator quantum number.
+
+    // comparison
+    friend bool operator == (const basis::OrbitalStatePN& a1, const basis::OrbitalStatePN& a2)
+    // Equality test based on labels (so permits comparison across different subspace indexings).
+    {
+      return (a1.labels() == a2.labels()) && (a1.subspace().labels() == a2.subspace().labels());
+    }
 
   };
 
