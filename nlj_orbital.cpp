@@ -905,6 +905,7 @@ namespace basis {
   OrbitalSectorsLJPN::OrbitalSectorsLJPN(
       const OrbitalSpaceLJPN& bra_space, const OrbitalSpaceLJPN& ket_space,
       int l0max, int Tz0)
+    : l0max_(l0max), Tz0_(Tz0)
   {
     int g0 = l0max%2;
     for (int bra_subspace_index=0; bra_subspace_index<bra_space.size(); ++bra_subspace_index) {
