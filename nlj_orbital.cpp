@@ -42,8 +42,7 @@ namespace basis {
         << " " << std::setw(width) << TwiceValue(orbital_info.j)
         << " " << std::setw(width) << int(orbital_info.orbital_species)+1  // 1-based
         << " " << std::fixed << std::setw(width+1+precision)
-        << std::setprecision(precision) << orbital_info.weight
-        << std::endl;
+        << std::setprecision(precision) << orbital_info.weight;
 
     return out;
   }
@@ -172,7 +171,7 @@ namespace basis {
           output_index = ++n_index;
         }
 
-        body << " " << std::setw(width) << output_index << state;
+        body << " " << std::setw(width) << output_index << state << std::endl;
       }
 
     // construct header
