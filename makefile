@@ -11,7 +11,7 @@ modules_h = indexing
 ##modules_ho = jt_scheme
 modules_ho = operator many_body
 modules_ho += lsjt_scheme lsjt_operator jjjt_scheme jjjt_operator
-modules_ho += jjjpn_scheme jjjpn_operator nlj_orbital
+modules_ho += jjjpn_scheme jjjpn_operator nlj_orbital nlj_operator
 
 # programs
 ##programs = jt_scheme_test

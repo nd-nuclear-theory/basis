@@ -11,23 +11,23 @@
 
   + 7/7/16 (mac): Created (jjjpnorb_scheme), building on code from jjjt_scheme.
   + 7/19/16 (mac):
-   - Add default constructors.
-   - Use enum Rank for truncation rank.
-   - Add two-body species code definitions.
-   - Add GetOrbital accessors.
+    - Add default constructors.
+    - Use enum Rank for truncation rank.
+    - Add two-body species code definitions.
+    - Add GetOrbital accessors.
   + 7/22/16 (mac):
-   - Fix reference error in TwoBodySpaceJJJPN.
-   - Add debugging strings.
+    - Fix reference error in TwoBodySpaceJJJPN.
+    - Add debugging strings.
   + 9/28/16 (mac,pjf): Break out into nlj_orbital.
-  + 10/6/16 (pjf): Add LJPN classes
-  + 10/7/16 (pjf): Add LJPN sectors and general constructors
+  + 10/6/16 (pjf): Add LJPN classes.
+  + 10/7/16 (pjf): Add LJPN sectors and general constructors.
   + 10/13/16 (mac): Add default constructors.
   + 10/18/16 (pjf): Add PN general constructors and serializers (OrbitalInfo).
   + 10/18/16 (pjf):
-   - Add general constructors and serializers for Orbital*PN (OrbitalPNInfo).
-   - Refactor OrbitalDefinitionStr out of spaces.
-   - Add oscillator-likeness tests to OrbitalSpacePN and OrbitalSubspacePN.
-   - Add == operator for OrbitalPNInfo.
+    - Add general constructors and serializers for Orbital*PN (OrbitalPNInfo).
+    - Refactor OrbitalDefinitionStr out of spaces.
+    - Add oscillator-likeness tests to OrbitalSpacePN and OrbitalSubspacePN.
+    - Add == operator for OrbitalPNInfo.
   + 10/19/16 (pjf): Update documentation to Doxygen format.
   + 10/19/16 (mac):
     - Add default constructors yet again.
@@ -39,7 +39,7 @@
     - Define array mappings for orbital species.
     - Define Tz accessor for states and subspaces.
   + 10/26/16 (mac): Add equality test for orbitals.
-  + 10/26/16 (pjf): Add stream operators to OrbitalPNInfo
+  + 10/26/16 (pjf): Add stream operators to OrbitalPNInfo.
 
 ****************************************************************/
 
