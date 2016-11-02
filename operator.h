@@ -26,6 +26,7 @@
    - Add diagnostic function AllocatedEntries.
   7/22/16 (mac): Revise syntax for CanonicalizeIndices.
   7/25/16 (mac): Add diagnostic function UpperTriangularEntries.
+  11/1/16 (mac): Reduce dependency from Eigen/Core to Eigen/Dense.
 
 ****************************************************************/
 
@@ -34,7 +35,7 @@
 
 #include <vector>
 
-#include "eigen3/Eigen/Core"
+#include "eigen3/Eigen/Dense"
 
 #include "basis/indexing.h"
 

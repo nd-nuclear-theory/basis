@@ -28,8 +28,8 @@ namespace basis {
   double MatrixElementLJPN(
       const basis::OrbitalSpaceLJPN& bra_orbital_space,
       const basis::OrbitalSpaceLJPN& ket_orbital_space,
-      const basis::OrbitalSectorsLJPN& orbital_sectors,
-      const basis::MatrixVector& orbital_matrices,
+      const basis::OrbitalSectorsLJPN& sectors,
+      const basis::MatrixVector& matrices,
       const basis::OrbitalStatePN& bra, const basis::OrbitalStatePN& ket
     );
   // Look up radial matrix element by (species,n,l,j) labels.
@@ -40,8 +40,8 @@ namespace basis {
   // Arguments:
   //   bra_orbital_space (basis::OrbitalSpaceLJPN): LJPN bra space
   //   ket_orbital_space (basis::OrbitalSpaceLJPN): LJPN ket space
-  //   orbital_sectors (basis::OrbitalSectorsLJPN): LJPN sectors for radial operator
-  //   orbital_matrices (basis::MatrixVector): matrices corresponding to these sectors
+  //   sectors (basis::OrbitalSectorsLJPN): LJPN sectors for operator
+  //   matrices (basis::MatrixVector): matrices corresponding to these sectors
   //   bra (basis::OrbitalStatePN): bra state (in PN space)
   //   ket (basis::OrbitalStatePN): ket state (in PN space)
   //
