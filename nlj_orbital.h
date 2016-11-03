@@ -40,6 +40,7 @@
     - Define Tz accessor for states and subspaces.
   + 10/26/16 (mac): Add equality test for orbitals.
   + 10/26/16 (pjf): Add stream operators to OrbitalPNInfo.
+  + 10/26/16 (mac): Add OrbitalStatePN::LabelStr().
 
 ****************************************************************/
 
@@ -324,6 +325,10 @@ namespace basis {
     // Look up floating-point weight.
     int N() const {return 2*n()+l();}
     // Calculate hard-coded oscillator quantum number.
+
+    // diagnostic strings
+    std::string LabelStr() const;
+    // Provide string representation of subspace labels.
 
     // comparison
     friend bool operator == (const basis::OrbitalStatePN& a1, const basis::OrbitalStatePN& a2)
