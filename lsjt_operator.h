@@ -45,6 +45,7 @@
   7/25/16 (mac): Add WriteRelativeOperatorLSJT.
   8/16/16 (mac): Add WriteRelativeCMOperatorComponentLSJT and
     corresponding gather function.
+  11/4/16 (mac): Remove dependency on Eigen/Core.
 
 ****************************************************************/
 

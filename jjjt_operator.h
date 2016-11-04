@@ -12,6 +12,7 @@
   University of Notre Dame
 
   7/13/16 (mac): Created, adapting code from lsjt_operator.
+  11/4/16 (mac): Remove dependency on Eigen/Core.
 
 ****************************************************************/
 
@@ -25,8 +26,6 @@
 #include <map>
 #include <tuple>
 #include <vector>
-
-#include "eigen3/Eigen/Core"
 
 #include "basis/lsjt_operator.h"  // for OperatorLabelsJT
 #include "basis/jjjt_scheme.h"
