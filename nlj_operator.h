@@ -10,6 +10,8 @@
   University of Notre Dame
 
   + 11/1/16 (mac): Created.
+  + 11/4/16 (mac): Add informative error messages on failed
+    MatrixElementLJPN lookup.
 
 ****************************************************************/
 
