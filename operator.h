@@ -1,6 +1,5 @@
-/// @file
-/****************************************************************
-  operator.h
+/**************************************************************************//**
+  @file operator.h
 
   Provides generic definitions for storage of operator matrix elements
   making use of the basis package's indexing scheme and Eigen matrices.
@@ -17,16 +16,16 @@
   Mark A. Caprio
   University of Notre Dame
 
-  7/2/16 (mac): Created from code in lsjt_operator.h.
-  7/9/16 (mac): Add support for canonicalizing indices in matrix
+  + 7/2/16 (mac): Created from code in lsjt_operator.h.
+  + 7/9/16 (mac): Add support for canonicalizing indices in matrix
     element lookup.
-  7/12/16 (mac): Add diagonal constant operator.
-  7/19/16 (mac):
-   - Extract AS/NAS conversion enum to many_body.h.
-   - Add diagnostic function AllocatedEntries.
-  7/22/16 (mac): Revise syntax for CanonicalizeIndices.
-  7/25/16 (mac): Add diagnostic function UpperTriangularEntries.
-  11/1/16 (mac): Reduce dependency from Eigen/Core to Eigen/Dense.
+  + 7/12/16 (mac): Add diagonal constant operator.
+  + 7/19/16 (mac):
+    - Extract AS/NAS conversion enum to many_body.h.
+    - Add diagnostic function AllocatedEntries.
+  + 7/22/16 (mac): Revise syntax for CanonicalizeIndices.
+  + 7/25/16 (mac): Add diagnostic function UpperTriangularEntries.
+  + 11/1/16 (mac): Reduce dependency from Eigen/Core to Eigen/Dense.
 
 ****************************************************************/
 

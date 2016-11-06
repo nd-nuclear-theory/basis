@@ -1,6 +1,5 @@
-/// @file
-/****************************************************************
-  jjjt_scheme.h
+/************************************************************//**
+  @file jjjt_scheme.h
 
   Defines two-body state indexing in jjJT coupling scheme.
   Written for use in Moshinsky transformation.
@@ -22,20 +21,20 @@
   Mark A. Caprio
   University of Notre Dame
 
-  11/26/15 (mac): Created, following analogous code for LSJT
+  + 11/26/15 (mac): Created, following analogous code for LSJT
     scheme in indexing_lsjt.
-  7/6/16 (mac): Overhaul to new basis module conventions.
-  7/7/16 (mac): Add fixed-N subspaces in two-body basis.
-  7/9/16 (mac): Add default constructors.
-  7/16/16 (mac):
+  + 7/6/16 (mac): Overhaul to new basis module conventions.
+  + 7/7/16 (mac): Add fixed-N subspaces in two-body basis.
+  + 7/9/16 (mac): Add default constructors.
+  + 7/16/16 (mac):
     - Add debug strings.
     - Move N to least significant subspace label in NLSJT basis.
-  7/17/16 (mac):
+  + 7/17/16 (mac):
     - Rename NJJJT to JJJTN.
     - Remove unnecessary complication of matching subspace Nmax
       to g.
     - Add one-body (square) truncation on two-body bases.
-  7/19/16 (mac): Use enum Rank for truncation rank.
+  + 7/19/16 (mac): Use enum Rank for truncation rank.
 
 ****************************************************************/
 

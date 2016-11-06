@@ -1,6 +1,5 @@
-/// @file
-/****************************************************************
-  indexing.h
+/************************************************************//**
+  @file indexing.h
 
   Defines template base classes for indexing quantum mechanical states
   arranged into subspaces (defined by good symmetry quantum numbers).
@@ -64,32 +63,32 @@
   Mark A. Caprio
   University of Notre Dame
 
-  11/21/15 (mac): Created (indexing_base.h), abstracted from code in indexing_lsjt.
-  3/5/16 (mac): Update header comment.
-  3/9/16 (mac): Relax protection of BaseSpace indexing containers
-    from private to protected to support sp3rlib.
-  3/11/16 (mac): Add subspace size() method and space
-    TotalDimension() and ContainsSubspace() methods.
-  5/3/16 (mac): Add boost-style hashing option ad hoc on subspace labels.
-  6/8/16 (mac): Extract to new basis module:
+  + 11/21/15 (mac): Created (indexing_base.h), abstracted from code in indexing_lsjt.
+  + 3/5/16 (mac): Update header comment.
+  + 3/9/16 (mac): Relax protection of BaseSpace indexing containers
+    - from private to protected to support sp3rlib.
+  + 3/11/16 (mac): Add subspace size() method and space
+    - TotalDimension() and ContainsSubspace() methods.
+  + 5/3/16 (mac): Add boost-style hashing option ad hoc on subspace labels.
+  + 6/8/16 (mac): Extract to new basis module:
     - Rename file from indexing_base.h to indexing.h.
     - Change namespace from shell to basis.
     - Systematize switching between map and unordered_map via INDEXING_HASH
       directive.
     - Remove deprecated subspace method Dimension().
-  6/16/16 (mac): Fix missing typename qualifier.
-  6/24/16 (mac): Add direction enum class.
-  6/30/16 (mac):
+  + 6/16/16 (mac): Fix missing typename qualifier.
+  + 6/24/16 (mac): Add direction enum class.
+  + 6/30/16 (mac):
     - Flesh out documentation of member functions.
     - Add utility member functions ContainsState, ContainsSector,
       IsDiagonal.
-  7/5/16 (mac): Add pass-through typedef StateLabelsType to BaseState.
-  7/13/16 (mac): Clean up accessor naming: Add labels() accessor to
+  + 7/5/16 (mac): Add pass-through typedef StateLabelsType to BaseState.
+  + 7/13/16 (mac): Clean up accessor naming: Add labels() accessor to
     subspace and state, deprecating subspace GetSubspaceLabels() and
     state GetStateLabels().  Add subspace() accessor to state, deprecating
     Subspace().
-  7/25/16 (mac): Add utility member function IsUpperTriangle.
-  10/25/16 (mac):
+  + 7/25/16 (mac): Add utility member function IsUpperTriangle.
+  + 10/25/16 (mac):
     - Implement return of flag value for failed lookup.
     - Provide sector lookup by sector key.
 

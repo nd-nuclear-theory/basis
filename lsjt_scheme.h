@@ -1,6 +1,5 @@
-/// @file
-/****************************************************************
-  lsjt_scheme.h
+/************************************************************//**
+  @file lsjt_scheme.h
 
   Defines relative and two-body state indexing in LSJT coupling scheme.
   Written for use in Moshinsky transformation.
@@ -22,12 +21,12 @@
   Mark A. Caprio
   University of Notre Dame
 
-  11/13/15 (mac): Created, styled after shell_indexing_nlj.
-  11/21/15 (mac): Rename from shell_indexing_lsjt to indexing_lsjt.
+  + 11/13/15 (mac): Created, styled after shell_indexing_nlj.
+  + 11/21/15 (mac): Rename from shell_indexing_lsjt to indexing_lsjt.
     Extracted generic class properties to templates base classes in
     indexing_base.
-  11/26/15 (mac): Update iteration schemes.
-  6/8/16 (mac): Update for basis package and update conventions.
+  + 11/26/15 (mac): Update iteration schemes.
+  + 6/8/16 (mac): Update for basis package and update conventions.
     - Rename to lsjt_scheme.h.
     - Rename quantum number N to Nr.
     - Rename SpuriousRelative to RelativeCM.
@@ -35,8 +34,8 @@
       constructor with *subspace* constraint Ncm+S+T+g~1 in Validate.
     - Restrict TwoBody states to canonical ordering of orbitals.
     - Replace Print() methods with Str() methods.
-  6/22/16 (mac): Make explicit typedefs for label types.
-  6/27/16 (mac):
+  + 6/22/16 (mac): Make explicit typedefs for label types.
+  + 6/27/16 (mac):
     - Add Jr_max cutoff on construction of relative basis.
     - Change relative-c.m. scheme from spectator (Nc,lc) to active (Nc,lc).
     - Add fixed-N subspaces in relative-c.m. basis for use with Moshinsky
@@ -46,25 +45,25 @@
     - Remove all-to-all sector constructors.
     - Rename Str() to DebugStr().
     - Rename labels on relative basis (e.g., J->Jr).
-  6/30/16 (mac): Revert labels on relative basis (e.g., Jr->J).
-  7/3/16 (mac): Add default constructors for RelativeLSJT basis.
-  7/4/16 (mac): Add fixed-N subspaces in two-body basis for use with
+  + 6/30/16 (mac): Revert labels on relative basis (e.g., Jr->J).
+  + 7/3/16 (mac): Add default constructors for RelativeLSJT basis.
+  + 7/4/16 (mac): Add fixed-N subspaces in two-body basis for use with
     Moshinsky transform block structure.
-  7/8/16 (mac): Add default constructors for TwoBodyLSJT basis.
-  7/9/16 (mac):
+  + 7/8/16 (mac): Add default constructors for TwoBodyLSJT basis.
+  + 7/9/16 (mac):
     - Add debug strings for RelativeLSJT basis.
     - Add default constructors for remaining subspaces, spaces,
       and sectors.
-  7/13/16 (mac): Fix relative enumeration.
-  7/16/16 (mac):
+  + 7/13/16 (mac): Fix relative enumeration.
+  + 7/16/16 (mac):
     - Add debug strings for TwoBodyLSJT basis.
     - Move N to least significant subspace label in LSJTN bases.
-  7/17/16 (mac):
+  + 7/17/16 (mac):
     - Rename NLSJT to LSJTN.
     - Remove unnecessary complication of matching subspace Nmax
       to g.
     - Add one-body (square) truncation on two-body bases.
-  7/19/16 (mac): Use enum Rank for truncation rank.
+  + 7/19/16 (mac): Use enum Rank for truncation rank.
 
 ****************************************************************/
 

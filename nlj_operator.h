@@ -1,6 +1,5 @@
-/// @file
-/****************************************************************
-  nlj_operator.h
+/************************************************************//**
+  @file nlj_operator.h
 
   Defines functions for manipulation of operators for nlj orbitals.
 

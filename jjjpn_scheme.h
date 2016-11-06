@@ -1,6 +1,5 @@
-/// @file
-/****************************************************************
-  jjjpn_scheme.h
+/************************************************************//**
+  @file jjjpn_scheme.h
 
   Defines two-body state indexing in jjJpn coupling scheme, based on
   general single-particle orbital sets.
@@ -18,19 +17,19 @@
   Mark A. Caprio
   University of Notre Dame
 
-  7/7/16 (mac): Created, building on code from jjjt_scheme (jjjpnorb_scheme).
-  7/19/16 (mac):
-   - Add default constructors.
-   - Use enum Rank for truncation rank.
-   - Add two-body species code definitions.
-   - Add GetOrbital accessors.
-  7/22/16 (mac):
-   - Fix reference error in TwoBodySpaceJJJPN.
-   - Add debugging strings.
-  9/28/16 (mac,pjf): Extract orbital definitions into nlj_orbital.
-  10/14/16 (mac): Add constructors for WeightMax.
-  10/14/16 (mac): Store operator properties with TwoBodySectorsJJJPN.
-  10/25/16 (mac):
+  + 7/7/16 (mac): Created, building on code from jjjt_scheme (jjjpnorb_scheme).
+  + 7/19/16 (mac):
+    - Add default constructors.
+    - Use enum Rank for truncation rank.
+    - Add two-body species code definitions.
+    - Add GetOrbital accessors.
+  + 7/22/16 (mac):
+    - Fix reference error in TwoBodySpaceJJJPN.
+    - Add debugging strings.
+  + 9/28/16 (mac,pjf): Extract orbital definitions into nlj_orbital.
+  + 10/14/16 (mac): Add constructors for WeightMax.
+  + 10/14/16 (mac): Store operator properties with TwoBodySectorsJJJPN.
+  + 10/25/16 (mac):
     - Rename to jjjpn_scheme.
     - Add Tz0 argument to sectors constructor.
     - Add reference to orbital_space from space (currently disabled due to
@@ -312,7 +311,7 @@ namespace basis {
     std::string DebugStr() const;
 
     private:
-    
+
     // convenience reference to underlying orbitals
     //
     // Caveat: Any reference member interferes with defining a default

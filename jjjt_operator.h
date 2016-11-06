@@ -1,6 +1,5 @@
-/// @file
-/****************************************************************
-  jjjt_operator.h
+/************************************************************//**
+  @file jjjt_operator.h
 
   Defines functions for I/O and manipulation of two-body operator
   matrices in jjJT coupling scheme.  Written for use in Moshinsky
@@ -11,8 +10,8 @@
   Mark A. Caprio
   University of Notre Dame
 
-  7/13/16 (mac): Created, adapting code from lsjt_operator.
-  11/4/16 (mac): Remove dependency on Eigen/Core.
+  + 7/13/16 (mac): Created, adapting code from lsjt_operator.
+  + 11/4/16 (mac): Remove dependency on Eigen/Core.
 
 ****************************************************************/
 

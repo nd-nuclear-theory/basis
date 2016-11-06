@@ -1,6 +1,5 @@
-/// @file
-/****************************************************************
-  lsjt_operator.h
+/************************************************************//**
+  @file lsjt_operator.h
 
   Defines functions for I/O and manipulation of relative and two-body
   operator matrices in LSJT coupling scheme.  Written for use in
@@ -20,32 +19,32 @@
   Mark A. Caprio
   University of Notre Dame
 
-  11/21/15 (mac): Created (lsjt_interaction.h), from code in
+  + 11/21/15 (mac): Created (lsjt_interaction.h), from code in
     moshinsky_xform_lsjt.
-  6/8/16 (mac): Update for basis package and update conventions.
+  + 6/8/16 (mac): Update for basis package and update conventions.
     - Rename to lsjt_operator.h.
     - Remove matrix-style output.
     - Remove generic template functions.
-  7/3/16 (mac): Add relative LSJT operator file I/O.
-  7/6/16 (mac):
+  + 7/3/16 (mac): Add relative LSJT operator file I/O.
+  + 7/6/16 (mac):
     - Add symmetry phase header field and update documentation.
     - Upgrade precision on operator output.
-  7/8/16 (mac): Add two-body LSJT operator file I/O.
-  7/9/16 (mac): Add support for canonicalizing indices in relative
+  + 7/8/16 (mac): Add two-body LSJT operator file I/O.
+  + 7/9/16 (mac): Add support for canonicalizing indices in relative
     LSJT matrix element lookup (for Hamiltonian-like operators).
-  7/10/16 (mac):
+  + 7/10/16 (mac):
     - Add support for canonicalizing indices in general
       LSJT matrix element lookup (for Hamiltonian-like operators).
     - Define OperatorLabelsJT and add documentation on operators.
     - Incorporate some basic LSJT operator construction and
       manipulation functions.
-  7/13/16 (mac): Revise code for LSJTN->LSJT gathering operation.
-  7/20/16 (mac): Add ReadRelativeOperatorLSJT.
-  7/22/16 (mac): Revise syntax for CanonicalizeIndicesLSJT.
-  7/25/16 (mac): Add WriteRelativeOperatorLSJT.
-  8/16/16 (mac): Add WriteRelativeCMOperatorComponentLSJT and
+  + 7/13/16 (mac): Revise code for LSJTN->LSJT gathering operation.
+  + 7/20/16 (mac): Add ReadRelativeOperatorLSJT.
+  + 7/22/16 (mac): Revise syntax for CanonicalizeIndicesLSJT.
+  + 7/25/16 (mac): Add WriteRelativeOperatorLSJT.
+  + 8/16/16 (mac): Add WriteRelativeCMOperatorComponentLSJT and
     corresponding gather function.
-  11/4/16 (mac): Remove dependency on Eigen/Core.
+  + 11/4/16 (mac): Remove dependency on Eigen/Core.
 
 ****************************************************************/
 

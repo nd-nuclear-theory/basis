@@ -1,6 +1,5 @@
-/// @file
-/****************************************************************
-  many_body.h
+/************************************************************//**
+  @file many_body.h
 
   Provides convenience definitions for many-body indexing schemes.
 
@@ -9,7 +8,7 @@
   Mark A. Caprio
   University of Notre Dame
 
-  7/19/16 (mac): Created, incorporating code from operator.h.
+  + 7/19/16 (mac): Created, incorporating code from operator.h.
 
 ****************************************************************/
 
