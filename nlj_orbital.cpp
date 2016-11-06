@@ -25,6 +25,10 @@ namespace basis {
   const std::array<const char*,2> kOrbitalSpeciesPNCodeChar({"p","n"});
 
 
+  // orbital file version codes
+  enum class MFDnOrbitalFormat : int {kVersion15099=15099};
+
+
   ////////////////////////////////////////////////////////////////
   // single-particle definition file parsing
   ////////////////////////////////////////////////////////////////
@@ -94,7 +98,7 @@ namespace basis {
           int version;
           line_stream >> version;
           ParsingCheck(line_stream,line_count,line);
-          assert(version==15055);
+          assert(version==int(MFDnOrbitalFormat::kVersion15099));
         }
 
         // line 2: number of p,n orbitals
@@ -188,7 +192,7 @@ namespace basis {
         header << "#   index n l 2*j species weight" << std::endl;
 
         // header line 1: version
-        int version = 15055;
+        int version = int(MFDnOrbitalFormat::kVersion15099);
         header << version << std::endl;
 
         // header line 2: dimensions
@@ -410,6 +414,7 @@ namespace basis {
        << " " << std::setw(width) << n()
        << " " << std::setw(width) << l()
        << " " << std::setw(width) << j()
+       << " :"
        << " " << std::setw(width) << weight()
        << " " << "]";
 

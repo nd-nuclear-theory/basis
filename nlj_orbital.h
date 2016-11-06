@@ -41,6 +41,7 @@
   + 10/26/16 (mac): Add equality test for orbitals.
   + 10/26/16 (pjf): Add stream operators to OrbitalPNInfo.
   + 10/26/16 (mac): Add OrbitalStatePN::LabelStr().
+  + 11/5/16 (mac): Update MFDn orbital file version code (and define enum).
 
 ****************************************************************/
 
