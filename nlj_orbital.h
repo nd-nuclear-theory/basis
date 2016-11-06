@@ -143,6 +143,14 @@ namespace basis {
       return equiv;
     }
 
+    inline bool operator<(const OrbitalPNInfo& rhs) const {
+      std::tuple<OrbitalSpeciesPN,double,int,int,HalfInt>
+        lhs_labels(orbital_species, weight, n, l, j);
+      std::tuple<OrbitalSpeciesPN,double,int,int,HalfInt>
+        rhs_labels(rhs.orbital_species, rhs.weight, rhs.n, rhs.l, rhs.j);
+      return (lhs_labels < rhs_labels);
+    }
+
     friend std::ostream& operator<<(
       std::ostream &out, const OrbitalPNInfo& orbital_info);
     friend std::istream& operator>>(
@@ -163,7 +171,7 @@ namespace basis {
   // Returns:
   //   (std::vector<OrbitalPNInfo>) : list of flattened orbital parameters
 
-  std::string OrbitalDefinitionStr(const std::vector<OrbitalPNInfo>& orbitals, bool standalone = false);
+  std::string OrbitalDefinitionStr(std::vector<OrbitalPNInfo> orbitals, bool standalone = false, bool sort = true);
   // Output orbital info as a string suitable for MFDn version 15.
   //
   // Arguments:
