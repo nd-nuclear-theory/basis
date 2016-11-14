@@ -41,6 +41,7 @@
   + 10/26/16 (pjf): Add stream operators to OrbitalPNInfo.
   + 10/26/16 (mac): Add OrbitalStatePN::LabelStr().
   + 11/5/16 (mac): Update MFDn orbital file version code (and define enum).
+  + 11/13/16 (mac): Fix sorting order of orbitals.
 
 ****************************************************************/
 
@@ -142,11 +143,13 @@ namespace basis {
       return equiv;
     }
 
+    // sorting operator imposing (species,weight,l,j) sorting order
+    //   which preserves standard oscillator order in oscillator scheme
     inline bool operator<(const OrbitalPNInfo& rhs) const {
-      std::tuple<OrbitalSpeciesPN,double,int,int,HalfInt>
-        lhs_labels(orbital_species, weight, n, l, j);
-      std::tuple<OrbitalSpeciesPN,double,int,int,HalfInt>
-        rhs_labels(rhs.orbital_species, rhs.weight, rhs.n, rhs.l, rhs.j);
+      std::tuple<OrbitalSpeciesPN,double,int,HalfInt,int>
+        lhs_labels(orbital_species, weight, l, j, n);
+      std::tuple<OrbitalSpeciesPN,double,int,HalfInt,int>
+        rhs_labels(rhs.orbital_species, rhs.weight, rhs.l, rhs.j, rhs.n);
       return (lhs_labels < rhs_labels);
     }
 
