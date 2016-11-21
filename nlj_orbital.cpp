@@ -908,11 +908,13 @@ namespace basis {
    * enumeration).
    *
    * Sectors are enumerated in lexicographical order by (bra)(ket).
+   *
    * @param[in] bra_space space containing bra states
    * @param[in] ket_space space containing ket states
    */
   OrbitalSectorsLJPN::OrbitalSectorsLJPN(
-      const OrbitalSpaceLJPN& bra_space, const OrbitalSpaceLJPN& ket_space)
+      const OrbitalSpaceLJPN& bra_space, const OrbitalSpaceLJPN& ket_space
+    )
   {
     for (int bra_subspace_index=0; bra_subspace_index<bra_space.size(); ++bra_subspace_index) {
       for (int ket_subspace_index=0; ket_subspace_index<ket_space.size(); ++ket_subspace_index) {

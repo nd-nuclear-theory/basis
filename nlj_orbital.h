@@ -42,6 +42,7 @@
   + 10/26/16 (mac): Add OrbitalStatePN::LabelStr().
   + 11/5/16 (mac): Update MFDn orbital file version code (and define enum).
   + 11/13/16 (mac): Fix sorting order of orbitals.
+  + 11/21/16 (mac): Add FullLabels accessor for orbitals.
 
 ****************************************************************/
 
@@ -59,7 +60,7 @@
 namespace basis {
 
   ////////////////////////////////////////////////////////////////
-  // single-particle orbitals
+  // single-particle orbital label types and coding schemes
   ////////////////////////////////////////////////////////////////
 
   /**
@@ -112,12 +113,19 @@ namespace basis {
    */
   extern const std::array<const char*, 2> kOrbitalSpeciesPNCodeChar;
 
-  /**
+  ////////////////////////////////////////////////////////////////
+  // orbital label containers
+  ////////////////////////////////////////////////////////////////
+
+  typedef std::tuple<OrbitalSpeciesPN,int,int,HalfInt> FullOrbitalLabels;
+  ///< Full (species,n,l,j) labels for an orbital.
+
+  struct OrbitalPNInfo
+  /**<
    * A flattened orbital container.
    *
    * All quantum numbers used by MFDn are contained in this simple struct.
    */
-  struct OrbitalPNInfo
   {
     OrbitalSpeciesPN orbital_species;
     int n;
@@ -330,6 +338,10 @@ namespace basis {
     int l() const {return std::get<1>(GetStateLabels());}
     HalfInt j() const {return std::get<2>(GetStateLabels());}
     int g() const {return l()%2;}
+    FullOrbitalLabels full_labels() const
+    {
+      return std::make_tuple(orbital_species(),n(),l(),j());
+    }
 
     // state weight accessors
     double weight() const {return Subspace().weights()[index()];}
@@ -542,6 +554,10 @@ namespace basis {
     int l() const {return Subspace().l();}
     HalfInt j() const {return Subspace().j();}
     int g() const {return l()%2;}
+    FullOrbitalLabels full_labels() const
+    {
+      return std::make_tuple(orbital_species(),n(),l(),j());
+    }
 
     // state label accessors
     int n() const {return std::get<0>(GetStateLabels());}

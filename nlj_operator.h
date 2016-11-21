@@ -11,6 +11,8 @@
   + 11/1/16 (mac): Created.
   + 11/4/16 (mac): Add informative error messages on failed
     MatrixElementLJPN lookup.
+  + 11/21/16 (mac): Break out matrix element indexing lookup
+    from value lookup.
 
 ****************************************************************/
 
@@ -25,6 +27,30 @@ namespace basis {
   ////////////////////////////////////////////////////////////////
   // matrix element lookup
   ////////////////////////////////////////////////////////////////
+
+  std::tuple<int,int,int>
+  MatrixElementIndicesLJPN(
+      const basis::OrbitalSpaceLJPN& bra_orbital_space,
+      const basis::OrbitalSpaceLJPN& ket_orbital_space,
+      const basis::OrbitalSectorsLJPN& sectors,
+      const basis::FullOrbitalLabels& bra_labels,
+      const basis::FullOrbitalLabels& ket_labels
+    );
+  // Look up radial matrix element indices by (species,n,l,j) labels.
+  //
+  // Returns basis::kNone for failed index lookups.
+  //
+  // Arguments:
+  //   bra_orbital_space (basis::OrbitalSpaceLJPN): LJPN bra space
+  //   ket_orbital_space (basis::OrbitalSpaceLJPN): LJPN ket space
+  //   sectors (basis::OrbitalSectorsLJPN): LJPN sectors for operator
+  //   matrices (basis::MatrixVector): matrices corresponding to these sectors
+  //   bra_labels (basis::FullOrbitalLabels): bra state labels
+  //   ket_labels (basis::FullOrbitalLabels): ket state labels
+  //
+  // Returns:
+  //   (std::tuple<int,int,int>): the matrix element indices
+  //     (sector_index,bra_state_index,ket_state_index)
 
   double MatrixElementLJPN(
       const basis::OrbitalSpaceLJPN& bra_orbital_space,
