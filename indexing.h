@@ -90,7 +90,11 @@
   + 7/25/16 (mac): Add utility member function IsUpperTriangle.
   + 10/25/16 (mac):
     - Implement return of flag value for failed lookup.
-    - Provide sector lookup by sector key.
+    - Provide sector lookup by sector key and refactor ContainsSector and
+      LookUpSectorIndex.
+  + 11/22/16 (mac):
+    - Fix wrong return in broken-out ContainsSector.
+    - Reexpand (remultiply?) ContainsSector and LookUpSectorIndex.
 
 ****************************************************************/
 
@@ -676,12 +680,14 @@ namespace basis {
       // is found within the the sector set.
       {
         typename SectorType::KeyType key(bra_subspace_index,ket_subspace_index,multiplicity_index);
-        return LookUpSectorIndex(key);
+        return lookup_.count(key);
       };
 
       bool ContainsSector(const typename SectorType::KeyType& key) const
       // Given the labels for a sector, returns whether or not the sector
       // is found within the the sector set.
+      //
+      // DEPRECATED
       {
         return lookup_.count(key);
       };
@@ -693,7 +699,11 @@ namespace basis {
       // If no such labels are found, basis::kNone is returned.
       {
         typename SectorType::KeyType key(bra_subspace_index,ket_subspace_index,multiplicity_index);
-        return LookUpSectorIndex(key);
+        auto pos = lookup_.find(key);
+        if (pos==lookup_.end())
+          return kNone;
+        else
+          return pos->second;
       };
 
       int LookUpSectorIndex(const typename SectorType::KeyType& key) const
@@ -701,6 +711,8 @@ namespace basis {
       // sector set.
       //
       // If no such labels are found, basis::kNone is returned.
+      //
+      // DEPRECATED
       {
 
         // PREVIOUSLY: trap failed lookup with assert for easier debugging
