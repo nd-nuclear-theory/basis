@@ -642,6 +642,15 @@ namespace basis {
     // enumeration).
 
     OrbitalSectorsLJPN(
+        const OrbitalSpaceLJPN& space,
+        int j0, int g0, int Tz0,
+        basis::SectorDirection sector_direction = basis::SectorDirection::kCanonical
+      );
+    // Enumerate sector pairs connected by an operator of given
+    // tensorial and parity character ("constrained" sector
+    // enumeration).
+
+    OrbitalSectorsLJPN(
         const OrbitalSpaceLJPN& bra_space, const OrbitalSpaceLJPN& ket_space
       );
     // Enumerate all sector pairs between two spaces ("all-to-all" sector
@@ -657,16 +666,27 @@ namespace basis {
     // given tensorial and parity character ("constrained" sector
     // enumeration).
 
+    OrbitalSectorsLJPN(
+        const OrbitalSpaceLJPN& bra_space, const OrbitalSpaceLJPN& ket_space,
+        int j0, int g0, int Tz0
+      );
+    // Enumerate sector pairs between two spaces connected by an operator of
+    // given tensorial and parity character ("constrained" sector
+    // enumeration).
+
     // diagnostic string
     std::string DebugStr() const;
 
     // accessors
     int l0max() const {return l0max_;}
+    HalfInt j0() const {return j0_;}
+    int g0() const {return g0_;}
     int Tz0() const {return Tz0_;}
 
    private:
     // operator properties
-    int l0max_, Tz0_;
+    int l0max_, Tz0_, g0_;
+    HalfInt j0_;
   };
 
   ////////////////////////////////////////////////////////////////
