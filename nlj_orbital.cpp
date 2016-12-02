@@ -153,17 +153,12 @@ namespace basis {
    * @param[in] orbitals list of flattened orbital parameters
    * @return output stream containing MFDn-formatted orbital definitions
    */
-  std::string OrbitalDefinitionStr(std::vector<OrbitalPNInfo> orbitals, bool standalone, bool sort)
+  std::string OrbitalDefinitionStr(const std::vector<OrbitalPNInfo>& orbitals, bool standalone)
   {
 
     std::ostringstream header;
     std::ostringstream body;
     std::ostringstream os;
-
-    // sort orbitals
-    if (sort) {
-      std::sort(orbitals.begin(), orbitals.end());
-    }
 
     // construct body
     const int width = 3;

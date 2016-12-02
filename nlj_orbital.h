@@ -43,6 +43,9 @@
   + 11/5/16 (mac): Update MFDn orbital file version code (and define enum).
   + 11/13/16 (mac): Fix sorting order of orbitals.
   + 11/21/16 (mac): Add FullLabels accessor for orbitals.
+  + 11/24/16 (pjf):
+    - Remove sorting from OrbitalDefinitionStr().
+    - Remove operator< from OrbitalPNInfo.
 
 ****************************************************************/
 
@@ -139,33 +142,23 @@ namespace basis {
     OrbitalPNInfo(OrbitalSpeciesPN os, int n, int l, HalfInt j, double weight)
       : orbital_species(os), n(n), l(l), j(j), weight(weight) {};
 
+    inline FullOrbitalLabels Key() const {
+      return FullOrbitalLabels(orbital_species, n, l, j);
+    }
     static constexpr double kWeightTolerance = 1e-8;
     inline bool operator==(const OrbitalPNInfo& rhs) const
     {
       bool equiv = true;
-      equiv &= (this->orbital_species==rhs.orbital_species);
-      equiv &= (this->n==rhs.n);
-      equiv &= (this->l==rhs.l);
-      equiv &= (this->j==rhs.j);
+      equiv &= (this->Key()==rhs.Key());
       equiv &= (abs(this->weight-rhs.weight)<kWeightTolerance);
       return equiv;
     }
 
-    // sorting operator imposing (species,weight,l,j) sorting order
-    //   which preserves standard oscillator order in oscillator scheme
-    inline bool operator<(const OrbitalPNInfo& rhs) const {
-      std::tuple<OrbitalSpeciesPN,double,int,HalfInt,int>
-        lhs_labels(orbital_species, weight, l, j, n);
-      std::tuple<OrbitalSpeciesPN,double,int,HalfInt,int>
-        rhs_labels(rhs.orbital_species, rhs.weight, rhs.l, rhs.j, rhs.n);
-      return (lhs_labels < rhs_labels);
-    }
-
-    friend std::ostream& operator<<(
-      std::ostream &out, const OrbitalPNInfo& orbital_info);
-    friend std::istream& operator>>(
-        std::istream &in, OrbitalPNInfo& orbital_info);
+    friend std::ostream& operator<<(std::ostream &out, const OrbitalPNInfo& orbital_info);
+    friend std::istream& operator>>(std::istream &in, OrbitalPNInfo& orbital_info);
   };
+
+
 
   // orbital I/O
 
@@ -181,7 +174,7 @@ namespace basis {
   // Returns:
   //   (std::vector<OrbitalPNInfo>) : list of flattened orbital parameters
 
-  std::string OrbitalDefinitionStr(std::vector<OrbitalPNInfo> orbitals, bool standalone = false, bool sort = true);
+  std::string OrbitalDefinitionStr(const std::vector<OrbitalPNInfo>& orbitals, bool standalone = false);
   // Output orbital info as a string suitable for MFDn version 15.
   //
   // Arguments:
