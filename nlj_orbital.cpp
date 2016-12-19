@@ -827,134 +827,10 @@ namespace basis {
 
   }
 
-  /**
-   * Construct all sector pairs ("all-to-all" sector enumeration).
-   *
-   * Sectors are enumerated in lexicographical order by (bra)(ket).
-   * @param[in] space space containing states from which to construct pairs
-   * @param[in] sector_direction
-   */
-  OrbitalSectorsLJPN::OrbitalSectorsLJPN(
-      const OrbitalSpaceLJPN& space,
-      basis::SectorDirection sector_direction)
-    : l0max_(999), j0_(999), g0_(0), Tz0_(1)
-  {
-    for (int bra_subspace_index=0; bra_subspace_index<space.size(); ++bra_subspace_index) {
-      for (int ket_subspace_index=0; ket_subspace_index<space.size(); ++ket_subspace_index) {
-        if ((sector_direction == basis::SectorDirection::kCanonical)
-            && (bra_subspace_index>ket_subspace_index)) {
-          continue;
-        }
-
-        // retrieve subspaces
-        const SubspaceType& bra_subspace = space.GetSubspace(bra_subspace_index);
-        const SubspaceType& ket_subspace = space.GetSubspace(ket_subspace_index);
-
-        // push sector
-        PushSector(SectorType(bra_subspace_index,ket_subspace_index,bra_subspace,ket_subspace));
-      }
-    }
-  }
-
-  /**
-   * Construct sector pairs connected by an operator of given
-   * maximum delta-l and Tz0 character ("constrained" sector
-   * enumeration).
-   *
-   * @param[in] space space containing states from which to construct pairs
-   * @param[in] l0max maximum change in orbital angular momentum
-   * @param[in] Tz0 isospin projection character
-   * @param[in] sector_direction
-   */
-  OrbitalSectorsLJPN::OrbitalSectorsLJPN(
-      const OrbitalSpaceLJPN& space,
-      int l0max, int Tz0,
-      basis::SectorDirection sector_direction)
-    : l0max_(l0max), j0_(l0max), g0_(l0max%2), Tz0_(Tz0)
-  {
-    int g0 = l0max%2;
-    for (int bra_subspace_index=0; bra_subspace_index<space.size(); ++bra_subspace_index) {
-      for (int ket_subspace_index=0; ket_subspace_index<space.size(); ++ket_subspace_index) {
-        if ((sector_direction == basis::SectorDirection::kCanonical)
-            && (bra_subspace_index>ket_subspace_index)) {
-          continue;
-        }
-
-        // retrieve subspaces
-        const SubspaceType& bra_subspace = space.GetSubspace(bra_subspace_index);
-        const SubspaceType& ket_subspace = space.GetSubspace(ket_subspace_index);
-
-        bool allowed = true;
-        allowed &= (abs(bra_subspace.l()-ket_subspace.l()) <= l0max);
-        allowed &= (abs(bra_subspace.Tz()-ket_subspace.Tz()) <= Tz0);
-        /// @note sectors also constrained by delta-j <= l0max
-        allowed &= (abs(bra_subspace.j()-ket_subspace.j()) <= l0max);
-        allowed &= ((ket_subspace.g()+g0+bra_subspace.g())%2==0);
-
-        // push sector
-        if (allowed) {
-          PushSector(SectorType(bra_subspace_index,ket_subspace_index,
-                                bra_subspace,ket_subspace));
-        }
-      }
-    }
-  }
-
-  /**
-   * Construct sector pairs connected by an operator of given
-   * maximum delta-l and Tz0 character ("constrained" sector
-   * enumeration).
-   *
-   * @param[in] space space containing states from which to construct pairs
-   * @param[in] j0 tensorial character
-   * @param[in] g0 parity character
-   * @param[in] Tz0 isospin projection character
-   * @param[in] sector_direction
-   */
-  OrbitalSectorsLJPN::OrbitalSectorsLJPN(
-      const OrbitalSpaceLJPN& space,
-      int j0, int g0, int Tz0,
-      basis::SectorDirection sector_direction)
-    : l0max_(j0), j0_(j0), g0_(g0), Tz0_(Tz0)
-  {
-    for (int bra_subspace_index=0; bra_subspace_index<space.size(); ++bra_subspace_index) {
-      for (int ket_subspace_index=0; ket_subspace_index<space.size(); ++ket_subspace_index) {
-        if ((sector_direction == basis::SectorDirection::kCanonical)
-            && (bra_subspace_index>ket_subspace_index)) {
-          continue;
-        }
-
-        // retrieve subspaces
-        const SubspaceType& bra_subspace = space.GetSubspace(bra_subspace_index);
-        const SubspaceType& ket_subspace = space.GetSubspace(ket_subspace_index);
-
-        bool allowed = true;
-        allowed &= am::AllowedTriangle(ket_subspace.j(),j0,bra_subspace.j());
-        allowed &= ((ket_subspace.g()+g0+bra_subspace.g())%2==0);
-        allowed &= (abs(bra_subspace.Tz()-ket_subspace.Tz()) <= Tz0);
-
-        // push sector
-        if (allowed) {
-          PushSector(SectorType(bra_subspace_index,ket_subspace_index,
-                                bra_subspace,ket_subspace));
-        }
-      }
-    }
-  }
-
-  /**
-   * Construct all sector pairs between two pairs ("all-to-all" sector
-   * enumeration).
-   *
-   * Sectors are enumerated in lexicographical order by (bra)(ket).
-   *
-   * @param[in] bra_space space containing bra states
-   * @param[in] ket_space space containing ket states
-   */
   OrbitalSectorsLJPN::OrbitalSectorsLJPN(
       const OrbitalSpaceLJPN& bra_space, const OrbitalSpaceLJPN& ket_space
     )
-    : l0max_(999), j0_(999), g0_(0), Tz0_(1)
+    : l0max_(-1), j0_(-1), g0_(-1), Tz0_(1), mode_(SectorsConstraintMode::kAll)
   {
     for (int bra_subspace_index=0; bra_subspace_index<bra_space.size(); ++bra_subspace_index) {
       for (int ket_subspace_index=0; ket_subspace_index<ket_space.size(); ++ket_subspace_index) {
@@ -968,22 +844,11 @@ namespace basis {
     }
   }
 
-  /**
-   * Construct sector pairs between two spaces connected by an operator of
-   * given maximum delta-l and Tz0 character ("constrained" sector
-   * enumeration).
-   *
-   * @param[in] bra_space space containing bra states
-   * @param[in] ket_space space containing ket states
-   * @param[in] l0max maximum change in orbital angular momentum
-   * @param[in] Tz0 isospin projection character
-   */
   OrbitalSectorsLJPN::OrbitalSectorsLJPN(
       const OrbitalSpaceLJPN& bra_space, const OrbitalSpaceLJPN& ket_space,
       int l0max, int Tz0)
-    : l0max_(l0max), j0_(l0max), g0_(l0max%2), Tz0_(Tz0)
+    : l0max_(l0max), j0_(-1), g0_(l0max%2), Tz0_(Tz0), mode_(SectorsConstraintMode::kRadial)
   {
-    int g0 = l0max%2;
     for (int bra_subspace_index=0; bra_subspace_index<bra_space.size(); ++bra_subspace_index) {
       for (int ket_subspace_index=0; ket_subspace_index<ket_space.size(); ++ket_subspace_index) {
 
@@ -996,7 +861,7 @@ namespace basis {
         /// @note sectors also constrained by delta-j <= l0max
         allowed &= (abs(bra_subspace.j()-ket_subspace.j()) <= l0max);
         allowed &= (abs(bra_subspace.Tz()-ket_subspace.Tz()) <= Tz0);
-        allowed &= ((ket_subspace.g()+g0+bra_subspace.g())%2 == 0);
+        allowed &= ((ket_subspace.g()+g0_+bra_subspace.g())%2 == 0);
 
         // push sector
         if (allowed) {
@@ -1007,21 +872,10 @@ namespace basis {
     }
   }
 
-  /**
-   * Construct sector pairs connected by an operator of given
-   * maximum delta-l and Tz0 character ("constrained" sector
-   * enumeration).
-   *
-   * @param[in] space space containing states from which to construct pairs
-   * @param[in] j0 tensorial character
-   * @param[in] g0 parity character
-   * @param[in] Tz0 isospin projection character
-   * @param[in] sector_direction
-   */
   OrbitalSectorsLJPN::OrbitalSectorsLJPN(
       const OrbitalSpaceLJPN& bra_space, const OrbitalSpaceLJPN& ket_space,
       int j0, int g0, int Tz0)
-    : l0max_(j0), j0_(j0), g0_(g0), Tz0_(Tz0)
+    : l0max_(-1), j0_(j0), g0_(g0), Tz0_(Tz0), mode_(SectorsConstraintMode::kSpherical)
   {
     for (int bra_subspace_index=0; bra_subspace_index<bra_space.size(); ++bra_subspace_index) {
       for (int ket_subspace_index=0; ket_subspace_index<ket_space.size(); ++ket_subspace_index) {

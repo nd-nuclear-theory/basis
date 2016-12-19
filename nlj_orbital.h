@@ -605,6 +605,8 @@ namespace basis {
 
   // sectors
 
+  enum class SectorsConstraintMode {kAll=0, kRadial=1, kSpherical=2};
+
   class OrbitalSectorsLJPN
     : public BaseSectors<OrbitalSpaceLJPN>
   {
@@ -618,51 +620,39 @@ namespace basis {
     // purposes by STL container classes (e.g., std::vector::resize)
 
     OrbitalSectorsLJPN(
-        const OrbitalSpaceLJPN& space,
-        basis::SectorDirection sector_direction = basis::SectorDirection::kCanonical
-      );
+      const OrbitalSpaceLJPN& bra_space, const OrbitalSpaceLJPN& ket_space
+    );
+    OrbitalSectorsLJPN(
+        const OrbitalSpaceLJPN& space
+    ) : OrbitalSectorsLJPN(space, space) {}
     // Enumerate all sector pairs ("all-to-all" sector enumeration).
     //
     // Sectors are enumerated in lexicographical order by (bra)(ket).
 
     OrbitalSectorsLJPN(
-        const OrbitalSpaceLJPN& space,
-        int l0max, int Tz0,
-        basis::SectorDirection sector_direction = basis::SectorDirection::kCanonical
-      );
-    // Enumerate sector pairs connected by an operator of given
-    // tensorial and parity character ("constrained" sector
-    // enumeration).
-
+      const OrbitalSpaceLJPN& bra_space, const OrbitalSpaceLJPN& ket_space,
+      int l0max, int Tz0
+    );
     OrbitalSectorsLJPN(
         const OrbitalSpaceLJPN& space,
-        int j0, int g0, int Tz0,
-        basis::SectorDirection sector_direction = basis::SectorDirection::kCanonical
-      );
-    // Enumerate sector pairs connected by an operator of given
-    // tensorial and parity character ("constrained" sector
-    // enumeration).
-
-    OrbitalSectorsLJPN(
-        const OrbitalSpaceLJPN& bra_space, const OrbitalSpaceLJPN& ket_space
-      );
-    // Enumerate all sector pairs between two spaces ("all-to-all" sector
-    // enumeration).
-    //
-    // Sectors are enumerated in lexicographical order by (bra)(ket).
-
-    OrbitalSectorsLJPN(
-        const OrbitalSpaceLJPN& bra_space, const OrbitalSpaceLJPN& ket_space,
         int l0max, int Tz0
-      );
-    // Enumerate sector pairs between two spaces connected by an operator of
-    // given tensorial and parity character ("constrained" sector
+    ) : OrbitalSectorsLJPN(space, space, l0max, Tz0) {}
+    // Enumerate sector pairs connected by an operator of given
+    // radial operator quality ("constrained" sector
     // enumeration).
 
     OrbitalSectorsLJPN(
-        const OrbitalSpaceLJPN& bra_space, const OrbitalSpaceLJPN& ket_space,
+      const OrbitalSpaceLJPN& bra_space, const OrbitalSpaceLJPN& ket_space,
+      int j0, int g0, int Tz0
+    );
+    OrbitalSectorsLJPN(
+        const OrbitalSpaceLJPN& space,
         int j0, int g0, int Tz0
-      );
+    ) : OrbitalSectorsLJPN(space, space, j0, g0, Tz0) {}
+    // Enumerate sector pairs connected by an operator of given
+    // tensorial and parity character ("constrained" sector
+    // enumeration).
+
     // Enumerate sector pairs between two spaces connected by an operator of
     // given tensorial and parity character ("constrained" sector
     // enumeration).
@@ -671,15 +661,17 @@ namespace basis {
     std::string DebugStr() const;
 
     // accessors
-    int l0max() const {return l0max_;}
-    HalfInt j0() const {return j0_;}
-    int g0() const {return g0_;}
-    int Tz0() const {return Tz0_;}
+    int l0max()  const {assert(mode()==SectorsConstraintMode::kRadial); return l0max_;}
+    HalfInt j0() const {assert(mode()==SectorsConstraintMode::kSpherical); return j0_;}
+    int g0()     const {return g0_;}
+    int Tz0()    const {return Tz0_;}
+    SectorsConstraintMode mode() const {return mode_;}
 
    private:
     // operator properties
     int l0max_, Tz0_, g0_;
     HalfInt j0_;
+    SectorsConstraintMode mode_;
   };
 
   ////////////////////////////////////////////////////////////////
