@@ -95,6 +95,7 @@
   + 11/22/16 (mac):
     - Fix wrong return in broken-out ContainsSector.
     - Reexpand (remultiply?) ContainsSector and LookUpSectorIndex.
+  + 2/17/17 (mac): Add generic DebugStr for BaseSectors.
 
 ****************************************************************/
 
@@ -104,6 +105,11 @@
 #include <cassert>
 #include <tuple>
 #include <vector>
+
+// for DebugStr
+#include <iomanip>
+#include <sstream>
+
 
 #ifdef INDEXING_HASH
 #include <unordered_map>
@@ -666,7 +672,7 @@ namespace basis {
       typedef BaseSector<SubspaceType> SectorType;
 
       ////////////////////////////////////////////////////////////////
-      // subspace lookup and retrieval
+      // sector lookup and retrieval
       ////////////////////////////////////////////////////////////////
 
       const SectorType& GetSector(int i) const
@@ -736,6 +742,15 @@ namespace basis {
         return sectors_.size();
       };
 
+      ////////////////////////////////////////////////////////////////
+      // diagnostic strings
+      ////////////////////////////////////////////////////////////////
+
+      std::string DebugStr() const;
+      // Generate string dump of contents, for debugging purposes.
+      //
+      // Requires subspace to have a LabelStr() member function.
+
       protected:
 
       ////////////////////////////////////////////////////////////////
@@ -765,6 +780,26 @@ namespace basis {
 #endif
 
     };
+
+  template <typename tSpaceType>
+    std::string BaseSectors<tSpaceType>::DebugStr() const
+    {
+      std::ostringstream os;
+      for (int sector_index=0; sector_index<size(); ++sector_index)
+        {
+          const SectorType& sector = GetSector(sector_index);
+          
+          os << "  sector " << sector_index
+             << "  bra index " << sector.bra_subspace_index()
+             << " labels " << sector.bra_subspace().LabelStr()
+             << " dim " << sector.bra_subspace().size()
+             << "  ket index " << sector.ket_subspace_index()
+             << " labels " << sector.ket_subspace().LabelStr()
+             << " dim " << sector.ket_subspace().size()
+             << std::endl;
+        }
+      return os.str();
+    }
 
   ////////////////////////////////////////////////////////////////
   ////////////////////////////////////////////////////////////////
