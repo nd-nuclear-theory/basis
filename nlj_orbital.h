@@ -158,7 +158,13 @@ namespace basis {
     friend std::istream& operator>>(std::istream &in, OrbitalPNInfo& orbital_info);
   };
 
-
+  inline bool OrbitalSortCmpWeight(const OrbitalPNInfo& lhs, const OrbitalPNInfo& rhs) {
+    std::tuple<OrbitalSpeciesPN,double,int,HalfInt,int>
+      lhs_labels(lhs.orbital_species, lhs.weight, lhs.l, lhs.j, lhs.n);
+    std::tuple<OrbitalSpeciesPN,double,int,HalfInt,int>
+      rhs_labels(rhs.orbital_species, rhs.weight, rhs.l, rhs.j, rhs.n);
+    return (lhs_labels < rhs_labels);
+  }
 
   // orbital I/O
 
