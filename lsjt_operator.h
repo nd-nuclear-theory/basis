@@ -45,6 +45,8 @@
   + 8/16/16 (mac): Add WriteRelativeCMOperatorComponentLSJT and
     corresponding gather function.
   + 11/4/16 (mac): Remove dependency on Eigen/Core.
+  + 3/26/17 (mac): Add note on conjugation phase relation for
+      spherical-harmonic-like operators (still kHermitian).
 
 ****************************************************************/
 
@@ -157,19 +159,21 @@ namespace basis {
   //   matrix elements.  Therefore, conjuation will in general involve
   //   phase and dimension factors.
   //
-  //   The symmetry_phase_mode field in the header is reserved to provide
-  //   information on the correct form to use for this phase factor.
-  //   However, for now, only the placeholder value kHermitian(=0) is
-  //   defined for symmetry_phase_mode, and phase conventions are only
-  //   well-defined for a Hamiltonian-like (J0=0, g0=0) operator.
+  //   The symmetry_phase_mode field in the header is reserved to
+  //   provide information on the correct form to use for this phase
+  //   factor.  However, for now, only the placeholder value
+  //   kHermitian(=0) is defined for symmetry_phase_mode, and phase
+  //   conventions are only well-defined for a Hamiltonian-like (J0=0,
+  //   g0=0) operator.
   //
-  //   symmetry_phase_mode=kHermitian, J0=0, g0=0: For a Hamiltonian-like operator,
-  //   we expect Hermiticity, i.e., symmetry of (M_J,M_T)-branched
-  //   matrix elements.  Within a diagonal sector, this means that the
-  //   lower triangle is obtained from the upper triangle by ordinary
-  //   symmetry.  For off-diagonal sectors, the appropriate symmetry
-  //   on the JT-reduced matrix elements in general includes phase and
-  //   dimension factors from the isospin Clebsches:
+  //   symmetry_phase_mode=kHermitian, J0=0, g0=0: For a
+  //   Hamiltonian-like operator, we expect Hermiticity, i.e.,
+  //   symmetry of (M_J,M_T)-branched matrix elements.  Within a
+  //   diagonal sector, this means that the lower triangle is obtained
+  //   from the upper triangle by ordinary symmetry.  For off-diagonal
+  //   sectors, the appropriate symmetry on the JT-reduced matrix
+  //   elements in general includes phase and dimension factors from
+  //   the isospin Clebsches:
   //
   //     <a,J,T,g || A_{T0} || a',J,T',g>
   //       = (-)^(T'-T)*Hat(T')/Hat(T)
@@ -179,6 +183,29 @@ namespace basis {
   //   in the isospin-changing <T=0|T=1> sectors.  These sectors
   //   conventionally only contain vanishing matrix elements for
   //   nuclear interactions.
+  //
+  //   For an operator which transforms under conjugation as a
+  //   spherical harmonic, if we look purely at the angular momentum
+  //   dependence, we in general obtain the conjugated RME (under
+  //   group theory conventions for the RME)
+  //
+  //          <J||A_{J0}||J'> = (-)^(J'-J)*Hat(J')/Hat(J)*<J'||A_{J0}||J>
+  //
+  //   This relation applies to both the M1 and E2 operators under
+  //   Condon-Shortley phase conventions (Suhonen Ch. 6) for these
+  //   operators.  It is derived from the W-E theorem, symmetry of CG
+  //   coefficient, and conjugation properties of these operators.
+  //
+  //   Putting this together, for a JT basis, a spherical
+  //   harmonic-like operator conjugates as
+  //
+  //     <a,J,T,g || A_{J0,T0} || a',J,T',g>
+  //       = (-)^(J'-J)*Hat(J')/Hat(J)
+  //         * (-)^(T'-T)*Hat(T')/Hat(T)
+  //         * <a',J,T',g || A_{J0,T0} || a,J,T,g>
+  //
+  //   Note that Hermitian conjugation behavior is recovered in the
+  //   special case of J0=0.
   //
   // Radial oscillator phase convention
   //
