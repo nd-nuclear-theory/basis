@@ -47,6 +47,7 @@
   + 11/4/16 (mac): Remove dependency on Eigen/Core.
   + 3/26/17 (mac): Add conjugation phase relation for
       spherical-harmonic-like operators (still kHermitian).
+  + 3/28/17 (mac): Add constructors for OperatorLabelsJT.
 
 ****************************************************************/
 
@@ -285,6 +286,17 @@ namespace basis {
   // See comments on relative LSJT file format and internal
   // representation of an operator in JT scheme for description.
   {
+    
+    OperatorLabelsJT()
+    // default constructor
+    : J0(0), g0(0), T0_min(0), T0_max(0), symmetry_phase_mode(basis::SymmetryPhaseMode::kHermitian)
+    {}
+
+    OperatorLabelsJT(int J0_, int g0_, int T0_min_, int T0_max_, basis::SymmetryPhaseMode symmetry_phase_mode_)
+    // explicit constructor
+    : J0(J0_), g0(g0_), T0_min(T0_min_), T0_max(T0_max_), symmetry_phase_mode(symmetry_phase_mode)
+    {}
+
     int J0, g0, T0_min, T0_max;
     basis::SymmetryPhaseMode symmetry_phase_mode;
   };

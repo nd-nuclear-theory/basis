@@ -26,7 +26,6 @@ namespace basis {
   const std::array<int,3> kTwoBodySpeciesPNCodeDecimal({11,22,12});
   const std::array<const char*,3> kTwoBodySpeciesPNCodeChar({"pp","nn","pn"});
 
-
   TwoBodySubspaceJJJPN::TwoBodySubspaceJJJPN(
       const OrbitalSpacePN& orbital_space,
       TwoBodySpeciesPN two_body_species, int J, int g,
