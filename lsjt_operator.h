@@ -296,7 +296,7 @@ namespace basis {
 
     OperatorLabelsJT(int J0_, int g0_, int T0_min_, int T0_max_, basis::SymmetryPhaseMode symmetry_phase_mode_)
     // explicit constructor
-    : J0(J0_), g0(g0_), T0_min(T0_min_), T0_max(T0_max_), symmetry_phase_mode(symmetry_phase_mode)
+    : J0(J0_), g0(g0_), T0_min(T0_min_), T0_max(T0_max_), symmetry_phase_mode(symmetry_phase_mode_)
     {}
 
     int J0, g0, T0_min, T0_max;
