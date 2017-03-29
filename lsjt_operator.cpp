@@ -354,6 +354,33 @@ namespace basis {
   // relative LSJT operator construction
   ////////////////////////////////////////////////////////////////
 
+  void ConstructZeroOperatorRelativeLSJT(
+      const basis::OperatorLabelsJT& operator_labels,
+      const basis::RelativeSpaceLSJT& relative_space,
+      std::array<basis::RelativeSectorsLSJT,3>& relative_component_sectors,
+      std::array<basis::MatrixVector,3>& relative_component_matrices
+    )
+  {
+
+    // validate operator labels
+    assert(operator_labels.J0==0);
+    assert(operator_labels.g0==0);
+    assert(operator_labels.symmetry_phase_mode==basis::SymmetryPhaseMode::kHermitian);
+
+    for (int T0=operator_labels.T0_min; T0<=operator_labels.T0_max; ++T0)
+      // for each isospin component
+      {
+
+        // enumerate sectors
+        relative_component_sectors[T0]
+          = basis::RelativeSectorsLSJT(relative_space,operator_labels.J0,T0,operator_labels.g0);
+         
+        // populate matrices
+        relative_component_matrices[T0].resize(relative_component_sectors[T0].size());
+        basis::SetOperatorToZero(relative_component_sectors[T0],relative_component_matrices[T0]);
+      }
+  }
+
   void ConstructIdentityOperatorRelativeLSJT(
       const basis::OperatorLabelsJT& operator_labels,
       const basis::RelativeSpaceLSJT& relative_space,

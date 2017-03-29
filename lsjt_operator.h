@@ -47,7 +47,9 @@
   + 11/4/16 (mac): Remove dependency on Eigen/Core.
   + 3/26/17 (mac): Add conjugation phase relation for
       spherical-harmonic-like operators (still kHermitian).
-  + 3/28/17 (mac): Add constructors for OperatorLabelsJT.
+  + 3/28/17 (mac):
+    - Add constructors for OperatorLabelsJT.
+    - Add ConstructZeroOperatorRelativeLSJT.
 
 ****************************************************************/
 
@@ -232,7 +234,7 @@ namespace basis {
   // The data structures to be used for the internal representation of
   // an operator in a JT coupled basis consist of:
   //
-  //   operator_labels (OperatorLabelsJT) : general information needed
+  //   operator_labels (OperatorLabelsJT): general information needed
   //     to work with operator (see comment on relative LSJT format
   //     above for a description of these labels):
   //
@@ -244,7 +246,7 @@ namespace basis {
   //     daughter type is primarily for internal use by the relative
   //     operator file I/O functions (and may otherwise be ignored).
   //
-  //   component_sectors (std::array<tSectorsType,3>) : the sector
+  //   component_sectors (std::array<tSectorsType,3>): the sector
   //     enumerations for each isospin component (T0=0,1,2) of the
   //     operator -- Here, tSectorsType represents the indexing
   //     Sectors type for the particular basis being used, e.g.,
@@ -252,7 +254,7 @@ namespace basis {
   //     should contain "upper trianglar" sectors only (see notes on
   //     relative LSJT file format).
   //
-  //   component_matrices (std::array<basis::MatrixVector,3>) : the
+  //   component_matrices (std::array<basis::MatrixVector,3>): the
   //     matrix representations for each isospin component (T0=0,1,2)
   //     of the operator -- In general, for diagonal sectors, only the
   //     matrix elements in the "upper triangle" are guaranteed to be
@@ -334,7 +336,7 @@ namespace basis {
   // Write file header for relative operator in LSJT scheme.
   //
   // Arguments:
-  //   os (std::ostream) : text-mode output stream
+  //   os (std::ostream): text-mode output stream
   //   parameters (basis::RelativeOperatorParametersLSJT)
   //     : operator parameters
 
@@ -345,7 +347,7 @@ namespace basis {
   // Write file header for relative operator in LSJT scheme.
   //
   // Arguments:
-  //   is (std::istream) : text-mode input stream
+  //   is (std::istream): text-mode input stream
   //   parameters (basis::RelativeOperatorParametersLSJT, output)
   //     : operator parameters
 
@@ -362,10 +364,10 @@ namespace basis {
   // stream is modified.
   //
   // Arguments:
-  //   os (std::ostream) : text-mode output stream
-  //   T0 (int) : isospin for this isospin component
-  //   sector (basis::RelativeSectorsLSJT) :  sectors defining operator
-  //   matrices (basis::MatrixVector) :  matrices defining operator
+  //   os (std::ostream): text-mode output stream
+  //   T0 (int): isospin for this isospin component
+  //   sector (basis::RelativeSectorsLSJT):  sectors defining operator
+  //   matrices (basis::MatrixVector):  matrices defining operator
 
   void ReadRelativeOperatorComponentLSJT(
       std::istream& is,
@@ -377,10 +379,10 @@ namespace basis {
   // scheme.
   //
   // Arguments:
-  //   is (std::istream) : text-mode inpus stream
-  //   T0 (int) : isospin for this isospin component
-  //   sector (basis::RelativeSectorsLSJT) :  sectors defining operator
-  //   matrices (basis::MatrixVector, output) :  matrices defining operator
+  //   is (std::istream): text-mode inpus stream
+  //   T0 (int): isospin for this isospin component
+  //   sector (basis::RelativeSectorsLSJT):  sectors defining operator
+  //   matrices (basis::MatrixVector, output):  matrices defining operator
 
   void ReadRelativeOperatorLSJT(
       const std::string& relative_filename,
@@ -393,13 +395,13 @@ namespace basis {
   // Set up and read relative operator.
   //
   // Arguments:
-  //   parameters (Parameters) : includes tensorial properties of operator
+  //   parameters (Parameters): includes tensorial properties of operator
   //      choice of operator to use
-  //   relative_space (..., output) : target space, based on parameters in file
-  //   operator_labels (basis::OperatorLabelsJT, output) : operator labels, from file
-  //   relative_component_sectors (..., output) : target sectors
-  //   relative_component_matrices (..., output) : target matrices
-  //   verbose (bool) : whether or not to include diagnostic output
+  //   relative_space (..., output): target space, based on parameters in file
+  //   operator_labels (basis::OperatorLabelsJT, output): operator labels, from file
+  //   relative_component_sectors (..., output): target sectors
+  //   relative_component_matrices (..., output): target matrices
+  //   verbose (bool): whether or not to include diagnostic output
 
   void WriteRelativeOperatorLSJT(
       const std::string& relative_filename,
@@ -412,13 +414,13 @@ namespace basis {
   // Set up and read relative operator.
   //
   // Arguments:
-  //   parameters (Parameters) : includes tensorial properties of operator
+  //   parameters (Parameters): includes tensorial properties of operator
   //      choice of operator to use
-  //   relative_space (...) : target space
-  //   operator_labels (basis::OperatorLabelsJT) : operator labels
-  //   relative_component_sectors (..., output) : source sectors
-  //   relative_component_matrices (..., output) : source matrices
-  //   verbose (bool) : whether or not to include diagnostic output
+  //   relative_space (...): target space
+  //   operator_labels (basis::OperatorLabelsJT): operator labels
+  //   relative_component_sectors (..., output): source sectors
+  //   relative_component_matrices (..., output): source matrices
+  //   verbose (bool): whether or not to include diagnostic output
 
   ////////////////////////////////////////////////////////////////
   // clearing operator data
@@ -459,19 +461,19 @@ namespace basis {
   //      accessor)
   //
   // Arguments:
-  //   relative_space (basis::RelativeSpaceLSJT) : space, for retrieving
+  //   relative_space (basis::RelativeSpaceLSJT): space, for retrieving
   //     subspace quantum numbers to calculate canonicalization factor
-  //   J0, T0, g0 (int) : operator tensorial properties
-  //   symmetry_phase_mode (basis::SymmetryPhaseMode) : operator
+  //   J0, T0, g0 (int): operator tensorial properties
+  //   symmetry_phase_mode (basis::SymmetryPhaseMode): operator
   //      conjugation symmetry
-  //   bra_subspace_index, ket_subspace_index (int) :
+  //   bra_subspace_index, ket_subspace_index (int):
   //     naive sector bra and ket subspace indices, possibly to be swapped
-  //   bra_state_index, ket_state_index (int) :
+  //   bra_state_index, ket_state_index (int):
   //     naive bra and ket state indices, possibly to be swapped if sector
   //     is diagonal sector
   //
   // Returns:
-  //   (std::tuple<int,int,int,int,double>) : canonicalized indices and swap
+  //   (std::tuple<int,int,int,int,double>): canonicalized indices and swap
   //      flag as:
   //
   //        subspace_index_bra,subspace_index_ket,
@@ -547,6 +549,24 @@ namespace basis {
   // relative LSJT operator construction
   ////////////////////////////////////////////////////////////////
 
+  void ConstructZeroOperatorRelativeLSJT(
+      const basis::OperatorLabelsJT& operator_labels,
+      const basis::RelativeSpaceLSJT& relative_space,
+      std::array<basis::RelativeSectorsLSJT,3>& relative_component_sectors,
+      std::array<basis::MatrixVector,3>& relative_component_matrices
+    );
+  // Construct zero operator in relative LSJT basis.
+  //
+  // See notes on "internal representation of an operator in JT
+  // scheme" in lsjt_operator.h for the general principles of how the
+  // operators are represented.
+  //
+  // Arguments:
+  //   operator_labels (input): tensorial properties of operator
+  //   relative_space (input): target space
+  //   relative_component_sectors (output): target sectors
+  //   relative_component_matrices (output): target matrices
+
   void ConstructIdentityOperatorRelativeLSJT(
       const basis::OperatorLabelsJT& operator_labels,
       const basis::RelativeSpaceLSJT& relative_space,
@@ -560,10 +580,10 @@ namespace basis {
   // operators are represented.
   //
   // Arguments:
-  //   operator_labels (basis::OperatorLabelsJT) : tensorial properties of operator
-  //   relative_space (...) : target space
-  //   relative_component_sectors (..., output) : target sectors
-  //   relative_component_matrices (..., output) : target matrices
+  //   operator_labels (input): tensorial properties of operator
+  //   relative_space (input): target space
+  //   relative_component_sectors (output): target sectors
+  //   relative_component_matrices (output): target matrices
 
   ////////////////////////////////////////////////////////////////
   // relative-cm LSJT operator -- gather N blocks
@@ -590,13 +610,13 @@ namespace basis {
   // zero-initialized, but not populated.
   //
   // Arguments:
-  //   operator_labels (basis::OperatorLabelsJT) : tensorial properties of operator
-  //   relative_cm_lsjtn_space (...) : source space
-  //   relative_cm_lsjtn_component_sectors (...) : source sectors
-  //   relative_cm_lsjtn_component_matrices (...) : source matrices
-  //   relative_cm_lsjt_space (...) : target space
-  //   relative_cm_lsjt_component_sectors (..., output) : target sectors
-  //   relative_cm_lsjt_component_matrices (..., output) : target matrices
+  //   operator_labels (basis::OperatorLabelsJT): tensorial properties of operator
+  //   relative_cm_lsjtn_space (...): source space
+  //   relative_cm_lsjtn_component_sectors (...): source sectors
+  //   relative_cm_lsjtn_component_matrices (...): source matrices
+  //   relative_cm_lsjt_space (...): target space
+  //   relative_cm_lsjt_component_sectors (..., output): target sectors
+  //   relative_cm_lsjt_component_matrices (..., output): target matrices
 
   ////////////////////////////////////////////////////////////////
   // two-body LSJT operator -- gather N blocks
@@ -623,13 +643,13 @@ namespace basis {
   // zero-initialized, but not populated.
   //
   // Arguments:
-  //   operator_labels (basis::OperatorLabelsJT) : tensorial properties of operator
-  //   two_body_lsjtn_space (...) : source space
-  //   two_body_lsjtn_component_sectors (...) : source sectors
-  //   two_body_lsjtn_component_matrices (...) : source matrices
-  //   two_body_lsjt_space (...) : target space
-  //   two_body_lsjt_component_sectors (..., output) : target sectors
-  //   two_body_lsjt_component_matrices (..., output) : target matrices
+  //   operator_labels (basis::OperatorLabelsJT): tensorial properties of operator
+  //   two_body_lsjtn_space (...): source space
+  //   two_body_lsjtn_component_sectors (...): source sectors
+  //   two_body_lsjtn_component_matrices (...): source matrices
+  //   two_body_lsjt_space (...): target space
+  //   two_body_lsjt_component_sectors (..., output): target sectors
+  //   two_body_lsjt_component_matrices (..., output): target matrices
 
   ////////////////////////////////////////////////////////////////
   // relative-cm LSJT operator output
@@ -667,10 +687,10 @@ namespace basis {
   // stream is modified.
   //
   // Arguments:
-  //   os (std::ostream) : text-mode output stream
-  //   T0 (int) : isospin for this isospin component
-  //   sectors (basis::RelativeCMSectorsLSJT) : sectors defining operator
-  //   matrices (basis::MatrixVector) : matrices defining operator
+  //   os (std::ostream): text-mode output stream
+  //   T0 (int): isospin for this isospin component
+  //   sectors (basis::RelativeCMSectorsLSJT): sectors defining operator
+  //   matrices (basis::MatrixVector): matrices defining operator
 
   ////////////////////////////////////////////////////////////////
   // two-body LSJT operator output
@@ -711,11 +731,11 @@ namespace basis {
   // stream is modified.
   //
   // Arguments:
-  //   os (std::ostream) : text-mode output stream
-  //   T0 (int) : isospin for this isospin component
-  //   sectors (basis::TwoBodySectorsLSJT) : sectors defining operator
-  //   matrices (basis::MatrixVector) : matrices defining operator
-  //   conversion (basis::NormalizationConversion) : specifies any
+  //   os (std::ostream): text-mode output stream
+  //   T0 (int): isospin for this isospin component
+  //   sectors (basis::TwoBodySectorsLSJT): sectors defining operator
+  //   matrices (basis::MatrixVector): matrices defining operator
+  //   conversion (basis::NormalizationConversion): specifies any
   //     conversion between AS and NAS for output
 
 
