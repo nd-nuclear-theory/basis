@@ -45,7 +45,7 @@
 
 #include "am/halfint.h"
 
-#include "basis/indexing.h"
+#include "basis/basis.h"
 #include "basis/many_body.h"
 #include "basis/nlj_orbital.h"
 

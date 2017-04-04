@@ -5,7 +5,7 @@
 libname = basis
 
 # modules -- header-only
-modules_h = indexing
+modules_h = basis
 
 # modules -- header-plus-object 
 ##modules_ho = jt_scheme

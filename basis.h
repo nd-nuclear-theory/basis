@@ -1,5 +1,5 @@
 /************************************************************//**
-  @file indexing.h
+  @file basis.h
 
   Defines template base classes for indexing quantum mechanical states
   arranged into subspaces (defined by good symmetry quantum numbers).
@@ -51,12 +51,12 @@
 
   Compilation directives:
 
-    INDEXING_HASH: In lookup tables, replace std::map with
+    BASIS_HASH: In lookup tables, replace std::map with
       std::unordered_map, using boost hash extensions.
 
   Library dependences:
 
-    boost -- only if INDEXING_HASH enabled
+    boost -- only if BASIS_HASH enabled
 
   Language: C++11
 
@@ -73,7 +73,7 @@
   + 6/8/16 (mac): Extract to new basis module:
     - Rename file from indexing_base.h to indexing.h.
     - Change namespace from shell to basis.
-    - Systematize switching between map and unordered_map via INDEXING_HASH
+    - Systematize switching between map and unordered_map via BASIS_HASH
       directive.
     - Remove deprecated subspace method Dimension().
   + 6/16/16 (mac): Fix missing typename qualifier.
@@ -96,11 +96,14 @@
     - Fix wrong return in broken-out ContainsSector.
     - Reexpand (remultiply?) ContainsSector and LookUpSectorIndex.
   + 2/17/17 (mac): Add generic DebugStr for BaseSectors.
+  + 4/4/17 (mac):
+    - Rename from indexing.h to basis.h.
+    - Rename compilation flag INDEXING_HASH to BASIS_HASH.
 
 ****************************************************************/
 
-#ifndef INDEXING_H_
-#define INDEXING_H_
+#ifndef BASIS_H_
+#define BASIS_H_
 
 #include <cassert>
 #include <tuple>
@@ -111,7 +114,7 @@
 #include <sstream>
 
 
-#ifdef INDEXING_HASH
+#ifdef BASIS_HASH
 #include <unordered_map>
 #include "boost/functional/hash.hpp"
 #else
@@ -258,7 +261,7 @@ namespace basis {
     std::vector<StateLabelsType> state_table_;
 
     // state index lookup by labels
-#ifdef INDEXING_HASH
+#ifdef BASIS_HASH
     std::unordered_map<StateLabelsType,int,boost::hash<StateLabelsType>> lookup_;
 #else
     std::map<StateLabelsType,int> lookup_;
@@ -545,7 +548,7 @@ namespace basis {
       std::vector<SubspaceType> subspaces_;
 
       // subspace index lookup by labels
-#ifdef INDEXING_HASH
+#ifdef BASIS_HASH
       std::unordered_map<typename SubspaceType::SubspaceLabelsType,int,boost::hash<typename SubspaceType::SubspaceLabelsType>> lookup_;
 #else
       std::map<typename SubspaceType::SubspaceLabelsType,int> lookup_;
@@ -675,10 +678,10 @@ namespace basis {
       // sector lookup and retrieval
       ////////////////////////////////////////////////////////////////
 
-      const SectorType& GetSector(int i) const
+      const SectorType& GetSector(int sector_index) const
       // Given sector index, return reference to sector itself.
       {
-        return sectors_[i];
+        return sectors_[sector_index];
       };
 
       bool ContainsSector(int bra_subspace_index, int ket_subspace_index, int multiplicity_index=1) const
@@ -773,7 +776,7 @@ namespace basis {
       std::vector<SectorType> sectors_;
 
       // sector index lookup by subspace indices
-#ifdef INDEXING_HASH
+#ifdef BASIS_HASH
       std::unordered_map<typename SectorType::KeyType,int,boost::hash<typename SectorType::KeyType>> lookup_;
 #else
       std::map<typename SectorType::KeyType,int> lookup_;
@@ -796,6 +799,7 @@ namespace basis {
              << "  ket index " << sector.ket_subspace_index()
              << " labels " << sector.ket_subspace().LabelStr()
              << " dim " << sector.ket_subspace().size()
+             << "  multiplicity index " << sector.multiplicity_index()
              << std::endl;
         }
       return os.str();

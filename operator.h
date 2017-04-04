@@ -36,7 +36,7 @@
 
 #include "eigen3/Eigen/Dense"
 
-#include "basis/indexing.h"
+#include "basis/basis.h"
 
 namespace basis {
 

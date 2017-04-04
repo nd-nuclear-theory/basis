@@ -58,7 +58,7 @@
 #include "am/halfint.h"
 #include "mcutils/parsing.h"
 
-#include "basis/indexing.h"
+#include "basis/basis.h"
 
 namespace basis {
 

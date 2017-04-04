@@ -473,7 +473,7 @@ namespace basis {
       // for each isospin component
       {
 
-        // enumerate sectors
+        // enumerate target sectors
         relative_cm_lsjt_component_sectors[T0]
           = basis::RelativeCMSectorsLSJT(relative_cm_lsjt_space,operator_labels.J0,T0,operator_labels.g0);
 
@@ -678,7 +678,7 @@ namespace basis {
       // for each isospin component
       {
 
-        // enumerate sectors
+        // enumerate target sectors
         two_body_lsjt_component_sectors[T0]
           = basis::TwoBodySectorsLSJT(two_body_lsjt_space,operator_labels.J0,T0,operator_labels.g0);
 

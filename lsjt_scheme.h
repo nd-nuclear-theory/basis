@@ -72,7 +72,7 @@
 
 #include <string>
 
-#include "basis/indexing.h"
+#include "basis/basis.h"
 #include "basis/many_body.h"
 
 namespace basis {
