@@ -50,6 +50,10 @@
   + 3/28/17 (mac):
     - Add constructors for OperatorLabelsJT.
     - Add ConstructZeroOperatorRelativeLSJT.
+  + 4/4/17 (mac):
+    - Rename CanonicalizeIndicesLSJT to CanonicalizeIndicesJT.
+    - Add overload to CanonicalizeIndicesJT which only
+      canonicalizes subspaces, with no reference to states.
 
 ****************************************************************/
 
@@ -441,9 +445,9 @@ namespace basis {
         }
     }
 
-  template <typename tLSJTSpace>
-    std::tuple<int,int,int,int,double> CanonicalizeIndicesLSJT(
-        const tLSJTSpace& space,
+  template <typename tJTSpace>
+    std::tuple<int,int,int,int,bool,double> CanonicalizeIndicesJT(
+        const tJTSpace& space,
         int J0, int T0, int g0,
         basis::SymmetryPhaseMode symmetry_phase_mode,
         int subspace_index_bra, int subspace_index_ket,
@@ -453,15 +457,15 @@ namespace basis {
   // canonical ("upper triangle") indices.
   //
   // This is a customized wrapper for basis::CanonicalizeIndices (see
-  // operator.h), for use with RelativeLSJT operators.
+  // operator.h), for use with RelativeJT operators.
   //
   // Template parameters:
-  //   tLSJTSpace : type for the LSJT space from which the subspaces are
+  //   tJTSpace: type for the JT space from which the subspaces are
   //     drawn (subspaces must provide the T(), J(), and other needed
   //      accessor)
   //
   // Arguments:
-  //   relative_space (basis::RelativeSpaceLSJT): space, for retrieving
+  //   relative_space (basis::RelativeSpaceJT): space, for retrieving
   //     subspace quantum numbers to calculate canonicalization factor
   //   J0, T0, g0 (int): operator tensorial properties
   //   symmetry_phase_mode (basis::SymmetryPhaseMode): operator
@@ -473,11 +477,11 @@ namespace basis {
   //     is diagonal sector
   //
   // Returns:
-  //   (std::tuple<int,int,int,int,double>): canonicalized indices and swap
-  //      flag as:
+  //   canonicalized indices and swap flag and phase as:
   //
   //        subspace_index_bra,subspace_index_ket,
   //        state_index_bra,state_index_ket,
+  //        swapped_subspaces,
   //        canonicalization_factor
   {
 
@@ -521,10 +525,10 @@ namespace basis {
       {
 
         // retrieve sector labels (*after* swap, i.e., canonical m.e. on RHS)
-        const typename tLSJTSpace::SubspaceType& subspace_bra = space.GetSubspace(
+        const typename tJTSpace::SubspaceType& subspace_bra = space.GetSubspace(
             subspace_index_bra
           );
-        const typename tLSJTSpace::SubspaceType& subspace_ket = space.GetSubspace(
+        const typename tJTSpace::SubspaceType& subspace_ket = space.GetSubspace(
             subspace_index_ket
           );
           int Tp = subspace_bra.T();
@@ -537,13 +541,74 @@ namespace basis {
       }
 
     // bundle return values
-    return std::tuple<int,int,int,int,double>(
+    return std::tuple<int,int,int,int,bool,double>(
         subspace_index_bra,subspace_index_ket,
         state_index_bra,state_index_ket,
+        swapped_subspaces,
+        canonicalization_factor
+      );
+  }
+
+  template <typename tJTSpace>
+    std::tuple<int,int,bool,double> CanonicalizeIndicesJT(
+        const tJTSpace& space,
+        int J0, int T0, int g0,
+        basis::SymmetryPhaseMode symmetry_phase_mode,
+        int subspace_index_bra, int subspace_index_ket
+      )
+  // Convert subspace indices for a matrix element to
+  // canonical ("upper triangle") indices.
+  //
+  // This is an overloaded wrapper to the full version (which takes
+  // subspace and state indices) and discards the state indices.
+  //
+  // Template parameters:
+  //   tJTSpace: type for the JT space from which the subspaces are
+  //     drawn (subspaces must provide the T(), J(), and other needed
+  //      accessor)
+  //
+  // Arguments:
+  //   relative_space (basis::RelativeSpaceJT): space, for retrieving
+  //     subspace quantum numbers to calculate canonicalization factor
+  //   J0, T0, g0 (int): operator tensorial properties
+  //   symmetry_phase_mode (basis::SymmetryPhaseMode): operator
+  //      conjugation symmetry
+  //   bra_subspace_index, ket_subspace_index (int):
+  //     naive sector bra and ket subspace indices, possibly to be swapped
+  //
+  // Returns:
+  //   canonicalized indices and swap flag and phase as:
+  //
+  //        subspace_index_bra,subspace_index_ket,
+  //        swapped_subspaces,
+  //        canonicalization_factor
+  {
+
+    // invoke canonicalization with dummy state indices
+    int state_index_bra=0, state_index_ket=0;
+    bool swapped_subspaces;
+    double canonicalization_factor;
+    std::tie(
+        subspace_index_bra,subspace_index_ket,
+        state_index_bra,state_index_ket,
+        swapped_subspaces,
+        canonicalization_factor
+      )
+      = CanonicalizeIndicesJT(
+          space,
+          J0,T0,g0,symmetry_phase_mode,
+          subspace_index_bra,subspace_index_ket,
+          state_index_bra,state_index_ket
+        );
+
+    // bundle return values
+    return std::tuple<int,int,bool,double>(
+        subspace_index_bra,subspace_index_ket,
+        swapped_subspaces,
         canonicalization_factor
       );
 
-  }
+  }      
 
   ////////////////////////////////////////////////////////////////
   // relative LSJT operator construction
