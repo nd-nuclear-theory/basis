@@ -585,12 +585,11 @@ namespace basis {
   {
 
     // invoke canonicalization with dummy state indices
-    int state_index_bra=0, state_index_ket=0;
     bool swapped_subspaces;
     double canonicalization_factor;
     std::tie(
         subspace_index_bra,subspace_index_ket,
-        state_index_bra,state_index_ket,
+        std::ignore,std::ignore,
         swapped_subspaces,
         canonicalization_factor
       )
@@ -598,7 +597,7 @@ namespace basis {
           space,
           J0,T0,g0,symmetry_phase_mode,
           subspace_index_bra,subspace_index_ket,
-          state_index_bra,state_index_ket
+          0,0
         );
 
     // bundle return values
