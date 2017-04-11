@@ -9,6 +9,8 @@
   University of Notre Dame
 
   + 4/4/17 (mac): Created, building on code from basis.h.
+  + 4/11/17 (mac): Add basic hyperoperator support --
+    OperatorHypersectors and SetHyperoperatorToZero.
 
 ****************************************************************/
 
@@ -16,16 +18,19 @@
 #define HYPERSECTOR_H_
 
 #include "basis/basis.h"
+#include "basis/operator.h"
 
 namespace basis {
+
+  ////////////////////////////////////////////////////////////////
+  // hypersector indexing
+  ////////////////////////////////////////////////////////////////
 
   // Note: A "hypersector" represents a triplet consisting of a pair
   // of "state" subspaces (which thus define a "sector" or block in
   // the matrix representation of an operator on the space) and an
-  // "operator" subspace.  The sector may also be labeled with a
-  // multiplicity index.
-
-  // BaseSector -- provide storage of information for a single sector
+  // "operator" subspace.  The hypersector may also be labeled with an
+  // optional multiplicity index.
 
   template <typename tSubspaceType, typename tOperatorSubspaceType>
     class BaseHypersector
@@ -240,6 +245,63 @@ namespace basis {
         }
       return os.str();
     }
+
+  ////////////////////////////////////////////////////////////////
+  // operator storage by hyperblock
+  ////////////////////////////////////////////////////////////////
+
+
+  // typedef for operator hyperblocks
+  //
+  // EX:
+  //   basis::OperatorHyperblocks<double> matrices;  // matrices for all operator planes of all hypersectors
+  //   ...
+  //   matrix_element = matrices[hypersector_index][operator_index](bra_index,ket_index);  // operator_index is within given hypersector's operator subspace
+  
+  template <typename tFloat>
+    using OperatorHyperblocks = std::vector<std::vector<OperatorBlock<tFloat>>>;
+
+  ////////////////////////////////////////////////////////////////
+  // zero operator
+  ////////////////////////////////////////////////////////////////
+
+  template <typename tHypersectorsType, typename tFloat>
+  void SetHyperoperatorToZero(
+      const tHypersectorsType& hypersectors,
+      basis::OperatorHyperblocks<tFloat>& matrices
+    )
+    // Set operator hyperblocks to zero.
+    //
+    // Arguments:
+    //   hypersectors (input): the set of hypersectors on which the
+    //     operators are defined
+    //   matrices (output): matrices to hold hyperblocks
+  {
+
+    // clear vector of matrices
+    matrices.clear();
+    matrices.resize(hypersectors.size());
+
+    // iterate over hypersectors
+    for (int hypersector_index = 0; hypersector_index < hypersectors.size(); ++hypersector_index)
+      {
+
+        // extract hypersector
+	const typename tHypersectorsType::HypersectorType& hypersector = hypersectors.GetHypersector(hypersector_index);
+
+        // extract hypersector subspaces
+	const typename tHypersectorsType::SubspaceType& bra_subspace = hypersector.bra_subspace();
+	const typename tHypersectorsType::SubspaceType& ket_subspace = hypersector.ket_subspace();
+	const typename tHypersectorsType::OperatorSubspaceType& operator_subspace = hypersector.operator_subspace();
+
+        // generate matrices for hypersector (by operator)
+        matrices[hypersector_index].resize(operator_subspace.size());
+        for (int operator_index = 0; operator_index < operator_subspace.size(); ++operator_index)
+          matrices[hypersector_index][operator_index]
+            = basis::OperatorBlock<tFloat>::Zero(bra_subspace.size(),ket_subspace.size());
+      }
+  }
+
 
   ////////////////////////////////////////////////////////////////
   ////////////////////////////////////////////////////////////////

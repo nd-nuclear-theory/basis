@@ -90,7 +90,7 @@ namespace basis {
 } // namespace
 
 
-void TestSectors()
+void TestHyprersectors()
 {
 
   std::cout << "Relative space" << std::endl;
@@ -110,7 +110,10 @@ void TestSectors()
   basis::RelativeHypersectorsLSJT hypersectors(space,operator_space);
   std::cout << hypersectors.DebugStr();
 
-
+  // allocate zero operator
+  basis::OperatorHyperblocks<float> matrices;
+  basis::SetHyperoperatorToZero(hypersectors,matrices);
+    
 }
 
 ////////////////////////////////////////////////////////////////
@@ -120,7 +123,7 @@ void TestSectors()
 int main(int argc, char **argv)
 {
 
-  TestSectors();
+  TestHyprersectors();
 
   // termination
   return EXIT_SUCCESS;
