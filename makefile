@@ -5,11 +5,11 @@
 libname = basis
 
 # modules -- header-only
-modules_h = basis hypersector
+modules_h = basis operator hypersector
 
 # modules -- header-plus-object 
 ##modules_ho = jt_scheme
-modules_ho = operator many_body
+modules_ho = many_body
 modules_ho += lsjt_scheme lsjt_operator jjjt_scheme jjjt_operator
 modules_ho += jjjpn_scheme jjjpn_operator nlj_orbital nlj_operator
 

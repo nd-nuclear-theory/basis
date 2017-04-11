@@ -26,6 +26,12 @@
   + 7/22/16 (mac): Revise syntax for CanonicalizeIndices.
   + 7/25/16 (mac): Add diagnostic function UpperTriangularEntries.
   + 11/1/16 (mac): Reduce dependency from Eigen/Core to Eigen/Dense.
+  + 4/11/17 (mac):
+    - Replace MatrixVector (hard coded double-precision) with
+      templatized OperatorBlocks (generic precision).
+    - Retemplatize functions to work with generic precision
+      operator blocks instead of MatrixXd.
+    
 
 ****************************************************************/
 
@@ -44,12 +50,38 @@ namespace basis {
   // matrix storage convenience typedef
   ////////////////////////////////////////////////////////////////
 
-  typedef std::vector<Eigen::MatrixXd> MatrixVector;
+  // typedefs for operator blocks
+  //
+  // EX: basis::OperatorBlock<double>  // single matrix
+  // EX: basis::OperatorBlocks<double>  // matrices for all sectors
+  
+  // Note: Typedefs cannot be templatized, but C++11 introduced
+  // parametrized type aliases, using the "using" keyword.
+  //
+  // template <typename tFloat>
+  //   typedef Eigen::Matrix<tFloat,Eigen::Dynamic,Eigen::Dynamic> OperatorBlocks;  // WRONG!
+
+  // Note: When templatizing a function which takes an OperatorBlocks
+  // argument, the following idiom should be successful
+  //
+  //  template <typename tFloat>
+  //    MyFunction(basis::OperatorBlocks<tFloat>& matrices)
+
+  template <typename tFloat>
+    using OperatorBlock = Eigen::Matrix<tFloat,Eigen::Dynamic,Eigen::Dynamic>;
+
+  template <typename tFloat>
+    using OperatorBlocks = std::vector<OperatorBlock<tFloat>>;
+
+  // legacy typedef -- DEPRECATED
+  typedef basis::OperatorBlocks<double> MatrixVector;
+
 
   ////////////////////////////////////////////////////////////////
   // storage diagnostics
   ////////////////////////////////////////////////////////////////
-  std::size_t AllocatedEntries(const MatrixVector& matrices);
+  template <typename tFloat>
+    std::size_t AllocatedEntries(const basis::OperatorBlocks<tFloat>& matrices)
     // Count entries in a vector of matrices.
     //
     // This may be larger than the nominal number of matrix elements
@@ -58,11 +90,16 @@ namespace basis {
     // matrices are always allocated.
     //
     // Arguments:
-    //   matrices (basis::MatrixVector) : vector of matrices
+    //   matrices (input): vector of matrices
     //
     // Returns:
-    //   (std::size_t) : number of allocated matrix entries
-
+    //   (std::size_t): number of allocated matrix entries
+    {
+      std::size_t count = 0;
+      for (auto iterator = matrices.begin(); iterator != matrices.end(); ++iterator)
+        count += iterator->size();
+      return count;
+    }
 
   template <typename tSectors>
     int UpperTriangularEntries(
@@ -74,10 +111,10 @@ namespace basis {
     // only upper-triangular entries are counted.
     //
     // Arguments:
-    //   sectors (tSectors) : container for sectors
+    //   sectors (input): container for sectors
     //
     // Returns:
-    //   (std::size_t) : number of upper triangular matrix entries
+    //   number of upper triangular matrix entries
     {
       int total_entries = 0;
       for (int sector_index=0; sector_index<sectors.size(); ++sector_index)
@@ -112,26 +149,22 @@ namespace basis {
   // zero operator
   ////////////////////////////////////////////////////////////////
 
-  template <typename tSectorsType>
+  template <typename tSectorsType, typename tFloat>
   void SetOperatorToZero(
       const tSectorsType& sectors,
-      MatrixVector& matrices
+      basis::OperatorBlocks<tFloat>& matrices
     )
-    // Set operator to zero operator.
-    //
-    // The matrices for all sectors are set to zero.
-    //
-    // RELATIONS: This could be absorbed as a special case of
-    // SetOperatorToDiagonalConstant.
+    // Set operator blocks to zero.
     //
     // Arguments:
-    //   sectors (BaseSectors daughter type) : the set of sectors on
-    //     which the operator is defined
-    //   matrices (MatrixVector, output) : matrices to hold operator
+    //   sectors (input): the set of sectors on which the operator is
+    //     defined
+    //   matrices (output): matrices to hold blocks
   {
 
     // clear vector of matrices
     matrices.clear();
+    matrices.resize(sectors.size());
 
     // iterate over sectors
     for (int sector_index = 0; sector_index < sectors.size(); ++sector_index)
@@ -145,11 +178,7 @@ namespace basis {
 	const typename tSectorsType::SubspaceType& ket_subspace = sector.ket_subspace();
 
         // generate matrix for sector
-	Eigen::MatrixXd sector_matrix;
-        sector_matrix = Eigen::MatrixXd::Zero(bra_subspace.size(),ket_subspace.size());
-
-        // store matrix
-	matrices.push_back(sector_matrix);
+        matrices[sector_index] = basis::OperatorBlock<tFloat>::Zero(bra_subspace.size(),ket_subspace.size());
 
       }
   }
@@ -158,10 +187,10 @@ namespace basis {
   // identity operator
   ////////////////////////////////////////////////////////////////
 
-  template <typename tSectorsType>
+  template <typename tSectorsType, typename tFloat>
   void SetOperatorToIdentity(
       const tSectorsType& sectors,
-      MatrixVector& matrices
+      basis::OperatorBlocks<tFloat>& matrices
     )
     // Set operator to "naive" identity operator.
     //
@@ -186,14 +215,15 @@ namespace basis {
     // SetOperatorToDiagonalConstant.
     //
     // Arguments:
-    //   sectors (BaseSectors daughter type) : the set of sectors on
+    //   sectors (input): the set of sectors on
     //     which the operator is defined
-    //   matrices (MatrixVector, output) : matrices to hold operator
+    //   matrices (output): matrices to hold operator
 
   {
 
     // clear vector of matrices
     matrices.clear();
+    matrices.resize(sectors.size());
 
     // iterate over sectors
     for (int sector_index = 0; sector_index < sectors.size(); ++sector_index)
@@ -207,18 +237,14 @@ namespace basis {
 	const typename tSectorsType::SubspaceType& ket_subspace = sector.ket_subspace();
 
         // generate matrix for sector
-	Eigen::MatrixXd sector_matrix;
 	if (sector.IsDiagonal())
 	  {
-	    sector_matrix = Eigen::MatrixXd::Identity(bra_subspace.size(),ket_subspace.size());
+            matrices[sector_index] = basis::OperatorBlock<tFloat>::Identity(bra_subspace.size(),ket_subspace.size());
 	  }
 	else
 	  {
-	    sector_matrix = Eigen::MatrixXd::Zero(bra_subspace.size(),ket_subspace.size());
+            matrices[sector_index] = basis::OperatorBlock<tFloat>::Zero(bra_subspace.size(),ket_subspace.size());
 	  }
-
-        // store matrix
-	matrices.push_back(sector_matrix);
 
       }
   }
@@ -227,10 +253,10 @@ namespace basis {
   // constant operator
   ////////////////////////////////////////////////////////////////
 
-  template <typename tSectorsType>
+  template <typename tSectorsType, typename tFloat>
   void SetOperatorToDiagonalConstant(
       const tSectorsType& sectors,
-      MatrixVector& matrices,
+      basis::OperatorBlocks<tFloat>& matrices,
       double c
     )
     // Set operator to "naive" diagonal constant operator.
@@ -253,15 +279,16 @@ namespace basis {
     // normalized antisymmetrized (NAS), states.
     //
     // Arguments:
-    //   sectors (BaseSectors daughter type) : the set of sectors on
+    //   sectors (input): the set of sectors on
     //     which the operator is defined
-    //   matrices (MatrixVector, output) : matrices to hold operator
-    //   c (double) : the diagonal constant
+    //   matrices (output): matrices to hold operator
+    //   c (input): the diagonal constant
 
   {
 
     // clear vector of matrices
     matrices.clear();
+    matrices.resize(sectors.size());
 
     // iterate over sectors
     for (int sector_index = 0; sector_index < sectors.size(); ++sector_index)
@@ -275,18 +302,14 @@ namespace basis {
 	const typename tSectorsType::SubspaceType& ket_subspace = sector.ket_subspace();
 
         // generate matrix for sector
-	Eigen::MatrixXd sector_matrix;
 	if (sector.IsDiagonal())
 	  {
-	    sector_matrix = c*Eigen::MatrixXd::Identity(bra_subspace.size(),ket_subspace.size());
+            matrices[sector_index] = c*basis::OperatorBlock<tFloat>::Identity(bra_subspace.size(),ket_subspace.size());
 	  }
 	else
 	  {
-	    sector_matrix = Eigen::MatrixXd::Zero(bra_subspace.size(),ket_subspace.size());
+            matrices[sector_index] = basis::OperatorBlock<tFloat>::Zero(bra_subspace.size(),ket_subspace.size());
 	  }
-
-        // store matrix
-	matrices.push_back(sector_matrix);
 
       }
   }

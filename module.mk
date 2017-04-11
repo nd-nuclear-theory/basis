@@ -4,8 +4,8 @@ $(eval $(begin-module))
 # unit definitions
 ################################################################
 
-module_units_h := basis hypersector
-module_units_cpp-h := operator many_body
+module_units_h := basis hypersector operator
+module_units_cpp-h := many_body
 module_units_cpp-h += lsjt_scheme lsjt_operator jjjt_scheme jjjt_operator
 module_units_cpp-h += jjjpn_scheme jjjpn_operator nlj_orbital nlj_operator
 # module_units_f := 
