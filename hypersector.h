@@ -11,7 +11,7 @@
   + 4/4/17 (mac): Created, building on code from basis.h.
   + 4/11/17 (mac): Add basic hyperoperator support --
     OperatorHypersectors and SetHyperoperatorToZero.
-
+  + 4/22/17 (aem): Fix error in hypersector constructor.
 ****************************************************************/
 
 #ifndef HYPERSECTOR_H_
@@ -60,7 +60,7 @@ namespace basis {
           int multiplicity_index=1
         )
         : bra_subspace_index_(bra_subspace_index), ket_subspace_index_(ket_subspace_index),
-        operator_subspace_index_(ket_subspace_index), multiplicity_index_(multiplicity_index)
+        operator_subspace_index_(operator_subspace_index), multiplicity_index_(multiplicity_index)
       {
         bra_subspace_ptr_ = &bra_subspace;
         ket_subspace_ptr_ = &ket_subspace;
