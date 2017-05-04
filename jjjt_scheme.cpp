@@ -234,8 +234,8 @@ namespace basis {
     N_ = N;
     std::tie(N1max_,N2max_) = basis::TwoBodyCutoffs(truncation_rank,truncation_cutoff);
 
-   // validate subspace labels
-    assert(ValidLabels()); 
+    // validate subspace labels
+    assert(ValidLabels());
 
     // set up indexing
     // iterate over total oscillator quanta -- omit (MODIFICATION for subspacing by N)
@@ -250,7 +250,7 @@ namespace basis {
     int N1_lower = N-std::min(N1max_,N);
     int N1_upper = std::min(N1max_,N);
     for (int N1 = N1_lower; N1 <= N1_upper; ++N1)
-      for (HalfInt j1 = HalfInt(1,2); j1 <= N1+HalfInt(1,2); j1 +=1) 
+      for (HalfInt j1 = HalfInt(1,2); j1 <= N1+HalfInt(1,2); j1 += 1)
         {
           // iterate over oscillator (Nj) orbitals for particle 2
           // subject to given total N
@@ -272,7 +272,7 @@ namespace basis {
                 continue;
 
               // keep surviving states
-              PushStateLabels(StateLabelsType(N1,j1,N2,j2)); 
+              PushStateLabels(StateLabelsType(N1,j1,N2,j2));
             }
         }
   }
@@ -294,8 +294,8 @@ namespace basis {
     const int width = 0;  // for now, no fixed width
 
     os << "["
-       << " " << std::setw(width) << J() 
-       << " " << std::setw(width) << T() 
+       << " " << std::setw(width) << J()
+       << " " << std::setw(width) << T()
        << " " << std::setw(width) << g()
        << " " << ";"
        << " " << std::setw(width) << N()
@@ -370,8 +370,8 @@ namespace basis {
 	  << " " << "index"
 	  << " " << std::setw(width) << subspace_index
 	  << " " << "JTg"
-	  << " " << std::setw(width) << subspace.J() 
-	  << " " << std::setw(width) << subspace.T() 
+	  << " " << std::setw(width) << subspace.J()
+	  << " " << std::setw(width) << subspace.T()
 	  << " " << std::setw(width) << subspace.g()
 	  << " " << "N"  // (MODIFICATION for subspacing by N)
 	  << " " << std::setw(width) << subspace.N()  // (MODIFICATION for subspacing by N)
