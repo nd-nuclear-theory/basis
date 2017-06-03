@@ -38,8 +38,8 @@
 
 ****************************************************************/
 
-#ifndef JJJT_SCHEME_H_
-#define JJJT_SCHEME_H_
+#ifndef BASIS_JJJT_SCHEME_H_
+#define BASIS_JJJT_SCHEME_H_
 
 #include <string>
 

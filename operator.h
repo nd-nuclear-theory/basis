@@ -35,8 +35,8 @@
 
 ****************************************************************/
 
-#ifndef OPERATOR_H_
-#define OPERATOR_H_
+#ifndef BASIS_OPERATOR_H_
+#define BASIS_OPERATOR_H_
 
 #include <vector>
 

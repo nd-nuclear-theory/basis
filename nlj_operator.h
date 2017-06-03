@@ -16,8 +16,8 @@
 
 ****************************************************************/
 
-#ifndef NLJ_OPERATOR_H_
-#define NLJ_OPERATOR_H_
+#ifndef BASIS_NLJ_OPERATOR_H_
+#define BASIS_NLJ_OPERATOR_H_
 
 #include "basis/nlj_orbital.h"
 #include "basis/operator.h"

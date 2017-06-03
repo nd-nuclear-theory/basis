@@ -37,8 +37,8 @@
 
 ****************************************************************/
 
-#ifndef JJJPN_SCHEME_H_
-#define JJJPN_SCHEME_H_
+#ifndef BASIS_JJJPN_SCHEME_H_
+#define BASIS_JJJPN_SCHEME_H_
 
 #include <array>
 #include <string>

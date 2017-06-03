@@ -57,8 +57,8 @@
 
 ****************************************************************/
 
-#ifndef LSJT_OPERATOR_H_
-#define LSJT_OPERATOR_H_
+#ifndef BASIS_LSJT_OPERATOR_H_
+#define BASIS_LSJT_OPERATOR_H_
 
 #include <cassert>
 #include <cstdlib>

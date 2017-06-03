@@ -67,8 +67,8 @@
 
 ****************************************************************/
 
-#ifndef LSJT_SCHEME_H_
-#define LSJT_SCHEME_H_
+#ifndef BASIS_LSJT_SCHEME_H_
+#define BASIS_LSJT_SCHEME_H_
 
 #include <string>
 

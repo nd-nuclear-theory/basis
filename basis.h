@@ -102,8 +102,8 @@
 
 ****************************************************************/
 
-#ifndef BASIS_H_
-#define BASIS_H_
+#ifndef BASIS_BASIS_H_
+#define BASIS_BASIS_H_
 
 #include <cassert>
 #include <tuple>

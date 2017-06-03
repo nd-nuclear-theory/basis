@@ -14,8 +14,8 @@
   + 4/22/17 (aem): Fix error in hypersector constructor.
 ****************************************************************/
 
-#ifndef HYPERSECTOR_H_
-#define HYPERSECTOR_H_
+#ifndef BASIS_HYPERSECTOR_H_
+#define BASIS_HYPERSECTOR_H_
 
 #include "basis/basis.h"
 #include "basis/operator.h"

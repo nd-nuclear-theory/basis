@@ -49,8 +49,8 @@
 
 ****************************************************************/
 
-#ifndef NLJ_ORBITAL_H_
-#define NLJ_ORBITAL_H_
+#ifndef BASIS_NLJ_ORBITAL_H_
+#define BASIS_NLJ_ORBITAL_H_
 
 #include <array>
 #include <string>

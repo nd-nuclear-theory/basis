@@ -15,8 +15,8 @@
 
 ****************************************************************/
 
-#ifndef JJJT_OPERATOR_H_
-#define JJJT_OPERATOR_H_
+#ifndef BASIS_JJJT_OPERATOR_H_
+#define BASIS_JJJT_OPERATOR_H_
 
 #include <cassert>
 #include <cstdlib>

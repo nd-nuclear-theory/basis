@@ -12,8 +12,8 @@
 
 ****************************************************************/
 
-#ifndef MANY_BODY_H_
-#define MANY_BODY_H_
+#ifndef BASIS_MANY_BODY_H_
+#define BASIS_MANY_BODY_H_
 
 #include <cassert>
 #include <tuple>
