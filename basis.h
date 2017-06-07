@@ -152,7 +152,7 @@ namespace basis {
     public:
 
     ////////////////////////////////////////////////////////////////
-    //  common type definitions
+    //  common typedefs
     ////////////////////////////////////////////////////////////////
 
     typedef tSubspaceLabelsType SubspaceLabelsType;
@@ -527,8 +527,8 @@ namespace basis {
       // Return the total dimension of all subspaces within the space.
       {
         int dimension = 0;
-        for (int i=0; i<size(); ++i)
-          dimension += GetSubspace(i).size();
+        for (int subspace_index=0; subspace_index<size(); ++subspace_index)
+          dimension += GetSubspace(subspace_index).size();
         return dimension;
       }
 
