@@ -329,13 +329,13 @@ namespace basis {
     OrbitalPNInfo OrbitalInfo() const;
 
     // pass-through accessors
-    OrbitalSpeciesPN orbital_species() const {return Subspace().orbital_species();}
-    HalfInt Tz() const {return Subspace().Tz();}
+    OrbitalSpeciesPN orbital_species() const {return subspace().orbital_species();}
+    HalfInt Tz() const {return subspace().Tz();}
 
     // state label accessors
-    int n() const {return std::get<0>(GetStateLabels());}
-    int l() const {return std::get<1>(GetStateLabels());}
-    HalfInt j() const {return std::get<2>(GetStateLabels());}
+    int n() const {return std::get<0>(labels());}
+    int l() const {return std::get<1>(labels());}
+    HalfInt j() const {return std::get<2>(labels());}
     int g() const {return l()%2;}
     FullOrbitalLabels full_labels() const
     {
@@ -343,7 +343,7 @@ namespace basis {
     }
 
     // state weight accessors
-    double weight() const {return Subspace().weights()[index()];}
+    double weight() const {return subspace().weights()[index()];}
     // Look up floating-point weight.
     int N() const {return 2*n()+l();}
     // Calculate hard-coded oscillator quantum number.
@@ -548,10 +548,10 @@ namespace basis {
     OrbitalPNInfo OrbitalInfo() const;
 
     // pass-through accessors
-    OrbitalSpeciesPN orbital_species() const {return Subspace().orbital_species();}
-    HalfInt Tz() const {return Subspace().Tz();}
-    int l() const {return Subspace().l();}
-    HalfInt j() const {return Subspace().j();}
+    OrbitalSpeciesPN orbital_species() const {return subspace().orbital_species();}
+    HalfInt Tz() const {return subspace().Tz();}
+    int l() const {return subspace().l();}
+    HalfInt j() const {return subspace().j();}
     int g() const {return l()%2;}
     FullOrbitalLabels full_labels() const
     {
@@ -559,10 +559,10 @@ namespace basis {
     }
 
     // state label accessors
-    int n() const {return std::get<0>(GetStateLabels());}
+    int n() const {return std::get<0>(labels());}
 
     // state weight accessors
-    double weight() const {return Subspace().weights()[index()];}
+    double weight() const {return subspace().weights()[index()];}
     // Look up floating-point weight.
     int N() const {return 2*n()+l();}
     // Calculate hard-coded oscillator quantum number.

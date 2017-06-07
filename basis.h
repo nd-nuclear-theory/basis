@@ -99,7 +99,8 @@
   + 4/4/17 (mac):
     - Rename from indexing.h to basis.h.
     - Rename compilation flag INDEXING_HASH to BASIS_HASH.
-
+  + 6/6/7 (mac): Disable deprecated member functions by default
+    (BASIS_ALLOW_DEPRECATED).
 ****************************************************************/
 
 #ifndef BASIS_BASIS_H_
@@ -175,6 +176,7 @@ namespace basis {
       return labels_;
     }
 
+#ifdef BASIS_ALLOW_DEPRECATED
     const SubspaceLabelsType& GetSubspaceLabels() const
     // Return the labels of the subspace itself.
     //
@@ -184,6 +186,7 @@ namespace basis {
     {
       return labels_;
     }
+#endif
 
     const StateLabelsType& GetStateLabels(int index) const
     // Retrieve the labels of a state within the subspace, given its
@@ -278,7 +281,6 @@ namespace basis {
   // The derived class is expected to set up a constructor and
   // friendlier accessors for the individual labels.
   //
-  //
   // The space (and the indexing it provides) is *not* copied into the
   // state but rather stored by pointer reference.  It should
   // therefore exist for the lifetime of the state object.
@@ -311,7 +313,7 @@ namespace basis {
       // constructors
 
       BaseState(const SubspaceType& subspace, int index)
-        // Construct state, given index index within subspace.
+        // Construct state, given index within subspace.
         : subspace_ptr_(&subspace), index_(index)
       {
         assert(ValidIndex());
@@ -342,11 +344,13 @@ namespace basis {
       // Return reference to subspace in which this state lies.
       {return *subspace_ptr_;}
 
+#ifdef BASIS_ALLOW_DEPRECATED
       const SubspaceType& Subspace() const
       // Return reference to subspace in which this state lies.
       //
       // DEPRECATED in favor of subspace().
       {return *subspace_ptr_;}
+#endif
 
       const StateLabelsType& labels() const
       // Return labels of this state.
@@ -356,9 +360,10 @@ namespace basis {
       // BaseSubspace::GetStateLabels).  Rather, derived types will
       // provide accessors for convenient access to individual labels.
       {
-        return Subspace().GetStateLabels(index());
+        return subspace().GetStateLabels(index());
       }
 
+#ifdef BASIS_ALLOW_DEPRECATED
       const StateLabelsType& GetStateLabels() const
       // Return labels of this state.
       //
@@ -371,6 +376,7 @@ namespace basis {
       {
         return Subspace().GetStateLabels(index());
       }
+#endif
 
       int index() const
       // Retrieve integer index of state within subspace.
@@ -421,7 +427,7 @@ namespace basis {
       //
       // For use on construction (or possibly with iteration).
       {
-        return index() < Subspace().size();
+        return index() < subspace().size();
       }
 
       private:
@@ -692,6 +698,7 @@ namespace basis {
         return lookup_.count(key);
       };
 
+#ifdef BASIS_ALLOW_DEPRECATED
       bool ContainsSector(const typename SectorType::KeyType& key) const
       // Given the labels for a sector, returns whether or not the sector
       // is found within the the sector set.
@@ -700,6 +707,7 @@ namespace basis {
       {
         return lookup_.count(key);
       };
+#endif
 
       int LookUpSectorIndex(int bra_subspace_index, int ket_subspace_index, int multiplicity_index=1) const
       // Given the labels for a sector, look up its index within the
@@ -715,6 +723,7 @@ namespace basis {
           return pos->second;
       };
 
+#ifdef BASIS_ALLOW_DEPRECATED
       int LookUpSectorIndex(const typename SectorType::KeyType& key) const
       // Given the labels for a sector, look up its index within the
       // sector set.
@@ -723,17 +732,18 @@ namespace basis {
       //
       // DEPRECATED
       {
-
+      
         // PREVIOUSLY: trap failed lookup with assert for easier debugging
         // assert(ContainsSector(bra_subspace_index,ket_subspace_index,multiplicity_index));
         // return lookup_.at(key);
-
+      
         auto pos = lookup_.find(key);
         if (pos==lookup_.end())
           return kNone;
         else
           return pos->second;
       };
+#endif
 
       ////////////////////////////////////////////////////////////////
       // size retrieval

@@ -264,15 +264,15 @@ namespace basis {
       : BaseState (subspace, state_labels) {}
 
     // pass-through accessors
-    TwoBodySpeciesPN two_body_species() const {return Subspace().two_body_species();}
-    int J() const {return Subspace().J();}
-    int g() const {return Subspace().g();}
-    const OrbitalSubspacePN& orbital_subspace1() const {return Subspace().orbital_subspace1();}
-    const OrbitalSubspacePN& orbital_subspace2() const {return Subspace().orbital_subspace2();}
+    TwoBodySpeciesPN two_body_species() const {return subspace().two_body_species();}
+    int J() const {return subspace().J();}
+    int g() const {return subspace().g();}
+    const OrbitalSubspacePN& orbital_subspace1() const {return subspace().orbital_subspace1();}
+    const OrbitalSubspacePN& orbital_subspace2() const {return subspace().orbital_subspace2();}
 
     // state label accessors
-    int index1() const {return std::get<0>(GetStateLabels());}
-    int index2() const {return std::get<1>(GetStateLabels());}
+    int index1() const {return std::get<0>(labels());}
+    int index2() const {return std::get<1>(labels());}
 
     // state retrieval
     const OrbitalStatePN GetOrbital1() const {return OrbitalStatePN(orbital_subspace1(),index1());}

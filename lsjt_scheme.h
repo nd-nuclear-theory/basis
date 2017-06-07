@@ -203,14 +203,14 @@ namespace basis {
       : BaseState (subspace, state_labels) {}
 
     // pass-through accessors
-    int L() const {return Subspace().L();}
-    int S() const {return Subspace().S();}
-    int J() const {return Subspace().J();}
-    int T() const {return Subspace().T();}
-    int g() const {return Subspace().g();}
+    int L() const {return subspace().L();}
+    int S() const {return subspace().S();}
+    int J() const {return subspace().J();}
+    int T() const {return subspace().T();}
+    int g() const {return subspace().g();}
 
     // state label accessors
-    int N() const {return std::get<0>(GetStateLabels());}
+    int N() const {return std::get<0>(labels());}
 
   };
 
@@ -422,17 +422,17 @@ namespace basis {
 
     // pass-through accessors
 
-    int L() const {return Subspace().L();}
-    int S() const {return Subspace().S();}
-    int J() const {return Subspace().J();}
-    int T() const {return Subspace().T();}
-    int g() const {return Subspace().g();}
+    int L() const {return subspace().L();}
+    int S() const {return subspace().S();}
+    int J() const {return subspace().J();}
+    int T() const {return subspace().T();}
+    int g() const {return subspace().g();}
 
     // state label accessors
-    int Nr() const {return std::get<0>(GetStateLabels());}
-    int lr() const {return std::get<1>(GetStateLabels());}
-    int Nc() const {return std::get<2>(GetStateLabels());}
-    int lc() const {return std::get<3>(GetStateLabels());}
+    int Nr() const {return std::get<0>(labels());}
+    int lr() const {return std::get<1>(labels());}
+    int Nc() const {return std::get<2>(labels());}
+    int lc() const {return std::get<3>(labels());}
     int N() const {return  Nr()+Nc();}
 
   };
@@ -616,17 +616,17 @@ namespace basis {
 
     // pass-through accessors
 
-    int L() const {return Subspace().L();}
-    int S() const {return Subspace().S();}
-    int J() const {return Subspace().J();}
-    int T() const {return Subspace().T();}
-    int g() const {return Subspace().g();}
+    int L() const {return subspace().L();}
+    int S() const {return subspace().S();}
+    int J() const {return subspace().J();}
+    int T() const {return subspace().T();}
+    int g() const {return subspace().g();}
 
     // state label accessors
-    int Nr() const {return std::get<0>(GetStateLabels());}
-    int lr() const {return std::get<1>(GetStateLabels());}
-    int Nc() const {return std::get<2>(GetStateLabels());}
-    int lc() const {return std::get<3>(GetStateLabels());}
+    int Nr() const {return std::get<0>(labels());}
+    int lr() const {return std::get<1>(labels());}
+    int Nc() const {return std::get<2>(labels());}
+    int lc() const {return std::get<3>(labels());}
     int N() const {return  Nr()+Nc();}
 
   };
@@ -830,17 +830,17 @@ namespace basis {
       : BaseState (subspace, state_labels) {}
 
     // pass-through accessors
-    int L() const {return Subspace().L();}
-    int S() const {return Subspace().S();}
-    int J() const {return Subspace().J();}
-    int T() const {return Subspace().T();}
-    int g() const {return Subspace().g();}
+    int L() const {return subspace().L();}
+    int S() const {return subspace().S();}
+    int J() const {return subspace().J();}
+    int T() const {return subspace().T();}
+    int g() const {return subspace().g();}
 
     // state label accessors
-    int N1() const {return std::get<0>(GetStateLabels());}
-    int l1() const {return std::get<1>(GetStateLabels());}
-    int N2() const {return std::get<2>(GetStateLabels());}
-    int l2() const {return std::get<3>(GetStateLabels());}
+    int N1() const {return std::get<0>(labels());}
+    int l1() const {return std::get<1>(labels());}
+    int N2() const {return std::get<2>(labels());}
+    int l2() const {return std::get<3>(labels());}
 
     int N() const {return N1()+N2();}
 
@@ -1030,17 +1030,17 @@ namespace basis {
       : BaseState (subspace, state_labels) {}
 
     // pass-through accessors
-    int L() const {return Subspace().L();}
-    int S() const {return Subspace().S();}
-    int J() const {return Subspace().J();}
-    int T() const {return Subspace().T();}
-    int g() const {return Subspace().g();}
+    int L() const {return subspace().L();}
+    int S() const {return subspace().S();}
+    int J() const {return subspace().J();}
+    int T() const {return subspace().T();}
+    int g() const {return subspace().g();}
 
     // state label accessors
-    int N1() const {return std::get<0>(GetStateLabels());}
-    int l1() const {return std::get<1>(GetStateLabels());}
-    int N2() const {return std::get<2>(GetStateLabels());}
-    int l2() const {return std::get<3>(GetStateLabels());}
+    int N1() const {return std::get<0>(labels());}
+    int l1() const {return std::get<1>(labels());}
+    int N2() const {return std::get<2>(labels());}
+    int l2() const {return std::get<3>(labels());}
 
     int N() const {return N1()+N2();}
 

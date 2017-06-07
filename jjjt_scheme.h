@@ -192,15 +192,15 @@ namespace basis {
       : BaseState (subspace, state_labels) {}
 
     // pass-through accessors
-    int J() const {return Subspace().J();}
-    int T() const {return Subspace().T();}
-    int g() const {return Subspace().g();}
+    int J() const {return subspace().J();}
+    int T() const {return subspace().T();}
+    int g() const {return subspace().g();}
 
     // state label accessors
-    int N1() const {return std::get<0>(GetStateLabels());}
-    HalfInt j1() const {return std::get<1>(GetStateLabels());}
-    int N2() const {return std::get<2>(GetStateLabels());}
-    HalfInt j2() const {return std::get<3>(GetStateLabels());}
+    int N1() const {return std::get<0>(labels());}
+    HalfInt j1() const {return std::get<1>(labels());}
+    int N2() const {return std::get<2>(labels());}
+    HalfInt j2() const {return std::get<3>(labels());}
 
     int l1() const
     {
@@ -425,15 +425,15 @@ namespace basis {
       : BaseState (subspace, state_labels) {}
 
     // pass-through accessors
-    int J() const {return Subspace().J();}
-    int T() const {return Subspace().T();}
-    int g() const {return Subspace().g();}
+    int J() const {return subspace().J();}
+    int T() const {return subspace().T();}
+    int g() const {return subspace().g();}
 
     // state label accessors
-    int N1() const {return std::get<0>(GetStateLabels());}
-    HalfInt j1() const {return std::get<1>(GetStateLabels());}
-    int N2() const {return std::get<2>(GetStateLabels());}
-    HalfInt j2() const {return std::get<3>(GetStateLabels());}
+    int N1() const {return std::get<0>(labels());}
+    HalfInt j1() const {return std::get<1>(labels());}
+    int N2() const {return std::get<2>(labels());}
+    HalfInt j2() const {return std::get<3>(labels());}
 
     int l1() const
     {
