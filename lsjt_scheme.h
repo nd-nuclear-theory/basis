@@ -196,11 +196,11 @@ namespace basis {
 
     RelativeStateLSJT(const SubspaceType& subspace, int index)
       // Construct state by index.
-      : BaseState (subspace, index) {}
+      : BaseState (subspace,index) {}
 
     RelativeStateLSJT(const SubspaceType& subspace, const StateLabelsType& state_labels)
       // Construct state by reverse lookup on labels.
-      : BaseState (subspace, state_labels) {}
+      : BaseState (subspace,state_labels) {}
 
     // pass-through accessors
     int L() const {return subspace().L();}

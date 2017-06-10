@@ -55,6 +55,6 @@ CPPFLAGS += -DBASIS_HASH
 
 CPPFLAGS += -I..
 
-# link to the libraries
+# link to neghboring libraries
 LDFLAGS += -L../am -L../mcutils
 LDLIBS +=  -lam -lmcutils

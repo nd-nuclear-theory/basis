@@ -98,7 +98,7 @@ namespace basis {
           std::istringstream line_stream(line);
           int version;
           line_stream >> version;
-          ParsingCheck(line_stream,line_count,line);
+          mcutils::ParsingCheck(line_stream,line_count,line);
           assert(version==int(MFDnOrbitalFormat::kVersion15099));
         }
 
@@ -108,7 +108,7 @@ namespace basis {
           std::getline(is,line);
           std::istringstream line_stream(line);
           line_stream >> num_orbitals_p >> num_orbitals_n;
-          ParsingCheck(line_stream,line_count,line);
+          mcutils::ParsingCheck(line_stream,line_count,line);
         }
       }
 
@@ -128,7 +128,7 @@ namespace basis {
         int index;
         OrbitalPNInfo state;
         line_stream >> index >> state;
-        ParsingCheck(line_stream,line_count,line);
+        mcutils::ParsingCheck(line_stream,line_count,line);
         // count orbitals by type
         num_orbitals_p_extracted +=
           static_cast<int>(state.orbital_species == OrbitalSpeciesPN::kP);
