@@ -10,6 +10,7 @@
   University of Notre Dame
 
   + 6/6/17 (mac): Created, abstracted from code in spncci branching_u3s.
+  + 6/11/17 (mac): Rename TotalFullDimension to FullDimension.
 
 ****************************************************************/
 
@@ -213,7 +214,7 @@ namespace basis {
       // size retrieval
       ////////////////////////////////////////////////////////////////
 
-      int TotalFullDimension() const
+      int FullDimension() const
       // Return the total dimension of all subspaces within the space,
       // taking into account substate multiplicities.
       {

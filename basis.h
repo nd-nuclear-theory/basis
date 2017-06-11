@@ -101,6 +101,7 @@
     - Rename compilation flag INDEXING_HASH to BASIS_HASH.
   + 6/6/7 (mac): Disable deprecated member functions by default
     (BASIS_ALLOW_DEPRECATED).
+  + 6/11/17 (mac): Rename TotalDimension to Dimension.
 ****************************************************************/
 
 #ifndef BASIS_BASIS_H_
@@ -523,7 +524,7 @@ namespace basis {
         return subspaces_.size();
       };
 
-      int TotalDimension() const
+      int Dimension() const
       // Return the total dimension of all subspaces within the space.
       {
         int dimension = 0;

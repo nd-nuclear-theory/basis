@@ -311,8 +311,8 @@ void Test()
   basis::RelativeMultiSpaceLSJT space(N_max,J_max);
   std::cout << space.DebugStr() << std::endl;
   std::cout
-    << "TotalDimension " << space.TotalDimension()
-    << " TotalFullDimension " << space.TotalFullDimension() << std::endl;
+    << "Dimension " << space.Dimension()
+    << "FullDimension " << space.FullDimension() << std::endl;
   std::cout << std::endl;
 
   for (int subspace_index=0; subspace_index<space.size(); ++subspace_index)
