@@ -716,7 +716,7 @@ namespace basis {
       //
       // If no such labels are found, basis::kNone is returned.
       {
-        typename SectorType::KeyType key(bra_subspace_index,ket_subspace_index,multiplicity_index);
+        const typename SectorType::KeyType key(bra_subspace_index,ket_subspace_index,multiplicity_index);
         auto pos = lookup_.find(key);
         if (pos==lookup_.end())
           return kNone;

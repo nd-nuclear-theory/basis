@@ -164,7 +164,7 @@ namespace basis {
       //
       // If no such labels are found, basis::kNone is returned.
       {
-        typename HypersectorType::KeyType
+        const typename HypersectorType::KeyType
           key(bra_subspace_index,ket_subspace_index,operator_subspace_index,multiplicity_index);
         auto pos = lookup_.find(key);
         if (pos==lookup_.end())
