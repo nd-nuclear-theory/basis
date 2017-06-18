@@ -8,7 +8,7 @@
 
 ****************************************************************/
 
-#include "basis/multibasis.h"
+#include "basis/degenerate.h"
 
 #include "am/am.h"
 
@@ -23,9 +23,9 @@ namespace basis {
   //
   // As for RelativeLSJT (in lsjt_scheme.h) but with...
   //
-  // multiplicity labels: (M_J,M_T)
+  // degeneracy labels: (M_J,M_T)
   //
-  //   => multiplicity (2*J+1)*(2*T+1)
+  //   => degeneracy (2*J+1)*(2*T+1)
   //
   ////////////////////////////////////////////////////////////////
 
@@ -36,19 +36,19 @@ namespace basis {
 
   // subspace
 
-  class RelativeMultiSubspaceLSJT
-    : public BaseMultiSubspace<RelativeSubspaceLSJTLabels,RelativeStateLSJTLabels>
+  class RelativeDegenerateSubspaceLSJT
+    : public BaseDegenerateSubspace<RelativeSubspaceLSJTLabels,RelativeStateLSJTLabels>
     {
 
       public:
 
       // constructor
 
-      RelativeMultiSubspaceLSJT() {};
+      RelativeDegenerateSubspaceLSJT() {};
       // default constructor -- provided since required for certain
       // purposes by STL container classes (e.g., std::vector::resize)
 
-      RelativeMultiSubspaceLSJT(int L, int S, int J, int T, int g, int Nmax);
+      RelativeDegenerateSubspaceLSJT(int L, int S, int J, int T, int g, int Nmax);
       // Set up indexing.
 
       // accessors
@@ -78,21 +78,21 @@ namespace basis {
 
   // state
 
-  class RelativeMultiStateLSJT
-    : public BaseMultiState<RelativeMultiSubspaceLSJT>
+  class RelativeDegenerateStateLSJT
+    : public BaseDegenerateState<RelativeDegenerateSubspaceLSJT>
   {
 
     public:
 
     // pass-through constructors
 
-    RelativeMultiStateLSJT(const SubspaceType& subspace, int index)
+    RelativeDegenerateStateLSJT(const SubspaceType& subspace, int index)
       // Construct state by index.
-      : BaseMultiState<RelativeMultiSubspaceLSJT>(subspace,index) {}
+      : BaseDegenerateState<RelativeDegenerateSubspaceLSJT>(subspace,index) {}
 
-    RelativeMultiStateLSJT(const SubspaceType& subspace, const StateLabelsType& state_labels)
+    RelativeDegenerateStateLSJT(const SubspaceType& subspace, const StateLabelsType& state_labels)
       // Construct state by reverse lookup on labels.
-      : BaseMultiState<RelativeMultiSubspaceLSJT>(subspace,state_labels) {}
+      : BaseDegenerateState<RelativeDegenerateSubspaceLSJT>(subspace,state_labels) {}
 
     // pass-through accessors
     int L() const {return subspace().L();}
@@ -108,19 +108,19 @@ namespace basis {
 
   // space
 
-  class RelativeMultiSpaceLSJT
-    : public BaseMultiSpace<RelativeMultiSubspaceLSJT>
+  class RelativeDegenerateSpaceLSJT
+    : public BaseDegenerateSpace<RelativeDegenerateSubspaceLSJT>
   {
 
     public:
 
     // constructor
 
-    RelativeMultiSpaceLSJT() {};
+    RelativeDegenerateSpaceLSJT() {};
     // default constructor -- provided since required for certain
     // purposes by STL container classes (e.g., std::vector::resize)
 
-    RelativeMultiSpaceLSJT(int Nmax, int Jmax);
+    RelativeDegenerateSpaceLSJT(int Nmax, int Jmax);
     // Enumerate all relative LSJT subspaces of given dimension up to
     // a given relative oscillator cutoff and relative angular
     // momentum cutoff.
@@ -152,7 +152,7 @@ namespace basis {
   // implementation
   ////////////////////////////////////////////////////////////////
 
-  RelativeMultiSubspaceLSJT::RelativeMultiSubspaceLSJT(int L, int S, int J, int T, int g, int Nmax)
+  RelativeDegenerateSubspaceLSJT::RelativeDegenerateSubspaceLSJT(int L, int S, int J, int T, int g, int Nmax)
   {
 
     // set values
@@ -173,7 +173,7 @@ namespace basis {
 
   }
 
-  bool RelativeMultiSubspaceLSJT::ValidLabels() const
+  bool RelativeDegenerateSubspaceLSJT::ValidLabels() const
   {
 
     bool valid = true;
@@ -190,7 +190,7 @@ namespace basis {
     return valid;
   }
 
-  std::string RelativeMultiSubspaceLSJT::LabelStr() const
+  std::string RelativeDegenerateSubspaceLSJT::LabelStr() const
   {
     std::ostringstream os;
 
@@ -207,7 +207,7 @@ namespace basis {
     return os.str();
   }
 
-  std::string RelativeMultiSubspaceLSJT::DebugStr() const
+  std::string RelativeDegenerateSubspaceLSJT::DebugStr() const
   {
 
     std::ostringstream os;
@@ -216,15 +216,15 @@ namespace basis {
 
     for (int state_index=0; state_index<size(); ++state_index)
       {
-        RelativeMultiStateLSJT state(*this,state_index);
+        RelativeDegenerateStateLSJT state(*this,state_index);
 
         os
 	  << " " << "index"
 	  << " " << std::setw(width) << state_index
 	  << " " << "N"
 	  << " " << std::setw(width) << state.N()
-	  << " " << "multiplicity"
-	  << " " << std::setw(width) << state.multiplicity()
+	  << " " << "degeneracy"
+	  << " " << std::setw(width) << state.degeneracy()
           << std::endl;
       }
 
@@ -234,7 +234,7 @@ namespace basis {
 
   }
 
-  RelativeMultiSpaceLSJT::RelativeMultiSpaceLSJT(int Nmax, int Jmax)
+  RelativeDegenerateSpaceLSJT::RelativeDegenerateSpaceLSJT(int Nmax, int Jmax)
     : Nmax_(Nmax), Jmax_(Jmax)
   {
 
@@ -258,7 +258,7 @@ namespace basis {
 		// required to pass label validity tests
 		// int Nmax_subspace = Nmax - (Nmax-g)%2;
 
-		RelativeMultiSubspaceLSJT subspace(L,S,J,T,g,Nmax);
+		RelativeDegenerateSubspaceLSJT subspace(L,S,J,T,g,Nmax);
 		assert(subspace.size()!=0);
 		PushSubspace(subspace);
 	      }
@@ -266,7 +266,7 @@ namespace basis {
       }
   }
 
-  std::string RelativeMultiSpaceLSJT::DebugStr() const
+  std::string RelativeDegenerateSpaceLSJT::DebugStr() const
   {
     std::ostringstream os;
 
@@ -308,7 +308,7 @@ void Test()
   int N_max = 2;
   int J_max = 3;
 
-  basis::RelativeMultiSpaceLSJT space(N_max,J_max);
+  basis::RelativeDegenerateSpaceLSJT space(N_max,J_max);
   std::cout << space.DebugStr() << std::endl;
   std::cout
     << "Dimension " << space.Dimension()
@@ -317,7 +317,7 @@ void Test()
 
   for (int subspace_index=0; subspace_index<space.size(); ++subspace_index)
     {
-      const basis::RelativeMultiSubspaceLSJT& subspace = space.GetSubspace(subspace_index);
+      const basis::RelativeDegenerateSubspaceLSJT& subspace = space.GetSubspace(subspace_index);
       std::cout << subspace.LabelStr() << std::endl;
       std::cout << subspace.DebugStr() << std::endl;
     }    

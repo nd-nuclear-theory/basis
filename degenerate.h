@@ -1,21 +1,23 @@
 /**************************************************************
-  @file multibasis.h
+  @file degenerate.h
 
   Defines basis containers in which each state has associated with it
-  a substate multiplicity.
+  a substate degeneracy.
 
   Language: C++11
 
   Mark A. Caprio
   University of Notre Dame
 
-  + 6/6/17 (mac): Created, abstracted from code in spncci branching_u3s.
+  + 6/6/17 (mac): Created as multibasis.h, abstracted from code in spncci
+    branching_u3s.
   + 6/11/17 (mac): Rename TotalFullDimension to FullDimension.
+  + 6/17/17 (mac): Rename to degenerate.h.  Rename multiplicity to degeneracy.
 
 ****************************************************************/
 
-#ifndef BASIS_MULTIBASIS_H_
-#define BASIS_MULTIBASIS_H_
+#ifndef BASIS_DEGENERATE_H_
+#define BASIS_DEGENERATE_H_
 
 #include "basis/basis.h"
 
@@ -26,7 +28,7 @@ namespace basis {
   // generic subspace
   ////////////////////////////////////////////////////////////////
 
-  // BaseMultiSubspace -- holds indexing of states within a symmetry
+  // BaseDegenerateSubspace -- holds indexing of states within a symmetry
   // subspace
   //
   // The derived class is expected to set up a constructor and
@@ -41,7 +43,7 @@ namespace basis {
   // state constructor syntactically distinct.
 
   template <typename tSubspaceLabelsType, typename tStateLabelsType>
-    class BaseMultiSubspace
+    class BaseDegenerateSubspace
     : public BaseSubspace<tSubspaceLabelsType,tStateLabelsType>
   {
 
@@ -64,7 +66,7 @@ namespace basis {
 
     // default constructor
     //   Implicitly invoked by derived class.
-    BaseMultiSubspace() : full_dimension_(0) {}
+    BaseDegenerateSubspace() : full_dimension_(0) {}
 
     ////////////////////////////////////////////////////////////////
     // accessors for substate information
@@ -91,7 +93,7 @@ namespace basis {
     // state label push (for initial construction)
     ////////////////////////////////////////////////////////////////
 
-    void PushStateLabels(const StateLabelsType& state_labels, int multiplicity)
+    void PushStateLabels(const StateLabelsType& state_labels, int degeneracy)
     // Create indexing information (in both directions, index <->
     // labels) for a state.
     {
@@ -100,15 +102,15 @@ namespace basis {
 
       // push substate information
       state_offsets_.push_back(full_dimension_);
-      state_multiplicities_.push_back(multiplicity);
-      full_dimension_ += multiplicity;
+      state_multiplicities_.push_back(degeneracy);
+      full_dimension_ += degeneracy;
     };
 
     ////////////////////////////////////////////////////////////////
     // private storage
     ////////////////////////////////////////////////////////////////
 
-    // multiplicity counting information
+    // degeneracy counting information
     std::vector<int> state_offsets_;  // offset to given state's starting substate
     std::vector<int> state_multiplicities_;  // given state's number of substates
     int full_dimension_;  // total number of substates
@@ -119,7 +121,7 @@ namespace basis {
   // generic state realized within subspace
   ////////////////////////////////////////////////////////////////
 
-  // BaseMultiState -- realization of a state withinin a given subspace
+  // BaseDegenerateState -- realization of a state withinin a given subspace
   //
   // The derived class is expected to set up a constructor and
   // friendlier accessors for the individual labels.
@@ -132,7 +134,7 @@ namespace basis {
   //   tSubspaceType : subspace type in which this state lives
 
   template <typename tSubspaceType>
-    class BaseMultiState
+    class BaseDegenerateState
     : public BaseState<tSubspaceType>
     {
 
@@ -150,19 +152,19 @@ namespace basis {
       ////////////////////////////////////////////////////////////////
 
       // default constructor -- disabled
-      BaseMultiState();
+      BaseDegenerateState();
 
       // copy constructor -- synthesized
 
       // constructors
 
-      BaseMultiState(const SubspaceType& subspace, int index)
+      BaseDegenerateState(const SubspaceType& subspace, int index)
         // Construct state, given index within subspace.
         : BaseState<tSubspaceType>(subspace,index)
       {
       }
 
-      BaseMultiState(const SubspaceType& subspace, const StateLabelsType& state_labels)
+      BaseDegenerateState(const SubspaceType& subspace, const StateLabelsType& state_labels)
         // Construct state, by reverse lookup on labels within subspace.
         : BaseState<tSubspaceType>(subspace,state_labels)
         {
@@ -177,7 +179,7 @@ namespace basis {
         return BaseState<tSubspaceType>::subspace().state_offsets()[BaseState<tSubspaceType>::index()];
       }
 
-      int multiplicity() const
+      int degeneracy() const
       {
         return BaseState<tSubspaceType>::subspace().state_multiplicities()[BaseState<tSubspaceType>::index()];
       }
@@ -191,14 +193,14 @@ namespace basis {
   // generic space
   ////////////////////////////////////////////////////////////////
 
-  // BaseMultiSpace -- container to hold subspaces, with reverse lookup by
+  // BaseDegenerateSpace -- container to hold subspaces, with reverse lookup by
   // subspace labels
   //
   // Template arguments:
   //   tSubspaceType (typename) : type for subspace
 
   template <typename tSubspaceType>
-    class BaseMultiSpace
+    class BaseDegenerateSpace
     : public BaseSpace<tSubspaceType>
     {
 

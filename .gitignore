@@ -12,3 +12,7 @@
 # Doxygen-generated docs
 doc/html/
 doc/latex/
+
+# project configuration symlinks
+makefile
+config.mk
