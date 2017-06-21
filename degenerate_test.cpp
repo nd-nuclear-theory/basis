@@ -104,6 +104,9 @@ namespace basis {
     // state label accessors
     int N() const {return std::get<0>(labels());}
 
+    // diagnostic output
+    std::string LabelStr() const;
+
   };
 
   // space
@@ -139,7 +142,7 @@ namespace basis {
     int Jmax() const {return Jmax_;}
 
     // diagnostic string
-    std::string DebugStr() const;
+    std::string DebugStr(bool show_subspaces=false) const;
 
     private:
     // truncation
@@ -219,20 +222,42 @@ namespace basis {
         RelativeDegenerateStateLSJT state(*this,state_index);
 
         os
-	  << " " << "index"
-	  << " " << std::setw(width) << state_index
-	  << " " << "N"
-	  << " " << std::setw(width) << state.N()
+          << "  "  // extra indent
+	  << " " << "state_index"
+	  << " " << state_index
+	  << " " << "labels"
+	  << " " << state.LabelStr()
 	  << " " << "degeneracy"
-	  << " " << std::setw(width) << state.degeneracy()
+	  << " " << state.degeneracy()
+	  << " " << "offset"
+	  << " " << state.offset()
           << std::endl;
       }
 
-    os << "dimensions: size " << size() << " full_dimension " << full_dimension() << std::endl;
+    os << " " << "dimensions: size " << size() << " full_dimension " << full_dimension() << std::endl;
 
     return os.str();
 
   }
+
+  std::string RelativeDegenerateStateLSJT::LabelStr() const
+  {
+    std::ostringstream os;
+
+    const int width = 0;  // for now, no fixed width
+
+    os << "["
+       << " " << std::setw(width) << N() 
+       << " " << std::setw(width) << L() 
+       << " " << std::setw(width) << S() 
+       << " " << std::setw(width) << J() 
+       << " " << std::setw(width) << T() 
+       << " " << std::setw(width) << g()
+       << " " << "]";
+
+    return os.str();
+  }
+
 
   RelativeDegenerateSpaceLSJT::RelativeDegenerateSpaceLSJT(int Nmax, int Jmax)
     : Nmax_(Nmax), Jmax_(Jmax)
@@ -266,26 +291,25 @@ namespace basis {
       }
   }
 
-  std::string RelativeDegenerateSpaceLSJT::DebugStr() const
+  std::string RelativeDegenerateSpaceLSJT::DebugStr(bool show_subspaces) const
   {
     std::ostringstream os;
-
-    const int width = 3;
 
     for (int subspace_index=0; subspace_index<size(); ++subspace_index)
       {
 	const SubspaceType& subspace = GetSubspace(subspace_index);
 	os
-	  << " " << "index"
-	  << " " << std::setw(width) << subspace_index
-	  << " " << " (L,S,J,T,g) "
+	  << " " << "subspace_index"
+	  << " " << subspace_index
+	  << " " << "labels"
 	  << " " << subspace.LabelStr()
-	  << " " << "Nmax"
-	  << " " << std::setw(width) << subspace.Nmax()
-	  << " " << "dim"
-	  << " " << std::setw(width) << subspace.size()
-	  << " " << std::setw(width) << subspace.full_dimension()
-	  << " " << std::endl;
+	  << " " << "size"
+	  << " " << subspace.size()
+	  << " " << "full_dimension"
+	  << " " << subspace.full_dimension()
+	  << std::endl;
+        if (show_subspaces)
+          os << subspace.DebugStr();
       }
 
     return os.str();
@@ -304,23 +328,25 @@ namespace basis {
 
 void Test()
 {
-  std::cout << "Relative space" << std::endl;
   int N_max = 2;
   int J_max = 3;
 
   basis::RelativeDegenerateSpaceLSJT space(N_max,J_max);
-  std::cout << space.DebugStr() << std::endl;
+  std::cout << space.DebugStr(true) << std::endl;
   std::cout
-    << "Dimension " << space.Dimension()
-    << "FullDimension " << space.FullDimension() << std::endl;
+    << " " << "Dimension"
+    << " " << space.Dimension()
+    << " " << "FullDimension "
+    << " " << space.FullDimension()
+    << std::endl;
   std::cout << std::endl;
 
-  for (int subspace_index=0; subspace_index<space.size(); ++subspace_index)
-    {
-      const basis::RelativeDegenerateSubspaceLSJT& subspace = space.GetSubspace(subspace_index);
-      std::cout << subspace.LabelStr() << std::endl;
-      std::cout << subspace.DebugStr() << std::endl;
-    }    
+  // for (int subspace_index=0; subspace_index<space.size(); ++subspace_index)
+  //   {
+  //     const basis::RelativeDegenerateSubspaceLSJT& subspace = space.GetSubspace(subspace_index);
+  //     std::cout << subspace.LabelStr() << std::endl;
+  //     std::cout << subspace.DebugStr() << std::endl;
+  //   }    
 }
 
 int main(int argc, char **argv)
