@@ -34,7 +34,8 @@
     - Add Tz0 argument to sectors constructor.
     - Add reference to orbital_space from space (currently disabled due to
       initializer issues).
-
+  + 7/1/17 (mac): Extract generic proton-neutron definitions to
+    proton_neutron.
 ****************************************************************/
 
 #ifndef BASIS_JJJPN_SCHEME_H_
@@ -47,6 +48,7 @@
 
 #include "basis/basis.h"
 #include "basis/many_body.h"
+#include "basis/proton_neutron.h"
 #include "basis/nlj_orbital.h"
 
 namespace basis {
@@ -113,25 +115,6 @@ namespace basis {
   //      retained.
   //
   ////////////////////////////////////////////////////////////////
-
-  // enumerated type for two-body state species
-  //
-  // Note: Ordering of pp/nn/pn labels follows the same sequence as
-  // used in MFDn.  However, note that MFDn uses 1-based numbering.
-
-  enum class TwoBodySpeciesPN {kPP=0,kNN=1,kPN=2};
-
-  // notational definitions for two-body state species
-  //
-  // Use of these arrays requires conversion of the TwoBodySpeciesPN to int.
-  //
-  // Example:
-  //   basis::TwoBodySpeciesPN two_body_species;
-  //   ...
-  //   os << basis::kTwoBodySpeciesPNCodeTz[int(two_body_species)];
-  extern const std::array<int,3> kTwoBodySpeciesPNCodeTz;  // {+1,-1,0} -- "up quark is positive" convention
-  extern const std::array<int,3> kTwoBodySpeciesPNCodeDecimal;  // {11,22,12} -- used by MFDn
-  extern const std::array<const char*,3> kTwoBodySpeciesPNCodeChar;  // {"pp","nn","pn"}
 
   // maximum weight collection
   struct WeightMax
