@@ -42,14 +42,14 @@ void TestRelative()
   for (int N=0; N<=6; N+=2)
     {
       basis::RelativeStateLSJT state(subspace,N/2);
-      std::cout << "N " << N << " index " << state.index() << " N " << state.N() << std::endl;
+      std::cout << "N " << N << " index " << state.index() << " N " << state.N() << " n " << state.n() << std::endl;
     }
 
   std::cout << "State lookup" << std::endl;
   for (int N=0; N<=6; N+=2)
     {
       basis::RelativeStateLSJT state(subspace,basis::RelativeSubspaceLSJT::StateLabelsType(N));
-      std::cout << "N " << N << " index " << state.index() << " N " << state.N() << std::endl;
+      std::cout << "N " << N << " index " << state.index() << " N " << state.N() << " n " << state.n() << std::endl;
     }
 
 

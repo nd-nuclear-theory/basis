@@ -64,6 +64,7 @@
       to g.
     - Add one-body (square) truncation on two-body bases.
   + 7/19/16 (mac): Use enum Rank for truncation rank.
+  + 7/1/17 (mac): Add n accessor to RelativeStateLSJT.
 
 ****************************************************************/
 
@@ -211,6 +212,13 @@ namespace basis {
 
     // state label accessors
     int N() const {return std::get<0>(labels());}
+
+    // derived label
+    //
+    // radial number n can be recovered from N=2*n+L, but it also
+    // happens to simply be state index w/in the subspace
+    int n() const {return (N()-L())/2;}
+
 
   };
 
