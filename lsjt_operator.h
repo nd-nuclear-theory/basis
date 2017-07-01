@@ -54,6 +54,8 @@
     - Rename CanonicalizeIndicesLSJT to CanonicalizeIndicesJT.
     - Add overload to CanonicalizeIndicesJT which only
       canonicalizes subspaces, with no reference to states.
+  + 7/1/17 (mac): Remove constraints on operator labels for
+    ConstructZeroOperatorRelativeLSJT.
 
 ****************************************************************/
 

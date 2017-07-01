@@ -362,11 +362,6 @@ namespace basis {
     )
   {
 
-    // validate operator labels
-    assert(operator_labels.J0==0);
-    assert(operator_labels.g0==0);
-    assert(operator_labels.symmetry_phase_mode==basis::SymmetryPhaseMode::kHermitian);
-
     for (int T0=operator_labels.T0_min; T0<=operator_labels.T0_max; ++T0)
       // for each isospin component
       {
