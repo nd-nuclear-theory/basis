@@ -11,6 +11,16 @@
 namespace basis {
 
   ////////////////////////////////////////////////////////////////
+  // single-particle orbitals
+  ////////////////////////////////////////////////////////////////
+
+  // notational definitions for orbital species
+  const std::array<HalfInt,2> kOrbitalSpeciesPNCodeTz({HalfInt(+1,2),HalfInt(-1,2)});
+  const std::array<int,2> kOrbitalSpeciesPNCodeDecimal({1,2});
+  const std::array<const char*,2> kOrbitalSpeciesPNCodeChar({"p","n"});
+
+
+  ////////////////////////////////////////////////////////////////
   // two-body states in jjJpn scheme with general orbitals
   ////////////////////////////////////////////////////////////////
 
