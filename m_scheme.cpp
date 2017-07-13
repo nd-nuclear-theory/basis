@@ -19,7 +19,7 @@
 #include "mcutils/parsing.h"
 #include "basis/proton_neutron.h"
 
-#include "m_scheme.h"
+#include "basis/m_scheme.h"
 
 namespace basis {
 
