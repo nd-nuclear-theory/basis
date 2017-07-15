@@ -17,8 +17,39 @@
 
 #include <array>
 
+#include "am/halfint.h"
+
 namespace basis {
 
+  ////////////////////////////////////////////////////////////////
+  // single-particle orbital label types and coding schemes
+  ////////////////////////////////////////////////////////////////
+
+  // enumerated type for orbital species
+  //
+  // Note: Follows same sequence as MFDn, but MFDn uses 1-based
+  // numbering.
+
+  enum class OrbitalSpeciesPN {kP=0,kN=1};
+
+  // notational definitions for orbital species
+  //
+  // Use of this array requires conversion of the OrbitalSpeciesPN to int.
+  //
+  // Example:
+  //   basis::OrbitalSpeciesPN orbital_species;
+  //   ...
+  //   os << basis::kOrbitalSpeciesPNCodeTz[int(orbital_species)];
+  //
+  // Note: Tz uses "up quark is positive" convention.
+  extern const std::array<HalfInt, 2> kOrbitalSpeciesPNCodeTz;
+  extern const std::array<int, 2> kOrbitalSpeciesPNCodeDecimal;
+  extern const std::array<const char*, 2> kOrbitalSpeciesPNCodeChar;
+
+
+  ////////////////////////////////////////////////////////////////
+  // two-body label types and coding schemes
+  ////////////////////////////////////////////////////////////////
 
   // enumerated type for two-body state species
   //

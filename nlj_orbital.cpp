@@ -20,12 +20,6 @@
 
 namespace basis {
 
-  // notational definitions for orbital species
-  const std::array<HalfInt,2> kOrbitalSpeciesPNCodeTz({HalfInt(+1,2),HalfInt(-1,2)});
-  const std::array<int,2> kOrbitalSpeciesPNCodeDecimal({1,2});
-  const std::array<const char*,2> kOrbitalSpeciesPNCodeChar({"p","n"});
-
-
   // orbital file version codes
   enum class MFDnOrbitalFormat : int {kVersion15099=15099};
 

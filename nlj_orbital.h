@@ -59,62 +59,9 @@
 #include "mcutils/parsing.h"
 
 #include "basis/basis.h"
+#include "basis/proton_neutron.h"
 
 namespace basis {
-
-  ////////////////////////////////////////////////////////////////
-  // single-particle orbital label types and coding schemes
-  ////////////////////////////////////////////////////////////////
-
-  /**
-   * Enumerated type for orbital species
-   *
-   * Note: Follows same sequence as MFDn, but MFDn uses 1-based
-   * numbering.
-   */
-  enum class OrbitalSpeciesPN {kP=0,kN=1};
-
-  /**
-   * Notational definition for orbital species conversion to Tz.
-   * Uses "up quark is positive" convention.
-   *
-   * Use of this array requires conversion of the OrbitalSpeciesPN to int.
-   *
-   * Example:
-   * \code
-   *   basis::OrbitalSpeciesPN orbital_species;
-   *   ...
-   *   os << basis::kOrbitalSpeciesPNCodeTz[int(orbital_species)];
-   * \endcode
-   */
-  extern const std::array<HalfInt, 2> kOrbitalSpeciesPNCodeTz;
-  /**
-   * Notational definition for orbital species conversion to MFDn decimal code.
-   * "p" -> 1, "n" -> 2
-   *
-   * Use of this array requires conversion of the OrbitalSpeciesPN to int.
-   *
-   * Example:
-   * \code
-   *   basis::OrbitalSpeciesPN orbital_species;
-   *   ...
-   *   os << basis::kOrbitalSpeciesPNCodeDecimal[int(orbital_species)];
-   * \endcode
-   */
-  extern const std::array<int, 2> kOrbitalSpeciesPNCodeDecimal;
-  /**
-   * Notational definition for orbital species conversion to character name.
-   *
-   * Use of this array requires conversion of the OrbitalSpeciesPN to int.
-   *
-   * Example:
-   * \code
-   *   basis::OrbitalSpeciesPN orbital_species;
-   *   ...
-   *   os << basis::kOrbitalSpeciesPNCodeChar[int(orbital_species)];
-   * \endcode
-   */
-  extern const std::array<const char*, 2> kOrbitalSpeciesPNCodeChar;
 
   ////////////////////////////////////////////////////////////////
   // orbital label containers
