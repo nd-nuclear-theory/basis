@@ -1,4 +1,4 @@
-/************************************************************//**
+/****************************************************************
   @file lsjt_operator.h
 
   Defines functions for I/O and manipulation of relative and two-body
@@ -295,14 +295,14 @@ namespace basis {
   // representation of an operator in JT scheme for description.
   {
     
-    OperatorLabelsJT()
-    // default constructor
-    : J0(0), g0(0), T0_min(0), T0_max(0), symmetry_phase_mode(basis::SymmetryPhaseMode::kHermitian)
+  OperatorLabelsJT()
+  // default constructor
+  : J0(0), g0(0), T0_min(0), T0_max(0), symmetry_phase_mode(basis::SymmetryPhaseMode::kHermitian)
     {}
 
-    OperatorLabelsJT(int J0_, int g0_, int T0_min_, int T0_max_, basis::SymmetryPhaseMode symmetry_phase_mode_)
-    // explicit constructor
-    : J0(J0_), g0(g0_), T0_min(T0_min_), T0_max(T0_max_), symmetry_phase_mode(symmetry_phase_mode_)
+  OperatorLabelsJT(int J0_, int g0_, int T0_min_, int T0_max_, basis::SymmetryPhaseMode symmetry_phase_mode_)
+  // explicit constructor
+  : J0(J0_), g0(g0_), T0_min(T0_min_), T0_max(T0_max_), symmetry_phase_mode(symmetry_phase_mode_)
     {}
 
     int J0, g0, T0_min, T0_max;
@@ -326,7 +326,7 @@ namespace basis {
         const basis::OperatorLabelsJT& operator_labels, int Nmax_, int Jmax_)
       // Construct using given operator labels, plus given version and basis parameters.
       : OperatorLabelsJT(operator_labels), Nmax(Nmax_), Jmax(Jmax_)
-      {}
+    {}
 
     int Nmax, Jmax;
   };
@@ -533,13 +533,13 @@ namespace basis {
         const typename tJTSpace::SubspaceType& subspace_ket = space.GetSubspace(
             subspace_index_ket
           );
-          int Tp = subspace_bra.T();
-          int T = subspace_ket.T();
-          int Jp = subspace_bra.J();
-          int J = subspace_ket.J();
+        int Tp = subspace_bra.T();
+        int T = subspace_ket.T();
+        int Jp = subspace_bra.J();
+        int J = subspace_ket.J();
 
-          canonicalization_factor *= ParitySign(Tp-T)*Hat(Tp)/Hat(T);
-          canonicalization_factor *= ParitySign(Jp-J)*Hat(Jp)/Hat(J);
+        canonicalization_factor *= ParitySign(Tp-T)*Hat(Tp)/Hat(T);
+        canonicalization_factor *= ParitySign(Jp-J)*Hat(Jp)/Hat(J);
       }
 
     // bundle return values
