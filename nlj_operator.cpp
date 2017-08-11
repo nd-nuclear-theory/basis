@@ -71,7 +71,7 @@ namespace basis {
       const basis::OrbitalSpaceLJPN& bra_orbital_space,
       const basis::OrbitalSpaceLJPN& ket_orbital_space,
       const basis::OrbitalSectorsLJPN& sectors,
-      const basis::MatrixVector& matrices,
+      const basis::OperatorBlocks<double>& matrices,
       const basis::OrbitalStatePN& bra, const basis::OrbitalStatePN& ket
     )
   {

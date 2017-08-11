@@ -260,7 +260,7 @@ namespace basis {
   //     should contain "upper trianglar" sectors only (see notes on
   //     relative LSJT file format).
   //
-  //   component_matrices (std::array<basis::MatrixVector,3>): the
+  //   component_matrices (std::array<basis::OperatorBlocks<double>,3>): the
   //     matrix representations for each isospin component (T0=0,1,2)
   //     of the operator -- In general, for diagonal sectors, only the
   //     matrix elements in the "upper triangle" are guaranteed to be
@@ -361,7 +361,7 @@ namespace basis {
       std::ostream& os,
       int T0,
       const basis::RelativeSectorsLSJT& sectors,
-      const basis::MatrixVector& matrices
+      const basis::OperatorBlocks<double>& matrices
     );
   // Write single isospin component of a relative operator in LSJT
   // scheme.
@@ -373,13 +373,13 @@ namespace basis {
   //   os (std::ostream): text-mode output stream
   //   T0 (int): isospin for this isospin component
   //   sector (basis::RelativeSectorsLSJT):  sectors defining operator
-  //   matrices (basis::MatrixVector):  matrices defining operator
+  //   matrices (basis::OperatorBlocks<double>):  matrices defining operator
 
   void ReadRelativeOperatorComponentLSJT(
       std::istream& is,
       int T0,
       const basis::RelativeSectorsLSJT& sectors,
-      basis::MatrixVector& matrices
+      basis::OperatorBlocks<double>& matrices
     );
   // Read single isospin component of a relative operator in LSJT
   // scheme.
@@ -388,14 +388,14 @@ namespace basis {
   //   is (std::istream): text-mode inpus stream
   //   T0 (int): isospin for this isospin component
   //   sector (basis::RelativeSectorsLSJT):  sectors defining operator
-  //   matrices (basis::MatrixVector, output):  matrices defining operator
+  //   matrices (basis::OperatorBlocks<double>, output):  matrices defining operator
 
   void ReadRelativeOperatorLSJT(
       const std::string& relative_filename,
       basis::RelativeSpaceLSJT& relative_space,
       basis::OperatorLabelsJT& operator_labels,
       std::array<basis::RelativeSectorsLSJT,3>& relative_component_sectors,
-      std::array<basis::MatrixVector,3>& relative_component_matrices,
+      std::array<basis::OperatorBlocks<double>,3>& relative_component_matrices,
       bool verbose
     );
   // Set up and read relative operator.
@@ -414,7 +414,7 @@ namespace basis {
       const basis::RelativeSpaceLSJT& relative_space,
       const basis::OperatorLabelsJT& operator_labels,
       const std::array<basis::RelativeSectorsLSJT,3>& relative_component_sectors,
-      const std::array<basis::MatrixVector,3>& relative_component_matrices,
+      const std::array<basis::OperatorBlocks<double>,3>& relative_component_matrices,
       bool verbose
     );
   // Set up and read relative operator.
@@ -435,7 +435,7 @@ namespace basis {
   template <typename tJTSectors>
     void ClearOperatorJT(
         std::array<tJTSectors,3> component_sectors,
-        std::array<basis::MatrixVector,3> component_matrices
+        std::array<basis::OperatorBlocks<double>,3> component_matrices
       )
     // Delete all sector and matrix data for all isospin components of
     // an operator in **JT scheme.
@@ -619,7 +619,7 @@ namespace basis {
       const basis::OperatorLabelsJT& operator_labels,
       const basis::RelativeSpaceLSJT& relative_space,
       std::array<basis::RelativeSectorsLSJT,3>& relative_component_sectors,
-      std::array<basis::MatrixVector,3>& relative_component_matrices
+      std::array<basis::OperatorBlocks<double>,3>& relative_component_matrices
     );
   // Construct zero operator in relative LSJT basis.
   //
@@ -637,7 +637,7 @@ namespace basis {
       const basis::OperatorLabelsJT& operator_labels,
       const basis::RelativeSpaceLSJT& relative_space,
       std::array<basis::RelativeSectorsLSJT,3>& relative_component_sectors,
-      std::array<basis::MatrixVector,3>& relative_component_matrices
+      std::array<basis::OperatorBlocks<double>,3>& relative_component_matrices
     );
   // Construct identity operator in relative LSJT basis.
   //
@@ -659,10 +659,10 @@ namespace basis {
       const basis::OperatorLabelsJT& operator_labels,
       const basis::RelativeCMSpaceLSJTN& relative_cm_lsjtn_space,
       const std::array<basis::RelativeCMSectorsLSJTN,3>& relative_cm_lsjtn_component_sectors,
-      const std::array<basis::MatrixVector,3>& relative_cm_lsjtn_component_matrices,
+      const std::array<basis::OperatorBlocks<double>,3>& relative_cm_lsjtn_component_matrices,
       const basis::RelativeCMSpaceLSJT& relative_cm_lsjt_space,
       std::array<basis::RelativeCMSectorsLSJT,3>& relative_cm_lsjt_component_sectors,
-      std::array<basis::MatrixVector,3>& relative_cm_lsjt_component_matrices
+      std::array<basis::OperatorBlocks<double>,3>& relative_cm_lsjt_component_matrices
     );
   // Assemble relative-cm representation of operator in LSJT basis,
   // from relative-cm representation in LSJTN basis, i.e., gathering
@@ -692,10 +692,10 @@ namespace basis {
       const basis::OperatorLabelsJT& operator_labels,
       const basis::TwoBodySpaceLSJTN& two_body_lsjtn_space,
       const std::array<basis::TwoBodySectorsLSJTN,3>& two_body_lsjtn_component_sectors,
-      const std::array<basis::MatrixVector,3>& two_body_lsjtn_component_matrices,
+      const std::array<basis::OperatorBlocks<double>,3>& two_body_lsjtn_component_matrices,
       const basis::TwoBodySpaceLSJT& two_body_lsjt_space,
       std::array<basis::TwoBodySectorsLSJT,3>& two_body_lsjt_component_sectors,
-      std::array<basis::MatrixVector,3>& two_body_lsjt_component_matrices
+      std::array<basis::OperatorBlocks<double>,3>& two_body_lsjt_component_matrices
     );
   // Assemble two-body representation of operator in LSJT basis, from
   // two-body representation in LSJTN basis, i.e., gathering the
@@ -744,7 +744,7 @@ namespace basis {
       std::ostream& os,
       int T0,
       const basis::RelativeCMSectorsLSJT& sectors,
-      const basis::MatrixVector& matrices
+      const basis::OperatorBlocks<double>& matrices
     );
   // Write single isospin component of a relative-cm operator in LSJT
   // scheme.
@@ -756,7 +756,7 @@ namespace basis {
   //   os (std::ostream): text-mode output stream
   //   T0 (int): isospin for this isospin component
   //   sectors (basis::RelativeCMSectorsLSJT): sectors defining operator
-  //   matrices (basis::MatrixVector): matrices defining operator
+  //   matrices (basis::OperatorBlocks<double>): matrices defining operator
 
   ////////////////////////////////////////////////////////////////
   // two-body LSJT operator output
@@ -787,7 +787,7 @@ namespace basis {
       std::ostream& os,
       int T0,
       const basis::TwoBodySectorsLSJT& sectors,
-      const basis::MatrixVector& matrices,
+      const basis::OperatorBlocks<double>& matrices,
       basis::NormalizationConversion conversion_mode
     );
   // Write single isospin component of a two-body operator in LSJT
@@ -800,7 +800,7 @@ namespace basis {
   //   os (std::ostream): text-mode output stream
   //   T0 (int): isospin for this isospin component
   //   sectors (basis::TwoBodySectorsLSJT): sectors defining operator
-  //   matrices (basis::MatrixVector): matrices defining operator
+  //   matrices (basis::OperatorBlocks<double>): matrices defining operator
   //   conversion (basis::NormalizationConversion): specifies any
   //     conversion between AS and NAS for output
 

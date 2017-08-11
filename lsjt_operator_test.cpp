@@ -44,7 +44,7 @@ void WriteTestRelativeManual(const std::string& filename)
   //
   // These are arrays to store information for T0=0/1/2 components.
   std::array<basis::RelativeSectorsLSJT,3> component_sectors;
-  std::array<basis::MatrixVector,3> component_matrices;
+  std::array<basis::OperatorBlocks<double>,3> component_matrices;
 
   // populate operator containers
   //
@@ -120,7 +120,7 @@ void WriteTestRelative(const std::string& filename)
 
   // populate operator containers
   std::array<basis::RelativeSectorsLSJT,3> relative_component_sectors;
-  std::array<basis::MatrixVector,3> relative_component_matrices;
+  std::array<basis::OperatorBlocks<double>,3> relative_component_matrices;
   basis::ConstructIdentityOperatorRelativeLSJT(
       operator_labels,
       relative_space,
@@ -163,7 +163,7 @@ void ReadTestRelativeManual(const std::string& filename)
 
   // read matrices
   std::array<basis::RelativeSectorsLSJT,3> component_sectors;
-  std::array<basis::MatrixVector,3> component_matrices;
+  std::array<basis::OperatorBlocks<double>,3> component_matrices;
 
   for (int T0=operator_parameters.T0_min; T0<=operator_parameters.T0_max; ++T0)
     // for each isospin component
@@ -207,7 +207,7 @@ void IdentityTestOLD()
   // define space and operator containers
   basis::RelativeSpaceLSJT relative_space(Nmax_relative,Jmax_relative);
   std::array<basis::RelativeSectorsLSJT,3> relative_component_sectors;
-  std::array<basis::MatrixVector,3> relative_component_matrices;
+  std::array<basis::OperatorBlocks<double>,3> relative_component_matrices;
 
   // do construction
   ConstructIdentityOperatorRelativeLSJT(
@@ -228,7 +228,7 @@ void ReadTestRelative(const std::string& filename)
   basis::RelativeSpaceLSJT relative_space;
   basis::OperatorLabelsJT operator_labels;
   std::array<basis::RelativeSectorsLSJT,3> relative_component_sectors;
-  std::array<basis::MatrixVector,3> relative_component_matrices;
+  std::array<basis::OperatorBlocks<double>,3> relative_component_matrices;
   basis::ReadRelativeOperatorLSJT(
       filename,
       relative_space,
@@ -253,7 +253,7 @@ void WriteTestRelativeCM(const std::string& filename)
   //
   // These are vectors to store information for T0=0/1/2 components.
   std::array<basis::RelativeCMSectorsLSJT,3> component_sectors;
-  std::array<basis::MatrixVector,3> component_matrices;
+  std::array<basis::OperatorBlocks<double>,3> component_matrices;
 
   // populate operator containers
   int J0 = 0;
@@ -313,7 +313,7 @@ void WriteTestTwoBody(const std::string& filename)
   //
   // These are vectors to store information for T0=0/1/2 components.
   std::array<basis::TwoBodySectorsLSJT,3> component_sectors;
-  std::array<basis::MatrixVector,3> component_matrices;
+  std::array<basis::OperatorBlocks<double>,3> component_matrices;
 
   // populate operator containers
   int J0 = 0;

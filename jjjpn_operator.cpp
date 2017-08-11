@@ -20,7 +20,7 @@ namespace basis {
   void WriteTwoBodyOperatorJJJPN(
       std::ostream& os,
       const basis::TwoBodySectorsJJJPN& sectors,
-      const basis::MatrixVector& matrices,
+      const basis::OperatorBlocks<double>& matrices,
       basis::NormalizationConversion conversion_mode,
       int indexing_base
     )

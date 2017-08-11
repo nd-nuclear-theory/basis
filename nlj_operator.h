@@ -44,7 +44,7 @@ namespace basis {
   //   bra_orbital_space (basis::OrbitalSpaceLJPN): LJPN bra space
   //   ket_orbital_space (basis::OrbitalSpaceLJPN): LJPN ket space
   //   sectors (basis::OrbitalSectorsLJPN): LJPN sectors for operator
-  //   matrices (basis::MatrixVector): matrices corresponding to these sectors
+  //   matrices (basis::OperatorBlocks<double>): matrices corresponding to these sectors
   //   bra_labels (basis::FullOrbitalLabels): bra state labels
   //   ket_labels (basis::FullOrbitalLabels): ket state labels
   //
@@ -56,7 +56,7 @@ namespace basis {
       const basis::OrbitalSpaceLJPN& bra_orbital_space,
       const basis::OrbitalSpaceLJPN& ket_orbital_space,
       const basis::OrbitalSectorsLJPN& sectors,
-      const basis::MatrixVector& matrices,
+      const basis::OperatorBlocks<double>& matrices,
       const basis::OrbitalStatePN& bra, const basis::OrbitalStatePN& ket
     );
   // Look up radial matrix element by (species,n,l,j) labels.
@@ -68,7 +68,7 @@ namespace basis {
   //   bra_orbital_space (basis::OrbitalSpaceLJPN): LJPN bra space
   //   ket_orbital_space (basis::OrbitalSpaceLJPN): LJPN ket space
   //   sectors (basis::OrbitalSectorsLJPN): LJPN sectors for operator
-  //   matrices (basis::MatrixVector): matrices corresponding to these sectors
+  //   matrices (basis::OperatorBlocks<double>): matrices corresponding to these sectors
   //   bra (basis::OrbitalStatePN): bra state (in PN space)
   //   ket (basis::OrbitalStatePN): ket state (in PN space)
   //
