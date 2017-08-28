@@ -60,7 +60,7 @@ namespace basis {
   void WriteTwoBodyOperatorJJJPN(
       std::ostream& os,
       const basis::TwoBodySectorsJJJPN& sectors,
-      const basis::MatrixVector& matrices,
+      const basis::OperatorBlocks<double>& matrices,
       basis::NormalizationConversion conversion_mode,
       int indexing_base
     );
@@ -72,7 +72,7 @@ namespace basis {
   // Arguments:
   //   os (std::ostream) : text-mode output stream
   //   sector (basis::TwoBodySectorsJJJPN) : sectors defining operator
-  //   matrices (basis::MatrixVector) : matrices defining operator
+  //   matrices (basis::OperatorBlocks<double>) : matrices defining operator
   //   conversion (basis::NormalizationConversion) : specifies any
   //     conversion between AS and NAS for output
   //   indexing_base (int) : use 0-based or 1-based indexing

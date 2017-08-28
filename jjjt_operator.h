@@ -40,10 +40,10 @@ namespace basis {
       const basis::OperatorLabelsJT& operator_labels,
       const basis::TwoBodySpaceJJJTN& two_body_jjjtn_space,
       const std::array<basis::TwoBodySectorsJJJTN,3>& two_body_jjjtn_component_sectors,
-      const std::array<basis::MatrixVector,3>& two_body_jjjtn_component_matrices,
+      const std::array<basis::OperatorBlocks<double>,3>& two_body_jjjtn_component_matrices,
       const basis::TwoBodySpaceJJJT& two_body_jjjt_space,
       std::array<basis::TwoBodySectorsJJJT,3>& two_body_jjjt_component_sectors,
-      std::array<basis::MatrixVector,3>& two_body_jjjt_component_matrices
+      std::array<basis::OperatorBlocks<double>,3>& two_body_jjjt_component_matrices
     );
   // Assemble two-body representation of operator in JJJT basis, from
   // two-body representation in JJJTN basis, i.e., gathering the
@@ -96,7 +96,7 @@ namespace basis {
       std::ostream& os,
       int T0,
       const basis::TwoBodySectorsJJJT& sectors,
-      const basis::MatrixVector& matrices,
+      const basis::OperatorBlocks<double>& matrices,
       basis::NormalizationConversion conversion_mode
     );
   // Write single isospin component of a two-body operator in JJJT
@@ -109,7 +109,7 @@ namespace basis {
   //   os (std::ostream) : text-mode output stream
   //   T0 (int) : isospin for this isospin component
   //   sector (basis::TwoBodySectorsJJJT) : sectors defining operator
-  //   matrices (basis::MatrixVector) : matrices defining operator
+  //   matrices (basis::OperatorBlocks<double>) : matrices defining operator
   //   conversion (basis::NormalizationConversion) : specifies any
   //     conversion between AS and NAS for output
 

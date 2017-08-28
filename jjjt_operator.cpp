@@ -61,10 +61,10 @@ namespace basis {
       const basis::OperatorLabelsJT& operator_labels,
       const basis::TwoBodySpaceJJJTN& two_body_jjjtn_space,
       const std::array<basis::TwoBodySectorsJJJTN,3>& two_body_jjjtn_component_sectors,
-      const std::array<basis::MatrixVector,3>& two_body_jjjtn_component_matrices,
+      const std::array<basis::OperatorBlocks<double>,3>& two_body_jjjtn_component_matrices,
       const basis::TwoBodySpaceJJJT& two_body_jjjt_space,
       std::array<basis::TwoBodySectorsJJJT,3>& two_body_jjjt_component_sectors,
-      std::array<basis::MatrixVector,3>& two_body_jjjt_component_matrices
+      std::array<basis::OperatorBlocks<double>,3>& two_body_jjjt_component_matrices
     )
   {
   for (int T0=operator_labels.T0_min; T0<=operator_labels.T0_max; ++T0)
@@ -182,7 +182,7 @@ namespace basis {
       std::ostream& os,
       int T0,
       const TwoBodySectorsJJJT& sectors,
-      const MatrixVector& matrices,
+      const OperatorBlocks<double>& matrices,
       basis::NormalizationConversion conversion_mode
     )
   {

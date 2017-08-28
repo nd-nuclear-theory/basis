@@ -31,7 +31,7 @@
       templatized OperatorBlocks (generic precision).
     - Retemplatize functions to work with generic precision
       operator blocks instead of MatrixXd.
-    
+  + 08/11/17 (pjf): Emit warnings if deprecated member functions are used.
 
 ****************************************************************/
 
@@ -44,6 +44,9 @@
 
 #include "basis/basis.h"
 
+// emit warnings on deprecated
+#include "mcutils/deprecated.h"
+
 namespace basis {
 
   ////////////////////////////////////////////////////////////////
@@ -54,7 +57,7 @@ namespace basis {
   //
   // EX: basis::OperatorBlock<double>  // single matrix
   // EX: basis::OperatorBlocks<double>  // matrices for all sectors
-  
+
   // Note: Typedefs cannot be templatized, but C++11 introduced
   // parametrized type aliases, using the "using" keyword.
   //
@@ -74,6 +77,7 @@ namespace basis {
     using OperatorBlocks = std::vector<OperatorBlock<tFloat>>;
 
   // legacy typedef -- DEPRECATED
+  DEPRECATED("use basis::OperatorBlocks<double> instead")
   typedef basis::OperatorBlocks<double> MatrixVector;
 
 

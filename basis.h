@@ -102,6 +102,7 @@
   + 6/6/7 (mac): Disable deprecated member functions by default
     (BASIS_ALLOW_DEPRECATED).
   + 6/11/17 (mac): Rename TotalDimension to Dimension.
+  + 08/11/17 (pjf): Emit warnings if deprecated member functions are used.
 ****************************************************************/
 
 #ifndef BASIS_BASIS_H_
@@ -115,6 +116,8 @@
 #include <iomanip>
 #include <sstream>
 
+// emit warnings on deprecated
+#include "mcutils/deprecated.h"
 
 #ifdef BASIS_HASH
 #include <unordered_map>
@@ -178,6 +181,7 @@ namespace basis {
     }
 
 #ifdef BASIS_ALLOW_DEPRECATED
+    DEPRECATED("use labels() instead")
     const SubspaceLabelsType& GetSubspaceLabels() const
     // Return the labels of the subspace itself.
     //
@@ -346,6 +350,7 @@ namespace basis {
       {return *subspace_ptr_;}
 
 #ifdef BASIS_ALLOW_DEPRECATED
+      DEPRECATED("use subspace() instead")
       const SubspaceType& Subspace() const
       // Return reference to subspace in which this state lies.
       //
@@ -365,6 +370,7 @@ namespace basis {
       }
 
 #ifdef BASIS_ALLOW_DEPRECATED
+      DEPRECATED("use labels() instead")
       const StateLabelsType& GetStateLabels() const
       // Return labels of this state.
       //
@@ -700,6 +706,7 @@ namespace basis {
       };
 
 #ifdef BASIS_ALLOW_DEPRECATED
+      DEPRECATED("lookup by bra and ket subspace indices instead")
       bool ContainsSector(const typename SectorType::KeyType& key) const
       // Given the labels for a sector, returns whether or not the sector
       // is found within the the sector set.
@@ -725,6 +732,7 @@ namespace basis {
       };
 
 #ifdef BASIS_ALLOW_DEPRECATED
+      DEPRECATED("lookup by bra and ket subspace indices instead")
       int LookUpSectorIndex(const typename SectorType::KeyType& key) const
       // Given the labels for a sector, look up its index within the
       // sector set.
@@ -733,11 +741,11 @@ namespace basis {
       //
       // DEPRECATED
       {
-      
+
         // PREVIOUSLY: trap failed lookup with assert for easier debugging
         // assert(ContainsSector(bra_subspace_index,ket_subspace_index,multiplicity_index));
         // return lookup_.at(key);
-      
+
         auto pos = lookup_.find(key);
         if (pos==lookup_.end())
           return kNone;
@@ -802,7 +810,7 @@ namespace basis {
       for (int sector_index=0; sector_index<size(); ++sector_index)
         {
           const SectorType& sector = GetSector(sector_index);
-          
+
           os << "  sector " << sector_index
              << "  bra index " << sector.bra_subspace_index()
              << " labels " << sector.bra_subspace().LabelStr()

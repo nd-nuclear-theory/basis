@@ -34,7 +34,7 @@ void WriteTest(const std::string& filename)
 
   // set up operator containers
   basis::TwoBodySectorsJJJPN sectors;
-  basis::MatrixVector matrices;
+  basis::OperatorBlocks<double> matrices;
 
   // populate operator containers
   int J0 = 0;

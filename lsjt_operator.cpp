@@ -68,7 +68,7 @@ namespace basis {
       std::ostream& os,
       int T0,
       const RelativeSectorsLSJT& sectors,
-      const MatrixVector& matrices
+      const OperatorBlocks<double>& matrices
     )
   {
 
@@ -136,7 +136,7 @@ namespace basis {
       std::istream& is,
       int T0,
       const RelativeSectorsLSJT& sectors,
-      MatrixVector& matrices
+      OperatorBlocks<double>& matrices
     )
   {
 
@@ -224,7 +224,7 @@ namespace basis {
       basis::RelativeSpaceLSJT& relative_space,
       basis::OperatorLabelsJT& operator_labels,
       std::array<basis::RelativeSectorsLSJT,3>& relative_component_sectors,
-      std::array<basis::MatrixVector,3>& relative_component_matrices,
+      std::array<basis::OperatorBlocks<double>,3>& relative_component_matrices,
       bool verbose
     )
   // FUTURE: change to line-based input with std::getline and parsing checks for easier debugging
@@ -300,7 +300,7 @@ namespace basis {
       const basis::RelativeSpaceLSJT& relative_space,
       const basis::OperatorLabelsJT& operator_labels,
       const std::array<basis::RelativeSectorsLSJT,3>& relative_component_sectors,
-      const std::array<basis::MatrixVector,3>& relative_component_matrices,
+      const std::array<basis::OperatorBlocks<double>,3>& relative_component_matrices,
       bool verbose
     )
   // FUTURE: check file status on open
@@ -358,7 +358,7 @@ namespace basis {
       const basis::OperatorLabelsJT& operator_labels,
       const basis::RelativeSpaceLSJT& relative_space,
       std::array<basis::RelativeSectorsLSJT,3>& relative_component_sectors,
-      std::array<basis::MatrixVector,3>& relative_component_matrices
+      std::array<basis::OperatorBlocks<double>,3>& relative_component_matrices
     )
   {
 
@@ -380,7 +380,7 @@ namespace basis {
       const basis::OperatorLabelsJT& operator_labels,
       const basis::RelativeSpaceLSJT& relative_space,
       std::array<basis::RelativeSectorsLSJT,3>& relative_component_sectors,
-      std::array<basis::MatrixVector,3>& relative_component_matrices
+      std::array<basis::OperatorBlocks<double>,3>& relative_component_matrices
     )
   {
 
@@ -458,10 +458,10 @@ namespace basis {
       const basis::OperatorLabelsJT& operator_labels,
       const basis::RelativeCMSpaceLSJTN& relative_cm_lsjtn_space,
       const std::array<basis::RelativeCMSectorsLSJTN,3>& relative_cm_lsjtn_component_sectors,
-      const std::array<basis::MatrixVector,3>& relative_cm_lsjtn_component_matrices,
+      const std::array<basis::OperatorBlocks<double>,3>& relative_cm_lsjtn_component_matrices,
       const basis::RelativeCMSpaceLSJT& relative_cm_lsjt_space,
       std::array<basis::RelativeCMSectorsLSJT,3>& relative_cm_lsjt_component_sectors,
-      std::array<basis::MatrixVector,3>& relative_cm_lsjt_component_matrices
+      std::array<basis::OperatorBlocks<double>,3>& relative_cm_lsjt_component_matrices
     )
   {
     for (int T0=operator_labels.T0_min; T0<=operator_labels.T0_max; ++T0)
@@ -663,10 +663,10 @@ namespace basis {
       const basis::OperatorLabelsJT& operator_labels,
       const basis::TwoBodySpaceLSJTN& two_body_lsjtn_space,
       const std::array<basis::TwoBodySectorsLSJTN,3>& two_body_lsjtn_component_sectors,
-      const std::array<basis::MatrixVector,3>& two_body_lsjtn_component_matrices,
+      const std::array<basis::OperatorBlocks<double>,3>& two_body_lsjtn_component_matrices,
       const basis::TwoBodySpaceLSJT& two_body_lsjt_space,
       std::array<basis::TwoBodySectorsLSJT,3>& two_body_lsjt_component_sectors,
-      std::array<basis::MatrixVector,3>& two_body_lsjt_component_matrices
+      std::array<basis::OperatorBlocks<double>,3>& two_body_lsjt_component_matrices
     )
   {
     for (int T0=operator_labels.T0_min; T0<=operator_labels.T0_max; ++T0)
@@ -808,7 +808,7 @@ namespace basis {
       std::ostream& os,
       int T0,
       const basis::RelativeCMSectorsLSJT& sectors,
-      const basis::MatrixVector& matrices
+      const basis::OperatorBlocks<double>& matrices
     )
   {
 
@@ -889,7 +889,7 @@ namespace basis {
       std::ostream& os,
       int T0,
       const TwoBodySectorsLSJT& sectors,
-      const MatrixVector& matrices,
+      const OperatorBlocks<double>& matrices,
       basis::NormalizationConversion conversion_mode
     )
   {
