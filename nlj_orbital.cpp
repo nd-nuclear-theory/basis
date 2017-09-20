@@ -856,7 +856,7 @@ namespace basis {
         allowed &= (abs(bra_subspace.l()-ket_subspace.l()) <= l0max);
         /// @note sectors also constrained by delta-j <= l0max
         allowed &= (abs(bra_subspace.j()-ket_subspace.j()) <= l0max);
-        allowed &= (abs(bra_subspace.Tz()-ket_subspace.Tz()) <= Tz0);
+        allowed &= (abs(bra_subspace.Tz()-ket_subspace.Tz()) == Tz0);
         allowed &= ((ket_subspace.g()+g0_+bra_subspace.g())%2 == 0);
 
         // push sector
@@ -883,7 +883,7 @@ namespace basis {
         bool allowed = true;
         allowed &= am::AllowedTriangle(ket_subspace.j(), j0, bra_subspace.j());
         allowed &= ((ket_subspace.g()+g0+bra_subspace.g())%2 == 0);
-        allowed &= (abs(bra_subspace.Tz()-ket_subspace.Tz()) <= Tz0);
+        allowed &= ((bra_subspace.Tz() - ket_subspace.Tz()) == Tz0);
 
         // push sector
         if (allowed) {
