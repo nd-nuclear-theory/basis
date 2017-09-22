@@ -46,7 +46,7 @@
   + 11/24/16 (pjf):
     - Remove sorting from OrbitalDefinitionStr().
     - Remove operator< from OrbitalPNInfo.
-
+  + 09/20/17 (pjf): Fix Tz0 constraint in OrbitalSectorsLJPN
 ****************************************************************/
 
 #ifndef BASIS_NLJ_ORBITAL_H_
