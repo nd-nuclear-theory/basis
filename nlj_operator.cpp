@@ -26,7 +26,7 @@ namespace basis {
     HalfInt bra_j, ket_j;
     std::tie(bra_orbital_species,bra_n,bra_l,bra_j) = bra_labels;
     std::tie(ket_orbital_species,ket_n,ket_l,ket_j) = ket_labels;
-    
+
     // look up LJPN sector
     int bra_subspace_index = bra_orbital_space.LookUpSubspaceIndex(
         typename basis::OrbitalSubspaceLJPN::SubspaceLabelsType(bra_orbital_species,bra_l,bra_j)
@@ -48,21 +48,14 @@ namespace basis {
     const typename basis::OrbitalSectorsLJPN::SectorType& sector = sectors.GetSector(sector_index);
 
     // retrieve state indices
-    //
-    // We rely on the assumption that the label n is equivalent to the
-    // index in an LJPN subspace.
 
     int bra_state_index, ket_state_index;
     assert((bra_n>=0)&&(ket_n>=0));  // pjf says: don't be dumb
-    if (bra_n<sector.bra_subspace().size())
-      bra_state_index = bra_n;
-    else
-      bra_state_index = basis::kNone;
-    if (ket_n<sector.ket_subspace().size())
-      ket_state_index = ket_n;
-    else
-      ket_state_index = basis::kNone;
-    
+    bra_state_index
+      = sector.bra_subspace().LookUpStateIndex(basis::OrbitalStateLJPNLabels(bra_n));
+    ket_state_index
+      = sector.ket_subspace().LookUpStateIndex(basis::OrbitalStateLJPNLabels(ket_n));
+
     return std::make_tuple(sector_index,bra_state_index,ket_state_index);
 
   }
