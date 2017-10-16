@@ -1,4 +1,4 @@
-/************************************************************//**
+/****************************************************************
   @file nlj_orbital.h
 
   Defines general single-particle orbital sets.
@@ -47,6 +47,9 @@
     - Remove sorting from OrbitalDefinitionStr().
     - Remove operator< from OrbitalPNInfo.
   + 09/20/17 (pjf): Fix Tz0 constraint in OrbitalSectorsLJPN
+  + 10/13/17 (pjf): Fix j0 type in OrbitalSectorsLJPN.
+  + 10/15/17 (pjf): Copy Nmax sanity checks to OrbitalSubspaceLJPN and
+      OrbitalSpaceLJPN.
 ****************************************************************/
 
 #ifndef BASIS_NLJ_ORBITAL_H_
@@ -454,7 +457,9 @@ namespace basis {
       HalfInt j() const {return std::get<2>(labels_);}
       int g() const {return l()%2;}
       double weight_max() const {return weight_max_;}
-      int Nmax() const {return Nmax_;}  // only meaningful if oscillator scheme constructor used
+      bool is_oscillator_like() const {return is_oscillator_like_;}
+      int Nmax() const {assert(is_oscillator_like()); return Nmax_;}
+        // only meaningful if oscillator scheme constructor used
       const std::vector<double>& weights() const {return weights_;}
 
       // diagnostic strings
@@ -467,7 +472,12 @@ namespace basis {
 
       // truncation
       double weight_max_;
+      bool is_oscillator_like_;
       int Nmax_;  // only meaningful if oscillator scheme constructor used
+
+      // test for truncation scheme
+      bool IsOscillatorLike_() const;
+      // Test if labeling and weights match oscillator truncation.
 
       // weights
       std::vector<double> weights_;
@@ -539,8 +549,9 @@ namespace basis {
 
     // accessors
     double weight_max() const {return weight_max_;}
-    int Nmax() const {return Nmax_;}  // only meaningful if oscillator scheme
-                                      // constructor used
+    bool is_oscillator_like() const {return is_oscillator_like_;}
+    int Nmax() const {assert(is_oscillator_like()); return Nmax_;}
+      // only meaningful if oscillator scheme constructor used
 
     // produce flattened orbital information
     std::vector<OrbitalPNInfo> OrbitalInfo() const;
@@ -552,8 +563,13 @@ namespace basis {
 
     // truncation
     double weight_max_;
+    bool is_oscillator_like_;
     int Nmax_;  // only meaningful if oscillator scheme constructor used
 
+    // test for truncation scheme
+    bool IsOscillatorLike_() const;
+    // Test if labeling and weights match oscillator truncation for
+    // all subspaces.
   };
 
   // sectors
