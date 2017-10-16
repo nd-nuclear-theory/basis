@@ -558,7 +558,11 @@ namespace basis {
 
   // sectors
 
-  enum class SectorsConstraintMode {kAll=0, kRadial=1, kSpherical=2};
+  enum class SectorsConstraintMode : char {
+    kAll = 'A',
+    kRadial = 'R',
+    kSpherical = 'S'
+  };
 
   class OrbitalSectorsLJPN
     : public BaseSectors<OrbitalSpaceLJPN>
@@ -615,15 +619,14 @@ namespace basis {
 
     // accessors
     int l0max()  const {assert(mode()==SectorsConstraintMode::kRadial); return l0max_;}
-    HalfInt j0() const {assert(mode()==SectorsConstraintMode::kSpherical); return j0_;}
+    int j0()     const {assert(mode()==SectorsConstraintMode::kSpherical); return j0_;}
     int g0()     const {return g0_;}
     int Tz0()    const {return Tz0_;}
     SectorsConstraintMode mode() const {return mode_;}
 
    private:
     // operator properties
-    int l0max_, Tz0_, g0_;
-    HalfInt j0_;
+    int l0max_, j0_, g0_, Tz0_;
     SectorsConstraintMode mode_;
   };
 
