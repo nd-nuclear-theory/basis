@@ -13,6 +13,8 @@
   + 7/19/16 (mac): Created, adapting code from jjjt_operator (jjjpnorb_operator).
   + 10/15/16 (mac): Update to use new sector method IsUpperTriangle().
   + 10/25/16 (mac): Rename to jjjpn_operator.
+  + 10/19/17 (mac): Fix normalization conversion factor for pn states
+    in WriteTwoBodyOperatorJJJPN.
 
 ****************************************************************/
 
