@@ -591,6 +591,7 @@ namespace basis {
     // set values
     labels_ = SubspaceLabelsType(orbital_species,l,j);
     weight_max_ = double(Nmax);
+    is_oscillator_like_ = true;
     Nmax_ = Nmax;
 
     // iterate over radial quantum number
@@ -617,7 +618,6 @@ namespace basis {
                                            const std::vector<OrbitalPNInfo>& states) {
     labels_ = SubspaceLabelsType(orbital_species,l,j);
     weight_max_ = 0.0;
-    Nmax_ = -1;
     for (auto&& state : states) {
       if (state.orbital_species == orbital_species
           && state.l == l && state.j == j) {
@@ -626,8 +626,45 @@ namespace basis {
         weight_max_ = std::max(weight_max_,state.weight);
       }
     }
+
+    // check if oscillator-like and set Nmax
+    if (IsOscillatorLike_()) {
+      is_oscillator_like_ = true;
+      Nmax_ = static_cast<int>(weight_max_);
+    } else {
+      is_oscillator_like_ = false;
+      Nmax_ = -1;
+    }
   }
 
+  /**
+   * Do a deep comparison to oscillator-truncated basis.
+   * @return true if truncation is like Nmax-truncated oscillator
+   */
+  bool OrbitalSubspaceLJPN::IsOscillatorLike_() const
+  {
+    // oscillators have states
+    if (size()==0)
+      return false;
+
+    // maximum weight should be an integer
+    int Nmax = int(weight_max());
+    if (Nmax != weight_max())
+      return false;
+
+    // only positive Nmax is allowed
+    if (Nmax < 0)
+      return false;
+
+    // compare to equivalent Nmax-truncated subspace
+    OrbitalSubspacePN reference_subspace(orbital_species(),Nmax);
+    if (reference_subspace.OrbitalInfo() != OrbitalInfo())
+      return false;
+
+    // if it looks like an oscillator, swims like an oscillator, and quacks
+    // like an oscillator, it's probably like an oscillator
+    return true;
+  }
 
   /**
    * Generate a string representation of the subspace labels.
@@ -721,6 +758,7 @@ namespace basis {
   OrbitalSpaceLJPN::OrbitalSpaceLJPN(int Nmax) {
     // save truncation
     weight_max_ = double(Nmax);
+    is_oscillator_like_ = true;
     Nmax_ = Nmax;
 
     // iterate over species
@@ -744,7 +782,6 @@ namespace basis {
   OrbitalSpaceLJPN::OrbitalSpaceLJPN(const std::vector<OrbitalPNInfo>& states)
   {
     weight_max_ = 0.0;
-    Nmax_ = -1;
 
     // collect (l,j) subspace labels sorted in canonical order
     std::set<OrbitalSubspaceLJPNLabels> subspace_labels_set;
@@ -767,6 +804,47 @@ namespace basis {
         weight_max_ = std::max(weight_max_,subspace.weight_max());
       }
 
+    // check if oscillator-like and set Nmax
+    if (IsOscillatorLike_()) {
+      is_oscillator_like_ = true;
+      Nmax_ = int(weight_max_);
+    } else {
+      is_oscillator_like_ = false;
+      Nmax_ = -1;
+    }
+  }
+
+  /**
+   * Check if space is truncated like an Nmax oscillator truncation.
+   *
+   * @return true if all subspaces are Nmax truncated with the same Nmax.
+   */
+  bool OrbitalSpaceLJPN::IsOscillatorLike_() const
+  {
+
+    // first check that the space contains subspaces
+    if (size() < 1)
+      return false;
+
+    // check if subspaces are individually Nmax truncated
+    for (int subspace_index=0; subspace_index<size(); ++subspace_index)
+      {
+        const SubspaceType& subspace = GetSubspace(subspace_index);
+        if (!subspace.is_oscillator_like())
+          return false;
+      }
+
+    // see if can extract viable Nmax
+    int Nmax = GetSubspace(0).Nmax();
+    for (int subspace_index=1; subspace_index<size(); ++subspace_index)
+      {
+        const SubspaceType& subspace = GetSubspace(subspace_index);
+        if (subspace.Nmax() != Nmax)
+          return false;
+      }
+
+    // orbitals are oscillator like!
+    return true;
   }
 
   /**
@@ -856,7 +934,7 @@ namespace basis {
         allowed &= (abs(bra_subspace.l()-ket_subspace.l()) <= l0max);
         /// @note sectors also constrained by delta-j <= l0max
         allowed &= (abs(bra_subspace.j()-ket_subspace.j()) <= l0max);
-        allowed &= (abs(bra_subspace.Tz()-ket_subspace.Tz()) <= Tz0);
+        allowed &= (abs(bra_subspace.Tz()-ket_subspace.Tz()) == Tz0);
         allowed &= ((ket_subspace.g()+g0_+bra_subspace.g())%2 == 0);
 
         // push sector
@@ -883,7 +961,7 @@ namespace basis {
         bool allowed = true;
         allowed &= am::AllowedTriangle(ket_subspace.j(), j0, bra_subspace.j());
         allowed &= ((ket_subspace.g()+g0+bra_subspace.g())%2 == 0);
-        allowed &= (abs(bra_subspace.Tz()-ket_subspace.Tz()) <= Tz0);
+        allowed &= ((bra_subspace.Tz() - ket_subspace.Tz()) == Tz0);
 
         // push sector
         if (allowed) {

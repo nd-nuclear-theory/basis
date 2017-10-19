@@ -13,6 +13,8 @@
     MatrixElementLJPN lookup.
   + 11/21/16 (mac): Break out matrix element indexing lookup
     from value lookup.
+  + 09/22/17 (pjf): Look up state indices honestly in
+    MatrixElementIndicesLJPN
 
 ****************************************************************/
 
