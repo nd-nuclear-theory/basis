@@ -246,25 +246,25 @@ namespace basis {
 		<< " " << "  "
 		<< " " << std::setw(width) << bra.N1()
 		<< " " << std::setw(width) << bra.l1()
-		<< " " << std::setw(width+2) << bra.j1()
+		<< " " << std::showpoint << std::fixed << std::setprecision(1) << std::setw(4) << float(bra.j1())
 		<< " " << std::setw(width) << bra.N2()
 		<< " " << std::setw(width) << bra.l2()
-		<< " " << std::setw(width+2) << bra.j2()
+		<< " " << std::showpoint << std::fixed << std::setprecision(1) << std::setw(4) << float(bra.j2())
 		<< " " << std::setw(width) << bra.J() 
 		<< " " << std::setw(width) << bra.T() 
 		<< " " << std::setw(width) << bra.g()
 		<< " " << "    "
 		<< " " << std::setw(width) << ket.N1()
 		<< " " << std::setw(width) << ket.l1()
-		<< " " << std::setw(width+2) << ket.j1()
+		<< " " << std::showpoint << std::fixed << std::setprecision(1) << std::setw(4) << float(ket.j1())
 		<< " " << std::setw(width) << ket.N2()
 		<< " " << std::setw(width) << ket.l2()
-		<< " " << std::setw(width+2) << ket.j2()
+		<< " " << std::showpoint << std::fixed << std::setprecision(1) << std::setw(4) << float(ket.j2())
 		<< " " << std::setw(width) << ket.J() 
 		<< " " << std::setw(width) << ket.T() 
 		<< " " << std::setw(width) << ket.g()
 		<< " " << "    "
-		<< " " << std::showpoint << std::scientific << matrix_element
+		<< " " << std::showpoint << std::scientific << std::setprecision(precision) << matrix_element
 		<< std::endl;
 	    
 	    }
