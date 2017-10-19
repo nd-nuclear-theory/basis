@@ -78,7 +78,7 @@ namespace basis {
   //
   // Data lines are of the form:
   //
-  //   T0  N1' l1' j1' N2' l2' J' T' g'  N1 l1 j1 N2 l2 j2 J T g  JT-RME
+  //   T0  N1' l1' j1' N2' l2' j2' J' T' g'  N1 l1 j1 N2 l2 j2 J T g  JT-RME
   //
   // Although the g label is redundant (it can be deduced from l1 and
   // l2), it is included to make the sector structure more easily
