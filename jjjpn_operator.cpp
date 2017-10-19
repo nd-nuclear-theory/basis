@@ -60,19 +60,24 @@ namespace basis {
               double conversion_factor = 1.;
               if (conversion_mode == basis::NormalizationConversion::kASToNAS)
                 {
-                  if ((bra.index1()==bra.index2())&&(bra.two_body_species()!=basis::TwoBodySpeciesPN::kPN))
-                    conversion_factor *= (1/sqrt(2.));
-                  if ((ket.index1()==ket.index2())&&(ket.two_body_species()!=basis::TwoBodySpeciesPN::kPN))
-                    conversion_factor *= (1/sqrt(2.));
+
+                  if (bra.two_body_species()!=basis::TwoBodySpeciesPN::kPN)
+                    if (bra.index1()==bra.index2())
+                      conversion_factor *= (1/sqrt(2.));
+                  if (ket.two_body_species()!=basis::TwoBodySpeciesPN::kPN)
+                    if (ket.index1()==ket.index2())
+                      conversion_factor *= (1/sqrt(2.));
                 }
               else if (conversion_mode == basis::NormalizationConversion::kNASToAS)
                 {
-                  if ((bra.index1()==bra.index2())&&(bra.two_body_species()!=basis::TwoBodySpeciesPN::kPN))
-                    conversion_factor *= (sqrt(2.));
-                  if ((ket.index1()==ket.index2())&&(ket.two_body_species()!=basis::TwoBodySpeciesPN::kPN))
-                    conversion_factor *= (sqrt(2.));
+                  if (bra.two_body_species()!=basis::TwoBodySpeciesPN::kPN)
+                    if (bra.index1()==bra.index2())
+                      conversion_factor *= (sqrt(2.));
+                  if (ket.two_body_species()!=basis::TwoBodySpeciesPN::kPN)
+                    if (ket.index1()==ket.index2())
+                      conversion_factor *= (sqrt(2.));
                 }
-        
+
               // extract matrix element
               const double matrix_element = conversion_factor*matrices[sector_index](bra_index,ket_index);
 
