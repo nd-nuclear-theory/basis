@@ -60,7 +60,6 @@ namespace basis {
               double conversion_factor = 1.;
               if (conversion_mode == basis::NormalizationConversion::kASToNAS)
                 {
-
                   if (bra.two_body_species()!=basis::TwoBodySpeciesPN::kPN)
                     if (bra.index1()==bra.index2())
                       conversion_factor *= (1/sqrt(2.));

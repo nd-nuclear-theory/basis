@@ -9,6 +9,7 @@
   University of Notre Dame
 
   + 7/1/17 (mac): Extracted from jjjpn_scheme.h.
+  + 10/19/17 (mac): Define OperatorTypePN.
 
 ****************************************************************/
 
@@ -69,6 +70,21 @@ namespace basis {
   extern const std::array<int,3> kTwoBodySpeciesPNCodeTz;  // {+1,-1,0} -- "up quark is positive" convention
   extern const std::array<int,3> kTwoBodySpeciesPNCodeDecimal;  // {11,22,12} -- used by MFDn
   extern const std::array<const char*,3> kTwoBodySpeciesPNCodeChar;  // {"pp","nn","pn"}
+
+
+  ////////////////////////////////////////////////////////////////
+  // proton-neutron operator types
+  ////////////////////////////////////////////////////////////////
+
+  // enumerated type for proton-neutron operator types
+
+  enum class OperatorTypePN {kP=0,kN=1,kTotal=2};
+
+  // notational definitions for proton-neutron operator types
+  //
+  // Use of these arrays requires conversion of the OperatorTypePN to int.
+  extern const std::array<const char*,3> kOperatorTypePNCodeChar;  // {"p","n","total"}
+
 
   ////////////////////////////////////////////////////////////////
   ////////////////////////////////////////////////////////////////

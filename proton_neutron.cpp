@@ -19,7 +19,6 @@ namespace basis {
   const std::array<int,2> kOrbitalSpeciesPNCodeDecimal({1,2});
   const std::array<const char*,2> kOrbitalSpeciesPNCodeChar({"p","n"});
 
-
   ////////////////////////////////////////////////////////////////
   // two-body states in jjJpn scheme with general orbitals
   ////////////////////////////////////////////////////////////////
@@ -28,6 +27,14 @@ namespace basis {
   const std::array<int,3> kTwoBodySpeciesPNCodeTz({+1,-1,0});
   const std::array<int,3> kTwoBodySpeciesPNCodeDecimal({11,22,12});
   const std::array<const char*,3> kTwoBodySpeciesPNCodeChar({"pp","nn","pn"});
+
+  ////////////////////////////////////////////////////////////////
+  // proton-neutron operator types
+  ////////////////////////////////////////////////////////////////
+
+  // notational definitions for proton-neutron operator types
+  const std::array<const char*,3> kOperatorTypePNCodeChar({"p","n","total"});
+
 
   ////////////////////////////////////////////////////////////////
   ////////////////////////////////////////////////////////////////
