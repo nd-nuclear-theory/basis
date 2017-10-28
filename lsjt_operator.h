@@ -81,7 +81,7 @@ namespace basis {
 
   ////////////////////////////////////////////////////////////////
   //
-  // general relative two-body operator format
+  // general relative two-body operator file format
   //
   ////////////////////////////////////////////////////////////////
   //
@@ -100,19 +100,30 @@ namespace basis {
   //
   //   Then, the header contains the following fields:
   //
-  //     version : file format version (=1)
+  //     version : file format version (1 = this version)
+  //
   //     J0 (int) : angular momentum of operator
+  //
   //     g0 (int) : parity grade of operator [P0=(-)^g0] (g0=0,1)
-  //     T0_min T0_max (int) : range of operator isospin components (a two-body operator
-  //       may in general have components T0=0,1,2 from the coupling of four isospin-1/2
-  //       fermionic operators)
-  //     symmetry_phase_mode (int) : RESERVED to describe how to obtain phase for lower triangle
-  //       (see "Conjugation symmetry" below) (=0)
-  //     Nmax (int) : oscillator truncation of relative space (Nmax>=0)
-  //     Jmax (int) : additional relative angular momentum truncation of relative space
-  //       (Jmax<=Nmax+1); Jmax=Nmax+1 includes the full relative space at the given
-  //       oscillator truncation, but operators may often be truncated at lower partial
-  //       waves
+  //
+  //     T0_min T0_max (int) : range of operator isospin components (a
+  //       two-body operator may in general have components T0=0,1,2
+  //       from the coupling of four isospin-1/2 fermionic operators)
+  //
+  //     symmetry_phase_mode (int) : RESERVED to describe how to
+  //       obtain phase for lower triangle (see "Conjugation symmetry"
+  //       below); currently only symmetry_phase_mode=0 is defined
+  //
+  //       Code note: An enum type basis::SymmetryPhaseMode is defined
+  //       for this field, with kHermitian=0.
+  //
+  //     Nmax (int) : oscillator truncation of relative space
+  //     (Nmax>=0)
+  //
+  //     Jmax (int) : additional relative angular momentum truncation
+  //       of relative space (Jmax<=Nmax+1); Jmax=Nmax+1 includes the
+  //       full relative space at the given oscillator truncation, but
+  //       operators may often be truncated at lower partial waves
   //
   // Data
   //
@@ -171,11 +182,11 @@ namespace basis {
   //   The symmetry_phase_mode field in the header is reserved to
   //   provide information on the correct form to use for this phase
   //   factor.  However, for now, only the placeholder value
-  //   kHermitian(=0) is defined for symmetry_phase_mode, and phase
+  //   0 (=kHermitian) is defined for symmetry_phase_mode, and phase
   //   conventions are only well-defined for a Hamiltonian-like (J0=0,
   //   g0=0) operator.
   //
-  //   symmetry_phase_mode=kHermitian, J0=0, g0=0: For a
+  //   symmetry_phase_mode=0 (=kHermitian), J0=0, g0=0: For a
   //   Hamiltonian-like operator, we expect Hermiticity, i.e.,
   //   symmetry of (M_J,M_T)-branched matrix elements.  Within a
   //   diagonal sector, this means that the lower triangle is obtained
