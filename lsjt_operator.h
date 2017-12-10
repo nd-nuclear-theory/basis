@@ -361,7 +361,7 @@ namespace basis {
       std::istream& is,
       basis::RelativeOperatorParametersLSJT& parameters
     );
-  // Write file header for relative operator in LSJT scheme.
+  // Read file header for relative operator in LSJT scheme.
   //
   // Arguments:
   //   is (std::istream): text-mode input stream
