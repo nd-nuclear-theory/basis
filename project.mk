@@ -4,6 +4,13 @@
 
 project_name := basis
 
+# makefile configuration flags
+#
+#   BASIS_ENABLE_UNIT_TEST: define to enable compilation of unit test
+#   codes
+
+BASIS_ENABLE_UNIT_TEST := yes
+
 ################################################################
 # modules -- list of directories in which to search 
 # for module.mk include files
