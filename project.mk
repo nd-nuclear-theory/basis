@@ -41,15 +41,6 @@ CPPFLAGS += -DHAVE_INLINE
 #   map vs. hash for space lookup in basis library
 CPPFLAGS += -DBASIS_HASH
 
-################################################################
-# makefile configuration flags
-################################################################
-
-#   BASIS_ENABLE_UNIT_TEST: define to enable compilation of unit test
-#   codes
-
-BASIS_ENABLE_UNIT_TEST := yes
-
 ################################
 # "neighboring" libraries
 ################################
