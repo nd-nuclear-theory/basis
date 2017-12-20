@@ -74,11 +74,11 @@ namespace basis {
   ///< Full (species,n,l,j) labels for an orbital.
 
   struct OrbitalPNInfo
-  /**<
-   * A flattened orbital container.
-   *
-   * All quantum numbers used by MFDn are contained in this simple struct.
-   */
+  ///
+  /// A flattened orbital container.
+  ///
+  /// All quantum numbers used by MFDn are contained in this simple struct.
+  ///
   {
     OrbitalSpeciesPN orbital_species;
     int n;
@@ -119,28 +119,28 @@ namespace basis {
   // orbital I/O
 
   std::vector<OrbitalPNInfo> ParseOrbitalPNStream(std::istream& is, bool standalone);
-  // Read orbital definitions from a stream.
-  //
-  // Arguments:
-  //   is (std::istream, input) :
-  //     input stream containing MFDn-formatted orbital definitions
-  //   standalone (bool): whether or not to expect initial comments and version number
-  //     as for standalone orbital file
-  //
-  // Returns:
-  //   (std::vector<OrbitalPNInfo>) : list of flattened orbital parameters
+  /// Read orbital definitions from a stream.
+  ///
+  /// Arguments:
+  ///   is (std::istream, input) :
+  ///     input stream containing MFDn-formatted orbital definitions
+  ///   standalone (bool): whether or not to expect initial comments and version number
+  ///     as for standalone orbital file
+  ///
+  /// Returns:
+  ///   (std::vector<OrbitalPNInfo>) : list of flattened orbital parameters
 
   std::string OrbitalDefinitionStr(const std::vector<OrbitalPNInfo>& orbitals, bool standalone = false);
-  // Output orbital info as a string suitable for MFDn version 15.
-  //
-  // Arguments:
-  //   orbitals (const std::vector<OrbitalPNInfo>&, input) :
-  //     list of flattened orbital parameters
-  //   standalone (bool, optional): whether or not to include initial comments and version number
-  //     as for standalone orbital file
-  //
-  // Returns:
-  //   (std::string) output stream containing MFDn-formatted orbital definitions
+  /// Output orbital info as a string suitable for MFDn version 15.
+  ///
+  /// Arguments:
+  ///   orbitals (const std::vector<OrbitalPNInfo>&, input) :
+  ///     list of flattened orbital parameters
+  ///   standalone (bool, optional): whether or not to include initial comments and version number
+  ///     as for standalone orbital file
+  ///
+  /// Returns:
+  ///   (std::string) output stream containing MFDn-formatted orbital definitions
 
   ////////////////////////////////////////////////////////////////
   /// @defgroup pn-subspaces PN Subspaces
@@ -435,19 +435,19 @@ namespace basis {
       // constructor
 
       OrbitalSubspaceLJPN() = default;
-      // default constructor -- provided since required for certain
-      // purposes by STL container classes (e.g., std::vector::resize)
+      /// default constructor -- provided since required for certain
+      /// purposes by STL container classes (e.g., std::vector::resize)
 
       OrbitalSubspaceLJPN(OrbitalSpeciesPN orbital_species, int l, HalfInt j, int Nmax);
-      // Set up indexing and weights in traditional oscillator Nmax
-      // truncation.
+      /// Set up indexing and weights in traditional oscillator Nmax
+      /// truncation.
 
       OrbitalSubspaceLJPN(OrbitalSpeciesPN orbital_species, int l, HalfInt j,
         const std::vector<OrbitalPNInfo>& states);
-      // Set up indexing for a list of states.
+      /// Set up indexing for a list of states.
 
-      // produce flattened orbital information
       std::vector<OrbitalPNInfo> OrbitalInfo() const;
+      /// produce flattened orbital information
 
       // accessors
 
@@ -494,15 +494,15 @@ namespace basis {
     // pass-through constructors
 
     OrbitalStateLJPN(const SubspaceType& subspace, int index)
-      // Construct state by index.
+      /// Construct state by index.
       : BaseState (subspace, index) {}
 
     OrbitalStateLJPN(const SubspaceType& subspace, const StateLabelsType& state_labels)
-      // Construct state by reverse lookup on labels.
+      /// Construct state by reverse lookup on labels.
       : BaseState (subspace, state_labels) {}
 
-    // produce flattened orbital information
     OrbitalPNInfo OrbitalInfo() const;
+    /// produce flattened orbital information
 
     // pass-through accessors
     OrbitalSpeciesPN orbital_species() const {return subspace().orbital_species();}
