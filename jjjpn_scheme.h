@@ -36,6 +36,7 @@
       initializer issues).
   + 7/1/17 (mac): Extract generic proton-neutron definitions to
     proton_neutron.
+  + 1/22/18 (mac): Enable nonzero Tz0 in sector enumeration.
 ****************************************************************/
 
 #ifndef BASIS_JJJPN_SCHEME_H_
@@ -329,8 +330,6 @@ namespace basis {
     // Enumerate sector pairs connected by an operator of given
     // tensorial and parity character ("constrained" sector
     // enumeration).
-    //
-    // LIMITATIONS: only implemented for Tz0=0
 
     // accessors
     int J0() const {return J0_;};

@@ -261,7 +261,11 @@ namespace basis {
     : J0_(J0), g0_(g0), Tz0_(Tz0)
   {
 
-    assert(sector_direction == basis::SectorDirection::kCanonical);  // enforce canonical until sure we might want otherwise...
+    // enforce canonical for Tz0=0 and non-cannonical for nonzero Tz0 until sure we might want otherwise...
+    assert(
+        ((sector_direction == basis::SectorDirection::kCanonical)&&(Tz0_==0))
+        || ((sector_direction == basis::SectorDirection::kBoth)&&(Tz0_!=0))
+      );
 
     for (int bra_subspace_index=0; bra_subspace_index<space.size(); ++bra_subspace_index)
       for (int ket_subspace_index=0; ket_subspace_index<space.size(); ++ket_subspace_index)
@@ -279,10 +283,9 @@ namespace basis {
           const SubspaceType& ket_subspace = space.GetSubspace(ket_subspace_index);
 
           // enforce particle conservation
-          //
-          // TODO: upgrade to fixed delta Tz condition
-          assert(Tz0_==0);
-          if (!(bra_subspace.two_body_species()==ket_subspace.two_body_species()))
+          int bra_Tz = basis::kTwoBodySpeciesPNCodeTz[int(bra_subspace.two_body_species())];
+          int ket_Tz = basis::kTwoBodySpeciesPNCodeTz[int(ket_subspace.two_body_species())];
+          if (!(bra_Tz == Tz0_ + ket_Tz))
               continue;
 
           // verify angular momentum, isosopin, and parity selection rules
