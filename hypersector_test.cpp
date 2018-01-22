@@ -1,5 +1,5 @@
 /************************************************************//**
-  hypersector_test.cpp
+  @file hypersector_test.cpp
 
   Mark A. Caprio
   University of Notre Dame
@@ -113,7 +113,7 @@ void TestHyprersectors()
   // allocate zero operator
   basis::OperatorHyperblocks<float> matrices;
   basis::SetHyperoperatorToZero(hypersectors,matrices);
-    
+
 }
 
 ////////////////////////////////////////////////////////////////
@@ -128,4 +128,3 @@ int main(int argc, char **argv)
   // termination
   return EXIT_SUCCESS;
 }
-

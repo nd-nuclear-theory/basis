@@ -135,19 +135,19 @@ namespace basis {
   // generic subspace
   ////////////////////////////////////////////////////////////////
 
-  // BaseSubspace -- holds indexing of states within a symmetry
-  // subspace
-  //
-  // The derived class is expected to set up a constructor and
-  // friendlier accessors for the individual labels.
-  //
-  // Template arguments:
-  //   tSubspaceLabelsType : tuple for subspace labels, e.g., std::tuple<int,int,int,int,int>
-  //   tStateLabelsType : tuple for state labels, e.g., std::tuple<int>
-  //
-  // Note: Even if only a single integer label is needed, we must use
-  // tuple<int> (as opposed to plain int) to make the two forms of the
-  // state constructor syntactically distinct.
+  /// BaseSubspace -- holds indexing of states within a symmetry
+  /// subspace
+  ///
+  /// The derived class is expected to set up a constructor and
+  /// friendlier accessors for the individual labels.
+  ///
+  /// Template arguments:
+  ///   tSubspaceLabelsType : tuple for subspace labels, e.g., std::tuple<int,int,int,int,int>
+  ///   tStateLabelsType : tuple for state labels, e.g., std::tuple<int>
+  ///
+  /// Note: Even if only a single integer label is needed, we must use
+  /// tuple<int> (as opposed to plain int) to make the two forms of the
+  /// state constructor syntactically distinct.
 
   template <typename tSubspaceLabelsType, typename tStateLabelsType>
     class BaseSubspace
@@ -166,7 +166,7 @@ namespace basis {
     // general constructors
     ////////////////////////////////////////////////////////////////
 
-    // default constructor
+    /// default constructor
     //   Implicitly invoked by derived class.
     BaseSubspace() : dimension_(0) {}
 
@@ -175,7 +175,7 @@ namespace basis {
     ////////////////////////////////////////////////////////////////
 
     const SubspaceLabelsType& labels() const
-    // Return the labels of the subspace itself.
+    /// Return the labels of the subspace itself.
     {
       return labels_;
     }
@@ -183,43 +183,43 @@ namespace basis {
 #ifdef BASIS_ALLOW_DEPRECATED
     DEPRECATED("use labels() instead")
     const SubspaceLabelsType& GetSubspaceLabels() const
-    // Return the labels of the subspace itself.
-    //
-    // DEPRECATED in favor of labels().
-    //
-    // To fix: grep GetSubspaceLabels -R --include="*.cpp"
+    /// Return the labels of the subspace itself.
+    ///
+    /// DEPRECATED in favor of labels().
+    ///
+    /// To fix: grep GetSubspaceLabels -R --include="*.cpp"
     {
       return labels_;
     }
 #endif
 
     const StateLabelsType& GetStateLabels(int index) const
-    // Retrieve the labels of a state within the subspace, given its
-    // index within the subspace.
-    //
-    // Note: It is not normally expected that this member function
-    // should be used directly.  The idea is instead to work with the
-    // *state* type (derived from BaseState) associated with this
-    // subspace.  One would rather instantiate a *state*, identified
-    // by this index, then query the state for various specific
-    // labels, as they are needed, using accessors provided by the
-    // state.
+    /// Retrieve the labels of a state within the subspace, given its
+    /// index within the subspace.
+    ///
+    /// Note: It is not normally expected that this member function
+    /// should be used directly.  The idea is instead to work with the
+    /// *state* type (derived from BaseState) associated with this
+    /// subspace.  One would rather instantiate a *state*, identified
+    /// by this index, then query the state for various specific
+    /// labels, as they are needed, using accessors provided by the
+    /// state.
     {
       return state_table_[index];
     }
 
     bool ContainsState(const StateLabelsType& state_labels) const
-    // Given the labels for a state, returns whether or not the state
-    // is found within the subspace.
+    /// Given the labels for a state, returns whether or not the state
+    /// is found within the subspace.
     {
       return lookup_.count(state_labels);
     };
 
     int LookUpStateIndex(const StateLabelsType& state_labels) const
-    // Given the labels for a state, look up its index within the
-    // subspace.
-    //
-    // If no such labels are found, basis::kNone is returned.
+    /// Given the labels for a state, look up its index within the
+    /// subspace.
+    ///
+    /// If no such labels are found, basis::kNone is returned.
     {
       // PREVIOUSLY: trap failed lookup with assert for easier debugging
       // assert(ContainsState(state_labels));
@@ -237,7 +237,7 @@ namespace basis {
     ////////////////////////////////////////////////////////////////
 
     int size() const
-    // Return the size of the subspace.
+    /// Return the size of the subspace.
     {
       return dimension_;
     }
@@ -249,8 +249,8 @@ namespace basis {
     ////////////////////////////////////////////////////////////////
 
     void PushStateLabels(const StateLabelsType& state_labels)
-    // Create indexing information (in both directions, index <->
-    // labels) for a state.
+    /// Create indexing information (in both directions, index <->
+    /// labels) for a state.
     {
       lookup_[state_labels] = dimension_; // index for lookup
       state_table_.push_back(state_labels);  // save state
@@ -281,17 +281,17 @@ namespace basis {
   // generic state realized within subspace
   ////////////////////////////////////////////////////////////////
 
-  // BaseState -- realization of a state withinin a given subspace
-  //
-  // The derived class is expected to set up a constructor and
-  // friendlier accessors for the individual labels.
-  //
-  // The space (and the indexing it provides) is *not* copied into the
-  // state but rather stored by pointer reference.  It should
-  // therefore exist for the lifetime of the state object.
-  //
-  // Template arguments:
-  //   tSubspaceType : subspace type in which this state lives
+  /// BaseState -- realization of a state withinin a given subspace
+  ///
+  /// The derived class is expected to set up a constructor and
+  /// friendlier accessors for the individual labels.
+  ///
+  /// The space (and the indexing it provides) is *not* copied into the
+  /// state but rather stored by pointer reference.  It should
+  /// therefore exist for the lifetime of the state object.
+  ///
+  /// Template arguments:
+  ///   tSubspaceType : subspace type in which this state lives
 
   template <typename tSubspaceType>
     class BaseState
@@ -310,7 +310,7 @@ namespace basis {
       // general constructors
       ////////////////////////////////////////////////////////////////
 
-      // default constructor -- disabled
+      /// default constructor -- disabled
       BaseState();
 
       // copy constructor -- synthesized
@@ -318,14 +318,14 @@ namespace basis {
       // constructors
 
       BaseState(const SubspaceType& subspace, int index)
-        // Construct state, given index within subspace.
+        /// Construct state, given index within subspace.
         : subspace_ptr_(&subspace), index_(index)
       {
         assert(ValidIndex());
       }
 
       BaseState(const SubspaceType& subspace, const StateLabelsType& state_labels)
-        // Construct state, by reverse lookup on labels within subspace.
+        /// Construct state, by reverse lookup on labels within subspace.
         {
 
           // Debugging: Delegation to BaseState(subspace,index)
@@ -346,25 +346,25 @@ namespace basis {
       ////////////////////////////////////////////////////////////////
 
       const SubspaceType& subspace() const
-      // Return reference to subspace in which this state lies.
+      /// Return reference to subspace in which this state lies.
       {return *subspace_ptr_;}
 
 #ifdef BASIS_ALLOW_DEPRECATED
       DEPRECATED("use subspace() instead")
       const SubspaceType& Subspace() const
-      // Return reference to subspace in which this state lies.
-      //
-      // DEPRECATED in favor of subspace().
+      /// Return reference to subspace in which this state lies.
+      ///
+      /// DEPRECATED in favor of subspace().
       {return *subspace_ptr_;}
 #endif
 
       const StateLabelsType& labels() const
-      // Return labels of this state.
-      //
-      // Note: It is not normally expected that this member function
-      // should be used directly (see related comment for
-      // BaseSubspace::GetStateLabels).  Rather, derived types will
-      // provide accessors for convenient access to individual labels.
+      /// Return labels of this state.
+      ///
+      /// Note: It is not normally expected that this member function
+      /// should be used directly (see related comment for
+      /// BaseSubspace::GetStateLabels).  Rather, derived types will
+      /// provide accessors for convenient access to individual labels.
       {
         return subspace().GetStateLabels(index());
       }
@@ -372,21 +372,21 @@ namespace basis {
 #ifdef BASIS_ALLOW_DEPRECATED
       DEPRECATED("use labels() instead")
       const StateLabelsType& GetStateLabels() const
-      // Return labels of this state.
-      //
-      // DEPRECATED in favor of labels().
-      //
-      // Note: It is not normally expected that this member function
-      // should be used directly (see related comment for
-      // BaseSubspace::GetStateLabels).  Rather, derived types will
-      // provide accessors for convenient access to individual labels.
+      /// Return labels of this state.
+      ///
+      /// DEPRECATED in favor of labels().
+      ///
+      /// Note: It is not normally expected that this member function
+      /// should be used directly (see related comment for
+      /// BaseSubspace::GetStateLabels).  Rather, derived types will
+      /// provide accessors for convenient access to individual labels.
       {
         return Subspace().GetStateLabels(index());
       }
 #endif
 
       int index() const
-      // Retrieve integer index of state within subspace.
+      /// Retrieve integer index of state within subspace.
       {return index_;}
 
       ////////////////////////////////////////////////////////////////
@@ -429,10 +429,10 @@ namespace basis {
       private:
 
       int ValidIndex() const
-      // Verify whether or not state indexing lies within allowed
-      // dimension.
-      //
-      // For use on construction (or possibly with iteration).
+      /// Verify whether or not state indexing lies within allowed
+      /// dimension.
+      ///
+      /// For use on construction (or possibly with iteration).
       {
         return index() < subspace().size();
       }
@@ -443,8 +443,8 @@ namespace basis {
       // private storage
       ////////////////////////////////////////////////////////////////
 
-      const SubspaceType* subspace_ptr_;  // subspace in which state lies
-      int index_;   // 0-based index within space
+      const SubspaceType* subspace_ptr_;  ///< subspace in which state lies
+      int index_;   ///< 0-based index within space
 
     };
 
@@ -454,11 +454,11 @@ namespace basis {
   // generic space
   ////////////////////////////////////////////////////////////////
 
-  // BaseSpace -- container to hold subspaces, with reverse lookup by
-  // subspace labels
-  //
-  // Template arguments:
-  //   tSubspaceType (typename) : type for subspace
+  /// BaseSpace -- container to hold subspaces, with reverse lookup by
+  /// subspace labels
+  ///
+  /// Template arguments:
+  ///   tSubspaceType (typename) : type for subspace
 
   template <typename tSubspaceType>
     class BaseSpace
@@ -476,17 +476,17 @@ namespace basis {
       ////////////////////////////////////////////////////////////////
 
       bool ContainsSubspace(const typename SubspaceType::SubspaceLabelsType& subspace_labels) const
-      // Given the labels for a subspace, returns whether or not the
-      // subspace is found within the space.
+      /// Given the labels for a subspace, returns whether or not the
+      /// subspace is found within the space.
       {
         return lookup_.count(subspace_labels);
       }
 
       int LookUpSubspaceIndex(const typename SubspaceType::SubspaceLabelsType& subspace_labels) const
-      // Given the labels for a subspace, look up its index within the
-      // space.
-      //
-      // If no such labels are found, basis::kNone is returned.
+      /// Given the labels for a subspace, look up its index within the
+      /// space.
+      ///
+      /// If no such labels are found, basis::kNone is returned.
       {
 
         // PREVIOUSLY: trap failed lookup with assert for easier debugging
@@ -501,11 +501,11 @@ namespace basis {
       };
 
       const SubspaceType& LookUpSubspace(const typename SubspaceType::SubspaceLabelsType& subspace_labels) const
-      // Given the labels for a subspace, retrieve a reference to the
-      // subspace.
-      //
-      // If no such labels are found, an exception will result
-      // (enforced by LookUpSubspaceIndex).
+      /// Given the labels for a subspace, retrieve a reference to the
+      /// subspace.
+      ///
+      /// If no such labels are found, an exception will result
+      /// (enforced by LookUpSubspaceIndex).
       {
 
         int subspace_index = LookUpSubspaceIndex(subspace_labels);
@@ -514,8 +514,8 @@ namespace basis {
       };
 
       const SubspaceType& GetSubspace(int i) const
-      // Given the index for a subspace, return a reference to the
-      // subspace.
+      /// Given the index for a subspace, return a reference to the
+      /// subspace.
       {
         return subspaces_[i];
       };
@@ -525,13 +525,13 @@ namespace basis {
       ////////////////////////////////////////////////////////////////
 
       int size() const
-      // Return the number of subspaces within the space.
+      /// Return the number of subspaces within the space.
       {
         return subspaces_.size();
       };
 
       int Dimension() const
-      // Return the total dimension of all subspaces within the space.
+      /// Return the total dimension of all subspaces within the space.
       {
         int dimension = 0;
         for (int subspace_index=0; subspace_index<size(); ++subspace_index)
@@ -546,8 +546,8 @@ namespace basis {
       ////////////////////////////////////////////////////////////////
 
       void PushSubspace(const SubspaceType& subspace)
-      // Create indexing information (in both directions, index <->
-      // labels) for a subspace.
+      /// Create indexing information (in both directions, index <->
+      /// labels) for a subspace.
       {
         lookup_[subspace.labels()] = subspaces_.size(); // index for lookup
         subspaces_.push_back(subspace);  // save space
@@ -557,7 +557,7 @@ namespace basis {
       // internal storage
       ////////////////////////////////////////////////////////////////
 
-      // subspaces (accessible by index)
+      /// subspaces (accessible by index)
       std::vector<SubspaceType> subspaces_;
 
       // subspace index lookup by labels
@@ -583,7 +583,7 @@ namespace basis {
   // multiplicity index.
 
 
-  // BaseSector -- provide storage of information for a single sector
+  /// BaseSector -- provide storage of information for a single sector
 
   template <typename tSubspaceType>
     class BaseSector

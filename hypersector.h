@@ -1,5 +1,5 @@
 /************************************************************//**
-  hypersector.h
+  @file hypersector.h
 
   Enumeration of sectors for multiple operators.
 
@@ -229,7 +229,7 @@ namespace basis {
       for (int hypersector_index=0; hypersector_index<size(); ++hypersector_index)
         {
           const HypersectorType& hypersector = GetHypersector(hypersector_index);
-          
+
           os << "  hypersector " << hypersector_index
              << "  bra index " << hypersector.bra_subspace_index()
              << " labels " << hypersector.bra_subspace().LabelStr()
@@ -257,7 +257,7 @@ namespace basis {
   //   basis::OperatorHyperblocks<double> matrices;  // matrices for all operator planes of all hypersectors
   //   ...
   //   matrix_element = matrices[hypersector_index][operator_index](bra_index,ket_index);  // operator_index is within given hypersector's operator subspace
-  
+
   template <typename tFloat>
     using OperatorHyperblocks = std::vector<std::vector<OperatorBlock<tFloat>>>;
 
