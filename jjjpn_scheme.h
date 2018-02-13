@@ -62,7 +62,7 @@ namespace basis {
   //
   // Labeling
   //
-  // subspace labels: (type,J,g)    P=(-)^g
+  // subspace labels: (species,J,g)    P=(-)^g
   //
   //   species (enum): two-body species (equivalent to Tz)
   //   J (int): total angular momentum
@@ -80,13 +80,13 @@ namespace basis {
   // Subspaces
   //
   // Within the full space, subspaces are ordered by:
-  //    -- increasing type (type=pp,nn,pn)
+  //    -- increasing species (species=pp,nn,pn)
   //    -- increasing J
   //    -- increasing g (g=0,1)
   //
   // Subspaces are pruned to those of nonzero dimension.
   //
-  // Note that ordering of subspaces is lexicographic by (type,J,g).
+  // Note that ordering of subspaces is lexicographic by (species,J,g).
   //
   // Truncation of the space is by one-body and two-body weights.
   //
