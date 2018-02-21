@@ -9,22 +9,26 @@
   University of Notre Dame
 
   + 11/1/16 (mac): Created.
-  + 11/4/16 (mac): Add informative error messages on failed
-    MatrixElementLJPN lookup.
-  + 11/21/16 (mac): Break out matrix element indexing lookup
-    from value lookup.
-  + 09/22/17 (pjf): Look up state indices honestly in
-    MatrixElementIndicesLJPN
-
+  + 11/4/16 (mac): Add informative error messages on failed MatrixElementLJPN lookup.
+  + 11/21/16 (mac): Break out matrix element indexing lookup from value lookup.
+  + 09/22/17 (pjf): Look up state indices honestly in MatrixElementIndicesLJPN
+  + 02/20/17 (pjf): Add OneBodyOperatorLJPN.
 ****************************************************************/
 
 #ifndef BASIS_NLJ_OPERATOR_H_
 #define BASIS_NLJ_OPERATOR_H_
 
+#include <string>
+
 #include "basis/nlj_orbital.h"
 #include "basis/operator.h"
 
 namespace basis {
+
+  enum class OneBodyOperatorType : char {
+    kRadial = 'R',
+    kSpherical = 'S'
+  };
 
   ////////////////////////////////////////////////////////////////
   // matrix element lookup
@@ -32,11 +36,11 @@ namespace basis {
 
   std::tuple<int,int,int>
   MatrixElementIndicesLJPN(
-      const basis::OrbitalSpaceLJPN& bra_orbital_space,
-      const basis::OrbitalSpaceLJPN& ket_orbital_space,
-      const basis::OrbitalSectorsLJPN& sectors,
-      const basis::FullOrbitalLabels& bra_labels,
-      const basis::FullOrbitalLabels& ket_labels
+      const OrbitalSpaceLJPN& bra_orbital_space,
+      const OrbitalSpaceLJPN& ket_orbital_space,
+      const OrbitalSectorsLJPN& sectors,
+      const FullOrbitalLabels& bra_labels,
+      const FullOrbitalLabels& ket_labels
     );
   // Look up radial matrix element indices by (species,n,l,j) labels.
   //
@@ -55,11 +59,11 @@ namespace basis {
   //     (sector_index,bra_state_index,ket_state_index)
 
   double MatrixElementLJPN(
-      const basis::OrbitalSpaceLJPN& bra_orbital_space,
-      const basis::OrbitalSpaceLJPN& ket_orbital_space,
-      const basis::OrbitalSectorsLJPN& sectors,
-      const basis::OperatorBlocks<double>& matrices,
-      const basis::OrbitalStatePN& bra, const basis::OrbitalStatePN& ket
+      const OrbitalSpaceLJPN& bra_orbital_space,
+      const OrbitalSpaceLJPN& ket_orbital_space,
+      const OrbitalSectorsLJPN& sectors,
+      const OperatorBlocks<double>& matrices,
+      const OrbitalStatePN& bra, const OrbitalStatePN& ket
     );
   // Look up radial matrix element by (species,n,l,j) labels.
   //
@@ -78,8 +82,27 @@ namespace basis {
   //   (double): the matrix element
 
   ////////////////////////////////////////////////////////////////
+  // one-body operator indexing and storage
+  ////////////////////////////////////////////////////////////////
+
+  struct OneBodyOperatorLJPN
+  {
+    OneBodyOperatorType operator_type;
+    OrbitalSpaceLJPN bra_orbital_space;
+    OrbitalSpaceLJPN ket_orbital_space;
+    OrbitalSectorsLJPN sectors;
+    OperatorBlocks<double> matrices;
+    std::string name;
+
+    double get_matrix_element(const OrbitalStatePN& bra, const OrbitalStatePN& ket) const
+    {
+      return MatrixElementLJPN(bra_orbital_space, ket_orbital_space, sectors, matrices, bra, ket);
+    }
+  };
+
+  ////////////////////////////////////////////////////////////////
   /// @}
   ////////////////////////////////////////////////////////////////
 }  // namespace basis
 
-#endif  // NLJ_ORBITAL_H_
+#endif  // BASIS_NLJ_ORBITAL_H_
