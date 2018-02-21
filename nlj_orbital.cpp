@@ -904,7 +904,7 @@ namespace basis {
   OrbitalSectorsLJPN::OrbitalSectorsLJPN(
       const OrbitalSpaceLJPN& bra_space, const OrbitalSpaceLJPN& ket_space
     )
-    : l0max_(-1), j0_(-1), g0_(-1), Tz0_(1), mode_(SectorsConstraintMode::kAll)
+    : j0_(-1), g0_(-1), Tz0_(1)
   {
     for (int bra_subspace_index=0; bra_subspace_index<bra_space.size(); ++bra_subspace_index) {
       for (int ket_subspace_index=0; ket_subspace_index<ket_space.size(); ++ket_subspace_index) {
@@ -920,36 +920,8 @@ namespace basis {
 
   OrbitalSectorsLJPN::OrbitalSectorsLJPN(
       const OrbitalSpaceLJPN& bra_space, const OrbitalSpaceLJPN& ket_space,
-      int l0max, int Tz0)
-    : l0max_(l0max), j0_(-1), g0_(l0max%2), Tz0_(Tz0), mode_(SectorsConstraintMode::kRadial)
-  {
-    for (int bra_subspace_index=0; bra_subspace_index<bra_space.size(); ++bra_subspace_index) {
-      for (int ket_subspace_index=0; ket_subspace_index<ket_space.size(); ++ket_subspace_index) {
-
-        // retrieve subspaces
-        const SubspaceType& bra_subspace = bra_space.GetSubspace(bra_subspace_index);
-        const SubspaceType& ket_subspace = ket_space.GetSubspace(ket_subspace_index);
-
-        bool allowed = true;
-        allowed &= (abs(bra_subspace.l()-ket_subspace.l()) <= l0max);
-        /// @note sectors also constrained by delta-j <= l0max
-        allowed &= (abs(bra_subspace.j()-ket_subspace.j()) <= l0max);
-        allowed &= (abs(bra_subspace.Tz()-ket_subspace.Tz()) == Tz0);
-        allowed &= ((ket_subspace.g()+g0_+bra_subspace.g())%2 == 0);
-
-        // push sector
-        if (allowed) {
-          PushSector(SectorType(bra_subspace_index,ket_subspace_index,
-                                bra_subspace,ket_subspace));
-        }
-      }
-    }
-  }
-
-  OrbitalSectorsLJPN::OrbitalSectorsLJPN(
-      const OrbitalSpaceLJPN& bra_space, const OrbitalSpaceLJPN& ket_space,
       int j0, int g0, int Tz0)
-    : l0max_(-1), j0_(j0), g0_(g0), Tz0_(Tz0), mode_(SectorsConstraintMode::kSpherical)
+    : j0_(j0), g0_(g0), Tz0_(Tz0)
   {
     for (int bra_subspace_index=0; bra_subspace_index<bra_space.size(); ++bra_subspace_index) {
       for (int ket_subspace_index=0; ket_subspace_index<ket_space.size(); ++ket_subspace_index) {
