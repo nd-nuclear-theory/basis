@@ -21,41 +21,43 @@
 
   + 11/21/15 (mac): Created (lsjt_interaction.h), from code in
     moshinsky_xform_lsjt.
-  + 6/8/16 (mac): Update for basis package and update conventions.
+  + 06/08/16 (mac): Update for basis package and update conventions.
     - Rename to lsjt_operator.h.
     - Remove matrix-style output.
     - Remove generic template functions.
-  + 7/3/16 (mac): Add relative LSJT operator file I/O.
-  + 7/6/16 (mac):
+  + 07/03/16 (mac): Add relative LSJT operator file I/O.
+  + 07/06/16 (mac):
     - Add symmetry phase header field and update documentation.
     - Upgrade precision on operator output.
-  + 7/8/16 (mac): Add two-body LSJT operator file I/O.
-  + 7/9/16 (mac): Add support for canonicalizing indices in relative
+  + 07/08/16 (mac): Add two-body LSJT operator file I/O.
+  + 07/09/16 (mac): Add support for canonicalizing indices in relative
     LSJT matrix element lookup (for Hamiltonian-like operators).
-  + 7/10/16 (mac):
+  + 07/10/16 (mac):
     - Add support for canonicalizing indices in general
       LSJT matrix element lookup (for Hamiltonian-like operators).
     - Define OperatorLabelsJT and add documentation on operators.
     - Incorporate some basic LSJT operator construction and
       manipulation functions.
-  + 7/13/16 (mac): Revise code for LSJTN->LSJT gathering operation.
-  + 7/20/16 (mac): Add ReadRelativeOperatorLSJT.
-  + 7/22/16 (mac): Revise syntax for CanonicalizeIndicesLSJT.
-  + 7/25/16 (mac): Add WriteRelativeOperatorLSJT.
-  + 8/16/16 (mac): Add WriteRelativeCMOperatorComponentLSJT and
+  + 07/13/16 (mac): Revise code for LSJTN->LSJT gathering operation.
+  + 07/20/16 (mac): Add ReadRelativeOperatorLSJT.
+  + 07/22/16 (mac): Revise syntax for CanonicalizeIndicesLSJT.
+  + 07/25/16 (mac): Add WriteRelativeOperatorLSJT.
+  + 08/16/16 (mac): Add WriteRelativeCMOperatorComponentLSJT and
     corresponding gather function.
-  + 11/4/16 (mac): Remove dependency on Eigen/Core.
-  + 3/26/17 (mac): Add conjugation phase relation for
+  + 11/04/16 (mac): Remove dependency on Eigen/Core.
+  + 03/26/17 (mac): Add conjugation phase relation for
       spherical-harmonic-like operators (still kHermitian).
-  + 3/28/17 (mac):
+  + 03/28/17 (mac):
     - Add constructors for OperatorLabelsJT.
     - Add ConstructZeroOperatorRelativeLSJT.
-  + 4/4/17 (mac):
+  + 04/04/17 (mac):
     - Rename CanonicalizeIndicesLSJT to CanonicalizeIndicesJT.
     - Add overload to CanonicalizeIndicesJT which only
       canonicalizes subspaces, with no reference to states.
-  + 7/1/17 (mac): Remove constraints on operator labels for
-    ConstructZeroOperatorRelativeLSJT.
+  + 07/01/17 (mac): Remove constraints on operator labels for
+      ConstructZeroOperatorRelativeLSJT.
+  + 05/05/18 (mac): Remove constraint on operator labels for
+      CanonicalizeIndicesJT.
 
 ****************************************************************/
 
@@ -528,10 +530,7 @@ namespace basis {
     // Phase definitions are currently only provided for
     // Hamiltonian-like or more generally spherical-harmonic-like
     // (kHermitian) operators.
-    assert(
-        (symmetry_phase_mode==basis::SymmetryPhaseMode::kHermitian)
-        && (g0==0)
-      );
+    assert(symmetry_phase_mode==basis::SymmetryPhaseMode::kHermitian);
 
     double canonicalization_factor = 1.;
     if (swapped_subspaces)
