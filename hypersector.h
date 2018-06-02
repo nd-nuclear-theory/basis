@@ -302,6 +302,44 @@ namespace basis {
       }
   }
 
+  ////////////////////////////////////////////////////////////////
+  // counting operator
+  ////////////////////////////////////////////////////////////////
+
+  template <typename tHypersectorsType>
+  long int GetNumHyperoperatorME(
+      const tHypersectorsType& hypersectors
+    )
+    // Set operator hyperblocks to zero.
+    //
+    // Arguments:
+    //   hypersectors (input): the set of hypersectors on which the
+    //     operators are defined
+    //   matrices (output): matrices to hold hyperblocks
+  {
+
+    // iterate over hypersectors
+    long int num_rmes=0;
+    for (int hypersector_index = 0; hypersector_index < hypersectors.size(); ++hypersector_index)
+      {
+
+        // extract hypersector
+        const typename tHypersectorsType::HypersectorType& hypersector = hypersectors.GetHypersector(hypersector_index);
+
+        // extract hypersector subspaces
+        const typename tHypersectorsType::SubspaceType& bra_subspace = hypersector.bra_subspace();
+        const typename tHypersectorsType::SubspaceType& ket_subspace = hypersector.ket_subspace();
+        const typename tHypersectorsType::OperatorSubspaceType& operator_subspace = hypersector.operator_subspace();
+
+        // generate matrices for hypersector (by operator)
+        for (int operator_index = 0; operator_index < operator_subspace.size(); ++operator_index)
+          num_rmes+=bra_subspace.size()*ket_subspace.size();
+      }
+    return num_rmes;
+  }
+
+  ////////////////////////////////////////////////////////////////
+
 
   ////////////////////////////////////////////////////////////////
   ////////////////////////////////////////////////////////////////
