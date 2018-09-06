@@ -26,7 +26,7 @@
 #include <tuple>
 #include <vector>
 
-#include "basis/lsjt_operator.h"  // for OperatorLabelsJT
+#include "basis/jt_operator.h"
 #include "basis/jjjt_scheme.h"
 #include "basis/operator.h"
 
