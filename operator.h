@@ -175,11 +175,11 @@ namespace basis {
       {
 
         // extract sector
-	const typename tSectorsType::SectorType& sector = sectors.GetSector(sector_index);
+        const typename tSectorsType::SectorType& sector = sectors.GetSector(sector_index);
 
         // extract sector subspaces
-	const typename tSectorsType::SubspaceType& bra_subspace = sector.bra_subspace();
-	const typename tSectorsType::SubspaceType& ket_subspace = sector.ket_subspace();
+        const typename tSectorsType::SubspaceType& bra_subspace = sector.bra_subspace();
+        const typename tSectorsType::SubspaceType& ket_subspace = sector.ket_subspace();
 
         // generate matrix for sector
         matrices[sector_index] = basis::OperatorBlock<tFloat>::Zero(bra_subspace.size(),ket_subspace.size());
@@ -234,21 +234,21 @@ namespace basis {
       {
 
         // extract sector
-	const typename tSectorsType::SectorType& sector = sectors.GetSector(sector_index);
+        const typename tSectorsType::SectorType& sector = sectors.GetSector(sector_index);
 
         // extract sector subspaces
-	const typename tSectorsType::SubspaceType& bra_subspace = sector.bra_subspace();
-	const typename tSectorsType::SubspaceType& ket_subspace = sector.ket_subspace();
+        const typename tSectorsType::SubspaceType& bra_subspace = sector.bra_subspace();
+        const typename tSectorsType::SubspaceType& ket_subspace = sector.ket_subspace();
 
         // generate matrix for sector
-	if (sector.IsDiagonal())
-	  {
+        if (sector.IsDiagonal())
+          {
             matrices[sector_index] = basis::OperatorBlock<tFloat>::Identity(bra_subspace.size(),ket_subspace.size());
-	  }
-	else
-	  {
+          }
+        else
+          {
             matrices[sector_index] = basis::OperatorBlock<tFloat>::Zero(bra_subspace.size(),ket_subspace.size());
-	  }
+          }
 
       }
   }
@@ -299,21 +299,21 @@ namespace basis {
       {
 
         // extract sector
-	const typename tSectorsType::SectorType& sector = sectors.GetSector(sector_index);
+        const typename tSectorsType::SectorType& sector = sectors.GetSector(sector_index);
 
         // extract sector subspaces
-	const typename tSectorsType::SubspaceType& bra_subspace = sector.bra_subspace();
-	const typename tSectorsType::SubspaceType& ket_subspace = sector.ket_subspace();
+        const typename tSectorsType::SubspaceType& bra_subspace = sector.bra_subspace();
+        const typename tSectorsType::SubspaceType& ket_subspace = sector.ket_subspace();
 
         // generate matrix for sector
-	if (sector.IsDiagonal())
-	  {
+        if (sector.IsDiagonal())
+          {
             matrices[sector_index] = c*basis::OperatorBlock<tFloat>::Identity(bra_subspace.size(),ket_subspace.size());
-	  }
-	else
-	  {
+          }
+        else
+          {
             matrices[sector_index] = basis::OperatorBlock<tFloat>::Zero(bra_subspace.size(),ket_subspace.size());
-	  }
+          }
 
       }
   }
