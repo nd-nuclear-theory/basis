@@ -32,6 +32,7 @@
     - Retemplatize functions to work with generic precision
       operator blocks instead of MatrixXd.
   + 08/11/17 (pjf): Emit warnings if deprecated member functions are used.
+  + 09/07/18 (pjf): Fix incomplete templatization of SetOperatorToDiagonalConstant.
 
 ****************************************************************/
 
@@ -261,7 +262,7 @@ namespace basis {
   void SetOperatorToDiagonalConstant(
       const tSectorsType& sectors,
       basis::OperatorBlocks<tFloat>& matrices,
-      double c
+      tFloat c
     )
     // Set operator to "naive" diagonal constant operator.
     //
