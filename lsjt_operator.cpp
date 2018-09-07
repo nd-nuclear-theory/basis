@@ -16,25 +16,6 @@ namespace basis {
   // relative two-body operator
   ////////////////////////////////////////////////////////////////
 
-  void WriteRelativeOperatorParametersLSJT(
-      std::ostream& os,
-      const basis::RelativeOperatorParametersLSJT& parameters
-    )
-  {
-    int version = 1;
-    os 
-      << "# RELATIVE LSJT" << std::endl
-      << "#   version" << std::endl
-      << "#   J0 g0 T0_min T0_max symmetry_phase_mode  [P0=(-)^g0]" << std::endl
-      << "#   Nmax Jmax" << std::endl
-      << "#   T0   N' L' S' J' T'   N L S J T   JT-RME" << std::endl
-      << " " << version << std::endl
-      << " " << parameters.J0 << " " << parameters.g0
-      << " " << parameters.T0_min << " " << parameters.T0_max
-      << " " << int(parameters.symmetry_phase_mode) << std::endl
-      << " " << parameters.Nmax << " " << parameters.Jmax << std::endl;
-  }
-
   void ReadRelativeOperatorParametersLSJT(
       std::istream& is,
       basis::RelativeOperatorParametersLSJT& parameters
@@ -64,72 +45,23 @@ namespace basis {
     std::stringstream(line) >> parameters.Nmax >> parameters.Jmax;
   }
 
-  void WriteRelativeOperatorComponentLSJT(
+  void WriteRelativeOperatorParametersLSJT(
       std::ostream& os,
-      int T0,
-      const RelativeSectorsLSJT& sectors,
-      const OperatorBlocks<double>& matrices
+      const basis::RelativeOperatorParametersLSJT& parameters
     )
   {
-
-    // iterate over sectors
-    for (int sector_index = 0; sector_index < sectors.size(); ++sector_index)
-      {
-
-        // extract sector
-	const typename RelativeSectorsLSJT::SectorType& sector = sectors.GetSector(sector_index);
-	const typename RelativeSectorsLSJT::SubspaceType& bra_subspace = sector.bra_subspace();
-	const typename RelativeSectorsLSJT::SubspaceType& ket_subspace = sector.ket_subspace();
-
-        // verify that sector is canonical
-        //
-        // This is a check that the caller's sector construction
-        // followed the specification that only "upper triangle"
-        // sectors are stored.
-        assert(sector.bra_subspace_index()<=sector.ket_subspace_index());
-
-	// iterate over matrix elements
-	for (int bra_index=0; bra_index<bra_subspace.size(); ++bra_index)
-	  for (int ket_index=0; ket_index<ket_subspace.size(); ++ket_index)
-	    {
-
-              // diagonal sector: restrict to upper triangle
-              if (sector.IsDiagonal())
-                if (!(bra_index<=ket_index))
-                  continue;
-
-              // define states
-	      const basis::RelativeStateLSJT bra(bra_subspace,bra_index);
-	      const basis::RelativeStateLSJT ket(ket_subspace,ket_index);
-
-              // extract matrix element factor
-      	      const double matrix_element = matrices[sector_index](bra_index,ket_index);
-	    
-              // generate output line
-              const int width = 3;
-              const int precision = 14;  // less than 16 to provide some roundoff and avoid ugliness on doubles
-              os << std::setprecision(precision);
-	      os 
-		<< " " << std::setw(width) << T0
-		<< " " << "  "
-		<< " " << std::setw(width) << bra.N()
-		<< " " << std::setw(width) << bra.L() 
-		<< " " << std::setw(width) << bra.S() 
-		<< " " << std::setw(width) << bra.J() 
-		<< " " << std::setw(width) << bra.T() 
-		<< " " << "  "
-		<< " " << std::setw(width) << ket.N()
-		<< " " << std::setw(width) << ket.L() 
-		<< " " << std::setw(width) << ket.S() 
-		<< " " << std::setw(width) << ket.J() 
-		<< " " << std::setw(width) << ket.T() 
-		<< " " << "  "
-		<< " " << std::showpoint << std::scientific << matrix_element
-		<< std::endl;
-	    
-	    }
-
-      };
+    int version = 1;
+    os 
+      << "# RELATIVE LSJT" << std::endl
+      << "#   version" << std::endl
+      << "#   J0 g0 T0_min T0_max symmetry_phase_mode  [P0=(-)^g0]" << std::endl
+      << "#   Nmax Jmax" << std::endl
+      << "#   T0   N' L' S' J' T'   N L S J T   JT-RME" << std::endl
+      << " " << version << std::endl
+      << " " << parameters.J0 << " " << parameters.g0
+      << " " << parameters.T0_min << " " << parameters.T0_max
+      << " " << int(parameters.symmetry_phase_mode) << std::endl
+      << " " << parameters.Nmax << " " << parameters.Jmax << std::endl;
   }
 
   void ReadRelativeOperatorComponentLSJT(
@@ -217,6 +149,74 @@ namespace basis {
 	matrices.push_back(sector_matrix);
 
       }
+  }
+
+  void WriteRelativeOperatorComponentLSJT(
+      std::ostream& os,
+      int T0,
+      const RelativeSectorsLSJT& sectors,
+      const OperatorBlocks<double>& matrices
+    )
+  {
+
+    // iterate over sectors
+    for (int sector_index = 0; sector_index < sectors.size(); ++sector_index)
+      {
+
+        // extract sector
+	const typename RelativeSectorsLSJT::SectorType& sector = sectors.GetSector(sector_index);
+	const typename RelativeSectorsLSJT::SubspaceType& bra_subspace = sector.bra_subspace();
+	const typename RelativeSectorsLSJT::SubspaceType& ket_subspace = sector.ket_subspace();
+
+        // verify that sector is canonical
+        //
+        // This is a check that the caller's sector construction
+        // followed the specification that only "upper triangle"
+        // sectors are stored.
+        assert(sector.bra_subspace_index()<=sector.ket_subspace_index());
+
+	// iterate over matrix elements
+	for (int bra_index=0; bra_index<bra_subspace.size(); ++bra_index)
+	  for (int ket_index=0; ket_index<ket_subspace.size(); ++ket_index)
+	    {
+
+              // diagonal sector: restrict to upper triangle
+              if (sector.IsDiagonal())
+                if (!(bra_index<=ket_index))
+                  continue;
+
+              // define states
+	      const basis::RelativeStateLSJT bra(bra_subspace,bra_index);
+	      const basis::RelativeStateLSJT ket(ket_subspace,ket_index);
+
+              // extract matrix element factor
+      	      const double matrix_element = matrices[sector_index](bra_index,ket_index);
+	    
+              // generate output line
+              const int width = 3;
+              const int precision = 14;  // less than 16 to provide some roundoff and avoid ugliness on doubles
+              os << std::setprecision(precision);
+	      os 
+		<< " " << std::setw(width) << T0
+		<< " " << "  "
+		<< " " << std::setw(width) << bra.N()
+		<< " " << std::setw(width) << bra.L() 
+		<< " " << std::setw(width) << bra.S() 
+		<< " " << std::setw(width) << bra.J() 
+		<< " " << std::setw(width) << bra.T() 
+		<< " " << "  "
+		<< " " << std::setw(width) << ket.N()
+		<< " " << std::setw(width) << ket.L() 
+		<< " " << std::setw(width) << ket.S() 
+		<< " " << std::setw(width) << ket.J() 
+		<< " " << std::setw(width) << ket.T() 
+		<< " " << "  "
+		<< " " << std::showpoint << std::scientific << matrix_element
+		<< std::endl;
+	    
+	    }
+
+      };
   }
 
   void ReadRelativeOperatorLSJT(
@@ -799,10 +799,57 @@ namespace basis {
 
   }
 
+  ////////////////////////////////////////////////////////////////
+  // relative-cm LSJT operator I/O
+  ////////////////////////////////////////////////////////////////
 
-  ////////////////////////////////////////////////////////////////
-  // relative-cm LSJT operator output
-  ////////////////////////////////////////////////////////////////
+  void ReadRelativeCMOperatorParametersLSJT(
+      std::istream& is,
+      basis::RelativeCMOperatorParametersLSJT& parameters
+    )
+  {
+
+    std::string line;
+
+    // line 1: version -- but first gobble any comment lines
+    while (std::getline(is,line), line[0]=='#') {};
+    int version;
+    std::stringstream(line) >> version;
+    assert(version==1);
+    
+    // line 2: operator tensor properties
+    std::getline(is,line);
+    int symmetry_phase_mode_int;
+    std::stringstream(line)
+      >> parameters.J0 >> parameters.g0
+      >> parameters.T0_min >> parameters.T0_max
+      >> symmetry_phase_mode_int;
+    assert (symmetry_phase_mode_int==0);
+    parameters.symmetry_phase_mode = basis::SymmetryPhaseMode(symmetry_phase_mode_int);
+
+    // line 3: relative basis truncation
+    std::getline(is,line);
+    std::stringstream(line) >> parameters.Nmax;
+  }
+
+  void WriteRelativeCMOperatorParametersLSJT(
+      std::ostream& os,
+      const basis::RelativeCMOperatorParametersLSJT& parameters
+    )
+  {
+    int version = 1;
+    os 
+      << "# RELATIVE-CM LSJT" << std::endl
+      << "#   version" << std::endl
+      << "#   J0 g0 T0_min T0_max symmetry_phase_mode  [P0=(-)^g0]" << std::endl
+      << "#   Nmax" << std::endl
+      << "#   T0   N1' l1' N2' l2' L' S' J' T' g'   N1 l1 N2 l2 L S J T g   JT-RME" << std::endl
+      << " " << version << std::endl
+      << " " << parameters.J0 << " " << parameters.g0
+      << " " << parameters.T0_min << " " << parameters.T0_max
+      << " " << int(parameters.symmetry_phase_mode) << std::endl
+      << " " << parameters.Nmax << std::endl;
+  }
 
   void WriteRelativeCMOperatorComponentLSJT(
       std::ostream& os,
