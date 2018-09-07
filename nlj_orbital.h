@@ -50,6 +50,7 @@
   + 10/13/17 (pjf): Fix j0 type in OrbitalSectorsLJPN.
   + 10/15/17 (pjf): Copy Nmax sanity checks to OrbitalSubspaceLJPN and OrbitalSpaceLJPN.
   + 02/11/18 (pjf): Remove radial sector constraint mode.
+  + 09/07/18 (pjf): Insert space before header lines for MFDn compatibility.
 ****************************************************************/
 
 #ifndef BASIS_NLJ_ORBITAL_H_

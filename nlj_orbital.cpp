@@ -188,10 +188,10 @@ namespace basis {
 
         // header line 1: version
         int version = int(MFDnOrbitalFormat::kVersion15099);
-        header << version << std::endl;
+        header << " " << version << std::endl;
 
         // header line 2: dimensions
-        header << p_index << " " << n_index << std::endl;
+        header << " " << p_index << " " << n_index << std::endl;
       }
 
     // assemble file
