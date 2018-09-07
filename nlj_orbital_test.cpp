@@ -54,7 +54,7 @@ void TestOrbitalsRead(const std::string& filename) {
   std::cout << "Read Orbitals" << std::endl;
 
   std::ifstream is(filename);
-  std::vector<basis::OrbitalPNInfo> states = basis::ParseOrbitalPNStream(is,true);
+  basis::OrbitalPNList states = basis::ParseOrbitalPNStream(is,true);
   basis::OrbitalSpacePN space(states);
   std::cout << space.DebugStr();
 
@@ -108,7 +108,7 @@ void TestLJOrbitalsRead(const std::string& filename) {
   std::cout << "Read Orbitals -- lj-subspaces" << std::endl;
 
   std::ifstream is(filename);
-  std::vector<basis::OrbitalPNInfo> states = basis::ParseOrbitalPNStream(is,true);
+  basis::OrbitalPNList states = basis::ParseOrbitalPNStream(is,true);
   basis::OrbitalSpaceLJPN space(states);
   std::cout << space.DebugStr();
 

@@ -74,7 +74,7 @@ namespace basis {
    * @param[in] is input stream containing MFDn-formatted orbital definitions
    * @return list of flattened orbital parameters
    */
-  std::vector<OrbitalPNInfo> ParseOrbitalPNStream(std::istream& is, bool standalone)
+  OrbitalPNList ParseOrbitalPNStream(std::istream& is, bool standalone)
   {
 
     // set up line counter for use in error messages
@@ -107,7 +107,7 @@ namespace basis {
       }
 
     // lines 3+: orbital definitions
-    std::vector<OrbitalPNInfo> states;
+    OrbitalPNList states;
     int num_orbitals_p_extracted=0, num_orbitals_n_extracted=0;
     while ( getline(is,line))
       {
@@ -147,7 +147,7 @@ namespace basis {
    * @param[in] orbitals list of flattened orbital parameters
    * @return output stream containing MFDn-formatted orbital definitions
    */
-  std::string OrbitalDefinitionStr(const std::vector<OrbitalPNInfo>& orbitals, bool standalone)
+  std::string OrbitalDefinitionStr(const OrbitalPNList& orbitals, bool standalone)
   {
 
     std::ostringstream header;
@@ -245,7 +245,7 @@ namespace basis {
    * @param[in] states vector of orbitals
    */
   OrbitalSubspacePN::OrbitalSubspacePN(OrbitalSpeciesPN orbital_species,
-                                       const std::vector<OrbitalPNInfo>& states)
+                                       const OrbitalPNList& states)
   {
 
     // set values
@@ -361,9 +361,9 @@ namespace basis {
    *
    * @return vector representation of subspace
    */
-  std::vector<OrbitalPNInfo> OrbitalSubspacePN::OrbitalInfo() const
+  OrbitalPNList OrbitalSubspacePN::OrbitalInfo() const
   {
-    std::vector<OrbitalPNInfo> orbitals;
+    OrbitalPNList orbitals;
 
     for (int state_index=0; state_index<size(); ++state_index)
       {
@@ -443,7 +443,7 @@ namespace basis {
    *
    * @param[in] states vector of orbitals
    */
-  OrbitalSpacePN::OrbitalSpacePN(const std::vector<OrbitalPNInfo>& states)
+  OrbitalSpacePN::OrbitalSpacePN(const OrbitalPNList& states)
   {
     weight_max_ = 0.0;
     // collect orbital_species subspace labels sorted in canonical order
@@ -550,14 +550,14 @@ namespace basis {
    *
    * @return vector representation of space
    */
-  std::vector<OrbitalPNInfo> OrbitalSpacePN::OrbitalInfo() const
+  OrbitalPNList OrbitalSpacePN::OrbitalInfo() const
   {
-    std::vector<OrbitalPNInfo> orbitals;
+    OrbitalPNList orbitals;
 
     for (int subspace_index=0; subspace_index<size(); ++subspace_index)
       {
         const SubspaceType& subspace = GetSubspace(subspace_index);
-        std::vector<OrbitalPNInfo> subspace_orbitals;
+        OrbitalPNList subspace_orbitals;
 
         // get orbitals for subspace and append to vector
         subspace_orbitals = subspace.OrbitalInfo();
@@ -615,7 +615,7 @@ namespace basis {
    */
   OrbitalSubspaceLJPN::OrbitalSubspaceLJPN(OrbitalSpeciesPN orbital_species,
                                            int l, HalfInt j,
-                                           const std::vector<OrbitalPNInfo>& states) {
+                                           const OrbitalPNList& states) {
     labels_ = SubspaceLabelsType(orbital_species,l,j);
     weight_max_ = 0.0;
     for (auto&& state : states) {
@@ -717,9 +717,9 @@ namespace basis {
    *
    * @return vector representation of subspace
    */
-  std::vector<OrbitalPNInfo> OrbitalSubspaceLJPN::OrbitalInfo() const
+  OrbitalPNList OrbitalSubspaceLJPN::OrbitalInfo() const
   {
-    std::vector<OrbitalPNInfo> orbitals;
+    OrbitalPNList orbitals;
 
     for (int state_index=0; state_index<size(); ++state_index)
       {
@@ -779,7 +779,7 @@ namespace basis {
    *
    * @param[in] states vector of orbitals
    */
-  OrbitalSpaceLJPN::OrbitalSpaceLJPN(const std::vector<OrbitalPNInfo>& states)
+  OrbitalSpaceLJPN::OrbitalSpaceLJPN(const OrbitalPNList& states)
   {
     weight_max_ = 0.0;
 
@@ -879,14 +879,14 @@ namespace basis {
    *
    * @return vector representation of space
    */
-  std::vector<OrbitalPNInfo> OrbitalSpaceLJPN::OrbitalInfo() const
+  OrbitalPNList OrbitalSpaceLJPN::OrbitalInfo() const
   {
-    std::vector<OrbitalPNInfo> orbitals;
+    OrbitalPNList orbitals;
 
     for (int subspace_index=0; subspace_index<size(); ++subspace_index)
       {
         const SubspaceType& subspace = GetSubspace(subspace_index);
-        std::vector<OrbitalPNInfo> subspace_orbitals;
+        OrbitalPNList subspace_orbitals;
 
         // get orbitals for subspace and append to vector
         subspace_orbitals = subspace.OrbitalInfo();

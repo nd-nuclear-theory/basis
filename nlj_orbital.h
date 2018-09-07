@@ -50,7 +50,9 @@
   + 10/13/17 (pjf): Fix j0 type in OrbitalSectorsLJPN.
   + 10/15/17 (pjf): Copy Nmax sanity checks to OrbitalSubspaceLJPN and OrbitalSpaceLJPN.
   + 02/11/18 (pjf): Remove radial sector constraint mode.
-  + 09/07/18 (pjf): Insert space before header lines for MFDn compatibility.
+  + 09/07/18 (pjf):
+    - Insert space before header lines for MFDn compatibility.
+    - Add OrbitalPNList typedef.
 ****************************************************************/
 
 #ifndef BASIS_NLJ_ORBITAL_H_
@@ -109,6 +111,9 @@ namespace basis {
     friend std::istream& operator>>(std::istream &in, OrbitalPNInfo& orbital_info);
   };
 
+  // a simple list of orbitals
+  typedef std::vector<OrbitalPNInfo> OrbitalPNList;
+
   inline bool OrbitalSortCmpWeight(const OrbitalPNInfo& lhs, const OrbitalPNInfo& rhs) {
     std::tuple<OrbitalSpeciesPN,double,int,HalfInt,int>
       lhs_labels(lhs.orbital_species, lhs.weight, lhs.l, lhs.j, lhs.n);
@@ -119,7 +124,7 @@ namespace basis {
 
   // orbital I/O
 
-  std::vector<OrbitalPNInfo> ParseOrbitalPNStream(std::istream& is, bool standalone);
+  OrbitalPNList ParseOrbitalPNStream(std::istream& is, bool standalone);
   /// Read orbital definitions from a stream.
   ///
   /// Arguments:
@@ -129,13 +134,13 @@ namespace basis {
   ///     as for standalone orbital file
   ///
   /// Returns:
-  ///   (std::vector<OrbitalPNInfo>) : list of flattened orbital parameters
+  ///   (OrbitalPNList) : list of flattened orbital parameters
 
-  std::string OrbitalDefinitionStr(const std::vector<OrbitalPNInfo>& orbitals, bool standalone = false);
+  std::string OrbitalDefinitionStr(const OrbitalPNList& orbitals, bool standalone = false);
   /// Output orbital info as a string suitable for MFDn version 15.
   ///
   /// Arguments:
-  ///   orbitals (const std::vector<OrbitalPNInfo>&, input) :
+  ///   orbitals (const OrbitalPNList&, input) :
   ///     list of flattened orbital parameters
   ///   standalone (bool, optional): whether or not to include initial comments and version number
   ///     as for standalone orbital file
@@ -221,11 +226,11 @@ namespace basis {
       // truncation.
 
       OrbitalSubspacePN(OrbitalSpeciesPN orbital_species,
-        const std::vector<OrbitalPNInfo>& states);
+        const OrbitalPNList& states);
       // Set up indexing for a list of states.
 
       // produce flattened orbital information
-      std::vector<OrbitalPNInfo> OrbitalInfo() const;
+      OrbitalPNList OrbitalInfo() const;
 
       // accessors
 
@@ -330,11 +335,11 @@ namespace basis {
     // Set up indexing and weights in traditional oscillator Nmax
     // truncation.
 
-    OrbitalSpacePN(const std::vector<OrbitalPNInfo>& states);
+    OrbitalSpacePN(const OrbitalPNList& states);
     // Set up indexing for a list of states.
 
     // produce flattened orbital information
-    std::vector<OrbitalPNInfo> OrbitalInfo() const;
+    OrbitalPNList OrbitalInfo() const;
 
     // accessors
     double weight_max() const {return weight_max_;}
@@ -444,10 +449,10 @@ namespace basis {
       /// truncation.
 
       OrbitalSubspaceLJPN(OrbitalSpeciesPN orbital_species, int l, HalfInt j,
-        const std::vector<OrbitalPNInfo>& states);
+        const OrbitalPNList& states);
       /// Set up indexing for a list of states.
 
-      std::vector<OrbitalPNInfo> OrbitalInfo() const;
+      OrbitalPNList OrbitalInfo() const;
       /// produce flattened orbital information
 
       // accessors
@@ -545,7 +550,7 @@ namespace basis {
     // Set up indexing and weights in traditional oscillator Nmax
     // truncation.
 
-    OrbitalSpaceLJPN(const std::vector<OrbitalPNInfo>& states);
+    OrbitalSpaceLJPN(const OrbitalPNList& states);
     // Set up indexing for a list of states.
 
     // accessors
@@ -555,7 +560,7 @@ namespace basis {
       // only meaningful if oscillator scheme constructor used
 
     // produce flattened orbital information
-    std::vector<OrbitalPNInfo> OrbitalInfo() const;
+    OrbitalPNList OrbitalInfo() const;
 
     // diagnostic string
     std::string DebugStr() const;

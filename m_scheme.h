@@ -108,7 +108,7 @@ namespace basis {
       // Set up indexing from an orbital subspace.
 
       SingleParticleSubspacePN(
-        OrbitalSpeciesPN orbital_species, const std::vector<OrbitalPNInfo>& states
+        OrbitalSpeciesPN orbital_species, const OrbitalPNList& states
       ) : SingleParticleSubspacePN(OrbitalSubspacePN(orbital_species, states)) {}
       // Set up indexing from a list of orbitals.
 
@@ -209,7 +209,7 @@ namespace basis {
     explicit SingleParticleSpacePN(const OrbitalSpacePN& orbital_space);
     // Set up indexing for a list of states.
 
-    explicit SingleParticleSpacePN(const std::vector<OrbitalPNInfo>& states)
+    explicit SingleParticleSpacePN(const OrbitalPNList& states)
       : SingleParticleSpacePN(OrbitalSpacePN(states)) {}
     // Set up indexing for a list of states.
 
@@ -285,7 +285,7 @@ namespace basis {
   //     // purposes by STL container classes (e.g., std::vector::resize)
   //
   //     ManyBodySubspaceMPH(
-  //       OrbitalSpeciesPN orbital_species, const std::vector<OrbitalPNInfo>& states
+  //       OrbitalSpeciesPN orbital_species, const OrbitalPNList& states
   //     );
   //     // Set up indexing from a list of orbitals.
   //
@@ -394,7 +394,7 @@ namespace basis {
   //   // Set up indexing and weights in traditional oscillator Nmax
   //   // truncation.
   //
-  //   explicit ManyBodySpaceMPH(const std::vector<OrbitalPNInfo>& states);
+  //   explicit ManyBodySpaceMPH(const OrbitalPNList& states);
   //   // Set up indexing for a list of states.
   //
   //   explicit ManyBodySpaceMPH(const OrbitalSpacePN& orbital_space);
