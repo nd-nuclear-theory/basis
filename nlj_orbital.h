@@ -53,6 +53,9 @@
   + 09/07/18 (pjf):
     - Insert space before header lines for MFDn compatibility.
     - Add OrbitalPNList typedef.
+  + 02/01/19 (pjf):
+    - Mark OrbitalSpacePN and OrbitalSpaceLJPN constructors explicit as appropriate.
+    - Add constructor for converting from OrbitalSpacePN to OrbitalSpaceLJPN.
 ****************************************************************/
 
 #ifndef BASIS_NLJ_ORBITAL_H_
@@ -331,11 +334,11 @@ namespace basis {
     // default constructor -- provided since required for certain
     // purposes by STL container classes (e.g., std::vector::resize)
 
-    OrbitalSpacePN(int Nmax);
+    explicit OrbitalSpacePN(int Nmax);
     // Set up indexing and weights in traditional oscillator Nmax
     // truncation.
 
-    OrbitalSpacePN(const OrbitalPNList& states);
+    explicit OrbitalSpacePN(const OrbitalPNList& states);
     // Set up indexing for a list of states.
 
     // produce flattened orbital information
@@ -546,12 +549,17 @@ namespace basis {
     // default constructor -- provided since required for certain
     // purposes by STL container classes (e.g., std::vector::resize)
 
-    OrbitalSpaceLJPN(int Nmax);
+    explicit OrbitalSpaceLJPN(int Nmax);
     // Set up indexing and weights in traditional oscillator Nmax
     // truncation.
 
-    OrbitalSpaceLJPN(const OrbitalPNList& states);
+    explicit OrbitalSpaceLJPN(const OrbitalPNList& states);
     // Set up indexing for a list of states.
+
+    explicit OrbitalSpaceLJPN(const OrbitalSpacePN& space)
+      : OrbitalSpaceLJPN(space.OrbitalInfo())
+    {}
+    // Set up indexing from space divided into pn-sectors.
 
     // accessors
     double weight_max() const {return weight_max_;}
