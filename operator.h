@@ -33,6 +33,8 @@
       operator blocks instead of MatrixXd.
   + 08/11/17 (pjf): Emit warnings if deprecated member functions are used.
   + 09/07/18 (pjf): Fix incomplete templatization of SetOperatorToDiagonalConstant.
+  + 12/19/18 (pjf): Add operator arithmetic manipulation functions.
+  + 02/01/19 (pjf): Update comment on OperatorLinearCombination.
 
 ****************************************************************/
 
@@ -317,6 +319,181 @@ namespace basis {
           }
 
       }
+  }
+
+  ////////////////////////////////////////////////////////////////
+  // operator linear combination
+  ////////////////////////////////////////////////////////////////
+
+  // new features in C++14 allow us to manipulate the Eigen expressions
+  // to get better performance; if decltype(auto) is not available, use
+  // naive
+  #if __cpp_decltype_auto
+    template <typename tFloat>
+    decltype(auto) OperatorBlockLinearCombination(
+        const int& sector_index,
+        const tFloat& a,
+        const OperatorBlocks<tFloat>& matrices
+      )
+      // Base case for linear combination of block. Simply return
+      // constant times matrix.
+      //
+      // WARNING: NOT INTENDED TO BE CALLED BY USER CODE.
+      // See OperatorLinearCombination for further documentation.
+    {
+      return a*matrices[sector_index];
+    }
+
+    template <typename tFloat, typename... Args>
+    decltype(auto) OperatorBlockLinearCombination(
+        const int& sector_index,
+        const tFloat& a,
+        const OperatorBlocks<tFloat>& matrices,
+        Args... args
+      )
+      // Peel off one layer of inputs from parameter pack and
+      // add matrix to sum, recurse.
+      //
+      // WARNING: NOT INTENDED TO BE CALLED BY USER CODE.
+      // See OperatorLinearCombination for further documentation.
+    {
+      return a*matrices[sector_index] + OperatorBlockLinearCombination(sector_index, args...);
+    }
+  #else
+    template <typename tFloat>
+    OperatorBlock<tFloat> OperatorBlockLinearCombination(
+      const int& sector_index,
+      const tFloat& a,
+      const OperatorBlocks<tFloat>& matrices
+      )
+    // Base case for linear combination of block. Simply return
+    // constant times matrix.
+    //
+    // WARNING: NOT INTENDED TO BE CALLED BY USER CODE.
+    // See OperatorLinearCombination for further documentation.
+    {
+      return (a*matrices[sector_index]).eval();
+    }
+
+    template <typename tFloat, typename... Args>
+    OperatorBlock<tFloat> OperatorBlockLinearCombination(
+        const int& sector_index,
+        const tFloat& a,
+        const OperatorBlocks<tFloat>& matrices,
+        Args... args
+      )
+    // Peel off one layer of inputs from parameter pack and
+    // add matrix to sum, recurse.
+    //
+    // WARNING: NOT INTENDED TO BE CALLED BY USER CODE.
+    // See OperatorLinearCombination for further documentation.
+    {
+      return (a*matrices[sector_index]
+                + OperatorBlockLinearCombination(sector_index, args...)).eval();
+    }
+  #endif
+
+  template <typename tSectorsType, typename tFloat, typename... Args>
+  void OperatorLinearCombination(
+      const tSectorsType& sectors,
+      OperatorBlocks<tFloat>& output_matrices,
+      Args... args
+    )
+    // Set output operator as linear combination of input operators.
+    //
+    // The output matrices are set to $\sum_i a_i O_i$. Any number of
+    // input coefficients and operators matrices may be passed.
+    //
+    // This variadic template function uses parameter packs to allow
+    // any arbitrary number of terms in the linear combination. On
+    // modern compilers (with decltype(auto) defined) this allows
+    // us to delay evaluation of Eigen's template language and optimize
+    // matrix operations.
+    //
+    // Arguments:
+    //   sectors (input): the set of sectors on
+    //     which the operators are defined
+    //   output_matrices (output): matrices to hold operator
+    //   Args (input, parameter pack): pairs defined by
+    //     a (input): coefficient of operator term
+    //     matrices (input): matrices for operator term
+  {
+    for (int sector_index = 0; sector_index < sectors.size(); ++sector_index)
+    {
+      output_matrices[sector_index] = OperatorBlockLinearCombination(sector_index, args...);
+    }
+  }
+
+  ////////////////////////////////////////////////////////////////
+  // operator scalar multiply
+  ////////////////////////////////////////////////////////////////
+
+  template <typename tSectorsType, typename tFloat>
+  void ScalarMultiplyOperator(
+      const tSectorsType& sectors,
+      basis::OperatorBlocks<tFloat>& matrices,
+      const tFloat& c
+    )
+  // Multiply operator by a constant.
+  //
+  // All matrices are multiplied by a constant scalar value.
+  //
+  // Arguments:
+  //   sectors (input): the set of sectors on
+  //     which the operator is defined
+  //   matrices (input/output): matrices to be multiplied
+  //   c (input): the diagonal constant
+  {
+    OperatorLinearCombination(sectors, matrices, c, matrices);
+  }
+
+  ////////////////////////////////////////////////////////////////
+  // operator addition
+  ////////////////////////////////////////////////////////////////
+
+  template <typename tSectorsType, typename tFloat>
+  void AddOperators(
+      const tSectorsType& sectors,
+      const basis::OperatorBlocks<tFloat>& matrices_a,
+      const basis::OperatorBlocks<tFloat>& matrices_b,
+      basis::OperatorBlocks<tFloat>& output_matrices
+    )
+  // Add two operators and place into new output matrices.
+  //
+  // Loop over sectors, adding matrices from operators A and B and placing
+  // in output matrix. This assumes that both operators share common sectors.
+  //
+  // Arguments:
+  //   sectors (input): the set of sectors on
+  //     which the operator is defined
+  //   matrices_a (input): matrices for first operator
+  //   matrices_b (input): matrices for second operator
+  //   output_matrices (output): matrices for sum operator
+  {
+    OperatorLinearCombination(sectors, output_matrices, 1, matrices_a, 1, matrices_b);
+  }
+
+  ////////////////////////////////////////////////////////////////
+  // operator addition
+  ////////////////////////////////////////////////////////////////
+
+  template <typename tSectorsType, typename tFloat>
+  void SubtractOperators(
+      const tSectorsType& sectors,
+      const basis::OperatorBlocks<tFloat>& matrices_a,
+      const basis::OperatorBlocks<tFloat>& matrices_b,
+      basis::OperatorBlocks<tFloat>& output_matrices
+    )
+  // Subtract operator B from operator A and place into new output matrices.
+  //
+  // Arguments:
+  //   sectors (input): the set of sectors on
+  //     which the operator is defined
+  //   matrices_a (input): matrices for first operator
+  //   matrices_b (input): matrices for second operator
+  //   output_matrices (output): matrices for sum operator
+  {
+    OperatorLinearCombination(sectors, output_matrices, 1, matrices_a, -1, matrices_b);
   }
 
   ////////////////////////////////////////////////////////////////
