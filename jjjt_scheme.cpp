@@ -114,15 +114,15 @@ namespace basis {
         TwoBodyStateJJJT state(*this,state_index);
 
         os
-	  << " " << "index"
-	  << " " << std::setw(width) << state_index
-	  << " " << "N1 l1 j1 N2 l2 j2"
-	  << " " << std::setw(width) << state.N1()
-	  << " " << std::setw(width) << state.l1()
-	  << " " << std::setw(width) << state.j1()
-	  << " " << std::setw(width) << state.N2()
-	  << " " << std::setw(width) << state.l2()
-	  << " " << std::setw(width) << state.j2()
+          << " " << "index"
+          << " " << std::setw(width) << state_index
+          << " " << "N1 l1 j1 N2 l2 j2"
+          << " " << std::setw(width) << state.N1()
+          << " " << std::setw(width) << state.l1()
+          << " " << std::setw(width) << state.j1()
+          << " " << std::setw(width) << state.N2()
+          << " " << std::setw(width) << state.l2()
+          << " " << std::setw(width) << state.j2()
           << std::endl;
       }
 
@@ -139,21 +139,21 @@ namespace basis {
 
     // iterate over J
     for (int J=0; J<=N2max_+1; ++J)
-	// iterate over T
-	for (int T=0; T<=1; ++T)
-	    // iterate over g
-	    for (int g=0; g<=1; ++g)
-	      {
-		
-		// downshift Nmax to match parity of subspace
-		// required to pass label validity tests
-		// int Nmax_subspace = Nmax - (Nmax-g)%2;
-		    
-		TwoBodySubspaceJJJT subspace(J,T,g,truncation_rank,truncation_cutoff);
+        // iterate over T
+        for (int T=0; T<=1; ++T)
+            // iterate over g
+            for (int g=0; g<=1; ++g)
+              {
+                
+                // downshift Nmax to match parity of subspace
+                // required to pass label validity tests
+                // int Nmax_subspace = Nmax - (Nmax-g)%2;
+                    
+                TwoBodySubspaceJJJT subspace(J,T,g,truncation_rank,truncation_cutoff);
 
-		if (subspace.size()!=0)
-		  PushSubspace(subspace);
-	      }
+                if (subspace.size()!=0)
+                  PushSubspace(subspace);
+              }
   }
 
   std::string TwoBodySpaceJJJT::DebugStr() const
@@ -165,20 +165,20 @@ namespace basis {
 
     for (int subspace_index=0; subspace_index<size(); ++subspace_index)
       {
-	const SubspaceType& subspace = GetSubspace(subspace_index);
-	os
-	  << " " << "index"
-	  << " " << std::setw(width) << subspace_index
-	  << " " << "JTg"
-	  << " " << std::setw(width) << subspace.J() 
-	  << " " << std::setw(width) << subspace.T() 
-	  << " " << std::setw(width) << subspace.g()
-	  << " " << "N1max N2max"
-	  << " " << std::setw(width) << subspace.N1max()
-	  << " " << std::setw(width) << subspace.N2max()
-	  << " " << "dim"
-	  << " " << std::setw(width) << subspace.size()
-	  << " " << std::endl;
+        const SubspaceType& subspace = GetSubspace(subspace_index);
+        os
+          << " " << "index"
+          << " " << std::setw(width) << subspace_index
+          << " " << "JTg"
+          << " " << std::setw(width) << subspace.J() 
+          << " " << std::setw(width) << subspace.T() 
+          << " " << std::setw(width) << subspace.g()
+          << " " << "N1max N2max"
+          << " " << std::setw(width) << subspace.N1max()
+          << " " << std::setw(width) << subspace.N2max()
+          << " " << "dim"
+          << " " << std::setw(width) << subspace.size()
+          << " " << std::endl;
       }
 
     return os.str();
@@ -194,7 +194,7 @@ namespace basis {
   {
     for (int bra_subspace_index=0; bra_subspace_index<space.size(); ++bra_subspace_index)
       for (int ket_subspace_index=0; ket_subspace_index<space.size(); ++ket_subspace_index)
-	{
+        {
 
           // enforce canonical ordering
           if (
@@ -214,7 +214,7 @@ namespace basis {
           allowed &= ((ket_subspace.g()+g0+bra_subspace.g())%2==0);
 
           // push sector
-	  if (allowed)
+          if (allowed)
             PushSector(SectorType(bra_subspace_index,ket_subspace_index,bra_subspace,ket_subspace));
         }
   }
@@ -316,15 +316,15 @@ namespace basis {
         TwoBodyStateJJJTN state(*this,state_index);
 
         os
-	  << " " << "index"
-	  << " " << std::setw(width) << state_index
-	  << " " << "N1 l1 j1 N2 l2 j2"
-	  << " " << std::setw(width) << state.N1()
-	  << " " << std::setw(width) << state.l1()
-	  << " " << std::setw(width) << state.j1()
-	  << " " << std::setw(width) << state.N2()
-	  << " " << std::setw(width) << state.l2()
-	  << " " << std::setw(width) << state.j2()
+          << " " << "index"
+          << " " << std::setw(width) << state_index
+          << " " << "N1 l1 j1 N2 l2 j2"
+          << " " << std::setw(width) << state.N1()
+          << " " << std::setw(width) << state.l1()
+          << " " << std::setw(width) << state.j1()
+          << " " << std::setw(width) << state.N2()
+          << " " << std::setw(width) << state.l2()
+          << " " << std::setw(width) << state.j2()
           << std::endl;
       }
 
@@ -340,13 +340,13 @@ namespace basis {
 
     // iterate over J
     for (int J=0; J<=N2max_+1; ++J)
-	// iterate over T
-	for (int T=0; T<=1; ++T)
-	    // iterate over g
-	    for (int g=0; g<=1; ++g)
+        // iterate over T
+        for (int T=0; T<=1; ++T)
+            // iterate over g
+            for (int g=0; g<=1; ++g)
               // iterate over total oscillator quanta (MODIFICATION for subspacing by N)
               for (int N = g; N <= N2max_; N +=2)
-                {	
+                {        
                   TwoBodySubspaceJJJTN subspace(
                       J,T,g,N,truncation_rank,truncation_cutoff
                     );  // (MODIFICATION for subspacing by N)
@@ -365,22 +365,22 @@ namespace basis {
 
     for (int subspace_index=0; subspace_index<size(); ++subspace_index)
       {
-	const SubspaceType& subspace = GetSubspace(subspace_index);
-	os
-	  << " " << "index"
-	  << " " << std::setw(width) << subspace_index
-	  << " " << "JTg"
-	  << " " << std::setw(width) << subspace.J()
-	  << " " << std::setw(width) << subspace.T()
-	  << " " << std::setw(width) << subspace.g()
-	  << " " << "N"  // (MODIFICATION for subspacing by N)
-	  << " " << std::setw(width) << subspace.N()  // (MODIFICATION for subspacing by N)
-	  << " " << "N1max N2max"
-	  << " " << std::setw(width) << subspace.N1max()
-	  << " " << std::setw(width) << subspace.N2max()
-	  << " " << "dim"
-	  << " " << std::setw(width) << subspace.size()
-	  << " " << std::endl;
+        const SubspaceType& subspace = GetSubspace(subspace_index);
+        os
+          << " " << "index"
+          << " " << std::setw(width) << subspace_index
+          << " " << "JTg"
+          << " " << std::setw(width) << subspace.J()
+          << " " << std::setw(width) << subspace.T()
+          << " " << std::setw(width) << subspace.g()
+          << " " << "N"  // (MODIFICATION for subspacing by N)
+          << " " << std::setw(width) << subspace.N()  // (MODIFICATION for subspacing by N)
+          << " " << "N1max N2max"
+          << " " << std::setw(width) << subspace.N1max()
+          << " " << std::setw(width) << subspace.N2max()
+          << " " << "dim"
+          << " " << std::setw(width) << subspace.size()
+          << " " << std::endl;
       }
 
     return os.str();
@@ -396,7 +396,7 @@ namespace basis {
   {
     for (int bra_subspace_index=0; bra_subspace_index<space.size(); ++bra_subspace_index)
       for (int ket_subspace_index=0; ket_subspace_index<space.size(); ++ket_subspace_index)
-	{
+        {
 
           // enforce canonical ordering
           if (
@@ -416,7 +416,7 @@ namespace basis {
           allowed &= ((ket_subspace.g()+g0+bra_subspace.g())%2==0);
 
           // push sector
-	  if (allowed)
+          if (allowed)
             PushSector(SectorType(bra_subspace_index,ket_subspace_index,bra_subspace,ket_subspace));
         }
   }

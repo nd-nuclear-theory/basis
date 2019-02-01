@@ -287,12 +287,12 @@ namespace basis {
       {
 
         // extract hypersector
-	const typename tHypersectorsType::HypersectorType& hypersector = hypersectors.GetHypersector(hypersector_index);
+        const typename tHypersectorsType::HypersectorType& hypersector = hypersectors.GetHypersector(hypersector_index);
 
         // extract hypersector subspaces
-	const typename tHypersectorsType::SubspaceType& bra_subspace = hypersector.bra_subspace();
-	const typename tHypersectorsType::SubspaceType& ket_subspace = hypersector.ket_subspace();
-	const typename tHypersectorsType::OperatorSubspaceType& operator_subspace = hypersector.operator_subspace();
+        const typename tHypersectorsType::SubspaceType& bra_subspace = hypersector.bra_subspace();
+        const typename tHypersectorsType::SubspaceType& ket_subspace = hypersector.ket_subspace();
+        const typename tHypersectorsType::OperatorSubspaceType& operator_subspace = hypersector.operator_subspace();
 
         // generate matrices for hypersector (by operator)
         matrices[hypersector_index].resize(operator_subspace.size());

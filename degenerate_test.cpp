@@ -168,7 +168,7 @@ namespace basis {
     // set up indexing
 
     // manual version w/o lookup
-    //	  dimension_ = (Nmax() - g()) / 2 + 1;
+    //          dimension_ = (Nmax() - g()) / 2 + 1;
 
     // iterate over total oscillator quanta
     for (int N = L; N <= Nmax; N +=2)
@@ -223,14 +223,14 @@ namespace basis {
 
         os
           << "  "  // extra indent
-	  << " " << "state_index"
-	  << " " << state_index
-	  << " " << "labels"
-	  << " " << state.LabelStr()
-	  << " " << "degeneracy"
-	  << " " << state.degeneracy()
-	  << " " << "offset"
-	  << " " << state.offset()
+          << " " << "state_index"
+          << " " << state_index
+          << " " << "labels"
+          << " " << state.LabelStr()
+          << " " << "degeneracy"
+          << " " << state.degeneracy()
+          << " " << "offset"
+          << " " << state.offset()
           << std::endl;
       }
 
@@ -267,27 +267,27 @@ namespace basis {
     for (int L=0; L<=Nmax; ++L)
       {
         // set g
-	int g = L%2;
+        int g = L%2;
 
-	// iterate over S
-	for (int S=0; S<=1; ++S)
-	  {
+        // iterate over S
+        for (int S=0; S<=1; ++S)
+          {
             // set T
-	    int T = (L+S+1)%2;
+            int T = (L+S+1)%2;
 
-	    // iterate over J
+            // iterate over J
             int J_limit = std::min(L+S,Jmax);
-	    for (int J=abs(L-S); J<=J_limit; ++J)
-	      {
-		// downshift Nmax to match parity of subspace
-		// required to pass label validity tests
-		// int Nmax_subspace = Nmax - (Nmax-g)%2;
+            for (int J=abs(L-S); J<=J_limit; ++J)
+              {
+                // downshift Nmax to match parity of subspace
+                // required to pass label validity tests
+                // int Nmax_subspace = Nmax - (Nmax-g)%2;
 
-		RelativeDegenerateSubspaceLSJT subspace(L,S,J,T,g,Nmax);
-		assert(subspace.size()!=0);
-		PushSubspace(subspace);
-	      }
-	  }
+                RelativeDegenerateSubspaceLSJT subspace(L,S,J,T,g,Nmax);
+                assert(subspace.size()!=0);
+                PushSubspace(subspace);
+              }
+          }
       }
   }
 
@@ -297,17 +297,17 @@ namespace basis {
 
     for (int subspace_index=0; subspace_index<size(); ++subspace_index)
       {
-	const SubspaceType& subspace = GetSubspace(subspace_index);
-	os
-	  << " " << "subspace_index"
-	  << " " << subspace_index
-	  << " " << "labels"
-	  << " " << subspace.LabelStr()
-	  << " " << "size"
-	  << " " << subspace.size()
-	  << " " << "full_dimension"
-	  << " " << subspace.full_dimension()
-	  << std::endl;
+        const SubspaceType& subspace = GetSubspace(subspace_index);
+        os
+          << " " << "subspace_index"
+          << " " << subspace_index
+          << " " << "labels"
+          << " " << subspace.LabelStr()
+          << " " << "size"
+          << " " << subspace.size()
+          << " " << "full_dimension"
+          << " " << subspace.full_dimension()
+          << std::endl;
         if (show_subspaces)
           os << subspace.DebugStr();
       }

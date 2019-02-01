@@ -192,9 +192,9 @@ namespace basis {
       {
 
         // extract sector
-	const typename TwoBodySectorsJJJT::SectorType& sector = sectors.GetSector(sector_index);
-	const typename TwoBodySectorsJJJT::SubspaceType& bra_subspace = sector.bra_subspace();
-	const typename TwoBodySectorsJJJT::SubspaceType& ket_subspace = sector.ket_subspace();
+        const typename TwoBodySectorsJJJT::SectorType& sector = sectors.GetSector(sector_index);
+        const typename TwoBodySectorsJJJT::SubspaceType& bra_subspace = sector.bra_subspace();
+        const typename TwoBodySectorsJJJT::SubspaceType& ket_subspace = sector.ket_subspace();
 
         // verify that sector is canonical
         //
@@ -203,10 +203,10 @@ namespace basis {
         // sectors are stored.
         assert(sector.bra_subspace_index()<=sector.ket_subspace_index());
 
-	// iterate over matrix elements
-	for (int bra_index=0; bra_index<bra_subspace.size(); ++bra_index)
-	  for (int ket_index=0; ket_index<ket_subspace.size(); ++ket_index)
-	    {
+        // iterate over matrix elements
+        for (int bra_index=0; bra_index<bra_subspace.size(); ++bra_index)
+          for (int ket_index=0; ket_index<ket_subspace.size(); ++ket_index)
+            {
 
               // diagonal sector: restrict to upper triangle
               if (sector.IsDiagonal())
@@ -214,8 +214,8 @@ namespace basis {
                   continue;
 
               // define states
-	      const basis::TwoBodyStateJJJT bra(bra_subspace,bra_index);
-	      const basis::TwoBodyStateJJJT ket(ket_subspace,ket_index);
+              const basis::TwoBodyStateJJJT bra(bra_subspace,bra_index);
+              const basis::TwoBodyStateJJJT ket(ket_subspace,ket_index);
 
               // determine matrix element normalization factor
               double conversion_factor = 1.;
@@ -241,33 +241,33 @@ namespace basis {
               const int width = 3;
               const int precision = 8;  // for approximately single precision output
               os << std::setprecision(precision);
-	      os 
-		<< " " << std::setw(width) << T0
-		<< " " << "  "
-		<< " " << std::setw(width) << bra.N1()
-		<< " " << std::setw(width) << bra.l1()
-		<< " " << std::showpoint << std::fixed << std::setprecision(1) << std::setw(4) << float(bra.j1())
-		<< " " << std::setw(width) << bra.N2()
-		<< " " << std::setw(width) << bra.l2()
-		<< " " << std::showpoint << std::fixed << std::setprecision(1) << std::setw(4) << float(bra.j2())
-		<< " " << std::setw(width) << bra.J() 
-		<< " " << std::setw(width) << bra.T() 
-		<< " " << std::setw(width) << bra.g()
-		<< " " << "    "
-		<< " " << std::setw(width) << ket.N1()
-		<< " " << std::setw(width) << ket.l1()
-		<< " " << std::showpoint << std::fixed << std::setprecision(1) << std::setw(4) << float(ket.j1())
-		<< " " << std::setw(width) << ket.N2()
-		<< " " << std::setw(width) << ket.l2()
-		<< " " << std::showpoint << std::fixed << std::setprecision(1) << std::setw(4) << float(ket.j2())
-		<< " " << std::setw(width) << ket.J() 
-		<< " " << std::setw(width) << ket.T() 
-		<< " " << std::setw(width) << ket.g()
-		<< " " << "    "
-		<< " " << std::showpoint << std::scientific << std::setprecision(precision) << matrix_element
-		<< std::endl;
-	    
-	    }
+              os 
+                << " " << std::setw(width) << T0
+                << " " << "  "
+                << " " << std::setw(width) << bra.N1()
+                << " " << std::setw(width) << bra.l1()
+                << " " << std::showpoint << std::fixed << std::setprecision(1) << std::setw(4) << float(bra.j1())
+                << " " << std::setw(width) << bra.N2()
+                << " " << std::setw(width) << bra.l2()
+                << " " << std::showpoint << std::fixed << std::setprecision(1) << std::setw(4) << float(bra.j2())
+                << " " << std::setw(width) << bra.J() 
+                << " " << std::setw(width) << bra.T() 
+                << " " << std::setw(width) << bra.g()
+                << " " << "    "
+                << " " << std::setw(width) << ket.N1()
+                << " " << std::setw(width) << ket.l1()
+                << " " << std::showpoint << std::fixed << std::setprecision(1) << std::setw(4) << float(ket.j1())
+                << " " << std::setw(width) << ket.N2()
+                << " " << std::setw(width) << ket.l2()
+                << " " << std::showpoint << std::fixed << std::setprecision(1) << std::setw(4) << float(ket.j2())
+                << " " << std::setw(width) << ket.J() 
+                << " " << std::setw(width) << ket.T() 
+                << " " << std::setw(width) << ket.g()
+                << " " << "    "
+                << " " << std::showpoint << std::scientific << std::setprecision(precision) << matrix_element
+                << std::endl;
+            
+            }
 
       }
   }
