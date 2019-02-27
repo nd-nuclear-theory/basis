@@ -8,8 +8,9 @@
   Mark A. Caprio
   University of Notre Dame
 
-  + 7/1/17 (mac): Extracted from jjjpn_scheme.h.
+  + 07/01/17 (mac): Extracted from jjjpn_scheme.h.
   + 10/19/17 (mac): Define OperatorTypePN.
+  + 02/27/19 (pjf): Add reverse lookups for OrbitalSpeciesPN.
 
 ****************************************************************/
 
@@ -17,6 +18,8 @@
 #define BASIS_PROTON_NEUTRON_H_
 
 #include <array>
+#include <string>
+#include <unordered_map>
 
 #include "am/halfint.h"
 
@@ -31,7 +34,7 @@ namespace basis {
   // Note: Follows same sequence as MFDn, but MFDn uses 1-based
   // numbering.
 
-  enum class OrbitalSpeciesPN {kP=0,kN=1};
+  enum class OrbitalSpeciesPN : int {kP=0,kN=1};
 
   // notational definitions for orbital species
   //
@@ -47,6 +50,17 @@ namespace basis {
   extern const std::array<int, 2> kOrbitalSpeciesPNCodeDecimal;
   extern const std::array<const char*, 2> kOrbitalSpeciesPNCodeChar;
 
+  // notational reverse definitions for orbital species
+  //
+  // Example:
+  //   std::string orbital_species_code = "p";
+  //   ...
+  //   os << basis::kTzOrbitalSpeciesPNCode[orbital_species_code];
+  //
+  // Note: Tz uses "up quark is positive" convention.
+  extern const std::unordered_map<HalfInt, OrbitalSpeciesPN> kTzCodeOrbitalSpeciesPN;
+  extern const std::unordered_map<int, OrbitalSpeciesPN> kDecimalCodeOrbitalSpeciesPN;
+  extern const std::unordered_map<std::string, OrbitalSpeciesPN> kCharCodeOrbitalSpeciesPN;
 
   ////////////////////////////////////////////////////////////////
   // two-body label types and coding schemes

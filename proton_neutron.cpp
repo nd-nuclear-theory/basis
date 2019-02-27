@@ -19,6 +19,19 @@ namespace basis {
   const std::array<int,2> kOrbitalSpeciesPNCodeDecimal({1,2});
   const std::array<const char*,2> kOrbitalSpeciesPNCodeChar({"p","n"});
 
+  const std::unordered_map<HalfInt, OrbitalSpeciesPN> kTzCodeOrbitalSpeciesPN({
+      {HalfInt(+1,2),OrbitalSpeciesPN::kP},
+      {HalfInt(-1,2),OrbitalSpeciesPN::kN}
+    });
+  const std::unordered_map<int, OrbitalSpeciesPN> kDecimalCodeOrbitalSpeciesPN({
+      {1,OrbitalSpeciesPN::kP},
+      {2,OrbitalSpeciesPN::kN}
+    });
+  const std::unordered_map<std::string, OrbitalSpeciesPN> kCharCodeOrbitalSpeciesPN({
+    {"p",OrbitalSpeciesPN::kP},
+    {"n",OrbitalSpeciesPN::kN}
+    });
+
   ////////////////////////////////////////////////////////////////
   // two-body states in jjJpn scheme with general orbitals
   ////////////////////////////////////////////////////////////////
