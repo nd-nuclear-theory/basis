@@ -37,6 +37,7 @@
   + 7/1/17 (mac): Extract generic proton-neutron definitions to
     proton_neutron.
   + 1/22/18 (mac): Enable nonzero Tz0 in sector enumeration.
+  + 02/12/19 (pjf): Allow space ordering {pp,pn,nn} for h2v15200.
 ****************************************************************/
 
 #ifndef BASIS_JJJPN_SCHEME_H_
@@ -209,6 +210,7 @@ namespace basis {
       TwoBodySpeciesPN two_body_species() const {return std::get<0>(labels_);}
       int J() const {return std::get<1>(labels_);}
       int g() const {return std::get<2>(labels_);}
+      int Tz() const {return basis::kTwoBodySpeciesPNCodeTz[int(two_body_species())];}
       const WeightMax& weight_max() const {return weight_max_;}
       const OrbitalSubspacePN& orbital_subspace1() const {return *orbital_subspace1_ptr_;}
       const OrbitalSubspacePN& orbital_subspace2() const {return *orbital_subspace2_ptr_;}
@@ -267,6 +269,12 @@ namespace basis {
 
   };
 
+  // subspace ordering in space
+  //
+  // kPN -> {pp,nn,pn}
+  // kTz -> {pp,pn,nn}
+  enum class TwoBodySpaceJJJPNOrdering : int { kPN=0, kTz=1 };
+
   // space
 
   class TwoBodySpaceJJJPN
@@ -283,13 +291,15 @@ namespace basis {
 
     TwoBodySpaceJJJPN(
           const OrbitalSpacePN& orbital_space,
-          const WeightMax& weight_max
+          const WeightMax& weight_max,
+          basis::TwoBodySpaceJJJPNOrdering ordering = TwoBodySpaceJJJPNOrdering::kPN
       );
     // Enumerate subspaces.
 
     // accessors
     // const OrbitalSpacePN& orbital_space() {return orbital_space_;}
     const WeightMax& weight_max() const {return weight_max_;}
+    const TwoBodySpaceJJJPNOrdering& space_ordering() const {return space_ordering_;}
 
     // diagnostic string
     std::string DebugStr() const;
@@ -305,6 +315,7 @@ namespace basis {
 
     // truncation
     WeightMax weight_max_;
+    TwoBodySpaceJJJPNOrdering space_ordering_;
 
   };
 

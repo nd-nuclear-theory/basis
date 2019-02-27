@@ -184,9 +184,10 @@ namespace basis {
 
   TwoBodySpaceJJJPN::TwoBodySpaceJJJPN(
       const OrbitalSpacePN& orbital_space,
-      const WeightMax& weight_max
+      const WeightMax& weight_max,
+      basis::TwoBodySpaceJJJPNOrdering ordering
     )
-    : weight_max_(weight_max) // orbital_space_(orbital_space)
+    : weight_max_(weight_max), space_ordering_(ordering) // orbital_space_(orbital_space)
   {
 
     // find putative Jmax from maximal j among orbitals
@@ -206,7 +207,12 @@ namespace basis {
     int Jmax = TwiceValue(jmax);
 
     // iterate over two-body species
-    for (TwoBodySpeciesPN two_body_species : {TwoBodySpeciesPN::kPP,TwoBodySpeciesPN::kNN,TwoBodySpeciesPN::kPN})
+    std::initializer_list<basis::TwoBodySpeciesPN> species_list;
+    if (space_ordering_==basis::TwoBodySpaceJJJPNOrdering::kPN)
+      species_list = {TwoBodySpeciesPN::kPP,TwoBodySpeciesPN::kNN,TwoBodySpeciesPN::kPN};
+    else  // if (space_ordering_==basis::TwoBodySpaceJJJPNOrdering::kTz)
+      species_list = {TwoBodySpeciesPN::kPP,TwoBodySpeciesPN::kPN,TwoBodySpeciesPN::kNN};
+    for (TwoBodySpeciesPN two_body_species : species_list)
       // iterate over J
       for (int J=0; J<=Jmax; ++J)
       {
@@ -261,11 +267,10 @@ namespace basis {
     : J0_(J0), g0_(g0), Tz0_(Tz0)
   {
 
-    // enforce canonical for Tz0=0 and non-cannonical for nonzero Tz0 until sure we might want otherwise...
-    assert(
-        ((sector_direction == basis::SectorDirection::kCanonical)&&(Tz0_==0))
-        || ((sector_direction == basis::SectorDirection::kBoth)&&(Tz0_!=0))
-      );
+    // enforce canonical
+    assert(sector_direction == basis::SectorDirection::kCanonical);
+    // enforce nonzero-Tz0 only if {pp,pn,nn} ordering
+    assert((Tz0_ == 0) || (space.space_ordering() == basis::TwoBodySpaceJJJPNOrdering::kTz));
 
     for (int bra_subspace_index=0; bra_subspace_index<space.size(); ++bra_subspace_index)
       for (int ket_subspace_index=0; ket_subspace_index<space.size(); ++ket_subspace_index)
@@ -283,8 +288,8 @@ namespace basis {
           const SubspaceType& ket_subspace = space.GetSubspace(ket_subspace_index);
 
           // enforce particle conservation
-          int bra_Tz = basis::kTwoBodySpeciesPNCodeTz[int(bra_subspace.two_body_species())];
-          int ket_Tz = basis::kTwoBodySpeciesPNCodeTz[int(ket_subspace.two_body_species())];
+          int bra_Tz = bra_subspace.Tz();
+          int ket_Tz = ket_subspace.Tz();
           if (!(bra_Tz == Tz0_ + ket_Tz))
               continue;
 
