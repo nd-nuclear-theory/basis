@@ -56,6 +56,7 @@
   + 02/01/19 (pjf):
     - Mark OrbitalSpacePN and OrbitalSpaceLJPN constructors explicit as appropriate.
     - Add constructor for converting from OrbitalSpacePN to OrbitalSpaceLJPN.
+  + 02/19/19 (pjf): Add v15200 orbital format.
 ****************************************************************/
 
 #ifndef BASIS_NLJ_ORBITAL_H_
@@ -110,8 +111,8 @@ namespace basis {
       return equiv;
     }
 
-    friend std::ostream& operator<<(std::ostream &out, const OrbitalPNInfo& orbital_info);
-    friend std::istream& operator>>(std::istream &in, OrbitalPNInfo& orbital_info);
+    // friend std::ostream& operator<<(std::ostream &out, const OrbitalPNInfo& orbital_info);
+    // friend std::istream& operator>>(std::istream &in, OrbitalPNInfo& orbital_info);
   };
 
   // a simple list of orbitals
@@ -127,7 +128,14 @@ namespace basis {
 
   // orbital I/O
 
-  OrbitalPNList ParseOrbitalPNStream(std::istream& is, bool standalone);
+  // orbital file version codes
+  enum class MFDnOrbitalFormat : int {kVersion15099=15099, kVersion15200=15200};
+
+  OrbitalPNList ParseOrbitalPNStream(
+      std::istream& is,
+      bool standalone,
+      MFDnOrbitalFormat format = MFDnOrbitalFormat::kVersion15099
+    );
   /// Read orbital definitions from a stream.
   ///
   /// Arguments:
@@ -135,11 +143,17 @@ namespace basis {
   ///     input stream containing MFDn-formatted orbital definitions
   ///   standalone (bool): whether or not to expect initial comments and version number
   ///     as for standalone orbital file
+  ///   format (MFDnOrbitalFormat, optional): orbital list format
+  ///     - (ignored/deduced for standalone)
   ///
   /// Returns:
   ///   (OrbitalPNList) : list of flattened orbital parameters
 
-  std::string OrbitalDefinitionStr(const OrbitalPNList& orbitals, bool standalone = false);
+  std::string OrbitalDefinitionStr(
+      const OrbitalPNList& orbitals,
+      bool standalone = false,
+      MFDnOrbitalFormat format = MFDnOrbitalFormat::kVersion15099
+    );
   /// Output orbital info as a string suitable for MFDn version 15.
   ///
   /// Arguments:
@@ -147,6 +161,7 @@ namespace basis {
   ///     list of flattened orbital parameters
   ///   standalone (bool, optional): whether or not to include initial comments and version number
   ///     as for standalone orbital file
+  ///   format (MFDnOrbitalFormat, optional): orbital list format
   ///
   /// Returns:
   ///   (std::string) output stream containing MFDn-formatted orbital definitions

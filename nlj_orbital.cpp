@@ -20,53 +20,9 @@
 
 namespace basis {
 
-  // orbital file version codes
-  enum class MFDnOrbitalFormat : int {kVersion15099=15099};
-
-
   ////////////////////////////////////////////////////////////////
   // single-particle definition file parsing
   ////////////////////////////////////////////////////////////////
-
-  /**
-   * Output orbital info as MFDn line. @note Does not include index.
-   */
-  std::ostream& operator<<(std::ostream &out, const OrbitalPNInfo& orbital_info)
-  {
-    const int width = 3;
-    const int precision = 8;
-
-    out << " " << std::setw(width) << orbital_info.n
-        << " " << std::setw(width) << orbital_info.l
-        << " " << std::setw(width) << TwiceValue(orbital_info.j)
-        << " " << std::setw(width) << int(orbital_info.orbital_species)+1  // 1-based
-        << " " << std::fixed << std::setw(width+1+precision)
-        << std::setprecision(precision) << orbital_info.weight;
-
-    return out;
-  }
-
-  /**
-   * Input orbital info from MFDn line. @note Does not expect index.
-   */
-  std::istream& operator>>(std::istream &in, OrbitalPNInfo& orbital_info) {
-    int n, l, twice_j, orbital_species_raw;
-    double weight;
-    in >> n >> l >> twice_j >> orbital_species_raw >> weight;
-    if (in.fail()) return in;
-
-    HalfInt j(twice_j, 2);
-    OrbitalSpeciesPN orbital_species =
-      static_cast<OrbitalSpeciesPN>(orbital_species_raw-1);
-
-    orbital_info.n = n;
-    orbital_info.l = l;
-    orbital_info.j = j;
-    orbital_info.orbital_species = orbital_species;
-    orbital_info.weight = weight;
-
-    return in;
-  }
 
   /**
    * Read orbital definitions from a stream.
@@ -74,7 +30,11 @@ namespace basis {
    * @param[in] is input stream containing MFDn-formatted orbital definitions
    * @return list of flattened orbital parameters
    */
-  OrbitalPNList ParseOrbitalPNStream(std::istream& is, bool standalone)
+  OrbitalPNList ParseOrbitalPNStream(
+      std::istream& is,
+      bool standalone,
+      MFDnOrbitalFormat format
+    )
   {
 
     // set up line counter for use in error messages
@@ -85,21 +45,21 @@ namespace basis {
     int num_orbitals_p, num_orbitals_n;
     if (standalone)
       {
-        // line 1: version -- but first gobble any comment lines
-        while (std::getline(is,line), line[0]=='#') {++line_count;};
+        // line 1: version
         {
-          ++line_count;
+          mcutils::GetLine(is,line,line_count);
           std::istringstream line_stream(line);
           int version;
           line_stream >> version;
           mcutils::ParsingCheck(line_stream,line_count,line);
-          assert(version==int(MFDnOrbitalFormat::kVersion15099));
+          format = static_cast<MFDnOrbitalFormat>(version);
+          assert((format==MFDnOrbitalFormat::kVersion15099)
+                 ||(format==MFDnOrbitalFormat::kVersion15200));
         }
 
         // line 2: number of p,n orbitals
         {
-          ++line_count;
-          std::getline(is,line);
+          mcutils::GetLine(is,line,line_count);
           std::istringstream line_stream(line);
           line_stream >> num_orbitals_p >> num_orbitals_n;
           mcutils::ParsingCheck(line_stream,line_count,line);
@@ -109,20 +69,30 @@ namespace basis {
     // lines 3+: orbital definitions
     OrbitalPNList states;
     int num_orbitals_p_extracted=0, num_orbitals_n_extracted=0;
-    while ( getline(is,line))
+    while (mcutils::GetLine(is,line,line_count))
       {
-        // count line
-        ++line_count;
-
         // set up for parsing
         std::istringstream line_stream(line);
-        if (line.size() == 0)
-          continue;
 
         int index;
-        OrbitalPNInfo state;
-        line_stream >> index >> state;
+        int n, l, twice_j;
+        basis::OrbitalSpeciesPN species;
+        double weight;
+        if (format==MFDnOrbitalFormat::kVersion15099)
+          {
+            int species_code;
+            line_stream >> index >> n >> l >> twice_j >> species_code >> weight;
+            species = kDecimalCodeOrbitalSpeciesPN.at(species_code);
+          }
+        else if (format==MFDnOrbitalFormat::kVersion15200)
+          {
+            int twice_tz;
+            line_stream >> index >> n >> l >> twice_j >> twice_tz >> weight;
+            species = kTzCodeOrbitalSpeciesPN.at(HalfInt(twice_tz,2));
+          }
         mcutils::ParsingCheck(line_stream,line_count,line);
+
+        OrbitalPNInfo state(species, n, l, HalfInt(twice_j, 2), weight);
         // count orbitals by type
         num_orbitals_p_extracted +=
           static_cast<int>(state.orbital_species == OrbitalSpeciesPN::kP);
@@ -147,8 +117,15 @@ namespace basis {
    * @param[in] orbitals list of flattened orbital parameters
    * @return output stream containing MFDn-formatted orbital definitions
    */
-  std::string OrbitalDefinitionStr(const OrbitalPNList& orbitals, bool standalone)
+  std::string OrbitalDefinitionStr(
+      const OrbitalPNList& orbitals,
+      bool standalone,
+      MFDnOrbitalFormat format
+    )
   {
+    // sanity check
+    assert((format==MFDnOrbitalFormat::kVersion15099)
+           ||(format==MFDnOrbitalFormat::kVersion15200));
 
     std::ostringstream header;
     std::ostringstream body;
@@ -161,16 +138,37 @@ namespace basis {
     int p_index = 0;
     int n_index = 0;
     int output_index = 0;
-    for (const OrbitalPNInfo& state: orbitals)
+    for (const OrbitalPNInfo& orbital_info: orbitals)
+      // iterate over states
       {
-        // iterate over states
-        if (state.orbital_species == OrbitalSpeciesPN::kP) {
-          output_index = ++p_index;
-        } else if (state.orbital_species == OrbitalSpeciesPN::kN) {
-          output_index = ++n_index;
-        }
-
-        body << " " << std::setw(width) << output_index << state << std::endl;
+        if (format==MFDnOrbitalFormat::kVersion15099)
+          {
+            if (orbital_info.orbital_species == OrbitalSpeciesPN::kP) {
+              output_index = ++p_index;
+            } else if (orbital_info.orbital_species == OrbitalSpeciesPN::kN) {
+              output_index = ++n_index;
+            }
+            body << " " << std::setw(width) << output_index
+                 << " " << std::setw(width) << orbital_info.n
+                 << " " << std::setw(width) << orbital_info.l
+                 << " " << std::setw(width) << TwiceValue(orbital_info.j)
+                 << " " << std::setw(width) << kOrbitalSpeciesPNCodeDecimal[static_cast<int>(orbital_info.orbital_species)]  // 1-based
+                 << " " << std::fixed << std::setw(width+1+precision)
+                 << std::setprecision(precision) << orbital_info.weight
+                 << std::endl;
+          }
+        else if (format==MFDnOrbitalFormat::kVersion15200)
+          {
+            ++output_index;
+            body << " " << std::setw(width) << output_index
+                 << " " << std::setw(width) << orbital_info.n
+                 << " " << std::setw(width) << orbital_info.l
+                 << " " << std::setw(width) << TwiceValue(orbital_info.j)
+                 << " " << std::setw(width) << kOrbitalSpeciesPNCodeTz[static_cast<int>(orbital_info.orbital_species)].TwiceValue()
+                 << " " << std::fixed << std::setw(width+1+precision)
+                 << std::setprecision(precision) << orbital_info.weight
+                 << std::endl;
+          }
       }
 
     // construct header
@@ -187,7 +185,7 @@ namespace basis {
         header << "#   index n l 2*j species weight" << std::endl;
 
         // header line 1: version
-        int version = int(MFDnOrbitalFormat::kVersion15099);
+        int version = static_cast<int>(format);
         header << " " << version << std::endl;
 
         // header line 2: dimensions
