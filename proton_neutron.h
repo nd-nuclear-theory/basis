@@ -59,6 +59,7 @@ namespace basis {
   //
   // Note: Tz uses "up quark is positive" convention.
   extern const std::unordered_map<HalfInt, OrbitalSpeciesPN> kTzCodeOrbitalSpeciesPN;
+  extern const std::unordered_map<int, OrbitalSpeciesPN> kIndexCodeOrbitalSpeciesPN;
   extern const std::unordered_map<int, OrbitalSpeciesPN> kDecimalCodeOrbitalSpeciesPN;
   extern const std::unordered_map<std::string, OrbitalSpeciesPN> kCharCodeOrbitalSpeciesPN;
 

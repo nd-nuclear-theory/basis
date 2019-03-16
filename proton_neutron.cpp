@@ -23,6 +23,10 @@ namespace basis {
       {HalfInt(+1,2),OrbitalSpeciesPN::kP},
       {HalfInt(-1,2),OrbitalSpeciesPN::kN}
     });
+  const std::unordered_map<int, OrbitalSpeciesPN> kIndexCodeOrbitalSpeciesPN({
+      {0,OrbitalSpeciesPN::kP},
+      {1,OrbitalSpeciesPN::kN}
+    });
   const std::unordered_map<int, OrbitalSpeciesPN> kDecimalCodeOrbitalSpeciesPN({
       {1,OrbitalSpeciesPN::kP},
       {2,OrbitalSpeciesPN::kN}
