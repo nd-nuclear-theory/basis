@@ -57,6 +57,8 @@
     - Mark OrbitalSpacePN and OrbitalSpaceLJPN constructors explicit as appropriate.
     - Add constructor for converting from OrbitalSpacePN to OrbitalSpaceLJPN.
   + 02/19/19 (pjf): Add v15200 orbital format.
+  + 04/03/19 (pjf): Define type conversion between OrbitalPNInfo and
+    FullOrbitalLabels.
 ****************************************************************/
 
 #ifndef BASIS_NLJ_ORBITAL_H_
@@ -99,8 +101,12 @@ namespace basis {
     OrbitalPNInfo(OrbitalSpeciesPN os, int n, int l, HalfInt j, double weight)
       : orbital_species(os), n(n), l(l), j(j), weight(weight) {};
 
-    inline FullOrbitalLabels Key() const {
+    inline operator FullOrbitalLabels() const
+    {
       return FullOrbitalLabels(orbital_species, n, l, j);
+    }
+    inline FullOrbitalLabels Key() const {
+      return static_cast<FullOrbitalLabels>(*this);
     }
     static constexpr double kWeightTolerance = 1e-8;
     inline bool operator==(const OrbitalPNInfo& rhs) const
