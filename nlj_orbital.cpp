@@ -78,19 +78,16 @@ namespace basis {
         int n, l, twice_j;
         basis::OrbitalSpeciesPN species;
         double weight;
-
-        if (standalone)
-          line_stream >> index;
         if (format==MFDnOrbitalFormat::kVersion15099)
           {
             int species_code;
-            line_stream >> n >> l >> twice_j >> species_code >> weight;
+            line_stream >> index >> n >> l >> twice_j >> species_code >> weight;
             species = kDecimalCodeOrbitalSpeciesPN.at(species_code);
           }
         else if (format==MFDnOrbitalFormat::kVersion15200)
           {
             int twice_tz;
-            line_stream >> n >> l >> twice_j >> twice_tz >> weight;
+            line_stream >> index >> n >> l >> twice_j >> twice_tz >> weight;
             species = kTzCodeOrbitalSpeciesPN.at(HalfInt(twice_tz,2));
           }
         mcutils::ParsingCheck(line_stream,line_count,line);
@@ -151,9 +148,8 @@ namespace basis {
             } else if (orbital_info.orbital_species == OrbitalSpeciesPN::kN) {
               output_index = ++n_index;
             }
-            if (standalone)
-              body << " " << std::setw(width) << output_index;
-            body << " " << std::setw(width) << orbital_info.n
+            body << " " << std::setw(width) << output_index
+                 << " " << std::setw(width) << orbital_info.n
                  << " " << std::setw(width) << orbital_info.l
                  << " " << std::setw(width) << TwiceValue(orbital_info.j)
                  << " " << std::setw(width) << kOrbitalSpeciesPNCodeDecimal[static_cast<int>(orbital_info.orbital_species)]  // 1-based
@@ -164,9 +160,8 @@ namespace basis {
         else if (format==MFDnOrbitalFormat::kVersion15200)
           {
             ++output_index;
-            if (standalone)
-              body << " " << std::setw(width) << output_index;
-            body << " " << std::setw(width) << orbital_info.n
+            body << " " << std::setw(width) << output_index
+                 << " " << std::setw(width) << orbital_info.n
                  << " " << std::setw(width) << orbital_info.l
                  << " " << std::setw(width) << TwiceValue(orbital_info.j)
                  << " " << std::setw(width) << kOrbitalSpeciesPNCodeTz[static_cast<int>(orbital_info.orbital_species)].TwiceValue()
