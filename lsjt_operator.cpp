@@ -10,6 +10,8 @@
 
 #include <fstream>
 
+#include "mcutils/parsing.h"
+
 namespace basis {
 
   ////////////////////////////////////////////////////////////////
@@ -222,7 +224,7 @@ namespace basis {
   void ReadRelativeOperatorLSJT(
       const std::string& relative_filename,
       basis::RelativeSpaceLSJT& relative_space,
-      basis::OperatorLabelsJT& operator_labels,
+      basis::RelativeOperatorParametersLSJT& operator_parameters,
       std::array<basis::RelativeSectorsLSJT,3>& relative_component_sectors,
       std::array<basis::OperatorBlocks<double>,3>& relative_component_matrices,
       bool verbose
@@ -241,9 +243,7 @@ namespace basis {
     std::ifstream is(relative_filename.c_str());
 
     // read header parameters
-    basis::RelativeOperatorParametersLSJT operator_parameters;
     basis::ReadRelativeOperatorParametersLSJT(is,operator_parameters);
-    operator_labels = static_cast<basis::OperatorLabelsJT>(operator_parameters);
     if (verbose)
       {
         std::cout
@@ -271,7 +271,7 @@ namespace basis {
       {
         // enumerate sectors
         relative_component_sectors[T0]
-          = basis::RelativeSectorsLSJT(relative_space,operator_labels.J0,T0,operator_labels.g0);
+          = basis::RelativeSectorsLSJT(relative_space,operator_parameters.J0,T0,operator_parameters.g0);
 
         // read matrices
         basis::ReadRelativeOperatorComponentLSJT(
@@ -454,6 +454,48 @@ namespace basis {
   }
 
 
+  inline
+  void RecastLabelsRelativeCMLSJTNToRelativeCMLSJT(
+      const RelativeCMSubspaceLSJTNLabels& relative_cm_lsjtn_subspace_labels,
+      const RelativeCMStateLSJTNLabels& relative_cm_lsjtn_state_labels,
+      RelativeCMSubspaceLSJTLabels& relative_cm_lsjt_subspace_labels,
+      RelativeCMStateLSJTLabels& relative_cm_lsjt_state_labels
+    )
+  // Recast labels for (subspace,state) from RelativeCMLSJTN scheme to
+  // RelativeCMLSJT scheme.
+  //
+  // This direction of conversion (from target labels to source
+  // labels) is as needed for looking up the source matrix element.
+  //
+  // This switches N from being the least-significant state label (that
+  // is, most-rapidly-varying in the lexicographic ordering scheme),
+  // to being the most-significant subspace label (that is,
+  // least-rapidly-varying):
+  //
+  //   (L,S,J,T,g,N) : (N1,l1,N2,l2) -> (L,S,J,T,g) : ([N],N1,l1,N2,l2)
+  //
+  // As a state label, N is actually an implicit label, not stored,
+  // but effectively the last label for ordering purposes.  Its value
+  // may be recovered as Nr+Nc.
+  //
+  // Arguments:
+  //   relative_cm_lsjtn_subspace_labels (...,output) : source subspace labels
+  //   relative_cm_lsjtn_state_labels (...,output) : source state labels
+  //   relative_cm_lsjt_subspace_labels (...) : target subspace labels
+  //   relative_cm_lsjt_state_labels (...) : target state labels
+  {
+    // extract labels
+    int L, S, J, T, g, N;
+    std::tie(L,S,J,T,g,N) = relative_cm_lsjtn_subspace_labels;
+    int Nr, lr, Nc, lc;
+    std::tie(Nr,lr,Nc,lc) = relative_cm_lsjtn_state_labels;
+
+    // repackage labels
+    relative_cm_lsjt_subspace_labels = RelativeCMSubspaceLSJTLabels(L,S,J,T,g);
+    relative_cm_lsjt_state_labels = relative_cm_lsjtn_state_labels;
+  }
+
+
   void GatherOperatorRelativeCMLSJTNToRelativeCMLSJT(
       const basis::OperatorLabelsJT& operator_labels,
       const basis::RelativeCMSpaceLSJTN& relative_cm_lsjtn_space,
@@ -607,6 +649,167 @@ namespace basis {
                   relative_cm_lsjt_matrix(bra_index,ket_index) = relative_cm_lsjtn_matrix_element;
 
                 }
+          }
+      }
+
+  }
+
+  void ScatterOperatorRelativeCMLSJTToRelativeCMLSJTN(
+      const basis::OperatorLabelsJT& operator_labels,
+      const basis::RelativeCMSpaceLSJT& relative_cm_lsjt_space,
+      const std::array<basis::RelativeCMSectorsLSJT,3>& relative_cm_lsjt_component_sectors,
+      const std::array<basis::OperatorBlocks<double>,3>& relative_cm_lsjt_component_matrices,
+      const basis::RelativeCMSpaceLSJTN& relative_cm_lsjtn_space,
+      std::array<basis::RelativeCMSectorsLSJTN,3>& relative_cm_lsjtn_component_sectors,
+      std::array<basis::OperatorBlocks<double>,3>& relative_cm_lsjtn_component_matrices
+    )
+  {
+    for (int T0=operator_labels.T0_min; T0<=operator_labels.T0_max; ++T0)
+      // for each isospin component
+      {
+
+        // enumerate target sectors
+        relative_cm_lsjtn_component_sectors[T0]
+          = basis::RelativeCMSectorsLSJTN(relative_cm_lsjtn_space,operator_labels.J0,T0,operator_labels.g0);
+
+        // populate matrices
+        relative_cm_lsjtn_component_matrices[T0].resize(relative_cm_lsjtn_component_sectors[T0].size());
+        for (int sector_index=0; sector_index<relative_cm_lsjtn_component_sectors[T0].size(); ++sector_index)
+          {
+            // retrieve target sector
+            const basis::RelativeCMSectorsLSJTN::SectorType& relative_cm_lsjtn_sector
+              = relative_cm_lsjtn_component_sectors[T0].GetSector(sector_index);
+
+            // initialize matrix
+            Eigen::MatrixXd& relative_cm_lsjtn_matrix = relative_cm_lsjtn_component_matrices[T0][sector_index];
+            relative_cm_lsjtn_matrix = Eigen::MatrixXd::Zero(
+                relative_cm_lsjtn_sector.bra_subspace().size(),
+                relative_cm_lsjtn_sector.ket_subspace().size()
+              );
+
+            // populate matrix elements
+            for (int bra_index = 0; bra_index < relative_cm_lsjtn_sector.bra_subspace().size(); ++bra_index)
+              {
+                // retreive target bra state
+                basis::RelativeCMStateLSJTN relative_cm_lsjtn_bra(relative_cm_lsjtn_sector.bra_subspace(),bra_index);
+                // extract source bra labels
+                RelativeCMSubspaceLSJTNLabels relative_cm_lsjtn_subspace_labels_bra
+                  = relative_cm_lsjtn_bra.subspace().labels();
+                RelativeCMStateLSJTNLabels relative_cm_lsjtn_state_labels_bra
+                  = relative_cm_lsjtn_bra.labels();
+                RelativeCMSubspaceLSJTLabels relative_cm_lsjt_subspace_labels_bra;
+                RelativeCMStateLSJTLabels relative_cm_lsjt_state_labels_bra;
+                RecastLabelsRelativeCMLSJTNToRelativeCMLSJT(
+                    relative_cm_lsjtn_subspace_labels_bra,
+                    relative_cm_lsjtn_state_labels_bra,
+                    relative_cm_lsjt_subspace_labels_bra,
+                    relative_cm_lsjt_state_labels_bra
+                  );
+
+                // extract source bra indices
+                int relative_cm_lsjt_subspace_index_bra
+                  = relative_cm_lsjt_space.LookUpSubspaceIndex(
+                      relative_cm_lsjt_subspace_labels_bra
+                    );
+                int relative_cm_lsjt_state_index_bra
+                  = relative_cm_lsjt_space.GetSubspace(relative_cm_lsjt_subspace_index_bra).LookUpStateIndex(
+                      relative_cm_lsjt_state_labels_bra
+                    );
+
+                for (int ket_index = 0; ket_index < relative_cm_lsjtn_sector.ket_subspace().size(); ++ket_index)
+                  // for each target matrix element
+                  {
+
+                    // ensure canonical matrix element if diagonal sector
+                    if (relative_cm_lsjtn_sector.IsDiagonal())
+                      if (!(bra_index<=ket_index))
+                        continue;
+
+                    // retrieve target ket state
+                    basis::RelativeCMStateLSJTN relative_cm_lsjtn_ket(relative_cm_lsjtn_sector.ket_subspace(),ket_index);
+
+                    // extract source ket labels
+                    RelativeCMSubspaceLSJTNLabels relative_cm_lsjtn_subspace_labels_ket
+                      = relative_cm_lsjtn_ket.subspace().labels();
+                    RelativeCMStateLSJTNLabels relative_cm_lsjtn_state_labels_ket
+                      = relative_cm_lsjtn_ket.labels();
+                    RelativeCMSubspaceLSJTLabels relative_cm_lsjt_subspace_labels_ket;
+                    RelativeCMStateLSJTLabels relative_cm_lsjt_state_labels_ket;
+                    RecastLabelsRelativeCMLSJTNToRelativeCMLSJT(
+                        relative_cm_lsjtn_subspace_labels_ket,
+                        relative_cm_lsjtn_state_labels_ket,
+                        relative_cm_lsjt_subspace_labels_ket,
+                        relative_cm_lsjt_state_labels_ket
+                      );
+
+                    // extract source ket indices
+                    int relative_cm_lsjt_subspace_index_ket
+                      = relative_cm_lsjt_space.LookUpSubspaceIndex(
+                          relative_cm_lsjt_subspace_labels_ket
+                        );
+                    int relative_cm_lsjt_state_index_ket
+                      = relative_cm_lsjt_space.GetSubspace(relative_cm_lsjt_subspace_index_ket).LookUpStateIndex(
+                          relative_cm_lsjt_state_labels_ket
+                        );
+
+                    // // debugging
+                    // const RelativeCMSubspaceLSJT& relative_cm_lsjt_subspace_bra
+                    //   = relative_cm_lsjt_space.GetSubspace(relative_cm_lsjt_subspace_index_bra);
+                    // const RelativeCMSubspaceLSJT& relative_cm_lsjt_subspace_ket
+                    //   = relative_cm_lsjt_space.GetSubspace(relative_cm_lsjt_subspace_index_ket);
+                    // std::cout << " pre-lookup "
+                    //           << " " << relative_cm_lsjt_subspace_index_bra
+                    //           << " " << relative_cm_lsjt_subspace_index_ket
+                    //           << " " << ";"
+                    //           << " " << relative_cm_lsjt_state_index_bra
+                    //           << " " << relative_cm_lsjt_state_index_ket
+                    //           << " " << ";"
+                    //           << " " << relative_cm_lsjt_subspace_bra.LabelStr()
+                    //           << " " << relative_cm_lsjt_subspace_ket.LabelStr()
+                    //           << " " << relative_cm_lsjt_subspace_bra.size()
+                    //           << " " << relative_cm_lsjt_subspace_ket.size()
+                    //           << std::endl;
+
+                    // Note on canonicalization of indices for lookup
+                    // (or lack thereof)
+                    //
+                    // Matrix elements which are canonical by LSJT
+                    // sector, and ordered by N within a LSJT sector,
+                    // should also be canonical by (LSJT;N) sector.
+                    // That is, the upper triangle of a matrix with
+                    // basis states ordered by
+                    //
+                    //   (L,S,J,T,g) : ([N],N1,l1,N2,l2)
+                    //
+                    // or
+                    //
+                    //   (L,S,J,T,g,N) : (N1,l1,N2,l2)
+                    //
+                    // should be identical.
+                    //
+                    // So canonicalization would only be necessary if we
+                    // were to fill in a *lower* triangle matrix element
+                    // of a diagonal target sector.  Then we would have
+                    // to ensure that we look up a canonical (upper
+                    // triangular) LSJT sector.
+
+                    // look up matrix element
+                    int relative_cm_lsjt_sector_index
+                      = relative_cm_lsjt_component_sectors[T0].LookUpSectorIndex(
+                          relative_cm_lsjt_subspace_index_bra,
+                          relative_cm_lsjt_subspace_index_ket
+                        );
+
+                    const Eigen::MatrixXd& relative_cm_lsjt_matrix
+                      = relative_cm_lsjt_component_matrices[T0][relative_cm_lsjt_sector_index];
+                    double relative_cm_lsjt_matrix_element = relative_cm_lsjt_matrix(
+                        relative_cm_lsjt_state_index_bra,relative_cm_lsjt_state_index_ket
+                      );
+
+                    relative_cm_lsjtn_matrix(bra_index,ket_index) = relative_cm_lsjt_matrix_element;
+
+                  }
+              }
           }
       }
 
@@ -843,12 +1046,102 @@ namespace basis {
       << "#   version" << std::endl
       << "#   J0 g0 T0_min T0_max symmetry_phase_mode  [P0=(-)^g0]" << std::endl
       << "#   Nmax" << std::endl
-      << "#   T0   N1' l1' N2' l2' L' S' J' T' g'   N1 l1 N2 l2 L S J T g   JT-RME" << std::endl
+      << "#   T0   Nr' lr' Nc' lc' L' S' J' T' g'   Nr lr Nc lc L S J T g   JT-RME" << std::endl
       << " " << version << std::endl
       << " " << parameters.J0 << " " << parameters.g0
       << " " << parameters.T0_min << " " << parameters.T0_max
       << " " << int(parameters.symmetry_phase_mode) << std::endl
       << " " << parameters.Nmax << std::endl;
+  }
+
+  void ReadRelativeCMOperatorComponentLSJT(
+      std::istream& is,
+      int T0,
+      const basis::RelativeCMSectorsLSJT& sectors,
+      basis::OperatorBlocks<double>& matrices
+    )
+  {
+    std::string line;
+    int line_count = 0;
+
+    // iterate over sectors
+    for (int sector_index = 0; sector_index < sectors.size(); ++sector_index)
+      {
+        // extract sector
+        const auto& sector = sectors.GetSector(sector_index);
+        const auto& bra_subspace = sector.bra_subspace();
+        const auto& ket_subspace = sector.ket_subspace();
+
+        // verify that sector is canonical
+        //
+        // This is a check that the caller's sector construction
+        // followed the specification that only "upper triangle"
+        // sectors are stored.
+        assert(sector.bra_subspace_index()<=sector.ket_subspace_index());
+
+        // construct zero matrix for sector
+        basis::OperatorBlock<double> sector_matrix =
+          basis::OperatorBlock<double>::Zero(bra_subspace.size(),ket_subspace.size());
+
+        // iterate over matrix elements
+        for (int bra_index=0; bra_index<bra_subspace.size(); ++bra_index)
+          for (int ket_index=0; ket_index<ket_subspace.size(); ++ket_index)
+            {
+
+              // diagonal sector: restrict to upper triangle
+              if (sector.IsDiagonal())
+                if (!(bra_index<=ket_index))
+                  continue;
+
+              // define states
+              const basis::RelativeCMStateLSJT bra(bra_subspace,bra_index);
+              const basis::RelativeCMStateLSJT ket(ket_subspace,ket_index);
+
+              // define input variables
+              int input_T0;
+              int bra_Nr, bra_lr, bra_Nc, bra_lc, bra_L, bra_S, bra_J, bra_T, bra_g;
+              int ket_Nr, ket_lr, ket_Nc, ket_lc, ket_L, ket_S, ket_J, ket_T, ket_g;
+              double matrix_element;
+
+              // read input line
+              mcutils::GetLine(is, line, line_count);
+              std::istringstream line_stream(line);
+              line_stream
+                >> input_T0
+                >> bra_Nr >> bra_lr >> bra_Nc >> bra_lc
+                >> bra_L  >> bra_S  >> bra_J  >> bra_T  >> bra_g
+                >> ket_Nr >> ket_lr >> ket_Nc >> ket_lc
+                >> ket_L  >> ket_S  >> ket_J  >> ket_T  >> ket_g
+                >> matrix_element;
+              mcutils::ParsingCheck(line_stream, line_count, line);
+
+                // validate labels
+                bool expected_labels = true
+                  && (input_T0==T0)
+                  && (bra_Nr==bra.Nr())
+                  && (bra_lr==bra.lr())
+                  && (bra_Nc==bra.Nc())
+                  && (bra_lc==bra.lc())
+                  && (bra_L==bra.L())
+                  && (bra_S==bra.S())
+                  && (bra_J==bra.J())
+                  && (bra_T==bra.T())
+                  && (ket_Nr==ket.Nr())
+                  && (ket_lr==ket.lr())
+                  && (ket_Nc==ket.Nc())
+                  && (ket_lc==ket.lc())
+                  && (ket_L==ket.L())
+                  && (ket_S==ket.S())
+                  && (ket_J==ket.J())
+                  && (ket_T==ket.T());
+                assert(expected_labels);
+                // save matrix element
+                sector_matrix(bra_index,ket_index) = matrix_element;
+              }
+
+          // store matrix for sector
+          matrices.push_back(std::move(sector_matrix));
+      }
   }
 
   void WriteRelativeCMOperatorComponentLSJT(
@@ -927,6 +1220,132 @@ namespace basis {
       };
   }
 
+
+  void ReadRelativeCMOperatorLSJT(
+      const std::string& filename,
+      basis::RelativeCMSpaceLSJT& space,
+      basis::RelativeCMOperatorParametersLSJT& operator_parameters,
+      std::array<basis::RelativeCMSectorsLSJT,3>& component_sectors,
+      std::array<basis::OperatorBlocks<double>,3>& component_matrices,
+      bool verbose
+    )
+  // FUTURE: change to line-based input with std::getline and parsing checks for easier debugging
+  // FUTURE: check file status on open
+  {
+
+    // open stream for reading
+    if (verbose)
+      {
+        std::cout
+          << "Reading relative-cm operator file..." << std::endl
+          << "  Filename: " << filename << std::endl;
+      }
+    std::ifstream is(filename.c_str());
+
+    // read header parameters
+    basis::ReadRelativeCMOperatorParametersLSJT(is, operator_parameters);
+    if (verbose)
+      {
+        std::cout
+          << "  Operator properties:"
+          << " J0 " << operator_parameters.J0
+          << " g0 " << operator_parameters.g0
+          << " T0_min " << operator_parameters.T0_min
+          << " T0_max " << operator_parameters.T0_max
+          << " symmetry " << int(operator_parameters.symmetry_phase_mode)
+          << std::endl
+          << "  Truncation:"
+          << " Nmax " << operator_parameters.Nmax
+          << std::endl;
+      }
+
+    // set up relative space
+    space = basis::RelativeCMSpaceLSJT(
+        operator_parameters.Nmax
+      );
+
+    // populate sectors and matrices
+    for (int T0=operator_parameters.T0_min; T0<=operator_parameters.T0_max; ++T0)
+      // for each isospin component
+      {
+        // enumerate sectors
+        component_sectors[T0]
+          = basis::RelativeCMSectorsLSJT(space,operator_parameters.J0,T0,operator_parameters.g0);
+
+        // read matrices
+        basis::ReadRelativeCMOperatorComponentLSJT(
+            is,
+            T0,
+            component_sectors[T0], component_matrices[T0]
+          );
+      }
+
+    // write diagnostics
+    if (verbose)
+      {
+        std::cout << "  Matrix elements:";
+        for (int T0=operator_parameters.T0_min; T0<=operator_parameters.T0_max; ++T0)
+          std::cout << " " << basis::UpperTriangularEntries(component_sectors[T0]);
+        std::cout << std::endl;
+        std::cout << "  Allocated:";
+        for (int T0=operator_parameters.T0_min; T0<=operator_parameters.T0_max; ++T0)
+          std::cout << " " << basis::AllocatedEntries(component_matrices[T0]);
+        std::cout << std::endl;
+      }
+  }
+
+  void WriteRelativeCMOperatorLSJT(
+      const std::string& filename,
+      const basis::RelativeCMSpaceLSJT& space,
+      const basis::OperatorLabelsJT& operator_labels,
+      const std::array<basis::RelativeCMSectorsLSJT,3>& component_sectors,
+      const std::array<basis::OperatorBlocks<double>,3>& component_matrices,
+      bool verbose
+    )
+  // FUTURE: check file status on open
+  {
+
+    // open stream for writing
+    if (verbose)
+      {
+        std::cout
+          << "Writing relative-cm operator file..." << std::endl
+          << "  Filename: " << filename << std::endl;
+      }
+    std::ofstream os(filename.c_str());
+
+    // set up full operator file parameters
+    int Nmax = space.Nmax();
+    RelativeCMOperatorParametersLSJT operator_parameters(operator_labels,Nmax);
+    if (verbose)
+      {
+        std::cout
+          << "  Operator properties:"
+          << " J0 " << operator_parameters.J0
+          << " g0 " << operator_parameters.g0
+          << " T0_min " << operator_parameters.T0_min
+          << " T0_max " << operator_parameters.T0_max
+          << " symmetry " << int(operator_parameters.symmetry_phase_mode)
+          << std::endl
+          << "  Truncation:"
+          << " Nmax " << operator_parameters.Nmax
+          << std::endl;
+      }
+
+    // write header parameters
+    basis::WriteRelativeCMOperatorParametersLSJT(os,operator_parameters);
+
+    // write matrices
+    for (int T0=operator_parameters.T0_min; T0<=operator_parameters.T0_max; ++T0)
+      {
+        basis::WriteRelativeCMOperatorComponentLSJT(
+            os,
+            T0,
+            component_sectors[T0], component_matrices[T0]
+          );
+      }
+
+  }
 
   ////////////////////////////////////////////////////////////////
   // two-body LSJT operator output

@@ -60,6 +60,12 @@
       CanonicalizeIndicesJT.
   + 09/06/18 (mac): Split out JT operator generic code to
       jt_operator from lsjt_operator.
+  + 04/03/19 (pjf):
+    - Have ReadRelativeOperatorLSJT take basis::RelativeOperatorParametersLSJT
+      rather than basis::OperatorLabelsJT, so to have access to additional
+      parameters specified in relative files.
+    - Implement relative-cm I/O.
+    - Add ScatterOperatorRelativeCMLSJTToRelativeCMLSJTN.
 
 ****************************************************************/
 
@@ -343,7 +349,7 @@ namespace basis {
   void ReadRelativeOperatorLSJT(
       const std::string& filename,
       basis::RelativeSpaceLSJT& space,
-      basis::OperatorLabelsJT& operator_labels,
+      basis::RelativeOperatorParametersLSJT& operator_parameters,
       std::array<basis::RelativeSectorsLSJT,3>& component_sectors,
       std::array<basis::OperatorBlocks<double>,3>& component_matrices,
       bool verbose
@@ -353,7 +359,7 @@ namespace basis {
   // Arguments:
   //   filename (input): input filename
   //   space (output): target space, based on parameters in file
-  //   operator_labels (output): operator labels, from file
+  //   operator_parameters (output): operator parameters, from file
   //   component_sectors (output): target sectors
   //   component_matrices (output): target matrices
   //   verbose (input): whether or not to include diagnostic output
@@ -516,7 +522,7 @@ namespace basis {
       {}
 
     RelativeCMOperatorParametersLSJT(
-        const basis::OperatorLabelsJT& operator_labels, int Nmax_, int Jmax_)
+        const basis::OperatorLabelsJT& operator_labels, int Nmax_)
       // Construct using given operator labels, plus given version and basis parameters.
       : OperatorLabelsJT(operator_labels), Nmax(Nmax_)
     {}
@@ -586,7 +592,7 @@ namespace basis {
   void ReadRelativeCMOperatorLSJT(
       const std::string& filename,
       basis::RelativeCMSpaceLSJT& space,
-      basis::OperatorLabelsJT& operator_labels,
+      basis::RelativeCMOperatorParametersLSJT& operator_parameters,
       std::array<basis::RelativeCMSectorsLSJT,3>& component_sectors,
       std::array<basis::OperatorBlocks<double>,3>& component_matrices,
       bool verbose
@@ -609,7 +615,7 @@ namespace basis {
       const std::array<basis::OperatorBlocks<double>,3>& component_matrices,
       bool verbose
     );
-  // Set up and read relative operator.
+  // Set up and write relative-cm operator.
   //
   // Arguments:
   //   filename (input): output filename
@@ -651,6 +657,39 @@ namespace basis {
   //   relative_cm_lsjt_space (...): target space
   //   relative_cm_lsjt_component_sectors (..., output): target sectors
   //   relative_cm_lsjt_component_matrices (..., output): target matrices
+
+  ////////////////////////////////////////////////////////////////
+  // relative-cm LSJTN operator -- scatter N blocks
+  ////////////////////////////////////////////////////////////////
+
+  void ScatterOperatorRelativeCMLSJTToRelativeCMLSJTN(
+      const basis::OperatorLabelsJT& operator_labels,
+      const basis::RelativeCMSpaceLSJT& relative_cm_lsjt_space,
+      const std::array<basis::RelativeCMSectorsLSJT,3>& relative_cm_lsjt_component_sectors,
+      const std::array<basis::OperatorBlocks<double>,3>& relative_cm_lsjt_component_matrices,
+      const basis::RelativeCMSpaceLSJTN& relative_cm_lsjtn_space,
+      std::array<basis::RelativeCMSectorsLSJTN,3>& relative_cm_lsjtn_component_sectors,
+      std::array<basis::OperatorBlocks<double>,3>& relative_cm_lsjtn_component_matrices
+    );
+  // Assemble relative-cm representation of operator in LSJTN basis,
+  // from relative-cm representation in LSJT basis, i.e., scattering
+  // the matrix elements to different N blocks.
+  //
+  // See notes on "internal representation of an operator in JT
+  // scheme" in lsjt_operator.h for the general principles of how the
+  // operators are represented.
+  //
+  // Symmetry: The lower triangle of diagonal sectors is
+  // zero-initialized, but not populated.
+  //
+  // Arguments:
+  //   operator_labels (basis::OperatorLabelsJT): tensorial properties of operator
+  //   relative_cm_lsjt_space (...): source space
+  //   relative_cm_lsjt_component_sectors (..., output): source sectors
+  //   relative_cm_lsjt_component_matrices (..., output): source matrices
+  //   relative_cm_lsjtn_space (...): target space
+  //   relative_cm_lsjtn_component_sectors (...): target sectors
+  //   relative_cm_lsjtn_component_matrices (...): target matrices
 
   ////////////////////////////////////////////////////////////////
   ////////////////////////////////////////////////////////////////
