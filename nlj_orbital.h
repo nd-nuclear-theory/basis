@@ -58,7 +58,8 @@
     - Add constructor for converting from OrbitalSpacePN to OrbitalSpaceLJPN.
   + 02/19/19 (pjf): Add v15200 orbital format.
   + 04/03/19 (pjf): Define type conversion between OrbitalPNInfo and
-    FullOrbitalLabels.
+      FullOrbitalLabels.
+  + 04/07/19 (pjf): Add LabelStr() for OrbitalStateLJPN.
 ****************************************************************/
 
 #ifndef BASIS_NLJ_ORBITAL_H_
@@ -330,7 +331,7 @@ namespace basis {
 
     // diagnostic strings
     std::string LabelStr() const;
-    // Provide string representation of subspace labels.
+    // Provide string representation of state labels.
 
     // comparison
     friend bool operator == (const basis::OrbitalStatePN& a1, const basis::OrbitalStatePN& a2)
@@ -554,6 +555,9 @@ namespace basis {
     int N() const {return 2*n()+l();}
     // Calculate hard-coded oscillator quantum number.
 
+    // diagnostic strings
+    std::string LabelStr() const;
+    // Provide string representation of state labels.
   };
 
   // space

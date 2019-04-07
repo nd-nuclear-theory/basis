@@ -730,6 +730,30 @@ namespace basis {
   }
 
   /**
+   * Generate a string representation of the orbital labels.
+   * @return orbital labels as a string
+   */
+  std::string OrbitalStateLJPN::LabelStr() const
+  {
+    std::ostringstream os;
+
+    const int width = 0;  // for now, no fixed width
+
+    os << "["
+       << " " << std::setw(width) << int(orbital_species())
+       << " " << std::setw(width) << index()
+       << " :"
+       << " " << std::setw(width) << n()
+       << " " << std::setw(width) << l()
+       << " " << std::setw(width) << j()
+       << " :"
+       << " " << std::setw(width) << weight()
+       << " " << "]";
+
+    return os.str();
+  }
+
+  /**
    * Flatten state into an OrbitalPNInfo object.
    *
    * @return OrbitalPNInfo representation of state
