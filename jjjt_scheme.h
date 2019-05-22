@@ -35,12 +35,15 @@
       to g.
     - Add one-body (square) truncation on two-body bases.
   + 7/19/16 (mac): Use enum Rank for truncation rank.
+  + 05/09/19 (pjf): Use std::size_t for indices and sizes, to prevent
+    integer overflow.
 
 ****************************************************************/
 
 #ifndef BASIS_JJJT_SCHEME_H_
 #define BASIS_JJJT_SCHEME_H_
 
+#include <cstddef>
 #include <string>
 
 #include "am/halfint.h"
@@ -183,7 +186,7 @@ namespace basis {
 
     // pass-through constructors
 
-    TwoBodyStateJJJT(const SubspaceType& subspace, int index)
+    TwoBodyStateJJJT(const SubspaceType& subspace, std::size_t index)
       // Construct state by index.
       : BaseState (subspace, index) {}
 
@@ -416,7 +419,7 @@ namespace basis {
 
     // pass-through constructors
 
-    TwoBodyStateJJJTN(const SubspaceType& subspace, int index)
+    TwoBodyStateJJJTN(const SubspaceType& subspace, std::size_t index)
       // Construct state by index.
       : BaseState (subspace, index) {}
 

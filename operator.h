@@ -35,12 +35,15 @@
   + 09/07/18 (pjf): Fix incomplete templatization of SetOperatorToDiagonalConstant.
   + 12/19/18 (pjf): Add operator arithmetic manipulation functions.
   + 02/01/19 (pjf): Update comment on OperatorLinearCombination.
+  + 05/09/19 (pjf): Use std::size_t for indices and sizes, to prevent
+    integer overflow.
 
 ****************************************************************/
 
 #ifndef BASIS_OPERATOR_H_
 #define BASIS_OPERATOR_H_
 
+#include <cstddef>
 #include <vector>
 
 #include "eigen3/Eigen/Dense"
@@ -109,7 +112,7 @@ namespace basis {
     }
 
   template <typename tSectors>
-    int UpperTriangularEntries(
+    std::size_t UpperTriangularEntries(
         const tSectors& sectors
       )
     // Count entries in the upper triangular portion of a set of sectors.
@@ -123,26 +126,26 @@ namespace basis {
     // Returns:
     //   number of upper triangular matrix entries
     {
-      int total_entries = 0;
-      for (int sector_index=0; sector_index<sectors.size(); ++sector_index)
+      std::size_t total_entries = 0;
+      for (std::size_t sector_index=0; sector_index<sectors.size(); ++sector_index)
         {
           // make reference to sector for convenience
           const typename tSectors::SectorType& sector
             = sectors.GetSector(sector_index);
 
           // count sector entries
-          int sector_entries = 0;
+          std::size_t sector_entries = 0;
           if (sector.IsDiagonal())
             // diagonal sector
             {
-              int dimension = sector.ket_subspace().size();
+              std::size_t dimension = sector.ket_subspace().size();
               sector_entries = dimension*(dimension+1)/2;
             }
           else if (sector.IsUpperTriangle())
             // upper triangle sector (but not diagonal)
             {
-              int bra_dimension = sector.bra_subspace().size();
-              int ket_dimension = sector.ket_subspace().size();
+              std::size_t bra_dimension = sector.bra_subspace().size();
+              std::size_t ket_dimension = sector.ket_subspace().size();
               sector_entries = bra_dimension*ket_dimension;
             }
 
@@ -174,7 +177,7 @@ namespace basis {
     matrices.resize(sectors.size());
 
     // iterate over sectors
-    for (int sector_index = 0; sector_index < sectors.size(); ++sector_index)
+    for (std::size_t sector_index = 0; sector_index < sectors.size(); ++sector_index)
       {
 
         // extract sector
@@ -233,7 +236,7 @@ namespace basis {
     matrices.resize(sectors.size());
 
     // iterate over sectors
-    for (int sector_index = 0; sector_index < sectors.size(); ++sector_index)
+    for (std::size_t sector_index = 0; sector_index < sectors.size(); ++sector_index)
       {
 
         // extract sector
@@ -298,7 +301,7 @@ namespace basis {
     matrices.resize(sectors.size());
 
     // iterate over sectors
-    for (int sector_index = 0; sector_index < sectors.size(); ++sector_index)
+    for (std::size_t sector_index = 0; sector_index < sectors.size(); ++sector_index)
       {
 
         // extract sector
@@ -331,7 +334,7 @@ namespace basis {
   #if __cpp_decltype_auto
     template <typename tFloat>
     decltype(auto) OperatorBlockLinearCombination(
-        const int& sector_index,
+        const std::size_t& sector_index,
         const tFloat& a,
         const OperatorBlocks<tFloat>& matrices
       )
@@ -346,7 +349,7 @@ namespace basis {
 
     template <typename tFloat, typename... Args>
     decltype(auto) OperatorBlockLinearCombination(
-        const int& sector_index,
+        const std::size_t& sector_index,
         const tFloat& a,
         const OperatorBlocks<tFloat>& matrices,
         Args... args
@@ -362,7 +365,7 @@ namespace basis {
   #else
     template <typename tFloat>
     OperatorBlock<tFloat> OperatorBlockLinearCombination(
-      const int& sector_index,
+      const std::size_t& sector_index,
       const tFloat& a,
       const OperatorBlocks<tFloat>& matrices
       )
@@ -377,7 +380,7 @@ namespace basis {
 
     template <typename tFloat, typename... Args>
     OperatorBlock<tFloat> OperatorBlockLinearCombination(
-        const int& sector_index,
+        const std::size_t& sector_index,
         const tFloat& a,
         const OperatorBlocks<tFloat>& matrices,
         Args... args
@@ -418,7 +421,7 @@ namespace basis {
     //     a (input): coefficient of operator term
     //     matrices (input): matrices for operator term
   {
-    for (int sector_index = 0; sector_index < sectors.size(); ++sector_index)
+    for (std::size_t sector_index = 0; sector_index < sectors.size(); ++sector_index)
     {
       output_matrices[sector_index] = OperatorBlockLinearCombination(sector_index, args...);
     }
@@ -501,10 +504,10 @@ namespace basis {
   ////////////////////////////////////////////////////////////////
 
   inline
-    std::tuple<int,int,int,int,bool>
+    std::tuple<std::size_t,std::size_t,std::size_t,std::size_t,bool>
     CanonicalizeIndices(
-        int subspace_index_bra, int subspace_index_ket,
-        int state_index_bra, int state_index_ket
+        std::size_t subspace_index_bra, std::size_t subspace_index_ket,
+        std::size_t state_index_bra, std::size_t state_index_ket
       )
     // Convert subspace and state indices for a matrix element to
     // canonical ("upper triangle") indices.
@@ -547,7 +550,7 @@ namespace basis {
         std::swap(state_index_bra,state_index_ket);
 
       // bundle return values
-      return std::tuple<int,int,int,int,bool>(
+      return std::tuple<std::size_t,std::size_t,std::size_t,std::size_t,bool>(
           subspace_index_bra,subspace_index_ket,
           state_index_bra,state_index_ket,
           swapped_subspaces

@@ -14,6 +14,8 @@
   + 10/15/16 (mac): Update to use new sector method IsUpperTriangle().
   + 10/25/16 (mac): Rename to jjjpn_operator.
   + 9/27/17 (mac): Fix AS/NAS conversion factors in WriteTwoBodyOperatorJJJPN.
+  + 05/09/19 (pjf): Use std::size_t for indices and sizes, to prevent
+    integer overflow.
 
 ****************************************************************/
 

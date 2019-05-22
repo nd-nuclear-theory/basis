@@ -6,12 +6,13 @@
 
 ****************************************************************/
 
+#include <cstddef>
 #include "nlj_operator.h"
 
 namespace basis {
 
 
-  std::tuple<int,int,int>
+  std::tuple<std::size_t,std::size_t,std::size_t>
   MatrixElementIndicesLJPN(
       const basis::OrbitalSpaceLJPN& bra_orbital_space,
       const basis::OrbitalSpaceLJPN& ket_orbital_space,
@@ -28,19 +29,19 @@ namespace basis {
     std::tie(ket_orbital_species,ket_n,ket_l,ket_j) = ket_labels;
 
     // look up LJPN sector
-    int bra_subspace_index = bra_orbital_space.LookUpSubspaceIndex(
+    std::size_t bra_subspace_index = bra_orbital_space.LookUpSubspaceIndex(
         typename basis::OrbitalSubspaceLJPN::SubspaceLabelsType(bra_orbital_species,bra_l,bra_j)
       );
-    int ket_subspace_index = ket_orbital_space.LookUpSubspaceIndex(
+    std::size_t ket_subspace_index = ket_orbital_space.LookUpSubspaceIndex(
         typename basis::OrbitalSubspaceLJPN::SubspaceLabelsType(ket_orbital_species,ket_l,ket_j)
       );
-    int sector_index = sectors.LookUpSectorIndex(bra_subspace_index,ket_subspace_index);
+    std::size_t sector_index = sectors.LookUpSectorIndex(bra_subspace_index,ket_subspace_index);
 
     // short-circuit on missing sector
     if (sector_index==basis::kNone)
       {
-        int bra_state_index = basis::kNone;
-        int ket_state_index = basis::kNone;
+        std::size_t bra_state_index = basis::kNone;
+        std::size_t ket_state_index = basis::kNone;
         return std::make_tuple(sector_index,bra_state_index,ket_state_index);
       }
 
@@ -49,7 +50,7 @@ namespace basis {
 
     // retrieve state indices
 
-    int bra_state_index, ket_state_index;
+    std::size_t bra_state_index, ket_state_index;
     assert((bra_n>=0)&&(ket_n>=0));  // pjf says: don't be dumb
     bra_state_index
       = sector.bra_subspace().LookUpStateIndex(basis::OrbitalStateLJPNLabels(bra_n));
@@ -69,7 +70,7 @@ namespace basis {
     )
   {
     // look up LJPN sector
-    int sector_index, bra_state_index, ket_state_index;
+    std::size_t sector_index, bra_state_index, ket_state_index;
     std::tie(sector_index,bra_state_index,ket_state_index)
       = MatrixElementIndicesLJPN(
           bra_orbital_space,ket_orbital_space,sectors,

@@ -7,6 +7,7 @@
 ****************************************************************/
 
 
+#include <cstddef>
 #include <iomanip>  // for debugging output
 #include <iostream>
 #include <sstream>
@@ -334,7 +335,7 @@ namespace basis {
     os << " (oscillator-like: " << oscillator_like_indicator << ")"
        << std::endl;
 
-    for (int state_index=0; state_index<size(); ++state_index)
+    for (std::size_t state_index=0; state_index<size(); ++state_index)
       {
         OrbitalStatePN state(*this,state_index);
 
@@ -363,7 +364,7 @@ namespace basis {
   {
     OrbitalPNList orbitals;
 
-    for (int state_index=0; state_index<size(); ++state_index)
+    for (std::size_t state_index=0; state_index<size(); ++state_index)
       {
         OrbitalStatePN state(*this,state_index);
         orbitals.push_back(state.OrbitalInfo());
@@ -446,7 +447,7 @@ namespace basis {
     weight_max_ = 0.0;
     // collect orbital_species subspace labels sorted in canonical order
     std::set<OrbitalSubspacePNLabels> subspace_labels_set;
-    for (int state_index=0; state_index<states.size(); ++state_index)
+    for (std::size_t state_index=0; state_index<states.size(); ++state_index)
       {
         OrbitalPNInfo state = states[state_index];
         OrbitalSubspacePNLabels labels(state.orbital_species);
@@ -487,7 +488,7 @@ namespace basis {
       return false;
 
     // check if subspaces are individually Nmax truncated
-    for (int subspace_index=0; subspace_index<size(); ++subspace_index)
+    for (std::size_t subspace_index=0; subspace_index<size(); ++subspace_index)
       {
         const SubspaceType& subspace = GetSubspace(subspace_index);
         if (!subspace.is_oscillator_like())
@@ -496,7 +497,7 @@ namespace basis {
 
     // see if can extract viable Nmax
     int Nmax = GetSubspace(0).Nmax();
-    for (int subspace_index=1; subspace_index<size(); ++subspace_index)
+    for (std::size_t subspace_index=1; subspace_index<size(); ++subspace_index)
       {
         const SubspaceType& subspace = GetSubspace(subspace_index);
         if (subspace.Nmax() != Nmax)
@@ -525,7 +526,7 @@ namespace basis {
     os << " (oscillator-like: " << oscillator_like_indicator << ")"
        << std::endl;
 
-    for (int subspace_index=0; subspace_index<size(); ++subspace_index)
+    for (std::size_t subspace_index=0; subspace_index<size(); ++subspace_index)
       {
         const SubspaceType& subspace = GetSubspace(subspace_index);
 
@@ -552,7 +553,7 @@ namespace basis {
   {
     OrbitalPNList orbitals;
 
-    for (int subspace_index=0; subspace_index<size(); ++subspace_index)
+    for (std::size_t subspace_index=0; subspace_index<size(); ++subspace_index)
       {
         const SubspaceType& subspace = GetSubspace(subspace_index);
         OrbitalPNList subspace_orbitals;
@@ -691,7 +692,7 @@ namespace basis {
 
     const int width = 3;
 
-    for (int state_index=0; state_index<size(); ++state_index) {
+    for (std::size_t state_index=0; state_index<size(); ++state_index) {
       OrbitalStateLJPN state(*this,state_index);
 
       os
@@ -719,7 +720,7 @@ namespace basis {
   {
     OrbitalPNList orbitals;
 
-    for (int state_index=0; state_index<size(); ++state_index)
+    for (std::size_t state_index=0; state_index<size(); ++state_index)
       {
         OrbitalStateLJPN state(*this,state_index);
         orbitals.push_back(state.OrbitalInfo());
@@ -807,7 +808,7 @@ namespace basis {
 
     // collect (l,j) subspace labels sorted in canonical order
     std::set<OrbitalSubspaceLJPNLabels> subspace_labels_set;
-    for (int state_index=0; state_index<states.size(); ++state_index)
+    for (std::size_t state_index=0; state_index<states.size(); ++state_index)
       {
         OrbitalPNInfo state = states[state_index];
         OrbitalSubspaceLJPNLabels labels(state.orbital_species,state.l,state.j);
@@ -849,7 +850,7 @@ namespace basis {
       return false;
 
     // check if subspaces are individually Nmax truncated
-    for (int subspace_index=0; subspace_index<size(); ++subspace_index)
+    for (std::size_t subspace_index=0; subspace_index<size(); ++subspace_index)
       {
         const SubspaceType& subspace = GetSubspace(subspace_index);
         if (!subspace.is_oscillator_like())
@@ -858,7 +859,7 @@ namespace basis {
 
     // see if can extract viable Nmax
     int Nmax = GetSubspace(0).Nmax();
-    for (int subspace_index=1; subspace_index<size(); ++subspace_index)
+    for (std::size_t subspace_index=1; subspace_index<size(); ++subspace_index)
       {
         const SubspaceType& subspace = GetSubspace(subspace_index);
         if (subspace.Nmax() != Nmax)
@@ -879,7 +880,7 @@ namespace basis {
 
     const int width = 3;
 
-    for (int subspace_index=0; subspace_index<size(); ++subspace_index) {
+    for (std::size_t subspace_index=0; subspace_index<size(); ++subspace_index) {
       const SubspaceType& subspace = GetSubspace(subspace_index);
 
       os
@@ -905,7 +906,7 @@ namespace basis {
   {
     OrbitalPNList orbitals;
 
-    for (int subspace_index=0; subspace_index<size(); ++subspace_index)
+    for (std::size_t subspace_index=0; subspace_index<size(); ++subspace_index)
       {
         const SubspaceType& subspace = GetSubspace(subspace_index);
         OrbitalPNList subspace_orbitals;
@@ -928,8 +929,8 @@ namespace basis {
     )
     : j0_(-1), g0_(-1), Tz0_(1)
   {
-    for (int bra_subspace_index=0; bra_subspace_index<bra_space.size(); ++bra_subspace_index) {
-      for (int ket_subspace_index=0; ket_subspace_index<ket_space.size(); ++ket_subspace_index) {
+    for (std::size_t bra_subspace_index=0; bra_subspace_index<bra_space.size(); ++bra_subspace_index) {
+      for (std::size_t ket_subspace_index=0; ket_subspace_index<ket_space.size(); ++ket_subspace_index) {
         // retrieve subspaces
         const SubspaceType& bra_subspace = bra_space.GetSubspace(bra_subspace_index);
         const SubspaceType& ket_subspace = ket_space.GetSubspace(ket_subspace_index);
@@ -945,8 +946,8 @@ namespace basis {
       int j0, int g0, int Tz0)
     : j0_(j0), g0_(g0), Tz0_(Tz0)
   {
-    for (int bra_subspace_index=0; bra_subspace_index<bra_space.size(); ++bra_subspace_index) {
-      for (int ket_subspace_index=0; ket_subspace_index<ket_space.size(); ++ket_subspace_index) {
+    for (std::size_t bra_subspace_index=0; bra_subspace_index<bra_space.size(); ++bra_subspace_index) {
+      for (std::size_t ket_subspace_index=0; ket_subspace_index<ket_space.size(); ++ket_subspace_index) {
 
         // retrieve subspaces
         const SubspaceType& bra_subspace = bra_space.GetSubspace(bra_subspace_index);
@@ -975,7 +976,7 @@ namespace basis {
     std::ostringstream os;
     int width = 3;
 
-    for (int sector_index=0; sector_index<size(); ++sector_index) {
+    for (std::size_t sector_index=0; sector_index<size(); ++sector_index) {
       // const basis::OrbitalSectorLJPN& sector = GetSector(sector_index);
       // os << sector_index+1 << sector.DebugStr();
       const basis::BaseSector<basis::OrbitalSubspaceLJPN>& sector =

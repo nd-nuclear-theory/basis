@@ -30,15 +30,18 @@
       CanonicalizeIndicesJT.
   + 09/06/18 (mac): Create jt_operator, by splitting out JT
       operator generic code from lsjt_operator.
+  + 05/09/19 (pjf): Use std::size_t for indices and sizes, to prevent
+    integer overflow.
 
 ****************************************************************/
 
 #ifndef BASIS_JT_OPERATOR_H_
 #define BASIS_JT_OPERATOR_H_
 
-#include <array>
+#include <cstddef>
 #include <cassert>
 #include <cstdlib>
+#include <array>
 #include <tuple>
 
 #include "basis/operator.h"
@@ -118,7 +121,7 @@ namespace basis {
   // See comments on relative LSJT file format and internal
   // representation of an operator in JT scheme for description.
   {
-    
+
   OperatorLabelsJT()
   // default constructor
   : J0(0), g0(0), T0_min(0), T0_max(0), symmetry_phase_mode(basis::SymmetryPhaseMode::kHermitian)
@@ -153,12 +156,12 @@ namespace basis {
     }
 
   template <typename tJTSpace>
-    std::tuple<int,int,int,int,bool,double> CanonicalizeIndicesJT(
+    std::tuple<std::size_t,std::size_t,std::size_t,std::size_t,bool,double> CanonicalizeIndicesJT(
         const tJTSpace& space,
         int J0, int T0, int g0,
         basis::SymmetryPhaseMode symmetry_phase_mode,
-        int subspace_index_bra, int subspace_index_ket,
-        int state_index_bra, int state_index_ket
+        std::size_t subspace_index_bra, std::size_t subspace_index_ket,
+        std::size_t state_index_bra, std::size_t state_index_ket
       )
   // Convert subspace and state indices for a matrix element to
   // canonical ("upper triangle") indices.
@@ -177,9 +180,9 @@ namespace basis {
   //   J0, T0, g0 (int): operator tensorial properties
   //   symmetry_phase_mode (basis::SymmetryPhaseMode): operator
   //      conjugation symmetry
-  //   bra_subspace_index, ket_subspace_index (int):
+  //   bra_subspace_index, ket_subspace_index (std::size_t):
   //     naive sector bra and ket subspace indices, possibly to be swapped
-  //   bra_state_index, ket_state_index (int):
+  //   bra_state_index, ket_state_index (std::size_t):
   //     naive bra and ket state indices, possibly to be swapped if sector
   //     is diagonal sector
   //
@@ -245,7 +248,7 @@ namespace basis {
       }
 
     // bundle return values
-    return std::tuple<int,int,int,int,bool,double>(
+    return std::tuple<std::size_t,std::size_t,std::size_t,std::size_t,bool,double>(
         subspace_index_bra,subspace_index_ket,
         state_index_bra,state_index_ket,
         swapped_subspaces,
@@ -254,11 +257,11 @@ namespace basis {
   }
 
   template <typename tJTSpace>
-    std::tuple<int,int,bool,double> CanonicalizeIndicesJT(
+    std::tuple<std::size_t,std::size_t,bool,double> CanonicalizeIndicesJT(
         const tJTSpace& space,
         int J0, int T0, int g0,
         basis::SymmetryPhaseMode symmetry_phase_mode,
-        int subspace_index_bra, int subspace_index_ket
+        std::size_t subspace_index_bra, std::size_t subspace_index_ket
       )
   // Convert subspace indices for a matrix element to
   // canonical ("upper triangle") indices.
@@ -277,7 +280,7 @@ namespace basis {
   //   J0, T0, g0 (int): operator tensorial properties
   //   symmetry_phase_mode (basis::SymmetryPhaseMode): operator
   //      conjugation symmetry
-  //   bra_subspace_index, ket_subspace_index (int):
+  //   bra_subspace_index, ket_subspace_index (std::size_t):
   //     naive sector bra and ket subspace indices, possibly to be swapped
   //
   // Returns:
@@ -305,13 +308,13 @@ namespace basis {
         );
 
     // bundle return values
-    return std::tuple<int,int,bool,double>(
+    return std::tuple<std::size_t,std::size_t,bool,double>(
         subspace_index_bra,subspace_index_ket,
         swapped_subspaces,
         canonicalization_factor
       );
 
-  }      
+  }
 
 
   ////////////////////////////////////////////////////////////////

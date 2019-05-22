@@ -32,7 +32,7 @@ void TestRelative()
 
 
   // index-based looping
-  for (int k=0; k<subspace.size(); ++k)
+  for (std::size_t k=0; k<subspace.size(); ++k)
     {
       basis::RelativeStateLSJT state(subspace,k);
       std::cout << "index " << state.index() << " N " << state.N() << std::endl;
@@ -72,24 +72,24 @@ void TestRelative()
 
 
   std::cout << " J0 " << J0 << " T0 " << T0 << " g0 " << g0 << std::endl;
-  for (int sector_index=0; sector_index < sectors.size(); ++sector_index)
+  for (std::size_t sector_index=0; sector_index < sectors.size(); ++sector_index)
     {
-      int bra_subspace_index = sectors.GetSector(sector_index).bra_subspace_index();
+      std::size_t bra_subspace_index = sectors.GetSector(sector_index).bra_subspace_index();
       const basis::RelativeSubspaceLSJT& bra_subspace = sectors.GetSector(sector_index).bra_subspace();
-      int ket_subspace_index = sectors.GetSector(sector_index).ket_subspace_index();
+      std::size_t ket_subspace_index = sectors.GetSector(sector_index).ket_subspace_index();
       const basis::RelativeSubspaceLSJT& ket_subspace = sectors.GetSector(sector_index).ket_subspace();
 
-      std::cout 
-        << " sector " 
-        << std::setw(3) << sector_index 
+      std::cout
+        << " sector "
+        << std::setw(3) << sector_index
         << "     "
         << " index "
         << std::setw(3) << bra_subspace_index
         << " LSJTg "
-        << std::setw(3) << bra_subspace.L() 
-        << std::setw(3) << bra_subspace.S() 
-        << std::setw(3) << bra_subspace.J() 
-        << std::setw(3) << bra_subspace.T() 
+        << std::setw(3) << bra_subspace.L()
+        << std::setw(3) << bra_subspace.S()
+        << std::setw(3) << bra_subspace.J()
+        << std::setw(3) << bra_subspace.T()
         << std::setw(3) << bra_subspace.g()
         << " dim "
         << std::setw(3) << bra_subspace.size()
@@ -97,10 +97,10 @@ void TestRelative()
         << " index "
         << std::setw(3) << ket_subspace_index
         << " LSJTg "
-        << std::setw(3) << ket_subspace.L() 
-        << std::setw(3) << ket_subspace.S() 
-        << std::setw(3) << ket_subspace.J() 
-        << std::setw(3) << ket_subspace.T() 
+        << std::setw(3) << ket_subspace.L()
+        << std::setw(3) << ket_subspace.S()
+        << std::setw(3) << ket_subspace.J()
+        << std::setw(3) << ket_subspace.T()
         << std::setw(3) << ket_subspace.g()
         << " dim "
         << std::setw(3) << ket_subspace.size()
@@ -142,24 +142,24 @@ void TestRelativeCM()
   basis::RelativeCMSectorsLSJT sectors(space,J0,T0,g0);
 
   std::cout << " J0 " << J0 << " T0 " << T0 << " g0 " << g0 << std::endl;
-  for (int sector_index=0; sector_index < sectors.size(); ++sector_index)
+  for (std::size_t sector_index=0; sector_index < sectors.size(); ++sector_index)
     {
-      int bra_subspace_index = sectors.GetSector(sector_index).bra_subspace_index();
+      std::size_t bra_subspace_index = sectors.GetSector(sector_index).bra_subspace_index();
       const basis::RelativeCMSubspaceLSJT& bra_subspace = sectors.GetSector(sector_index).bra_subspace();
-      int ket_subspace_index = sectors.GetSector(sector_index).ket_subspace_index();
+      std::size_t ket_subspace_index = sectors.GetSector(sector_index).ket_subspace_index();
       const basis::RelativeCMSubspaceLSJT& ket_subspace = sectors.GetSector(sector_index).ket_subspace();
 
-      std::cout 
-        << " sector " 
-        << std::setw(3) << sector_index 
+      std::cout
+        << " sector "
+        << std::setw(3) << sector_index
         << "     "
         << " index "
         << std::setw(3) << bra_subspace_index
         << " LSJTg "
-        << std::setw(3) << bra_subspace.L() 
-        << std::setw(3) << bra_subspace.S() 
-        << std::setw(3) << bra_subspace.J() 
-        << std::setw(3) << bra_subspace.T() 
+        << std::setw(3) << bra_subspace.L()
+        << std::setw(3) << bra_subspace.S()
+        << std::setw(3) << bra_subspace.J()
+        << std::setw(3) << bra_subspace.T()
         << std::setw(3) << bra_subspace.g()
         // << std::setw(3) << bra_subspace.Nmax()
         << " dim "
@@ -168,10 +168,10 @@ void TestRelativeCM()
         << " index "
         << std::setw(3) << ket_subspace_index
         << " LSJTg "
-        << std::setw(3) << ket_subspace.L() 
-        << std::setw(3) << ket_subspace.S() 
-        << std::setw(3) << ket_subspace.J() 
-        << std::setw(3) << ket_subspace.T() 
+        << std::setw(3) << ket_subspace.L()
+        << std::setw(3) << ket_subspace.S()
+        << std::setw(3) << ket_subspace.J()
+        << std::setw(3) << ket_subspace.T()
         << std::setw(3) << ket_subspace.g()
         // << std::setw(3) << ket_subspace.Nmax()
         << " dim "
@@ -205,24 +205,24 @@ void TestRelativeCMN()
   basis::RelativeCMSectorsLSJTN sectors(space,J0,T0,g0);
 
   std::cout << " J0 " << J0 << " T0 " << T0 << " g0 " << g0 << std::endl;
-  for (int sector_index=0; sector_index < sectors.size(); ++sector_index)
+  for (std::size_t sector_index=0; sector_index < sectors.size(); ++sector_index)
     {
-      int bra_subspace_index = sectors.GetSector(sector_index).bra_subspace_index();
+      std::size_t bra_subspace_index = sectors.GetSector(sector_index).bra_subspace_index();
       const basis::RelativeCMSubspaceLSJTN& bra_subspace = sectors.GetSector(sector_index).bra_subspace();
-      int ket_subspace_index = sectors.GetSector(sector_index).ket_subspace_index();
+      std::size_t ket_subspace_index = sectors.GetSector(sector_index).ket_subspace_index();
       const basis::RelativeCMSubspaceLSJTN& ket_subspace = sectors.GetSector(sector_index).ket_subspace();
 
-      std::cout 
-        << " sector " 
-        << std::setw(3) << sector_index 
+      std::cout
+        << " sector "
+        << std::setw(3) << sector_index
         << "     "
         << " index "
         << std::setw(3) << bra_subspace_index
         << " LSJTg-N "
-        << std::setw(3) << bra_subspace.L() 
-        << std::setw(3) << bra_subspace.S() 
-        << std::setw(3) << bra_subspace.J() 
-        << std::setw(3) << bra_subspace.T() 
+        << std::setw(3) << bra_subspace.L()
+        << std::setw(3) << bra_subspace.S()
+        << std::setw(3) << bra_subspace.J()
+        << std::setw(3) << bra_subspace.T()
         << std::setw(3) << bra_subspace.g()
         << std::setw(3) << bra_subspace.N()
         << " dim "
@@ -231,10 +231,10 @@ void TestRelativeCMN()
         << " index "
         << std::setw(3) << ket_subspace_index
         << " LSJTg-N "
-        << std::setw(3) << ket_subspace.L() 
-        << std::setw(3) << ket_subspace.S() 
-        << std::setw(3) << ket_subspace.J() 
-        << std::setw(3) << ket_subspace.T() 
+        << std::setw(3) << ket_subspace.L()
+        << std::setw(3) << ket_subspace.S()
+        << std::setw(3) << ket_subspace.J()
+        << std::setw(3) << ket_subspace.T()
         << std::setw(3) << ket_subspace.g()
         << std::setw(3) << ket_subspace.N()
         << " dim "
@@ -275,24 +275,24 @@ void TestTwoBody()
   basis::TwoBodySectorsLSJT sectors(space,J0,T0,g0);
 
   std::cout << " J0 " << J0 << " T0 " << T0 << " g0 " << g0 << std::endl;
-  for (int sector_index=0; sector_index < sectors.size(); ++sector_index)
+  for (std::size_t sector_index=0; sector_index < sectors.size(); ++sector_index)
     {
-      int bra_subspace_index = sectors.GetSector(sector_index).bra_subspace_index();
+      std::size_t bra_subspace_index = sectors.GetSector(sector_index).bra_subspace_index();
       const basis::TwoBodySubspaceLSJT& bra_subspace = sectors.GetSector(sector_index).bra_subspace();
-      int ket_subspace_index = sectors.GetSector(sector_index).ket_subspace_index();
+      std::size_t ket_subspace_index = sectors.GetSector(sector_index).ket_subspace_index();
       const basis::TwoBodySubspaceLSJT& ket_subspace = sectors.GetSector(sector_index).ket_subspace();
 
-      std::cout 
-        << " sector " 
-        << std::setw(3) << sector_index 
+      std::cout
+        << " sector "
+        << std::setw(3) << sector_index
         << "     "
         << " index "
         << std::setw(3) << bra_subspace_index
         << " LSJTg "
-        << std::setw(3) << bra_subspace.L() 
-        << std::setw(3) << bra_subspace.S() 
-        << std::setw(3) << bra_subspace.J() 
-        << std::setw(3) << bra_subspace.T() 
+        << std::setw(3) << bra_subspace.L()
+        << std::setw(3) << bra_subspace.S()
+        << std::setw(3) << bra_subspace.J()
+        << std::setw(3) << bra_subspace.T()
         << std::setw(3) << bra_subspace.g()
         // << std::setw(3) << bra_subspace.Nmax()
         << " dim "
@@ -301,10 +301,10 @@ void TestTwoBody()
         << " index "
         << std::setw(3) << ket_subspace_index
         << " LSJTg "
-        << std::setw(3) << ket_subspace.L() 
-        << std::setw(3) << ket_subspace.S() 
-        << std::setw(3) << ket_subspace.J() 
-        << std::setw(3) << ket_subspace.T() 
+        << std::setw(3) << ket_subspace.L()
+        << std::setw(3) << ket_subspace.S()
+        << std::setw(3) << ket_subspace.J()
+        << std::setw(3) << ket_subspace.T()
         << std::setw(3) << ket_subspace.g()
         // << std::setw(3) << ket_subspace.Nmax()
         << " dim "
@@ -345,24 +345,24 @@ void TestTwoBodyN1max()
   basis::TwoBodySectorsLSJT sectors(space,J0,T0,g0);
 
   std::cout << " J0 " << J0 << " T0 " << T0 << " g0 " << g0 << std::endl;
-  for (int sector_index=0; sector_index < sectors.size(); ++sector_index)
+  for (std::size_t sector_index=0; sector_index < sectors.size(); ++sector_index)
     {
-      int bra_subspace_index = sectors.GetSector(sector_index).bra_subspace_index();
+      std::size_t bra_subspace_index = sectors.GetSector(sector_index).bra_subspace_index();
       const basis::TwoBodySubspaceLSJT& bra_subspace = sectors.GetSector(sector_index).bra_subspace();
-      int ket_subspace_index = sectors.GetSector(sector_index).ket_subspace_index();
+      std::size_t ket_subspace_index = sectors.GetSector(sector_index).ket_subspace_index();
       const basis::TwoBodySubspaceLSJT& ket_subspace = sectors.GetSector(sector_index).ket_subspace();
 
-      std::cout 
-        << " sector " 
-        << std::setw(3) << sector_index 
+      std::cout
+        << " sector "
+        << std::setw(3) << sector_index
         << "     "
         << " index "
         << std::setw(3) << bra_subspace_index
         << " LSJTg "
-        << std::setw(3) << bra_subspace.L() 
-        << std::setw(3) << bra_subspace.S() 
-        << std::setw(3) << bra_subspace.J() 
-        << std::setw(3) << bra_subspace.T() 
+        << std::setw(3) << bra_subspace.L()
+        << std::setw(3) << bra_subspace.S()
+        << std::setw(3) << bra_subspace.J()
+        << std::setw(3) << bra_subspace.T()
         << std::setw(3) << bra_subspace.g()
         // << std::setw(3) << bra_subspace.Nmax()
         << " dim "
@@ -371,10 +371,10 @@ void TestTwoBodyN1max()
         << " index "
         << std::setw(3) << ket_subspace_index
         << " LSJTg "
-        << std::setw(3) << ket_subspace.L() 
-        << std::setw(3) << ket_subspace.S() 
-        << std::setw(3) << ket_subspace.J() 
-        << std::setw(3) << ket_subspace.T() 
+        << std::setw(3) << ket_subspace.L()
+        << std::setw(3) << ket_subspace.S()
+        << std::setw(3) << ket_subspace.J()
+        << std::setw(3) << ket_subspace.T()
         << std::setw(3) << ket_subspace.g()
         // << std::setw(3) << ket_subspace.Nmax()
         << " dim "
@@ -414,24 +414,24 @@ void TestTwoBodyN()
   basis::TwoBodySectorsLSJTN sectors(space,J0,T0,g0);
 
   std::cout << " J0 " << J0 << " T0 " << T0 << " g0 " << g0 << std::endl;
-  // for (int sector_index=0; sector_index < sectors.size(); ++sector_index)
+  // for (std::size_t sector_index=0; sector_index < sectors.size(); ++sector_index)
   //   {
-  //     int bra_subspace_index = sectors.GetSector(sector_index).bra_subspace_index();
+  //     std::size_t bra_subspace_index = sectors.GetSector(sector_index).bra_subspace_index();
   //     const basis::TwoBodySubspaceLSJTN& bra_subspace = sectors.GetSector(sector_index).bra_subspace();
-  //     int ket_subspace_index = sectors.GetSector(sector_index).ket_subspace_index();
+  //     std::size_t ket_subspace_index = sectors.GetSector(sector_index).ket_subspace_index();
   //     const basis::TwoBodySubspaceLSJTN& ket_subspace = sectors.GetSector(sector_index).ket_subspace();
   //
-  //     std::cout 
-  //       << " sector " 
-  //       << std::setw(3) << sector_index 
+  //     std::cout
+  //       << " sector "
+  //       << std::setw(3) << sector_index
   //       << "     "
   //       << " index "
   //       << std::setw(3) << bra_subspace_index
   //       << " LSJTg-N "
-  //       << std::setw(3) << bra_subspace.L() 
-  //       << std::setw(3) << bra_subspace.S() 
-  //       << std::setw(3) << bra_subspace.J() 
-  //       << std::setw(3) << bra_subspace.T() 
+  //       << std::setw(3) << bra_subspace.L()
+  //       << std::setw(3) << bra_subspace.S()
+  //       << std::setw(3) << bra_subspace.J()
+  //       << std::setw(3) << bra_subspace.T()
   //       << std::setw(3) << bra_subspace.g()
   //       << std::setw(3) << bra_subspace.N()
   //       << " dim "
@@ -440,10 +440,10 @@ void TestTwoBodyN()
   //       << " index "
   //       << std::setw(3) << ket_subspace_index
   //       << " LSJTg-N "
-  //       << std::setw(3) << ket_subspace.L() 
-  //       << std::setw(3) << ket_subspace.S() 
-  //       << std::setw(3) << ket_subspace.J() 
-  //       << std::setw(3) << ket_subspace.T() 
+  //       << std::setw(3) << ket_subspace.L()
+  //       << std::setw(3) << ket_subspace.S()
+  //       << std::setw(3) << ket_subspace.J()
+  //       << std::setw(3) << ket_subspace.T()
   //       << std::setw(3) << ket_subspace.g()
   //       << std::setw(3) << ket_subspace.N()
   //       << " dim "

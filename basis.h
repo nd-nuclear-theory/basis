@@ -103,12 +103,16 @@
     (BASIS_ALLOW_DEPRECATED).
   + 6/11/17 (mac): Rename TotalDimension to Dimension.
   + 08/11/17 (pjf): Emit warnings if deprecated member functions are used.
+  + 05/09/19 (pjf): Use std::size_t for indices and sizes, to prevent
+    integer overflow.
 ****************************************************************/
 
 #ifndef BASIS_BASIS_H_
 #define BASIS_BASIS_H_
 
 #include <cassert>
+#include <cstddef>
+#include <limits>
 #include <tuple>
 #include <vector>
 
@@ -128,7 +132,7 @@
 
 namespace basis {
 
-  static const int kNone = -1;
+  static constexpr std::size_t kNone = std::numeric_limits<std::size_t>::max();
   // Flag value for missing target in index lookups.
 
   ////////////////////////////////////////////////////////////////
@@ -193,7 +197,7 @@ namespace basis {
     }
 #endif
 
-    const StateLabelsType& GetStateLabels(int index) const
+    const StateLabelsType& GetStateLabels(std::size_t index) const
     /// Retrieve the labels of a state within the subspace, given its
     /// index within the subspace.
     ///
@@ -215,7 +219,7 @@ namespace basis {
       return lookup_.count(state_labels);
     };
 
-    int LookUpStateIndex(const StateLabelsType& state_labels) const
+    std::size_t LookUpStateIndex(const StateLabelsType& state_labels) const
     /// Given the labels for a state, look up its index within the
     /// subspace.
     ///
@@ -236,7 +240,7 @@ namespace basis {
     // size retrieval
     ////////////////////////////////////////////////////////////////
 
-    int size() const
+    std::size_t size() const
     /// Return the size of the subspace.
     {
       return dimension_;
@@ -263,16 +267,16 @@ namespace basis {
 
     // subspace properties
     SubspaceLabelsType labels_;
-    int dimension_;
+    std::size_t dimension_;
 
     // state labels (accessible by index)
     std::vector<StateLabelsType> state_table_;
 
     // state index lookup by labels
 #ifdef BASIS_HASH
-    std::unordered_map<StateLabelsType,int,boost::hash<StateLabelsType>> lookup_;
+    std::unordered_map<StateLabelsType,std::size_t,boost::hash<StateLabelsType>> lookup_;
 #else
-    std::map<StateLabelsType,int> lookup_;
+    std::map<StateLabelsType,std::size_t> lookup_;
 #endif
 
   };
@@ -317,7 +321,7 @@ namespace basis {
 
       // constructors
 
-      BaseState(const SubspaceType& subspace, int index)
+      BaseState(const SubspaceType& subspace, std::size_t index)
         /// Construct state, given index within subspace.
         : subspace_ptr_(&subspace), index_(index)
       {
@@ -385,7 +389,7 @@ namespace basis {
       }
 #endif
 
-      int index() const
+      std::size_t index() const
       /// Retrieve integer index of state within subspace.
       {return index_;}
 
@@ -428,7 +432,7 @@ namespace basis {
 
       private:
 
-      int ValidIndex() const
+      std::size_t ValidIndex() const
       /// Verify whether or not state indexing lies within allowed
       /// dimension.
       ///
@@ -444,7 +448,7 @@ namespace basis {
       ////////////////////////////////////////////////////////////////
 
       const SubspaceType* subspace_ptr_;  ///< subspace in which state lies
-      int index_;   ///< 0-based index within space
+      std::size_t index_;   ///< 0-based index within space
 
     };
 
@@ -482,7 +486,9 @@ namespace basis {
         return lookup_.count(subspace_labels);
       }
 
-      int LookUpSubspaceIndex(const typename SubspaceType::SubspaceLabelsType& subspace_labels) const
+      std::size_t LookUpSubspaceIndex(
+          const typename SubspaceType::SubspaceLabelsType& subspace_labels
+        ) const
       /// Given the labels for a subspace, look up its index within the
       /// space.
       ///
@@ -500,7 +506,9 @@ namespace basis {
           return pos->second;
       };
 
-      const SubspaceType& LookUpSubspace(const typename SubspaceType::SubspaceLabelsType& subspace_labels) const
+      const SubspaceType& LookUpSubspace(
+          const typename SubspaceType::SubspaceLabelsType& subspace_labels
+        ) const
       /// Given the labels for a subspace, retrieve a reference to the
       /// subspace.
       ///
@@ -508,12 +516,12 @@ namespace basis {
       /// (enforced by LookUpSubspaceIndex).
       {
 
-        int subspace_index = LookUpSubspaceIndex(subspace_labels);
+        std::size_t subspace_index = LookUpSubspaceIndex(subspace_labels);
         assert(subspace_index!=kNone);
         return subspaces_[subspace_index];
       };
 
-      const SubspaceType& GetSubspace(int i) const
+      const SubspaceType& GetSubspace(std::size_t i) const
       /// Given the index for a subspace, return a reference to the
       /// subspace.
       {
@@ -524,17 +532,17 @@ namespace basis {
       // size retrieval
       ////////////////////////////////////////////////////////////////
 
-      int size() const
+      std::size_t size() const
       /// Return the number of subspaces within the space.
       {
         return subspaces_.size();
       };
 
-      int Dimension() const
+      std::size_t Dimension() const
       /// Return the total dimension of all subspaces within the space.
       {
-        int dimension = 0;
-        for (int subspace_index=0; subspace_index<size(); ++subspace_index)
+        std::size_t dimension = 0;
+        for (std::size_t subspace_index=0; subspace_index<size(); ++subspace_index)
           dimension += GetSubspace(subspace_index).size();
         return dimension;
       }
@@ -562,9 +570,12 @@ namespace basis {
 
       // subspace index lookup by labels
 #ifdef BASIS_HASH
-      std::unordered_map<typename SubspaceType::SubspaceLabelsType,int,boost::hash<typename SubspaceType::SubspaceLabelsType>> lookup_;
+      std::unordered_map<
+          typename SubspaceType::SubspaceLabelsType,std::size_t,
+          boost::hash<typename SubspaceType::SubspaceLabelsType>
+        > lookup_;
 #else
-      std::map<typename SubspaceType::SubspaceLabelsType,int> lookup_;
+      std::map<typename SubspaceType::SubspaceLabelsType,std::size_t> lookup_;
 #endif
     };
 
@@ -599,18 +610,20 @@ namespace basis {
 
       public:
       typedef tSubspaceType SubspaceType;
-      typedef std::tuple<int,int,int> KeyType;
+      typedef std::tuple<std::size_t,std::size_t,std::size_t> KeyType;
 
       ////////////////////////////////////////////////////////////////
       // constructors
       ////////////////////////////////////////////////////////////////
 
       BaseSector(
-          int bra_subspace_index, int ket_subspace_index,
+          std::size_t bra_subspace_index, std::size_t ket_subspace_index,
           const SubspaceType& bra_subspace, const SubspaceType& ket_subspace,
-          int multiplicity_index=1
+          std::size_t multiplicity_index=1
         )
-        : bra_subspace_index_(bra_subspace_index), ket_subspace_index_(ket_subspace_index), multiplicity_index_(multiplicity_index)
+        : bra_subspace_index_(bra_subspace_index),
+          ket_subspace_index_(ket_subspace_index),
+          multiplicity_index_(multiplicity_index)
       {
         bra_subspace_ptr_ = &bra_subspace;
         ket_subspace_ptr_ = &ket_subspace;
@@ -627,15 +640,15 @@ namespace basis {
         return KeyType(bra_subspace_index(),ket_subspace_index(),multiplicity_index());
       }
 
-      int bra_subspace_index() const {return bra_subspace_index_;}
-      int ket_subspace_index() const {return ket_subspace_index_;}
+      std::size_t bra_subspace_index() const {return bra_subspace_index_;}
+      std::size_t ket_subspace_index() const {return ket_subspace_index_;}
       // Return integer index of bra/ket subspace.
 
       const SubspaceType& bra_subspace() const {return *bra_subspace_ptr_;}
       const SubspaceType& ket_subspace() const {return *ket_subspace_ptr_;}
       // Return reference to bra/ket subspace.
 
-      int multiplicity_index() const {return multiplicity_index_;}
+      std::size_t multiplicity_index() const {return multiplicity_index_;}
       // Return multiplicity index of this sector.
 
       inline bool IsDiagonal() const
@@ -651,10 +664,10 @@ namespace basis {
       }
 
       private:
-      int bra_subspace_index_, ket_subspace_index_;
+      std::size_t bra_subspace_index_, ket_subspace_index_;
       const SubspaceType* bra_subspace_ptr_;
       const SubspaceType* ket_subspace_ptr_;
-      int multiplicity_index_;
+      std::size_t multiplicity_index_;
     };
 
   // SectorDirection -- sector direction specifier
@@ -691,13 +704,17 @@ namespace basis {
       // sector lookup and retrieval
       ////////////////////////////////////////////////////////////////
 
-      const SectorType& GetSector(int sector_index) const
+      const SectorType& GetSector(std::size_t sector_index) const
       // Given sector index, return reference to sector itself.
       {
         return sectors_[sector_index];
       };
 
-      bool ContainsSector(int bra_subspace_index, int ket_subspace_index, int multiplicity_index=1) const
+      bool ContainsSector(
+          std::size_t bra_subspace_index,
+          std::size_t ket_subspace_index,
+          std::size_t multiplicity_index=1
+        ) const
       // Given the labels for a sector, returns whether or not the sector
       // is found within the the sector set.
       {
@@ -717,7 +734,11 @@ namespace basis {
       };
 #endif
 
-      int LookUpSectorIndex(int bra_subspace_index, int ket_subspace_index, int multiplicity_index=1) const
+      std::size_t LookUpSectorIndex(
+          std::size_t bra_subspace_index,
+          std::size_t ket_subspace_index,
+          std::size_t multiplicity_index=1
+        ) const
       // Given the labels for a sector, look up its index within the
       // sector set.
       //
@@ -733,7 +754,7 @@ namespace basis {
 
 #ifdef BASIS_ALLOW_DEPRECATED
       DEPRECATED("lookup by bra and ket subspace indices instead")
-      int LookUpSectorIndex(const typename SectorType::KeyType& key) const
+      std::size_t LookUpSectorIndex(const typename SectorType::KeyType& key) const
       // Given the labels for a sector, look up its index within the
       // sector set.
       //
@@ -758,7 +779,7 @@ namespace basis {
       // size retrieval
       ////////////////////////////////////////////////////////////////
 
-      int size() const
+      std::size_t size() const
       // Return number of sectors within sector set.
       {
         return sectors_.size();
@@ -796,9 +817,12 @@ namespace basis {
 
       // sector index lookup by subspace indices
 #ifdef BASIS_HASH
-      std::unordered_map<typename SectorType::KeyType,int,boost::hash<typename SectorType::KeyType>> lookup_;
+      std::unordered_map<
+          typename SectorType::KeyType,std::size_t,
+          boost::hash<typename SectorType::KeyType>
+        > lookup_;
 #else
-      std::map<typename SectorType::KeyType,int> lookup_;
+      std::map<typename SectorType::KeyType,std::size_t> lookup_;
 #endif
 
     };
@@ -807,7 +831,7 @@ namespace basis {
     std::string BaseSectors<tSpaceType>::DebugStr() const
     {
       std::ostringstream os;
-      for (int sector_index=0; sector_index<size(); ++sector_index)
+      for (std::size_t sector_index=0; sector_index<size(); ++sector_index)
         {
           const SectorType& sector = GetSector(sector_index);
 

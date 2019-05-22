@@ -8,11 +8,14 @@
   Patrick J. Fasano
   University of Notre Dame
 
-  + 7/10/16 (pjf): Created (m_scheme), building on code from nlj_orbital.
+  + 07/10/16 (pjf): Created (m_scheme), building on code from nlj_orbital.
+  + 05/09/19 (pjf): Use std::size_t for indices and sizes, to prevent
+    integer overflow.
 */
 #ifndef BASIS_M_SCHEME_H_
 #define BASIS_M_SCHEME_H_
 
+#include <cstddef>
 #include <tuple>
 #include <vector>
 
@@ -150,7 +153,7 @@ namespace basis {
 
       // pass-through constructors
 
-      SingleParticleStatePN(const SubspaceType& subspace, int index)
+      SingleParticleStatePN(const SubspaceType& subspace, std::size_t index)
         // Construct state by index.
         : BaseState (subspace, index) {}
 

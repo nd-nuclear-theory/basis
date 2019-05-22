@@ -8,6 +8,7 @@
 
 #include "lsjt_operator.h"
 
+#include <cstddef>
 #include <fstream>
 
 #include "mcutils/parsing.h"
@@ -75,7 +76,7 @@ namespace basis {
   {
 
     // iterate over sectors
-    for (int sector_index = 0; sector_index < sectors.size(); ++sector_index)
+    for (std::size_t sector_index = 0; sector_index < sectors.size(); ++sector_index)
       {
 
         // extract sector
@@ -87,8 +88,8 @@ namespace basis {
         Eigen::MatrixXd sector_matrix = Eigen::MatrixXd::Zero(bra_subspace.size(),ket_subspace.size());
 
         // retrieve matrix elements
-        for (int bra_index=0; bra_index<bra_subspace.size(); ++bra_index)
-          for (int ket_index=0; ket_index<ket_subspace.size(); ++ket_index)
+        for (std::size_t bra_index=0; bra_index<bra_subspace.size(); ++bra_index)
+          for (std::size_t ket_index=0; ket_index<ket_subspace.size(); ++ket_index)
             {
 
               // diagonal sector: restrict to upper triangle
@@ -162,7 +163,7 @@ namespace basis {
   {
 
     // iterate over sectors
-    for (int sector_index = 0; sector_index < sectors.size(); ++sector_index)
+    for (std::size_t sector_index = 0; sector_index < sectors.size(); ++sector_index)
       {
 
         // extract sector
@@ -178,8 +179,8 @@ namespace basis {
         assert(sector.bra_subspace_index()<=sector.ket_subspace_index());
 
         // iterate over matrix elements
-        for (int bra_index=0; bra_index<bra_subspace.size(); ++bra_index)
-          for (int ket_index=0; ket_index<ket_subspace.size(); ++ket_index)
+        for (std::size_t bra_index=0; bra_index<bra_subspace.size(); ++bra_index)
+          for (std::size_t ket_index=0; ket_index<ket_subspace.size(); ++ket_index)
             {
 
               // diagonal sector: restrict to upper triangle
@@ -516,7 +517,7 @@ namespace basis {
 
         // populate matrices
         relative_cm_lsjt_component_matrices[T0].resize(relative_cm_lsjt_component_sectors[T0].size());
-        for (int sector_index=0; sector_index<relative_cm_lsjt_component_sectors[T0].size(); ++sector_index)
+        for (std::size_t sector_index=0; sector_index<relative_cm_lsjt_component_sectors[T0].size(); ++sector_index)
           {
             // retrieve target sector
             const basis::RelativeCMSectorsLSJT::SectorType& relative_cm_lsjt_sector
@@ -530,8 +531,8 @@ namespace basis {
               );
 
             // populate matrix elements
-            for (int bra_index = 0; bra_index < relative_cm_lsjt_sector.bra_subspace().size(); ++bra_index)
-              for (int ket_index = 0; ket_index < relative_cm_lsjt_sector.ket_subspace().size(); ++ket_index)
+            for (std::size_t bra_index = 0; bra_index < relative_cm_lsjt_sector.bra_subspace().size(); ++bra_index)
+              for (std::size_t ket_index = 0; ket_index < relative_cm_lsjt_sector.ket_subspace().size(); ++ket_index)
                 // for each target matrix element
                 {
 
@@ -559,11 +560,11 @@ namespace basis {
                     );
 
                   // extract source bra indices
-                  int relative_cm_lsjtn_subspace_index_bra
+                  std::size_t relative_cm_lsjtn_subspace_index_bra
                     = relative_cm_lsjtn_space.LookUpSubspaceIndex(
                         relative_cm_lsjtn_subspace_labels_bra
                       );
-                  int relative_cm_lsjtn_state_index_bra
+                  std::size_t relative_cm_lsjtn_state_index_bra
                     = relative_cm_lsjtn_space.GetSubspace(relative_cm_lsjtn_subspace_index_bra).LookUpStateIndex(
                         relative_cm_lsjtn_state_labels_bra
                       );
@@ -583,11 +584,11 @@ namespace basis {
                     );
 
                   // extract source ket indices
-                  int relative_cm_lsjtn_subspace_index_ket
+                  std::size_t relative_cm_lsjtn_subspace_index_ket
                     = relative_cm_lsjtn_space.LookUpSubspaceIndex(
                         relative_cm_lsjtn_subspace_labels_ket
                       );
-                  int relative_cm_lsjtn_state_index_ket
+                  std::size_t relative_cm_lsjtn_state_index_ket
                     = relative_cm_lsjtn_space.GetSubspace(relative_cm_lsjtn_subspace_index_ket).LookUpStateIndex(
                         relative_cm_lsjtn_state_labels_ket
                       );
@@ -634,7 +635,7 @@ namespace basis {
                   // triangular) LSJTN sector.
 
                   // look up matrix element
-                  int relative_cm_lsjtn_sector_index
+                  std::size_t relative_cm_lsjtn_sector_index
                     = relative_cm_lsjtn_component_sectors[T0].LookUpSectorIndex(
                         relative_cm_lsjtn_subspace_index_bra,
                         relative_cm_lsjtn_subspace_index_ket
@@ -674,7 +675,7 @@ namespace basis {
 
         // populate matrices
         relative_cm_lsjtn_component_matrices[T0].resize(relative_cm_lsjtn_component_sectors[T0].size());
-        for (int sector_index=0; sector_index<relative_cm_lsjtn_component_sectors[T0].size(); ++sector_index)
+        for (std::size_t sector_index=0; sector_index<relative_cm_lsjtn_component_sectors[T0].size(); ++sector_index)
           {
             // retrieve target sector
             const basis::RelativeCMSectorsLSJTN::SectorType& relative_cm_lsjtn_sector
@@ -688,7 +689,7 @@ namespace basis {
               );
 
             // populate matrix elements
-            for (int bra_index = 0; bra_index < relative_cm_lsjtn_sector.bra_subspace().size(); ++bra_index)
+            for (std::size_t bra_index = 0; bra_index < relative_cm_lsjtn_sector.bra_subspace().size(); ++bra_index)
               {
                 // retreive target bra state
                 basis::RelativeCMStateLSJTN relative_cm_lsjtn_bra(relative_cm_lsjtn_sector.bra_subspace(),bra_index);
@@ -707,16 +708,16 @@ namespace basis {
                   );
 
                 // extract source bra indices
-                int relative_cm_lsjt_subspace_index_bra
+                std::size_t relative_cm_lsjt_subspace_index_bra
                   = relative_cm_lsjt_space.LookUpSubspaceIndex(
                       relative_cm_lsjt_subspace_labels_bra
                     );
-                int relative_cm_lsjt_state_index_bra
+                std::size_t relative_cm_lsjt_state_index_bra
                   = relative_cm_lsjt_space.GetSubspace(relative_cm_lsjt_subspace_index_bra).LookUpStateIndex(
                       relative_cm_lsjt_state_labels_bra
                     );
 
-                for (int ket_index = 0; ket_index < relative_cm_lsjtn_sector.ket_subspace().size(); ++ket_index)
+                for (std::size_t ket_index = 0; ket_index < relative_cm_lsjtn_sector.ket_subspace().size(); ++ket_index)
                   // for each target matrix element
                   {
 
@@ -743,11 +744,11 @@ namespace basis {
                       );
 
                     // extract source ket indices
-                    int relative_cm_lsjt_subspace_index_ket
+                    std::size_t relative_cm_lsjt_subspace_index_ket
                       = relative_cm_lsjt_space.LookUpSubspaceIndex(
                           relative_cm_lsjt_subspace_labels_ket
                         );
-                    int relative_cm_lsjt_state_index_ket
+                    std::size_t relative_cm_lsjt_state_index_ket
                       = relative_cm_lsjt_space.GetSubspace(relative_cm_lsjt_subspace_index_ket).LookUpStateIndex(
                           relative_cm_lsjt_state_labels_ket
                         );
@@ -794,7 +795,7 @@ namespace basis {
                     // triangular) LSJT sector.
 
                     // look up matrix element
-                    int relative_cm_lsjt_sector_index
+                    std::size_t relative_cm_lsjt_sector_index
                       = relative_cm_lsjt_component_sectors[T0].LookUpSectorIndex(
                           relative_cm_lsjt_subspace_index_bra,
                           relative_cm_lsjt_subspace_index_ket
@@ -882,7 +883,7 @@ namespace basis {
 
         // populate matrices
         two_body_lsjt_component_matrices[T0].resize(two_body_lsjt_component_sectors[T0].size());
-        for (int sector_index=0; sector_index<two_body_lsjt_component_sectors[T0].size(); ++sector_index)
+        for (std::size_t sector_index=0; sector_index<two_body_lsjt_component_sectors[T0].size(); ++sector_index)
           {
             // retrieve target sector
             const basis::TwoBodySectorsLSJT::SectorType& two_body_lsjt_sector
@@ -896,8 +897,8 @@ namespace basis {
               );
 
             // populate matrix elements
-            for (int bra_index = 0; bra_index < two_body_lsjt_sector.bra_subspace().size(); ++bra_index)
-              for (int ket_index = 0; ket_index < two_body_lsjt_sector.ket_subspace().size(); ++ket_index)
+            for (std::size_t bra_index = 0; bra_index < two_body_lsjt_sector.bra_subspace().size(); ++bra_index)
+              for (std::size_t ket_index = 0; ket_index < two_body_lsjt_sector.ket_subspace().size(); ++ket_index)
                 // for each target matrix element
                 {
 
@@ -925,11 +926,11 @@ namespace basis {
                     );
 
                   // extract source bra indices
-                  int two_body_lsjtn_subspace_index_bra
+                  std::size_t two_body_lsjtn_subspace_index_bra
                     = two_body_lsjtn_space.LookUpSubspaceIndex(
                         two_body_lsjtn_subspace_labels_bra
                       );
-                  int two_body_lsjtn_state_index_bra
+                  std::size_t two_body_lsjtn_state_index_bra
                     = two_body_lsjtn_space.GetSubspace(two_body_lsjtn_subspace_index_bra).LookUpStateIndex(
                         two_body_lsjtn_state_labels_bra
                       );
@@ -949,11 +950,11 @@ namespace basis {
                     );
 
                   // extract source ket indices
-                  int two_body_lsjtn_subspace_index_ket
+                  std::size_t two_body_lsjtn_subspace_index_ket
                     = two_body_lsjtn_space.LookUpSubspaceIndex(
                         two_body_lsjtn_subspace_labels_ket
                       );
-                  int two_body_lsjtn_state_index_ket
+                  std::size_t two_body_lsjtn_state_index_ket
                     = two_body_lsjtn_space.GetSubspace(two_body_lsjtn_subspace_index_ket).LookUpStateIndex(
                         two_body_lsjtn_state_labels_ket
                       );
@@ -982,7 +983,7 @@ namespace basis {
                   // triangular) LSJTN sector.
 
                   // look up matrix element
-                  int two_body_lsjtn_sector_index
+                  std::size_t two_body_lsjtn_sector_index
                     = two_body_lsjtn_component_sectors[T0].LookUpSectorIndex(
                         two_body_lsjtn_subspace_index_bra,
                         two_body_lsjtn_subspace_index_ket
@@ -1065,7 +1066,7 @@ namespace basis {
     int line_count = 0;
 
     // iterate over sectors
-    for (int sector_index = 0; sector_index < sectors.size(); ++sector_index)
+    for (std::size_t sector_index = 0; sector_index < sectors.size(); ++sector_index)
       {
         // extract sector
         const auto& sector = sectors.GetSector(sector_index);
@@ -1084,8 +1085,8 @@ namespace basis {
           basis::OperatorBlock<double>::Zero(bra_subspace.size(),ket_subspace.size());
 
         // iterate over matrix elements
-        for (int bra_index=0; bra_index<bra_subspace.size(); ++bra_index)
-          for (int ket_index=0; ket_index<ket_subspace.size(); ++ket_index)
+        for (std::size_t bra_index=0; bra_index<bra_subspace.size(); ++bra_index)
+          for (std::size_t ket_index=0; ket_index<ket_subspace.size(); ++ket_index)
             {
 
               // diagonal sector: restrict to upper triangle
@@ -1153,7 +1154,7 @@ namespace basis {
   {
 
     // iterate over sectors
-    for (int sector_index = 0; sector_index < sectors.size(); ++sector_index)
+    for (std::size_t sector_index = 0; sector_index < sectors.size(); ++sector_index)
       {
 
         // extract sector
@@ -1169,8 +1170,8 @@ namespace basis {
         assert(sector.bra_subspace_index()<=sector.ket_subspace_index());
 
         // iterate over matrix elements
-        for (int bra_index=0; bra_index<bra_subspace.size(); ++bra_index)
-          for (int ket_index=0; ket_index<ket_subspace.size(); ++ket_index)
+        for (std::size_t bra_index=0; bra_index<bra_subspace.size(); ++bra_index)
+          for (std::size_t ket_index=0; ket_index<ket_subspace.size(); ++ket_index)
             {
 
               // diagonal sector: restrict to upper triangle
@@ -1361,7 +1362,7 @@ namespace basis {
   {
 
     // iterate over sectors
-    for (int sector_index = 0; sector_index < sectors.size(); ++sector_index)
+    for (std::size_t sector_index = 0; sector_index < sectors.size(); ++sector_index)
       {
 
         // extract sector
@@ -1377,8 +1378,8 @@ namespace basis {
         assert(sector.bra_subspace_index()<=sector.ket_subspace_index());
 
         // iterate over matrix elements
-        for (int bra_index=0; bra_index<bra_subspace.size(); ++bra_index)
-          for (int ket_index=0; ket_index<ket_subspace.size(); ++ket_index)
+        for (std::size_t bra_index=0; bra_index<bra_subspace.size(); ++bra_index)
+          for (std::size_t ket_index=0; ket_index<ket_subspace.size(); ++ket_index)
             {
 
               // diagonal sector: restrict to upper triangle

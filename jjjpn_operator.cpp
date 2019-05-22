@@ -8,6 +8,7 @@
 
 #include "jjjpn_operator.h"
 
+#include <cstddef>
 #include <iomanip>
 #include <iostream>
 
@@ -27,7 +28,7 @@ namespace basis {
   {
 
     // iterate over sectors
-    for (int sector_index = 0; sector_index < sectors.size(); ++sector_index)
+    for (std::size_t sector_index = 0; sector_index < sectors.size(); ++sector_index)
       {
 
         // extract sector
@@ -43,8 +44,8 @@ namespace basis {
         assert(sector.IsUpperTriangle());
 
         // iterate over matrix elements
-        for (int bra_index=0; bra_index<bra_subspace.size(); ++bra_index)
-          for (int ket_index=0; ket_index<ket_subspace.size(); ++ket_index)
+        for (std::size_t bra_index=0; bra_index<bra_subspace.size(); ++bra_index)
+          for (std::size_t ket_index=0; ket_index<ket_subspace.size(); ++ket_index)
             {
 
               // diagonal sector: restrict to upper triangle

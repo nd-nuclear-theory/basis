@@ -60,11 +60,14 @@
   + 04/03/19 (pjf): Define type conversion between OrbitalPNInfo and
       FullOrbitalLabels.
   + 04/07/19 (pjf): Add LabelStr() for OrbitalStateLJPN.
+  + 05/09/19 (pjf): Use std::size_t for indices and sizes, to prevent
+    integer overflow.
 ****************************************************************/
 
 #ifndef BASIS_NLJ_ORBITAL_H_
 #define BASIS_NLJ_ORBITAL_H_
 
+#include <cstddef>
 #include <array>
 #include <string>
 
@@ -298,7 +301,7 @@ namespace basis {
 
     // pass-through constructors
 
-    OrbitalStatePN(const SubspaceType& subspace, int index)
+    OrbitalStatePN(const SubspaceType& subspace, std::size_t index)
       // Construct state by index.
       : BaseState (subspace, index) {}
 
@@ -524,7 +527,7 @@ namespace basis {
 
     // pass-through constructors
 
-    OrbitalStateLJPN(const SubspaceType& subspace, int index)
+    OrbitalStateLJPN(const SubspaceType& subspace, std::size_t index)
       /// Construct state by index.
       : BaseState (subspace, index) {}
 

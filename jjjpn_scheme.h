@@ -38,11 +38,14 @@
     proton_neutron.
   + 1/22/18 (mac): Enable nonzero Tz0 in sector enumeration.
   + 02/12/19 (pjf): Allow space ordering {pp,pn,nn} for h2v15200.
+  + 05/09/19 (pjf): Use std::size_t for indices and sizes, to prevent
+    integer overflow.
 ****************************************************************/
 
 #ifndef BASIS_JJJPN_SCHEME_H_
 #define BASIS_JJJPN_SCHEME_H_
 
+#include <cstddef>
 #include <array>
 #include <string>
 
@@ -71,9 +74,9 @@ namespace basis {
   //
   // state labels within subspace: (index1,index2)
   //
-  //   index1 (int): index of particle 1 within appropriate
+  //   index1 (std::size_t): index of particle 1 within appropriate
   //     (proton or neutron) orbital set
-  //   index2 (int): index of particle 2 within appropriate
+  //   index2 (std::size_t): index of particle 2 within appropriate
   //     (proton or neutron) orbital set
   //
   ////////////////////////////////////////////////////////////////
@@ -183,7 +186,7 @@ namespace basis {
   // labels
 
   typedef std::tuple<TwoBodySpeciesPN,int,int> TwoBodySubspaceJJJPNLabels;
-  typedef std::tuple<int,int> TwoBodyStateJJJPNLabels;
+  typedef std::tuple<std::size_t,std::size_t> TwoBodyStateJJJPNLabels;
 
   // subspace
 
@@ -241,7 +244,7 @@ namespace basis {
 
     // pass-through constructors
 
-    TwoBodyStateJJJPN(const SubspaceType& subspace, int index)
+    TwoBodyStateJJJPN(const SubspaceType& subspace, std::size_t index)
       // Construct state by index.
       : BaseState (subspace, index) {}
 
@@ -257,8 +260,8 @@ namespace basis {
     const OrbitalSubspacePN& orbital_subspace2() const {return subspace().orbital_subspace2();}
 
     // state label accessors
-    int index1() const {return std::get<0>(labels());}
-    int index2() const {return std::get<1>(labels());}
+    std::size_t index1() const {return std::get<0>(labels());}
+    std::size_t index2() const {return std::get<1>(labels());}
 
     // state retrieval
     const OrbitalStatePN GetOrbital1() const {return OrbitalStatePN(orbital_subspace1(),index1());}

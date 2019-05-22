@@ -9,15 +9,19 @@
   Mark A. Caprio
   University of Notre Dame
 
-  + 6/6/17 (mac): Created as multibasis.h, abstracted from code in spncci
+  + 06/06/17 (mac): Created as multibasis.h, abstracted from code in spncci
     branching_u3s.
-  + 6/11/17 (mac): Rename TotalFullDimension to FullDimension.
-  + 6/17/17 (mac): Rename to degenerate.h.  Rename multiplicity to degeneracy.
+  + 06/11/17 (mac): Rename TotalFullDimension to FullDimension.
+  + 06/17/17 (mac): Rename to degenerate.h.  Rename multiplicity to degeneracy.
+  + 05/09/19 (pjf): Use std::size_t for indices and sizes, to prevent
+    integer overflow.
 
 ****************************************************************/
 
 #ifndef BASIS_DEGENERATE_H_
 #define BASIS_DEGENERATE_H_
+
+#include <cstddef>
 
 #include "basis/basis.h"
 
@@ -72,7 +76,7 @@ namespace basis {
     // accessors for substate information
     ////////////////////////////////////////////////////////////////
 
-    const std::vector<int>& state_offsets() const
+    const std::vector<std::size_t>& state_offsets() const
     {
       return state_offsets_;
     }
@@ -82,7 +86,7 @@ namespace basis {
       return state_multiplicities_;
     }
 
-    int full_dimension() const
+    std::size_t full_dimension() const
     {
       return full_dimension_;
     }
@@ -111,9 +115,9 @@ namespace basis {
     ////////////////////////////////////////////////////////////////
 
     // degeneracy counting information
-    std::vector<int> state_offsets_;  // offset to given state's starting substate
+    std::vector<std::size_t> state_offsets_;  // offset to given state's starting substate
     std::vector<int> state_multiplicities_;  // given state's number of substates
-    int full_dimension_;  // total number of substates
+    std::size_t full_dimension_;  // total number of substates
 
   };
 
@@ -158,7 +162,7 @@ namespace basis {
 
       // constructors
 
-      BaseDegenerateState(const SubspaceType& subspace, int index)
+      BaseDegenerateState(const SubspaceType& subspace, std::size_t index)
         // Construct state, given index within subspace.
         : BaseState<tSubspaceType>(subspace,index)
       {
@@ -174,7 +178,7 @@ namespace basis {
       // retrieval of substate information
       ////////////////////////////////////////////////////////////////
 
-      int offset() const
+      std::size_t offset() const
       {
         return BaseState<tSubspaceType>::subspace().state_offsets()[BaseState<tSubspaceType>::index()];
       }
@@ -216,12 +220,12 @@ namespace basis {
       // size retrieval
       ////////////////////////////////////////////////////////////////
 
-      int FullDimension() const
+      std::size_t FullDimension() const
       // Return the total dimension of all subspaces within the space,
       // taking into account substate multiplicities.
       {
-        int full_dimension = 0;
-        for (int subspace_index=0; subspace_index<BaseSpace<tSubspaceType>::size(); ++subspace_index)
+        std::size_t full_dimension = 0;
+        for (std::size_t subspace_index=0; subspace_index<BaseSpace<tSubspaceType>::size(); ++subspace_index)
           full_dimension += BaseSpace<tSubspaceType>::GetSubspace(subspace_index).full_dimension();
         return full_dimension;
       }

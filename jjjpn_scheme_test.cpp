@@ -72,13 +72,13 @@ void TestTwoBodyNmax()
   std::cout << sectors.DebugStr() << std::endl;
 
   // // old manual iteration
-  // for (int sector_index=0; sector_index < sectors.size(); ++sector_index)
+  // for (std::size_t sector_index=0; sector_index < sectors.size(); ++sector_index)
   //   {
-  //     int bra_subspace_index = sectors.GetSector(sector_index).bra_subspace_index();
+  //     std::size_t bra_subspace_index = sectors.GetSector(sector_index).bra_subspace_index();
   //     const basis::TwoBodySubspaceJJJPN& bra_subspace = sectors.GetSector(sector_index).bra_subspace();
-  //     int ket_subspace_index = sectors.GetSector(sector_index).ket_subspace_index();
+  //     std::size_t ket_subspace_index = sectors.GetSector(sector_index).ket_subspace_index();
   //     const basis::TwoBodySubspaceJJJPN& ket_subspace = sectors.GetSector(sector_index).ket_subspace();
-  // 
+  //
   //     std::cout
   //       << " sector "
   //       << std::setw(3) << sector_index

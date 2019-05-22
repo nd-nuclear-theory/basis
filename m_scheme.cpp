@@ -9,6 +9,7 @@
 ****************************************************************/
 
 
+#include <cstddef>
 #include <iomanip>  // for debugging output
 #include <iostream>
 #include <sstream>
@@ -40,7 +41,7 @@ namespace basis {
     weight_max_ = orbital_subspace.weight_max();
 
     // iterate over all states, enumerating m-substates
-    for (int i=0; i < orbital_subspace.size(); ++i) {
+    for (std::size_t i=0; i < orbital_subspace.size(); ++i) {
       OrbitalStatePN orbital(orbital_subspace, i);
       for (HalfInt m = -orbital.j(); m <= orbital.j(); ++m) {
         PushStateLabels(StateLabelsType(orbital.n(),orbital.l(),orbital.j(),m));
@@ -93,7 +94,7 @@ namespace basis {
        << " (oscillator-like: " << oscillator_like_indicator << ")"
        << std::endl;
 
-    for (int state_index=0; state_index<size(); ++state_index)
+    for (std::size_t state_index=0; state_index<size(); ++state_index)
       {
         SingleParticleStatePN state(*this,state_index);
 
@@ -149,7 +150,7 @@ namespace basis {
     weight_max_ = orbital_space.weight_max();
 
     // construct subspaces
-    for (int i=0; i<orbital_space.size(); ++i)
+    for (std::size_t i=0; i<orbital_space.size(); ++i)
     {
       const OrbitalSubspacePN& orbital_subspace = orbital_space.GetSubspace(i);
       PushSubspace(SingleParticleSubspacePN(orbital_subspace));
@@ -182,7 +183,7 @@ namespace basis {
        << " (oscillator-like: " << oscillator_like_indicator << ")"
        << std::endl;
 
-    for (int subspace_index=0; subspace_index<size(); ++subspace_index)
+    for (std::size_t subspace_index=0; subspace_index<size(); ++subspace_index)
       {
         const SubspaceType& subspace = GetSubspace(subspace_index);
 

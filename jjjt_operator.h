@@ -10,8 +10,10 @@
   Mark A. Caprio
   University of Notre Dame
 
-  + 7/13/16 (mac): Created, adapting code from lsjt_operator.
-  + 11/4/16 (mac): Remove dependency on Eigen/Core.
+  + 07/13/16 (mac): Created, adapting code from lsjt_operator.
+  + 11/04/16 (mac): Remove dependency on Eigen/Core.
+  + 05/09/19 (pjf): Use std::size_t for indices and sizes, to prevent
+    integer overflow.
 
 ****************************************************************/
 

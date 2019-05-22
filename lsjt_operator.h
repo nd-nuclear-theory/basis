@@ -66,6 +66,8 @@
       parameters specified in relative files.
     - Implement relative-cm I/O.
     - Add ScatterOperatorRelativeCMLSJTToRelativeCMLSJTN.
+  + 05/09/19 (pjf): Use std::size_t for indices and sizes, to prevent
+    integer overflow.
 
 ****************************************************************/
 

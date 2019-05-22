@@ -86,7 +86,7 @@ namespace basis {
 
     // pass-through constructors
 
-    RelativeDegenerateStateLSJT(const SubspaceType& subspace, int index)
+    RelativeDegenerateStateLSJT(const SubspaceType& subspace, std::size_t index)
       // Construct state by index.
       : BaseDegenerateState<RelativeDegenerateSubspaceLSJT>(subspace,index) {}
 
@@ -163,7 +163,7 @@ namespace basis {
     Nmax_ = Nmax;
 
     // validate subspace labels
-    assert(ValidLabels()); 
+    assert(ValidLabels());
 
     // set up indexing
 
@@ -200,10 +200,10 @@ namespace basis {
     const int width = 0;  // for now, no fixed width
 
     os << "["
-       << " " << std::setw(width) << L() 
-       << " " << std::setw(width) << S() 
-       << " " << std::setw(width) << J() 
-       << " " << std::setw(width) << T() 
+       << " " << std::setw(width) << L()
+       << " " << std::setw(width) << S()
+       << " " << std::setw(width) << J()
+       << " " << std::setw(width) << T()
        << " " << std::setw(width) << g()
        << " " << "]";
 
@@ -217,7 +217,7 @@ namespace basis {
 
     const int width = 3;
 
-    for (int state_index=0; state_index<size(); ++state_index)
+    for (std::size_t state_index=0; state_index<size(); ++state_index)
       {
         RelativeDegenerateStateLSJT state(*this,state_index);
 
@@ -247,11 +247,11 @@ namespace basis {
     const int width = 0;  // for now, no fixed width
 
     os << "["
-       << " " << std::setw(width) << N() 
-       << " " << std::setw(width) << L() 
-       << " " << std::setw(width) << S() 
-       << " " << std::setw(width) << J() 
-       << " " << std::setw(width) << T() 
+       << " " << std::setw(width) << N()
+       << " " << std::setw(width) << L()
+       << " " << std::setw(width) << S()
+       << " " << std::setw(width) << J()
+       << " " << std::setw(width) << T()
        << " " << std::setw(width) << g()
        << " " << "]";
 
@@ -295,7 +295,7 @@ namespace basis {
   {
     std::ostringstream os;
 
-    for (int subspace_index=0; subspace_index<size(); ++subspace_index)
+    for (std::size_t subspace_index=0; subspace_index<size(); ++subspace_index)
       {
         const SubspaceType& subspace = GetSubspace(subspace_index);
         os
@@ -341,12 +341,12 @@ void Test()
     << std::endl;
   std::cout << std::endl;
 
-  // for (int subspace_index=0; subspace_index<space.size(); ++subspace_index)
+  // for (std::size_t subspace_index=0; subspace_index<space.size(); ++subspace_index)
   //   {
   //     const basis::RelativeDegenerateSubspaceLSJT& subspace = space.GetSubspace(subspace_index);
   //     std::cout << subspace.LabelStr() << std::endl;
   //     std::cout << subspace.DebugStr() << std::endl;
-  //   }    
+  //   }
 }
 
 int main(int argc, char **argv)

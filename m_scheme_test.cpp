@@ -34,7 +34,7 @@ void TestStatesNmax()
 
   // check subspaces
   std::cout << "Subspaces" << std::endl;
-  for (int subspace_index=0; subspace_index<space.size(); ++subspace_index)
+  for (std::size_t subspace_index=0; subspace_index<space.size(); ++subspace_index)
     {
       const basis::SingleParticleSubspacePN& subspace = space.GetSubspace(subspace_index);
 

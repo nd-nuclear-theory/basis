@@ -13,11 +13,14 @@
   + 11/21/16 (mac): Break out matrix element indexing lookup from value lookup.
   + 09/22/17 (pjf): Look up state indices honestly in MatrixElementIndicesLJPN
   + 02/20/17 (pjf): Add OneBodyOperatorLJPN.
+  + 05/09/19 (pjf): Use std::size_t for indices and sizes, to prevent
+    integer overflow.
 ****************************************************************/
 
 #ifndef BASIS_NLJ_OPERATOR_H_
 #define BASIS_NLJ_OPERATOR_H_
 
+#include <cstddef>
 #include <string>
 
 #include "basis/nlj_orbital.h"
@@ -34,7 +37,7 @@ namespace basis {
   // matrix element lookup
   ////////////////////////////////////////////////////////////////
 
-  std::tuple<int,int,int>
+  std::tuple<std::size_t,std::size_t,std::size_t>
   MatrixElementIndicesLJPN(
       const OrbitalSpaceLJPN& bra_orbital_space,
       const OrbitalSpaceLJPN& ket_orbital_space,
@@ -55,7 +58,7 @@ namespace basis {
   //   ket_labels (basis::FullOrbitalLabels): ket state labels
   //
   // Returns:
-  //   (std::tuple<int,int,int>): the matrix element indices
+  //   (std::tuple<std::size_t,std::size_t,std::size_t>): the matrix element indices
   //     (sector_index,bra_state_index,ket_state_index)
 
   double MatrixElementLJPN(

@@ -7,6 +7,7 @@
 ****************************************************************/
 
 
+#include <cstddef>
 #include <iomanip>  // for debugging output
 #include <iostream>
 #include <sstream>
@@ -50,9 +51,9 @@ namespace basis {
 
     // set up indexing
     // iterate over orbitals for particle 1
-    for (int index1 = 0; index1 < orbital_subspace1().size(); ++index1)
+    for (std::size_t index1 = 0; index1 < orbital_subspace1().size(); ++index1)
       // iterate over orbitals for particle 2
-      for (int index2 = 0; index2 < orbital_subspace2().size(); ++index2)
+      for (std::size_t index2 = 0; index2 < orbital_subspace2().size(); ++index2)
         {
 
           // retrieve orbitals
@@ -125,7 +126,7 @@ namespace basis {
 
     const int width = 3;
 
-    for (int state_index=0; state_index<size(); ++state_index)
+    for (std::size_t state_index=0; state_index<size(); ++state_index)
       {
 
         // retrieve two-body state
@@ -192,13 +193,13 @@ namespace basis {
 
     // find putative Jmax from maximal j among orbitals
     HalfInt jmax=HalfInt(1,2);
-    for (int subspace_index=0; subspace_index<orbital_space.size(); ++subspace_index)
+    for (std::size_t subspace_index=0; subspace_index<orbital_space.size(); ++subspace_index)
       {
         // retrieve subspace
         const OrbitalSubspacePN& subspace = orbital_space.GetSubspace(subspace_index);
 
         // iterate over states
-        for (int state_index=0; state_index<subspace.size(); ++state_index)
+        for (std::size_t state_index=0; state_index<subspace.size(); ++state_index)
           {
             OrbitalStatePN state(subspace,state_index);
             jmax = std::max(jmax,state.j());
@@ -239,7 +240,7 @@ namespace basis {
 
     const int width = 3;
 
-    for (int subspace_index=0; subspace_index<size(); ++subspace_index)
+    for (std::size_t subspace_index=0; subspace_index<size(); ++subspace_index)
       {
         const SubspaceType& subspace = GetSubspace(subspace_index);
         os
@@ -272,8 +273,8 @@ namespace basis {
     // enforce nonzero-Tz0 only if {pp,pn,nn} ordering
     assert((Tz0_ == 0) || (space.space_ordering() == basis::TwoBodySpaceJJJPNOrdering::kTz));
 
-    for (int bra_subspace_index=0; bra_subspace_index<space.size(); ++bra_subspace_index)
-      for (int ket_subspace_index=0; ket_subspace_index<space.size(); ++ket_subspace_index)
+    for (std::size_t bra_subspace_index=0; bra_subspace_index<space.size(); ++bra_subspace_index)
+      for (std::size_t ket_subspace_index=0; ket_subspace_index<space.size(); ++ket_subspace_index)
         {
 
           // enforce canonical ordering

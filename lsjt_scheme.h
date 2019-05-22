@@ -65,12 +65,15 @@
     - Add one-body (square) truncation on two-body bases.
   + 7/19/16 (mac): Use enum Rank for truncation rank.
   + 7/1/17 (mac): Add n accessor to RelativeStateLSJT.
+  + 05/09/19 (pjf): Use std::size_t for indices and sizes, to prevent
+    integer overflow.
 
 ****************************************************************/
 
 #ifndef BASIS_LSJT_SCHEME_H_
 #define BASIS_LSJT_SCHEME_H_
 
+#include <cstddef>
 #include <string>
 
 #include "basis/basis.h"
@@ -195,7 +198,7 @@ namespace basis {
 
     // pass-through constructors
 
-    RelativeStateLSJT(const SubspaceType& subspace, int index)
+    RelativeStateLSJT(const SubspaceType& subspace, std::size_t index)
       // Construct state by index.
       : BaseState (subspace,index) {}
 
@@ -420,7 +423,7 @@ namespace basis {
 
     // pass-through constructors
 
-    RelativeCMStateLSJT(const SubspaceType& subspace, int index)
+    RelativeCMStateLSJT(const SubspaceType& subspace, std::size_t index)
       // Construct state by index.
       : BaseState (subspace, index) {}
 
@@ -614,7 +617,7 @@ namespace basis {
 
     // pass-through constructors
 
-    RelativeCMStateLSJTN(const SubspaceType& subspace, int index)
+    RelativeCMStateLSJTN(const SubspaceType& subspace, std::size_t index)
       // Construct state by index.
       : BaseState (subspace, index) {}
 
@@ -829,7 +832,7 @@ namespace basis {
 
     // pass-through constructors
 
-    TwoBodyStateLSJT(const SubspaceType& subspace, int index)
+    TwoBodyStateLSJT(const SubspaceType& subspace, std::size_t index)
       // Construct state by index.
       : BaseState (subspace, index) {}
 
@@ -1029,7 +1032,7 @@ namespace basis {
 
     // pass-through constructors
 
-    TwoBodyStateLSJTN(const SubspaceType& subspace, int index)
+    TwoBodyStateLSJTN(const SubspaceType& subspace, std::size_t index)
       // Construct state by index.
       : BaseState (subspace, index) {}
 

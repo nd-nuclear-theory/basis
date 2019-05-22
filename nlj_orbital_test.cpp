@@ -33,7 +33,7 @@ void TestOrbitalsNmax(const std::string& filename)
 
   // check subspaces
   std::cout << "Subspaces" << std::endl;
-  for (int subspace_index=0; subspace_index<space.size(); ++subspace_index)
+  for (std::size_t subspace_index=0; subspace_index<space.size(); ++subspace_index)
     {
       const basis::OrbitalSubspacePN& subspace = space.GetSubspace(subspace_index);
 
@@ -60,7 +60,7 @@ void TestOrbitalsRead(const std::string& filename) {
 
   // check subspaces
   std::cout << "Subspaces" << std::endl;
-  for (int subspace_index=0; subspace_index<space.size(); ++subspace_index)
+  for (std::size_t subspace_index=0; subspace_index<space.size(); ++subspace_index)
     {
       const basis::OrbitalSubspacePN& subspace = space.GetSubspace(subspace_index);
 
@@ -85,7 +85,7 @@ void TestLJOrbitalsNmax(const std::string& filename)
 
   // check subspaces
   std::cout << "Subspaces" << std::endl;
-  for (int subspace_index=0; subspace_index<space.size(); ++subspace_index)
+  for (std::size_t subspace_index=0; subspace_index<space.size(); ++subspace_index)
     {
       const basis::OrbitalSubspaceLJPN& subspace = space.GetSubspace(subspace_index);
 
@@ -114,7 +114,7 @@ void TestLJOrbitalsRead(const std::string& filename) {
 
   // check subspaces
   std::cout << "Subspaces" << std::endl;
-  for (int subspace_index=0; subspace_index<space.size(); ++subspace_index)
+  for (std::size_t subspace_index=0; subspace_index<space.size(); ++subspace_index)
     {
       const basis::OrbitalSubspaceLJPN& subspace = space.GetSubspace(subspace_index);
 

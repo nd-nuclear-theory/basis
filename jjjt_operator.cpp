@@ -6,6 +6,8 @@
 
 ****************************************************************/
 
+#include <cstddef>
+
 #include "jjjt_operator.h"
 
 namespace basis {
@@ -77,7 +79,7 @@ namespace basis {
 
       // populate matrices
       two_body_jjjt_component_matrices[T0].resize(two_body_jjjt_component_sectors[T0].size());
-      for (int sector_index=0; sector_index<two_body_jjjt_component_sectors[T0].size(); ++sector_index)
+      for (std::size_t sector_index=0; sector_index<two_body_jjjt_component_sectors[T0].size(); ++sector_index)
         {
           // retrieve target sector
           const basis::TwoBodySectorsJJJT::SectorType& two_body_jjjt_sector
@@ -91,11 +93,11 @@ namespace basis {
             );
 
           // populate matrix elements
-          for (int bra_index = 0; bra_index < two_body_jjjt_sector.bra_subspace().size(); ++bra_index)
-            for (int ket_index = 0; ket_index < two_body_jjjt_sector.ket_subspace().size(); ++ket_index)
+          for (std::size_t bra_index = 0; bra_index < two_body_jjjt_sector.bra_subspace().size(); ++bra_index)
+            for (std::size_t ket_index = 0; ket_index < two_body_jjjt_sector.ket_subspace().size(); ++ket_index)
               // for each target matrix element
               {
-                
+
                 // ensure canonical matrix element if diagonal sector
                 if (two_body_jjjt_sector.IsDiagonal())
                   if (!(bra_index<=ket_index))
@@ -104,7 +106,7 @@ namespace basis {
                 // retrieve target states
                 basis::TwoBodyStateJJJT two_body_jjjt_bra(two_body_jjjt_sector.bra_subspace(),bra_index);
                 basis::TwoBodyStateJJJT two_body_jjjt_ket(two_body_jjjt_sector.ket_subspace(),ket_index);
-                
+
                 // extract source bra labels
                 TwoBodySubspaceJJJTLabels two_body_jjjt_subspace_labels_bra
                   = two_body_jjjt_bra.subspace().labels();
@@ -120,11 +122,11 @@ namespace basis {
                   );
 
                 // extract source bra indices
-                int two_body_jjjtn_subspace_index_bra
+                std::size_t two_body_jjjtn_subspace_index_bra
                   = two_body_jjjtn_space.LookUpSubspaceIndex(
                       two_body_jjjtn_subspace_labels_bra
                     );
-                int two_body_jjjtn_state_index_bra
+                std::size_t two_body_jjjtn_state_index_bra
                   = two_body_jjjtn_space.GetSubspace(two_body_jjjtn_subspace_index_bra).LookUpStateIndex(
                       two_body_jjjtn_state_labels_bra
                     );
@@ -144,17 +146,17 @@ namespace basis {
                   );
 
                 // extract source ket indices
-                int two_body_jjjtn_subspace_index_ket
+                std::size_t two_body_jjjtn_subspace_index_ket
                   = two_body_jjjtn_space.LookUpSubspaceIndex(
                       two_body_jjjtn_subspace_labels_ket
                     );
-                int two_body_jjjtn_state_index_ket
+                std::size_t two_body_jjjtn_state_index_ket
                   = two_body_jjjtn_space.GetSubspace(two_body_jjjtn_subspace_index_ket).LookUpStateIndex(
                       two_body_jjjtn_state_labels_ket
                     );
 
                 // look up matrix element
-                int two_body_jjjtn_sector_index
+                std::size_t two_body_jjjtn_sector_index
                   = two_body_jjjtn_component_sectors[T0].LookUpSectorIndex(
                       two_body_jjjtn_subspace_index_bra,
                       two_body_jjjtn_subspace_index_ket
@@ -188,7 +190,7 @@ namespace basis {
   {
 
     // iterate over sectors
-    for (int sector_index = 0; sector_index < sectors.size(); ++sector_index)
+    for (std::size_t sector_index = 0; sector_index < sectors.size(); ++sector_index)
       {
 
         // extract sector
@@ -204,8 +206,8 @@ namespace basis {
         assert(sector.bra_subspace_index()<=sector.ket_subspace_index());
 
         // iterate over matrix elements
-        for (int bra_index=0; bra_index<bra_subspace.size(); ++bra_index)
-          for (int ket_index=0; ket_index<ket_subspace.size(); ++ket_index)
+        for (std::size_t bra_index=0; bra_index<bra_subspace.size(); ++bra_index)
+          for (std::size_t ket_index=0; ket_index<ket_subspace.size(); ++ket_index)
             {
 
               // diagonal sector: restrict to upper triangle
@@ -241,7 +243,7 @@ namespace basis {
               const int width = 3;
               const int precision = 8;  // for approximately single precision output
               os << std::setprecision(precision);
-              os 
+              os
                 << " " << std::setw(width) << T0
                 << " " << "  "
                 << " " << std::setw(width) << bra.N1()
@@ -250,8 +252,8 @@ namespace basis {
                 << " " << std::setw(width) << bra.N2()
                 << " " << std::setw(width) << bra.l2()
                 << " " << std::showpoint << std::fixed << std::setprecision(1) << std::setw(4) << float(bra.j2())
-                << " " << std::setw(width) << bra.J() 
-                << " " << std::setw(width) << bra.T() 
+                << " " << std::setw(width) << bra.J()
+                << " " << std::setw(width) << bra.T()
                 << " " << std::setw(width) << bra.g()
                 << " " << "    "
                 << " " << std::setw(width) << ket.N1()
@@ -260,13 +262,13 @@ namespace basis {
                 << " " << std::setw(width) << ket.N2()
                 << " " << std::setw(width) << ket.l2()
                 << " " << std::showpoint << std::fixed << std::setprecision(1) << std::setw(4) << float(ket.j2())
-                << " " << std::setw(width) << ket.J() 
-                << " " << std::setw(width) << ket.T() 
+                << " " << std::setw(width) << ket.J()
+                << " " << std::setw(width) << ket.T()
                 << " " << std::setw(width) << ket.g()
                 << " " << "    "
                 << " " << std::showpoint << std::scientific << std::setprecision(precision) << matrix_element
                 << std::endl;
-            
+
             }
 
       }

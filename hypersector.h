@@ -8,14 +8,18 @@
   Mark A. Caprio
   University of Notre Dame
 
-  + 4/4/17 (mac): Created, building on code from basis.h.
-  + 4/11/17 (mac): Add basic hyperoperator support --
+  + 04/04/17 (mac): Created, building on code from basis.h.
+  + 04/11/17 (mac): Add basic hyperoperator support --
     OperatorHypersectors and SetHyperoperatorToZero.
-  + 4/22/17 (aem): Fix error in hypersector constructor.
+  + 04/22/17 (aem): Fix error in hypersector constructor.
+  + 05/09/19 (pjf): Use std::size_t for indices and sizes, to prevent
+    integer overflow.
 ****************************************************************/
 
 #ifndef BASIS_HYPERSECTOR_H_
 #define BASIS_HYPERSECTOR_H_
+
+#include <cstddef>
 
 #include "basis/basis.h"
 #include "basis/operator.h"
@@ -48,16 +52,16 @@ namespace basis {
       public:
       typedef tSubspaceType SubspaceType;
       typedef tOperatorSubspaceType OperatorSubspaceType;
-      typedef std::tuple<int,int,int,int> KeyType;
+      typedef std::tuple<std::size_t,std::size_t,std::size_t,std::size_t> KeyType;
 
       ////////////////////////////////////////////////////////////////
       // constructors
       ////////////////////////////////////////////////////////////////
 
       BaseHypersector(
-          int bra_subspace_index, int ket_subspace_index, int operator_subspace_index,
+          std::size_t bra_subspace_index, std::size_t ket_subspace_index, std::size_t operator_subspace_index,
           const SubspaceType& bra_subspace, const SubspaceType& ket_subspace, const OperatorSubspaceType& operator_subspace,
-          int multiplicity_index=1
+          std::size_t multiplicity_index=1
         )
         : bra_subspace_index_(bra_subspace_index), ket_subspace_index_(ket_subspace_index),
         operator_subspace_index_(operator_subspace_index), multiplicity_index_(multiplicity_index)
@@ -78,9 +82,9 @@ namespace basis {
         return KeyType(bra_subspace_index(),ket_subspace_index(),operator_subspace_index(),multiplicity_index());
       }
 
-      int bra_subspace_index() const {return bra_subspace_index_;}
-      int ket_subspace_index() const {return ket_subspace_index_;}
-      int operator_subspace_index() const {return operator_subspace_index_;}
+      std::size_t bra_subspace_index() const {return bra_subspace_index_;}
+      std::size_t ket_subspace_index() const {return ket_subspace_index_;}
+      std::size_t operator_subspace_index() const {return operator_subspace_index_;}
       // Return integer index of bra/ket subspace.
 
       const SubspaceType& bra_subspace() const {return *bra_subspace_ptr_;}
@@ -88,7 +92,7 @@ namespace basis {
       const OperatorSubspaceType& operator_subspace() const {return *operator_subspace_ptr_;}
       // Return reference to bra/ket/operator subspace.
 
-      int multiplicity_index() const {return multiplicity_index_;}
+      std::size_t multiplicity_index() const {return multiplicity_index_;}
       // Return multiplicity index of this sector.
 
       inline bool IsDiagonal() const
@@ -104,11 +108,11 @@ namespace basis {
       }
 
       private:
-      int bra_subspace_index_, ket_subspace_index_, operator_subspace_index_;
+      std::size_t bra_subspace_index_, ket_subspace_index_, operator_subspace_index_;
       const SubspaceType* bra_subspace_ptr_;
       const SubspaceType* ket_subspace_ptr_;
       const OperatorSubspaceType* operator_subspace_ptr_;
-      int multiplicity_index_;
+      std::size_t multiplicity_index_;
     };
 
   // BaseHypersectors -- container to hold a set of hypersectors with
@@ -137,15 +141,15 @@ namespace basis {
       // sector lookup and retrieval
       ////////////////////////////////////////////////////////////////
 
-      const HypersectorType& GetHypersector(int hypersector_index) const
+      const HypersectorType& GetHypersector(std::size_t hypersector_index) const
       // Given sector index, return reference to sector itself.
       {
         return hypersectors_[hypersector_index];
       };
 
       bool ContainsHypersector(
-          int bra_subspace_index, int ket_subspace_index, int operator_subspace_index,
-          int multiplicity_index=1
+          std::size_t bra_subspace_index, std::size_t ket_subspace_index, std::size_t operator_subspace_index,
+          std::size_t multiplicity_index=1
         ) const
       // Given the labels for a sector, returns whether or not the sector
       // is found within the the sector set.
@@ -155,9 +159,9 @@ namespace basis {
         return lookup_.count(key);
       };
 
-      int LookUpHypersectorIndex(
-          int bra_subspace_index, int ket_subspace_index, int operator_subspace_index,
-          int multiplicity_index=1
+      std::size_t LookUpHypersectorIndex(
+          std::size_t bra_subspace_index, std::size_t ket_subspace_index, std::size_t operator_subspace_index,
+          std::size_t multiplicity_index=1
         ) const
       // Given the labels for a sector, look up its index within the
       // sector set.
@@ -177,7 +181,7 @@ namespace basis {
       // size retrieval
       ////////////////////////////////////////////////////////////////
 
-      int size() const
+      std::size_t size() const
       // Return number of hypersectors within hypersector set.
       {
         return hypersectors_.size();
@@ -215,9 +219,9 @@ namespace basis {
 
       // sector index lookup by subspace indices
 #ifdef BASIS_HASH
-      std::unordered_map<typename HypersectorType::KeyType,int,boost::hash<typename HypersectorType::KeyType>> lookup_;
+      std::unordered_map<typename HypersectorType::KeyType,std::size_t,boost::hash<typename HypersectorType::KeyType>> lookup_;
 #else
-      std::map<typename HypersectorType::KeyType,int> lookup_;
+      std::map<typename HypersectorType::KeyType,std::size_t> lookup_;
 #endif
 
     };
@@ -226,7 +230,7 @@ namespace basis {
     std::string BaseHypersectors<tSpaceType,tOperatorSpaceType>::DebugStr() const
     {
       std::ostringstream os;
-      for (int hypersector_index=0; hypersector_index<size(); ++hypersector_index)
+      for (std::size_t hypersector_index=0; hypersector_index<size(); ++hypersector_index)
         {
           const HypersectorType& hypersector = GetHypersector(hypersector_index);
 
@@ -283,7 +287,7 @@ namespace basis {
     matrices.resize(hypersectors.size());
 
     // iterate over hypersectors
-    for (int hypersector_index = 0; hypersector_index < hypersectors.size(); ++hypersector_index)
+    for (std::size_t hypersector_index = 0; hypersector_index < hypersectors.size(); ++hypersector_index)
       {
 
         // extract hypersector
@@ -296,7 +300,7 @@ namespace basis {
 
         // generate matrices for hypersector (by operator)
         matrices[hypersector_index].resize(operator_subspace.size());
-        for (int operator_index = 0; operator_index < operator_subspace.size(); ++operator_index)
+        for (std::size_t operator_index = 0; operator_index < operator_subspace.size(); ++operator_index)
           matrices[hypersector_index][operator_index]
             = basis::OperatorBlock<tFloat>::Zero(bra_subspace.size(),ket_subspace.size());
       }
@@ -307,7 +311,7 @@ namespace basis {
   ////////////////////////////////////////////////////////////////
 
   template <typename tHypersectorsType>
-  long int GetNumHyperoperatorME(
+  std::size_t GetNumHyperoperatorME(
       const tHypersectorsType& hypersectors
     )
     // Set operator hyperblocks to zero.
@@ -319,8 +323,8 @@ namespace basis {
   {
 
     // iterate over hypersectors
-    long int num_rmes=0;
-    for (int hypersector_index = 0; hypersector_index < hypersectors.size(); ++hypersector_index)
+    std::size_t num_rmes=0;
+    for (std::size_t hypersector_index = 0; hypersector_index < hypersectors.size(); ++hypersector_index)
       {
 
         // extract hypersector
@@ -332,7 +336,7 @@ namespace basis {
         const typename tHypersectorsType::OperatorSubspaceType& operator_subspace = hypersector.operator_subspace();
 
         // generate matrices for hypersector (by operator)
-        for (int operator_index = 0; operator_index < operator_subspace.size(); ++operator_index)
+        for (std::size_t operator_index = 0; operator_index < operator_subspace.size(); ++operator_index)
           num_rmes+=bra_subspace.size()*ket_subspace.size();
       }
     return num_rmes;
