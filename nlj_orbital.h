@@ -62,6 +62,8 @@
   + 04/07/19 (pjf): Add LabelStr() for OrbitalStateLJPN.
   + 05/09/19 (pjf): Use std::size_t for indices and sizes, to prevent
     integer overflow.
+  + 05/27/19 (pjf): Update to initialize BaseSectors with spaces.
+
 ****************************************************************/
 
 #ifndef BASIS_NLJ_ORBITAL_H_

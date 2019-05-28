@@ -927,7 +927,7 @@ namespace basis {
   OrbitalSectorsLJPN::OrbitalSectorsLJPN(
       const OrbitalSpaceLJPN& bra_space, const OrbitalSpaceLJPN& ket_space
     )
-    : j0_(-1), g0_(-1), Tz0_(1)
+    : BaseSectors(bra_space, ket_space), j0_(-1), g0_(-1), Tz0_(1)
   {
     for (std::size_t bra_subspace_index=0; bra_subspace_index<bra_space.size(); ++bra_subspace_index) {
       for (std::size_t ket_subspace_index=0; ket_subspace_index<ket_space.size(); ++ket_subspace_index) {
@@ -936,7 +936,7 @@ namespace basis {
         const SubspaceType& ket_subspace = ket_space.GetSubspace(ket_subspace_index);
 
         // push sector
-        PushSector(SectorType(bra_subspace_index,ket_subspace_index,bra_subspace,ket_subspace));
+        PushSector(bra_subspace_index,ket_subspace_index);
       }
     }
   }
@@ -944,7 +944,7 @@ namespace basis {
   OrbitalSectorsLJPN::OrbitalSectorsLJPN(
       const OrbitalSpaceLJPN& bra_space, const OrbitalSpaceLJPN& ket_space,
       int j0, int g0, int Tz0)
-    : j0_(j0), g0_(g0), Tz0_(Tz0)
+    : BaseSectors(bra_space, ket_space), j0_(j0), g0_(g0), Tz0_(Tz0)
   {
     for (std::size_t bra_subspace_index=0; bra_subspace_index<bra_space.size(); ++bra_subspace_index) {
       for (std::size_t ket_subspace_index=0; ket_subspace_index<ket_space.size(); ++ket_subspace_index) {
@@ -960,8 +960,7 @@ namespace basis {
 
         // push sector
         if (allowed) {
-          PushSector(SectorType(bra_subspace_index,ket_subspace_index,
-                                bra_subspace,ket_subspace));
+          PushSector(bra_subspace_index,ket_subspace_index);
         }
       }
     }
@@ -979,8 +978,7 @@ namespace basis {
     for (std::size_t sector_index=0; sector_index<size(); ++sector_index) {
       // const basis::OrbitalSectorLJPN& sector = GetSector(sector_index);
       // os << sector_index+1 << sector.DebugStr();
-      const basis::BaseSector<basis::OrbitalSubspaceLJPN>& sector =
-        GetSector(sector_index);
+      const SectorType& sector = GetSector(sector_index);
       os << std::setw(width) << sector_index
          << " bra " << std::setw(width) << sector.bra_subspace_index()
          << " (" << int(sector.bra_subspace().orbital_species())

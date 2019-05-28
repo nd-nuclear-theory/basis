@@ -265,7 +265,7 @@ namespace basis {
       int J0, int g0, int Tz0,
       basis::SectorDirection sector_direction
     )
-    : J0_(J0), g0_(g0), Tz0_(Tz0)
+    : BaseSectors(space), J0_(J0), g0_(g0), Tz0_(Tz0)
   {
 
     // enforce canonical
@@ -301,7 +301,7 @@ namespace basis {
 
           // push sector
           if (allowed)
-            PushSector(SectorType(bra_subspace_index,ket_subspace_index,bra_subspace,ket_subspace));
+            PushSector(bra_subspace_index,ket_subspace_index);
         }
   }
 

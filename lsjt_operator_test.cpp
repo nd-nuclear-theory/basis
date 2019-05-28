@@ -58,7 +58,7 @@ void WriteTestRelativeManual(const std::string& filename)
       // enumerate sectors
       component_sectors[T0] = basis::RelativeSectorsLSJT(space,operator_parameters.J0,T0,operator_parameters.g0);
       std::cout << " T0 " << T0 << " size " << component_sectors[T0].size() << std::endl;
-          
+
       // populate matrices
       if (T0==0)
         basis::SetOperatorToIdentity(component_sectors[T0],component_matrices[T0]);
@@ -226,13 +226,13 @@ void IdentityTestOLD()
 void ReadTestRelative(const std::string& filename)
 {
   basis::RelativeSpaceLSJT relative_space;
-  basis::OperatorLabelsJT operator_labels;
+  basis::RelativeOperatorParametersLSJT operator_parameters;
   std::array<basis::RelativeSectorsLSJT,3> relative_component_sectors;
   std::array<basis::OperatorBlocks<double>,3> relative_component_matrices;
   basis::ReadRelativeOperatorLSJT(
       filename,
       relative_space,
-      operator_labels,relative_component_sectors,relative_component_matrices,
+      operator_parameters,relative_component_sectors,relative_component_matrices,
       true  // verbose
     );
 }
@@ -267,7 +267,7 @@ void WriteTestRelativeCM(const std::string& filename)
       // enumerate sectors
       component_sectors[T0] = basis::RelativeCMSectorsLSJT(space,J0,T0,g0);
       std::cout << " T0 " << T0 << " size " << component_sectors[T0].size() << std::endl;
-          
+
       // populate matrices
       if (T0==0)
         basis::SetOperatorToIdentity(component_sectors[T0],component_matrices[T0]);
@@ -327,7 +327,7 @@ void WriteTestTwoBody(const std::string& filename)
       // enumerate sectors
       component_sectors[T0] = basis::TwoBodySectorsLSJT(space,J0,T0,g0);
       std::cout << " T0 " << T0 << " size " << component_sectors[T0].size() << std::endl;
-          
+
       // populate matrices
       if (T0==0)
         basis::SetOperatorToIdentity(component_sectors[T0],component_matrices[T0]);
@@ -367,7 +367,7 @@ int main(int argc, char **argv)
 
   std::string relative_cm_filename("lsjt_operator_test_relative_cm_identity_Nmax02.dat");
   WriteTestRelativeCM(relative_cm_filename);
- 
+
   std::string two_body_filename("lsjt_operator_test_two_body_identity_nas_Nmax02.dat");
   WriteTestTwoBody(two_body_filename);
 

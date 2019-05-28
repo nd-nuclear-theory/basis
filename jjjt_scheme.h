@@ -37,6 +37,7 @@
   + 7/19/16 (mac): Use enum Rank for truncation rank.
   + 05/09/19 (pjf): Use std::size_t for indices and sizes, to prevent
     integer overflow.
+  + 05/27/19 (pjf): Update to initialize BaseSectors with spaces.
 
 ****************************************************************/
 
@@ -263,7 +264,7 @@ namespace basis {
 
     // constructor
 
-    TwoBodySectorsJJJT() {};
+    TwoBodySectorsJJJT() = default;
     // default constructor -- provided since required for certain
     // purposes by STL container classes (e.g., std::vector::resize)
 
@@ -496,7 +497,7 @@ namespace basis {
 
     // constructor
 
-    TwoBodySectorsJJJTN() {};
+    TwoBodySectorsJJJTN() = default;
     // default constructor -- provided since required for certain
     // purposes by STL container classes (e.g., std::vector::resize)
 

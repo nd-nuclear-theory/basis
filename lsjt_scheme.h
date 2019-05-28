@@ -67,6 +67,7 @@
   + 7/1/17 (mac): Add n accessor to RelativeStateLSJT.
   + 05/09/19 (pjf): Use std::size_t for indices and sizes, to prevent
     integer overflow.
+  + 05/27/19 (pjf): Update to initialize BaseSectors with spaces.
 
 ****************************************************************/
 
@@ -276,7 +277,7 @@ namespace basis {
 
     // constructor
 
-    RelativeSectorsLSJT() {};
+    RelativeSectorsLSJT() = default;
     // default constructor -- provided since required for certain
     // purposes by STL container classes (e.g., std::vector::resize)
 
@@ -487,7 +488,7 @@ namespace basis {
 
     // constructor
 
-    RelativeCMSectorsLSJT() {};
+    RelativeCMSectorsLSJT() = default;
     // default constructor -- provided since required for certain
     // purposes by STL container classes (e.g., std::vector::resize)
 
@@ -681,7 +682,7 @@ namespace basis {
 
     // constructor
 
-    RelativeCMSectorsLSJTN() {};
+    RelativeCMSectorsLSJTN() = default;
     // default constructor -- provided since required for certain
     // purposes by STL container classes (e.g., std::vector::resize)
 
@@ -897,7 +898,7 @@ namespace basis {
 
     // constructor
 
-    TwoBodySectorsLSJT() {};
+    TwoBodySectorsLSJT() = default;
     // default constructor -- provided since required for certain
     // purposes by STL container classes (e.g., std::vector::resize)
 
@@ -1097,7 +1098,7 @@ namespace basis {
 
     // constructor
 
-    TwoBodySectorsLSJTN() {};
+    TwoBodySectorsLSJTN() = default;
     // default constructor -- provided since required for certain
     // purposes by STL container classes (e.g., std::vector::resize)
 

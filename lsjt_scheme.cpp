@@ -164,6 +164,7 @@ namespace basis {
       const RelativeSpaceLSJT& space,
       basis::SectorDirection sector_direction
     )
+    : BaseSectors(space)
   {
     for (std::size_t bra_subspace_index=0; bra_subspace_index<space.size(); ++bra_subspace_index)
       for (std::size_t ket_subspace_index=0; ket_subspace_index<space.size(); ++ket_subspace_index)
@@ -181,7 +182,7 @@ namespace basis {
           const SubspaceType& ket_subspace = space.GetSubspace(ket_subspace_index);
 
           // push sector
-          PushSector(SectorType(bra_subspace_index,ket_subspace_index,bra_subspace,ket_subspace));
+          PushSector(bra_subspace_index,ket_subspace_index);
         }
   }
 
@@ -190,6 +191,7 @@ namespace basis {
       int J0, int T0, int g0,
       basis::SectorDirection sector_direction
     )
+    : BaseSectors(space)
   {
     for (std::size_t bra_subspace_index=0; bra_subspace_index<space.size(); ++bra_subspace_index)
       for (std::size_t ket_subspace_index=0; ket_subspace_index<space.size(); ++ket_subspace_index)
@@ -213,7 +215,7 @@ namespace basis {
 
           // push sector
           if (allowed)
-            PushSector(SectorType(bra_subspace_index,ket_subspace_index,bra_subspace,ket_subspace));
+            PushSector(bra_subspace_index,ket_subspace_index);
         }
   }
 
@@ -380,6 +382,7 @@ namespace basis {
       int J0, int T0, int g0,
       basis::SectorDirection sector_direction
     )
+    : BaseSectors(space)
   {
     for (std::size_t bra_subspace_index=0; bra_subspace_index<space.size(); ++bra_subspace_index)
       for (std::size_t ket_subspace_index=0; ket_subspace_index<space.size(); ++ket_subspace_index)
@@ -403,7 +406,7 @@ namespace basis {
 
           // push sector
           if (allowed)
-            PushSector(SectorType(bra_subspace_index,ket_subspace_index,bra_subspace,ket_subspace));
+            PushSector(bra_subspace_index,ket_subspace_index);
         }
   }
 
@@ -568,6 +571,7 @@ namespace basis {
       int J0, int T0, int g0,
       basis::SectorDirection sector_direction
     )
+    : BaseSectors(space)
   {
     for (std::size_t bra_subspace_index=0; bra_subspace_index<space.size(); ++bra_subspace_index)
       for (std::size_t ket_subspace_index=0; ket_subspace_index<space.size(); ++ket_subspace_index)
@@ -591,7 +595,7 @@ namespace basis {
 
           // push sector
           if (allowed)
-            PushSector(SectorType(bra_subspace_index,ket_subspace_index,bra_subspace,ket_subspace));
+            PushSector(bra_subspace_index,ket_subspace_index);
         }
   }
 
@@ -778,6 +782,7 @@ namespace basis {
       int J0, int T0, int g0,
       basis::SectorDirection sector_direction
     )
+    : BaseSectors(space)
   {
     for (std::size_t bra_subspace_index=0; bra_subspace_index<space.size(); ++bra_subspace_index)
       for (std::size_t ket_subspace_index=0; ket_subspace_index<space.size(); ++ket_subspace_index)
@@ -802,7 +807,7 @@ namespace basis {
 
           // push sector
           if (allowed)
-            PushSector(SectorType(bra_subspace_index,ket_subspace_index,bra_subspace,ket_subspace));
+            PushSector(bra_subspace_index,ket_subspace_index);
         }
   }
 
@@ -988,6 +993,7 @@ namespace basis {
       int J0, int T0, int g0,
       basis::SectorDirection sector_direction
     )
+    : BaseSectors(space)
   {
     for (std::size_t bra_subspace_index=0; bra_subspace_index<space.size(); ++bra_subspace_index)
       for (std::size_t ket_subspace_index=0; ket_subspace_index<space.size(); ++ket_subspace_index)
@@ -1012,7 +1018,7 @@ namespace basis {
 
           // push sector
           if (allowed)
-            PushSector(SectorType(bra_subspace_index,ket_subspace_index,bra_subspace,ket_subspace));
+            PushSector(bra_subspace_index,ket_subspace_index);
         }
   }
 

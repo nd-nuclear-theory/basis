@@ -105,6 +105,13 @@
   + 08/11/17 (pjf): Emit warnings if deprecated member functions are used.
   + 05/09/19 (pjf): Use std::size_t for indices and sizes, to prevent
     integer overflow.
+  + 05/27/19 (pjf): Modify BaseSpace and BaseSectors to fix fragility problems:
+    - Move BaseSpace subspaces_ and lookup_ into shared_ptrs; copying a
+      space is now a lightweight operation.
+    - Store copy of bra and ket spaces inside BaseSectors.
+    - Construct BaseSector at access time, dereferencing from local copy of
+      space.
+    - Add BaseSpace::EmplaceSubspace() for in-place addition of subspaces.
 ****************************************************************/
 
 #ifndef BASIS_BASIS_H_
@@ -113,7 +120,9 @@
 #include <cassert>
 #include <cstddef>
 #include <limits>
+#include <memory>
 #include <tuple>
+#include <utility>
 #include <vector>
 
 // for DebugStr
@@ -476,6 +485,23 @@ namespace basis {
       typedef tSubspaceType SubspaceType;
 
       ////////////////////////////////////////////////////////////////
+      // constructors
+      ////////////////////////////////////////////////////////////////
+
+      BaseSpace()
+      {
+        subspaces_ = std::make_shared<std::vector<SubspaceType>>();
+#ifdef BASIS_HASH
+        lookup_ = std::make_shared<std::unordered_map<
+            typename SubspaceType::SubspaceLabelsType,std::size_t,
+            boost::hash<typename SubspaceType::SubspaceLabelsType>
+          >>();
+#else
+        lookup_ = std::make_shared<std::map<typename SubspaceType::SubspaceLabelsType,std::size_t>>();
+#endif
+      }
+
+      ////////////////////////////////////////////////////////////////
       // subspace lookup and retrieval
       ////////////////////////////////////////////////////////////////
 
@@ -483,7 +509,7 @@ namespace basis {
       /// Given the labels for a subspace, returns whether or not the
       /// subspace is found within the space.
       {
-        return lookup_.count(subspace_labels);
+        return lookup_->count(subspace_labels);
       }
 
       std::size_t LookUpSubspaceIndex(
@@ -499,8 +525,8 @@ namespace basis {
         // assert(ContainsSubspace(subspace_labels));
         // return lookup_.at(subspace_labels);
 
-        auto pos = lookup_.find(subspace_labels);
-        if (pos==lookup_.end())
+        auto pos = lookup_->find(subspace_labels);
+        if (pos==lookup_->end())
           return kNone;
         else
           return pos->second;
@@ -518,14 +544,14 @@ namespace basis {
 
         std::size_t subspace_index = LookUpSubspaceIndex(subspace_labels);
         assert(subspace_index!=kNone);
-        return subspaces_[subspace_index];
+        return subspaces_->at(subspace_index);
       };
 
       const SubspaceType& GetSubspace(std::size_t i) const
       /// Given the index for a subspace, return a reference to the
       /// subspace.
       {
-        return subspaces_[i];
+        return subspaces_->at(i);
       };
 
       ////////////////////////////////////////////////////////////////
@@ -535,7 +561,7 @@ namespace basis {
       std::size_t size() const
       /// Return the number of subspaces within the space.
       {
-        return subspaces_.size();
+        return subspaces_->size();
       };
 
       std::size_t Dimension() const
@@ -557,25 +583,38 @@ namespace basis {
       /// Create indexing information (in both directions, index <->
       /// labels) for a subspace.
       {
-        lookup_[subspace.labels()] = subspaces_.size(); // index for lookup
-        subspaces_.push_back(subspace);  // save space
+        (*lookup_)[subspace.labels()] = subspaces_->size();  // index for lookup
+        subspaces_->push_back(subspace);  // save space
       };
+
+      template <class... Args>
+      void EmplaceSubspace(Args&&... args)
+      /// Create indexing information (in both directions, index <->
+      /// labels) for a subspace.
+      {
+        std::size_t index = subspaces_->size();  // index for lookup
+        subspaces_->emplace_back(std::forward<Args>(args)...);
+        (*lookup_)[subspaces_->back().labels()] = index;
+      }
+
+      private:
 
       ////////////////////////////////////////////////////////////////
       // internal storage
       ////////////////////////////////////////////////////////////////
 
       /// subspaces (accessible by index)
-      std::vector<SubspaceType> subspaces_;
+      std::shared_ptr<std::vector<SubspaceType>> subspaces_;
 
       // subspace index lookup by labels
 #ifdef BASIS_HASH
+      std::shared_ptr<
       std::unordered_map<
           typename SubspaceType::SubspaceLabelsType,std::size_t,
           boost::hash<typename SubspaceType::SubspaceLabelsType>
-        > lookup_;
+        >> lookup_;
 #else
-      std::map<typename SubspaceType::SubspaceLabelsType,std::size_t> lookup_;
+      std::shared_ptr<std::map<typename SubspaceType::SubspaceLabelsType,std::size_t>> lookup_;
 #endif
     };
 
@@ -701,13 +740,38 @@ namespace basis {
       typedef BaseSector<SubspaceType> SectorType;
 
       ////////////////////////////////////////////////////////////////
+      // constructors
+      ////////////////////////////////////////////////////////////////
+
+      BaseSectors() = default;
+      // default constructor -- provided since required for certain
+      // purposes by STL container classes (e.g., std::vector::resize)
+
+      explicit BaseSectors(const SpaceType& space)
+        : bra_space_(space), ket_space_(space)
+      {}
+
+      BaseSectors(const SpaceType& bra_space, const SpaceType& ket_space)
+        : bra_space_(bra_space), ket_space_(ket_space)
+      {}
+
+      ////////////////////////////////////////////////////////////////
       // sector lookup and retrieval
       ////////////////////////////////////////////////////////////////
 
-      const SectorType& GetSector(std::size_t sector_index) const
+      SectorType GetSector(std::size_t sector_index) const
       // Given sector index, return reference to sector itself.
       {
-        return sectors_[sector_index];
+        const typename SectorType::KeyType& key = keys_.at(sector_index);
+        std::size_t bra_subspace_index, ket_subspace_index, multiplicity_index;
+        std::tie(bra_subspace_index, ket_subspace_index, multiplicity_index) = key;
+        const auto& bra_subspace = bra_space_.GetSubspace(bra_subspace_index);
+        const auto& ket_subspace = ket_space_.GetSubspace(ket_subspace_index);
+        return SectorType(
+            bra_subspace_index, ket_subspace_index,
+            bra_subspace, ket_subspace,
+            multiplicity_index
+          );
       };
 
       bool ContainsSector(
@@ -722,17 +786,18 @@ namespace basis {
         return lookup_.count(key);
       };
 
-#ifdef BASIS_ALLOW_DEPRECATED
-      DEPRECATED("lookup by bra and ket subspace indices instead")
-      bool ContainsSector(const typename SectorType::KeyType& key) const
-      // Given the labels for a sector, returns whether or not the sector
-      // is found within the the sector set.
+      std::size_t LookUpSectorIndex(const typename SectorType::KeyType& key) const
+      // Given the key for a sector, look up its index within the
+      // sector set.
       //
-      // DEPRECATED
+      // If no such labels are found, basis::kNone is returned.
       {
-        return lookup_.count(key);
+        auto pos = lookup_.find(key);
+        if (pos==lookup_.end())
+          return kNone;
+        else
+          return pos->second;
       };
-#endif
 
       std::size_t LookUpSectorIndex(
           std::size_t bra_subspace_index,
@@ -745,36 +810,8 @@ namespace basis {
       // If no such labels are found, basis::kNone is returned.
       {
         const typename SectorType::KeyType key(bra_subspace_index,ket_subspace_index,multiplicity_index);
-        auto pos = lookup_.find(key);
-        if (pos==lookup_.end())
-          return kNone;
-        else
-          return pos->second;
-      };
-
-#ifdef BASIS_ALLOW_DEPRECATED
-      DEPRECATED("lookup by bra and ket subspace indices instead")
-      std::size_t LookUpSectorIndex(const typename SectorType::KeyType& key) const
-      // Given the labels for a sector, look up its index within the
-      // sector set.
-      //
-      // If no such labels are found, basis::kNone is returned.
-      //
-      // DEPRECATED
-      {
-
-        // PREVIOUSLY: trap failed lookup with assert for easier debugging
-        // assert(ContainsSector(bra_subspace_index,ket_subspace_index,multiplicity_index));
-        // return lookup_.at(key);
-
-        auto pos = lookup_.find(key);
-        if (pos==lookup_.end())
-          return kNone;
-        else
-          return pos->second;
-      };
-#endif
-
+        return LookUpSectorIndex(key);
+      }
       ////////////////////////////////////////////////////////////////
       // size retrieval
       ////////////////////////////////////////////////////////////////
@@ -782,7 +819,7 @@ namespace basis {
       std::size_t size() const
       // Return number of sectors within sector set.
       {
-        return sectors_.size();
+        return keys_.size();
       };
 
       ////////////////////////////////////////////////////////////////
@@ -800,20 +837,47 @@ namespace basis {
       // sector push (for initial construction)
       ////////////////////////////////////////////////////////////////
 
+      void PushSector(const typename SectorType::KeyType& key)
+      // Create indexing information (in both directions, index <->
+      // labels) for a sector, given key.
+      {
+        lookup_[key] = keys_.size(); // index for lookup
+        keys_.push_back(key);  // save sector
+      };
+
+      void PushSector(
+          std::size_t bra_subspace_index,
+          std::size_t ket_subspace_index,
+          std::size_t multiplicity_index=1
+        )
+      // Create indexing information (in both directions, index <->
+      // labels) for a sector, given indices.
+      {
+        PushSector({bra_subspace_index, ket_subspace_index, multiplicity_index});
+      }
+
+      DEPRECATED("use index- or key-based PushSector() instead")
       void PushSector(const SectorType& sector)
       // Create indexing information (in both directions, index <->
-      // labels) for a sector.
+      // labels) for a sector, given a sector.
+      //
+      // DEPRECATED -- use index- or key-based PushSector() instead
       {
-        lookup_[sector.Key()] = sectors_.size(); // index for lookup
-        sectors_.push_back(sector);  // save sector
-      };
+        PushSector(sector.Key());
+      }
 
       ////////////////////////////////////////////////////////////////
       // internal storage
       ////////////////////////////////////////////////////////////////
 
-      // sectors (accessible by index)
-      std::vector<SectorType> sectors_;
+      protected:
+      // spaces
+      SpaceType bra_space_;
+      SpaceType ket_space_;
+
+      private:
+      // sector keys (accessible by index)
+      std::vector<typename SectorType::KeyType> keys_;
 
       // sector index lookup by subspace indices
 #ifdef BASIS_HASH
