@@ -853,7 +853,7 @@ namespace basis {
       // Create indexing information (in both directions, index <->
       // labels) for a sector, given indices.
       {
-        PushSector({bra_subspace_index, ket_subspace_index, multiplicity_index});
+        PushSector(typename SectorType::KeyType{bra_subspace_index, ket_subspace_index, multiplicity_index});
       }
 
       DEPRECATED("use index- or key-based PushSector() instead")
