@@ -63,6 +63,7 @@
   + 05/09/19 (pjf): Use std::size_t for indices and sizes, to prevent
     integer overflow.
   + 05/27/19 (pjf): Update to initialize BaseSectors with spaces.
+  + 06/03/19 (pjf): Add OrbitalPNInfo constructor which takes tz.
 
 ****************************************************************/
 
@@ -106,6 +107,10 @@ namespace basis {
 
     OrbitalPNInfo(OrbitalSpeciesPN os, int n, int l, HalfInt j, double weight)
       : orbital_species(os), n(n), l(l), j(j), weight(weight) {};
+
+    OrbitalPNInfo(int n, int l, HalfInt j, HalfInt tz, double weight)
+      : orbital_species(kTzCodeOrbitalSpeciesPN.at(tz)), n(n), l(l), j(j), weight(weight)
+    {}
 
     inline operator FullOrbitalLabels() const
     {
