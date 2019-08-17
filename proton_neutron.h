@@ -11,6 +11,7 @@
   + 07/01/17 (mac): Extracted from jjjpn_scheme.h.
   + 10/19/17 (mac): Define OperatorTypePN.
   + 02/27/19 (pjf): Add reverse lookups for OrbitalSpeciesPN.
+  + 08/14/19 (pjf): Add reverse lookup for OperatorTypePN.
 
 ****************************************************************/
 
@@ -99,6 +100,14 @@ namespace basis {
   //
   // Use of these arrays requires conversion of the OperatorTypePN to int.
   extern const std::array<const char*,3> kOperatorTypePNCodeChar;  // {"p","n","total"}
+
+  // notational reverse definitions for proton-neutron operator types
+  //
+  // Example:
+  //   std::string operator_species_code = "p";
+  //   ...
+  //   os << kCharCodeOperatorTypePN[operator_species_code];
+  extern const std::unordered_map<std::string,OperatorTypePN> kCharCodeOperatorTypePN;
 
 
   ////////////////////////////////////////////////////////////////
