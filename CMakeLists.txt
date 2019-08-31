@@ -16,7 +16,15 @@ set(SOURCES jjjpn_operator.cpp jjjpn_scheme.cpp
             nlj_operator.cpp nlj_orbital.cpp
             proton_neutron.cpp)
 
-set(HEADERS basis.h degenerate.h
+function(add_headers VAR)
+  set(headers ${${VAR}})
+  foreach (header ${ARGN})
+    set(headers ${headers} ../basis/${header})
+  endforeach()
+  set(${VAR} ${headers} PARENT_SCOPE)
+endfunction()
+
+add_headers(HEADERS basis.h degenerate.h
             hypersector.h
             jjjpn_operator.h jjjpn_scheme.h
             jjjt_operator.h jjjt_scheme.h
@@ -39,4 +47,4 @@ target_link_libraries(${TARGET} PUBLIC Eigen3::Eigen)
 find_package(GSL REQUIRED)
 target_link_libraries(${TARGET} PUBLIC GSL::gsl GSL::gslcblas)
 
-target_include_directories(${TARGET} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/..)
+target_include_directories(${TARGET} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
