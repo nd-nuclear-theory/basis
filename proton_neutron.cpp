@@ -52,6 +52,11 @@ namespace basis {
   // notational definitions for proton-neutron operator types
   const std::array<const char*,3> kOperatorTypePNCodeChar({"p","n","total"});
 
+  const std::unordered_map<std::string,OperatorTypePN> kCharCodeOperatorTypePN({
+      {"p",OperatorTypePN::kP},
+      {"n",OperatorTypePN::kN},
+      {"total",OperatorTypePN::kTotal}
+    });
 
   ////////////////////////////////////////////////////////////////
   ////////////////////////////////////////////////////////////////
