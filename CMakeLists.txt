@@ -19,7 +19,7 @@ set(SOURCES jjjpn_operator.cpp jjjpn_scheme.cpp
 function(add_headers VAR)
   set(headers ${${VAR}})
   foreach (header ${ARGN})
-    set(headers ${headers} ../basis/${header})
+    set(headers ${headers} ../${CMAKE_CURRENT_SOURCE_DIR}/${header})
   endforeach()
   set(${VAR} ${headers} PARENT_SCOPE)
 endfunction()
