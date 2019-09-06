@@ -1,7 +1,7 @@
 /****************************************************************
   nlj_orbital.cpp
 
-  Mark A. Caprio
+  Mark A. Caprio, Patrick J. Fasano
   University of Notre Dame
 
 ****************************************************************/
@@ -20,6 +20,25 @@
 #include "nlj_orbital.h"
 
 namespace basis {
+
+  ////////////////////////////////////////////////////////////////
+  // orbital truncation
+  ////////////////////////////////////////////////////////////////
+
+  OrbitalPNList TruncateOrbitalList(
+      const WeightMax& weight_max, const OrbitalPNList& orbital_list
+    )
+  {
+    OrbitalPNList output_orbitals;
+
+    for (const auto& orbital : orbital_list)
+    {
+      if (orbital.weight <= weight_max.one_body[int(orbital.orbital_species)])
+        output_orbitals.push_back(orbital);
+    }
+
+    return output_orbitals;
+  }
 
   ////////////////////////////////////////////////////////////////
   // single-particle definition file parsing
