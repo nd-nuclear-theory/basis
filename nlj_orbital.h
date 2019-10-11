@@ -65,6 +65,7 @@
   + 05/27/19 (pjf): Update to initialize BaseSectors with spaces.
   + 06/03/19 (pjf): Add OrbitalPNInfo constructor which takes tz.
   + 09/06/19 (pjf): Add TruncateOrbitalList.
+  + 10/10/19 (pjf): Fix standalone output of 15200 orbital files.
 
 ****************************************************************/
 

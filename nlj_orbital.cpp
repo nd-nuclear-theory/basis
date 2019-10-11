@@ -161,13 +161,13 @@ namespace basis {
     for (const OrbitalPNInfo& orbital_info: orbitals)
       // iterate over states
       {
+        if (orbital_info.orbital_species == OrbitalSpeciesPN::kP) {
+          output_index = ++p_index;
+        } else if (orbital_info.orbital_species == OrbitalSpeciesPN::kN) {
+          output_index = ++n_index;
+        }
         if (format==MFDnOrbitalFormat::kVersion15099)
           {
-            if (orbital_info.orbital_species == OrbitalSpeciesPN::kP) {
-              output_index = ++p_index;
-            } else if (orbital_info.orbital_species == OrbitalSpeciesPN::kN) {
-              output_index = ++n_index;
-            }
             body << " " << std::setw(width) << output_index
                  << " " << std::setw(width) << orbital_info.n
                  << " " << std::setw(width) << orbital_info.l
@@ -179,7 +179,7 @@ namespace basis {
           }
         else if (format==MFDnOrbitalFormat::kVersion15200)
           {
-            ++output_index;
+            output_index = p_index + n_index;
             body << " " << std::setw(width) << output_index
                  << " " << std::setw(width) << orbital_info.n
                  << " " << std::setw(width) << orbital_info.l
