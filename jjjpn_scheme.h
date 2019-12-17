@@ -41,6 +41,7 @@
   + 05/09/19 (pjf): Use std::size_t for indices and sizes, to prevent
     integer overflow.
   + 09/06/19 (pjf): Move WeightMax to many_body.h.
+  + 12/12/19 (pjf): Fix UB in TwoBodySpaceJJJPN construction.
 ****************************************************************/
 
 #ifndef BASIS_JJJPN_SCHEME_H_
