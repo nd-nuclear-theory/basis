@@ -122,6 +122,7 @@
   + 06/25/21 (pjf):
     - Add accessor for subspace offset in BaseSpace.
     - Fix initialization of dimension_ in BaseSpace.
+    - Add BaseDegenerateSpace as friend of BaseSpace.
 ****************************************************************/
 
 #ifndef BASIS_BASIS_H_
@@ -678,6 +679,10 @@ namespace basis {
       }
 
       private:
+
+      // allow BaseDegenerateSpace to access private members to override
+      // PushSubspace and EmplaceSubspace
+      template<typename T> friend class BaseDegenerateSpace;
 
       ////////////////////////////////////////////////////////////////
       // internal storage

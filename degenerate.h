@@ -19,6 +19,13 @@
     - Add dimension() accessor to BaseDegenerateSubspace.
     - Deprecate full_dimension() in BaseDegenerateSubspace and FullDimension()
       in BaseDegenerateSpace.
+  + 06/25/21 (pjf):
+    - Complete renaming of multiplicity to degeneracy.
+    - Add GetStateOffset() and GetStateDegeneracy() to BaseDegenerateSubspace.
+    - Repurpose BaseDegenerateSpace to fit its name:
+      * Allow multiple degenerate subspaces within BaseDegenerateSpace.
+      * Add subspace degeneracy.
+      * Override PushSubspace and EmplaceSubspace to account for degeneracies.
 
 ****************************************************************/
 
@@ -26,6 +33,7 @@
 #define BASIS_DEGENERATE_H_
 
 #include <cstddef>
+#include <utility>
 #include <vector>
 
 #include "basis/basis.h"
@@ -86,9 +94,20 @@ namespace basis {
       return state_offsets_;
     }
 
-    const std::vector<int>& state_multiplicities() const
+    const std::vector<int>& state_degeneracies() const
     {
-      return state_multiplicities_;
+      return state_degeneracies_;
+    }
+
+    std::size_t GetStateOffset(std::size_t i, int degeneracy_index=1) const
+    {
+      assert(degeneracy_index < state_degeneracies_.at(i));
+      return state_offsets()[i]+(degeneracy_index-1);
+    }
+
+    std::size_t GetStateDegeneracy(std::size_t i) const
+    {
+      return state_degeneracies_.at(i);
     }
 
     std::size_t dimension() const
@@ -119,7 +138,7 @@ namespace basis {
 
       // push substate information
       state_offsets_.push_back(full_dimension_);
-      state_multiplicities_.push_back(degeneracy);
+      state_degeneracies_.push_back(degeneracy);
       full_dimension_ += degeneracy;
     };
 
@@ -129,7 +148,7 @@ namespace basis {
 
     // degeneracy counting information
     std::vector<std::size_t> state_offsets_;  // offset to given state's starting substate
-    std::vector<int> state_multiplicities_;  // given state's number of substates
+    std::vector<int> state_degeneracies_;  // given state's number of substates
     std::size_t full_dimension_;  // total number of substates
 
   };
@@ -198,7 +217,7 @@ namespace basis {
 
       int degeneracy() const
       {
-        return BaseState<tSubspaceType>::subspace().state_multiplicities()[BaseState<tSubspaceType>::index()];
+        return BaseState<tSubspaceType>::subspace().state_degeneracies()[BaseState<tSubspaceType>::index()];
       }
 
 
@@ -237,7 +256,7 @@ namespace basis {
       DEPRECATED("use dimension() instead")
       std::size_t FullDimension() const
       // Return the total dimension of all subspaces within the space,
-      // taking into account substate multiplicities.
+      // taking into account substate degeneracies.
       {
         std::size_t full_dimension = 0;
         for (std::size_t subspace_index=0; subspace_index<BaseSpace<tSubspaceType>::size(); ++subspace_index)
@@ -246,10 +265,74 @@ namespace basis {
       }
 #endif
 
+      ////////////////////////////////////////////////////////////////
+      // subspace lookup and retrieval
+      ////////////////////////////////////////////////////////////////
+
+      int GetSubspaceDegeneracy(std::size_t i) const
+      /// Given the index for a subspace, return the degeneracy of the
+      /// subspace within the space.
+      {
+        return subspace_degeneracies_.at(i);
+      };
+
+      int GetSubspaceOffset(std::size_t i, int degeneracy_index) const
+      /// Given the index for a subspace and the degeneracy index, return
+      /// the offset of the subspace (with given degeneracy index) within
+      /// the space.
+      {
+        assert(degeneracy_index < subspace_degeneracies_.at(i));
+        return GetSubspaceOffset(i)+(degeneracy_index-1)*this->GetSubspace(i).dimension();
+      }
+
+      protected:
+
+      ////////////////////////////////////////////////////////////////
+      // subspace push (for initial construction)
+      ////////////////////////////////////////////////////////////////
+
+      void PushSubspace(const SubspaceType& subspace) = delete;
+      // Prevent use of PushSubspace without degeneracy.
+
+      void PushSubspace(const SubspaceType& subspace, int degeneracy)
+      /// Create indexing information (in both directions, index <->
+      /// labels) for a subspace.
+      {
+        this->subspace_offsets_.push_back(this->dimension_);
+        (*(this->lookup_))[subspace.labels()] = this->subspaces_->size();  // index for lookup
+        this->subspaces_->push_back(subspace);  // save space
+        subspace_degeneracies_.push_back(degeneracy);  // save degeneracy
+        this->dimension_ += subspace.dimension()*degeneracy;
+      };
+
+      template <class... Args>
+      void EmplaceSubspace(Args&&... args) = delete;
+      // Prevent use of PushSubspace without degeneracy.
+
+      template <class... Args>
+      void EmplaceSubspace(Args&&... args, int degeneracy)
+      /// Create indexing information (in both directions, index <->
+      /// labels) for a subspace.
+      {
+        std::size_t index = this->subspaces_->size();  // index for lookup
+        this->subspace_offsets_.push_back(this->dimension_);
+        this->subspaces_->emplace_back(std::forward<Args>(args)...);
+        (*(this->lookup_))[this->subspaces_->back().labels()] = index;
+        subspace_degeneracies_.push_back(degeneracy);  // save degeneracy
+        this->dimension_ += this->subspaces_->back().dimension()*degeneracy;
+      }
+
+    ////////////////////////////////////////////////////////////////
+    // private storage
+    ////////////////////////////////////////////////////////////////
+
+    // degeneracy counting information
+    std::vector<int> subspace_degeneracies_;  // given subspace's number of sub-subspaces
+
     };
 
   ////////////////////////////////////////////////////////////////
   ////////////////////////////////////////////////////////////////
-} // namespace
+}  // namespace basis
 
-#endif
+#endif  // BASIS_DEGENERATE_H_
