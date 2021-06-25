@@ -119,6 +119,9 @@
       this allows instantiating a space of spaces.
     - Add dimension() accessor to BaseSubspace and BaseSpace.
     - Store offsets to subspaces and total dimension directly in BaseSpace.
+  + 06/25/21 (pjf):
+    - Add accessor for subspace offset in BaseSpace.
+    - Fix initialization of dimension_ in BaseSpace.
 ****************************************************************/
 
 #ifndef BASIS_BASIS_H_
@@ -545,7 +548,7 @@ namespace basis {
       ////////////////////////////////////////////////////////////////
 
       BaseSpace()
-        : subspace_offsets_{0}
+        : dimension_{0}
       {
         subspaces_ = std::make_shared<std::vector<SubspaceType>>();
 #ifdef BASIS_HASH
@@ -610,6 +613,13 @@ namespace basis {
       {
         return subspaces_->at(i);
       };
+
+      std::size_t GetSubspaceOffset(std::size_t i) const
+      /// Given the index for a subspace, return the offset of the subspace
+      /// in the full space indexing.
+      {
+        return subspace_offsets_.at(i);
+      }
 
       ////////////////////////////////////////////////////////////////
       // size retrieval
