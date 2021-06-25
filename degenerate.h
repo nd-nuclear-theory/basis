@@ -101,7 +101,7 @@ namespace basis {
 
     std::size_t GetStateOffset(std::size_t i, int degeneracy_index=1) const
     {
-      assert(degeneracy_index < state_degeneracies_.at(i));
+      assert(degeneracy_index <= state_degeneracies_.at(i));
       return state_offsets()[i]+(degeneracy_index-1);
     }
 
@@ -281,7 +281,7 @@ namespace basis {
       /// the offset of the subspace (with given degeneracy index) within
       /// the space.
       {
-        assert(degeneracy_index < subspace_degeneracies_.at(i));
+        assert(degeneracy_index <= subspace_degeneracies_.at(i));
         return GetSubspaceOffset(i)+(degeneracy_index-1)*this->GetSubspace(i).dimension();
       }
 
