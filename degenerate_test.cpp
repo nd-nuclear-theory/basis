@@ -234,7 +234,7 @@ namespace basis {
           << std::endl;
       }
 
-    os << " " << "dimensions: size " << size() << " full_dimension " << full_dimension() << std::endl;
+    os << " " << "dimensions: size " << size() << " dimension " << dimension() << std::endl;
 
     return os.str();
 
@@ -306,7 +306,7 @@ namespace basis {
           << " " << "size"
           << " " << subspace.size()
           << " " << "full_dimension"
-          << " " << subspace.full_dimension()
+          << " " << subspace.dimension()
           << std::endl;
         if (show_subspaces)
           os << subspace.DebugStr();
@@ -334,10 +334,10 @@ void Test()
   basis::RelativeDegenerateSpaceLSJT space(N_max,J_max);
   std::cout << space.DebugStr(true) << std::endl;
   std::cout
-    << " " << "Dimension"
-    << " " << space.Dimension()
+    << " " << "Size"
+    << " " << space.size()
     << " " << "FullDimension "
-    << " " << space.FullDimension()
+    << " " << space.dimension()
     << std::endl;
   std::cout << std::endl;
 

@@ -15,6 +15,10 @@
   + 06/17/17 (mac): Rename to degenerate.h.  Rename multiplicity to degeneracy.
   + 05/09/19 (pjf): Use std::size_t for indices and sizes, to prevent
     integer overflow.
+  + 06/24/21 (pjf):
+    - Add dimension() accessor to BaseDegenerateSubspace.
+    - Deprecate full_dimension() in BaseDegenerateSubspace and FullDimension()
+      in BaseDegenerateSpace.
 
 ****************************************************************/
 
@@ -22,6 +26,7 @@
 #define BASIS_DEGENERATE_H_
 
 #include <cstddef>
+#include <vector>
 
 #include "basis/basis.h"
 
@@ -86,10 +91,18 @@ namespace basis {
       return state_multiplicities_;
     }
 
+    std::size_t dimension() const
+    {
+      return full_dimension_;
+    }
+
+#ifdef BASIS_ALLOW_DEPRECATED
+      DEPRECATED("use dimension() instead")
     std::size_t full_dimension() const
     {
       return full_dimension_;
     }
+#endif
 
     protected:
 
@@ -220,6 +233,8 @@ namespace basis {
       // size retrieval
       ////////////////////////////////////////////////////////////////
 
+#ifdef BASIS_ALLOW_DEPRECATED
+      DEPRECATED("use dimension() instead")
       std::size_t FullDimension() const
       // Return the total dimension of all subspaces within the space,
       // taking into account substate multiplicities.
@@ -229,6 +244,7 @@ namespace basis {
           full_dimension += BaseSpace<tSubspaceType>::GetSubspace(subspace_index).full_dimension();
         return full_dimension;
       }
+#endif
 
     };
 
