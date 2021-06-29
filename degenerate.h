@@ -26,6 +26,8 @@
       * Allow multiple degenerate subspaces within BaseDegenerateSpace.
       * Add subspace degeneracy.
       * Override PushSubspace and EmplaceSubspace to account for degeneracies.
+  + 06/28/21 (pjf): Pass tSpaceLabelsType through BaseDegenerateSpace
+    to BaseSpace.
 
 ****************************************************************/
 
@@ -235,9 +237,9 @@ namespace basis {
   // Template arguments:
   //   tSubspaceType (typename) : type for subspace
 
-  template <typename tSubspaceType>
+  template <typename tSubspaceType, typename tSpaceLabelsType = void>
     class BaseDegenerateSpace
-    : public BaseSpace<tSubspaceType>
+    : public BaseSpace<tSubspaceType,tSpaceLabelsType>
     {
 
       public:
