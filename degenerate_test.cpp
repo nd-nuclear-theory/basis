@@ -309,6 +309,8 @@ namespace basis {
           << " " << subspace.dimension()
           << " " << "degeneracy"
           << " " << GetSubspaceDegeneracy(subspace_index)
+          << " " << "offset"
+          << " " << GetSubspaceOffset(subspace_index, 1)
           << std::endl;
         if (show_subspaces)
           os << subspace.DebugStr();

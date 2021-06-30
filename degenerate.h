@@ -28,6 +28,7 @@
       * Override PushSubspace and EmplaceSubspace to account for degeneracies.
   + 06/28/21 (pjf): Pass tSpaceLabelsType through BaseDegenerateSpace
     to BaseSpace.
+  + 06/29/21 (pjf): Fix GetSubspaceOffset accessor.
 
 ****************************************************************/
 
@@ -284,7 +285,8 @@ namespace basis {
       /// the space.
       {
         assert(degeneracy_index <= subspace_degeneracies_.at(i));
-        return GetSubspaceOffset(i)+(degeneracy_index-1)*this->GetSubspace(i).dimension();
+        return (BaseSpace<tSubspaceType,tSpaceLabelsType>::GetSubspaceOffset(i)
+          +(degeneracy_index-1)*this->GetSubspace(i).dimension());
       }
 
       protected:
@@ -309,7 +311,7 @@ namespace basis {
 
       template <class... Args>
       void EmplaceSubspace(Args&&... args) = delete;
-      // Prevent use of PushSubspace without degeneracy.
+      // Prevent use of EmplaceSubspace without degeneracy.
 
       template <class... Args>
       void EmplaceSubspace(Args&&... args, int degeneracy)
