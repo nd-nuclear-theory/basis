@@ -124,6 +124,9 @@
     - Fix initialization of dimension_ in BaseSpace.
     - Add BaseDegenerateSpace as friend of BaseSpace.
   + 06/28/21 (pjf): Fix friend declaration in BaseSpace.
+  + 07/02/21 (pjf):
+    - Replace `typedef`s with alias declarations (`using`).
+    - Add constructors for BaseSubspace and BaseSpace which accept labels.
 ****************************************************************/
 
 #ifndef BASIS_BASIS_H_
@@ -247,8 +250,8 @@ namespace basis {
     //  common typedefs
     ////////////////////////////////////////////////////////////////
 
-    typedef tSubspaceLabelsType SubspaceLabelsType;
-    typedef tStateLabelsType StateLabelsType;
+    using SubspaceLabelsType = tSubspaceLabelsType;
+    using StateLabelsType = tStateLabelsType;
 
     ////////////////////////////////////////////////////////////////
     // general constructors
@@ -257,6 +260,11 @@ namespace basis {
     /// default constructor
     //   Implicitly invoked by derived class.
     BaseSubspace() : dimension_(0) {}
+
+    // pass-through constructor accepting labels
+    explicit BaseSubspace(const SubspaceLabelsType& labels)
+      : dimension_(0), BaseLabeling<SubspaceLabelsType>{labels}
+    {}
 
     ////////////////////////////////////////////////////////////////
     // retrieval
@@ -377,8 +385,8 @@ namespace basis {
       // common typedefs
       ////////////////////////////////////////////////////////////////
 
-      typedef tSubspaceType SubspaceType;
-      typedef typename SubspaceType::StateLabelsType StateLabelsType;
+      using SubspaceType = tSubspaceType;
+      using StateLabelsType = typename SubspaceType::StateLabelsType;
 
       ////////////////////////////////////////////////////////////////
       // general constructors
@@ -543,7 +551,8 @@ namespace basis {
       // common typedefs
       ////////////////////////////////////////////////////////////////
 
-      typedef tSubspaceType SubspaceType;
+      using SubspaceType = tSubspaceType;
+      using SpaceLabelsType = tSpaceLabelsType;
 
       ////////////////////////////////////////////////////////////////
       // constructors
@@ -562,6 +571,24 @@ namespace basis {
         lookup_ = std::make_shared<std::map<typename SubspaceType::LabelsType,std::size_t>>();
 #endif
       }
+
+      // pass-through constructor accepting labels
+      //   n.b. this template here is SFINAE black magic
+      template<typename T = SpaceLabelsType>
+      explicit BaseSpace(const T& labels)
+        : dimension_(0), BaseLabeling<SpaceLabelsType>{labels}
+      {
+        subspaces_ = std::make_shared<std::vector<SubspaceType>>();
+#ifdef BASIS_HASH
+        lookup_ = std::make_shared<std::unordered_map<
+            typename SubspaceType::LabelsType,std::size_t,
+            boost::hash<typename SubspaceType::LabelsType>
+          >>();
+#else
+        lookup_ = std::make_shared<std::map<typename SubspaceType::LabelsType,std::size_t>>();
+#endif
+      }
+
 
       ////////////////////////////////////////////////////////////////
       // subspace lookup and retrieval

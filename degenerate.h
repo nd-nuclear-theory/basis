@@ -29,7 +29,10 @@
   + 06/28/21 (pjf): Pass tSpaceLabelsType through BaseDegenerateSpace
     to BaseSpace.
   + 06/29/21 (pjf): Fix GetSubspaceOffset accessor.
-
+  + 07/02/21 (pjf):
+    - Add private convenience typedefs to access base class.
+    - Replace `typedef`s with alias declarations (`using`).
+    - Add constructors for BaseSubspace and BaseSpace which accept labels.
 ****************************************************************/
 
 #ifndef BASIS_DEGENERATE_H_
@@ -67,6 +70,13 @@ namespace basis {
     : public BaseSubspace<tSubspaceLabelsType,tStateLabelsType>
   {
 
+    private:
+
+    ////////////////////////////////////////////////////////////////
+    // private (convenience) typedefs
+    ////////////////////////////////////////////////////////////////
+    using BaseSubspaceType = BaseSubspace<tSubspaceLabelsType,tStateLabelsType>;
+
     public:
 
     ////////////////////////////////////////////////////////////////
@@ -77,8 +87,8 @@ namespace basis {
     // from BaseSubspace (they are not recognized as inherited types
     // below)
 
-    typedef tSubspaceLabelsType SubspaceLabelsType;
-    typedef tStateLabelsType StateLabelsType;
+    using SubspaceLabelsType = tSubspaceLabelsType;
+    using StateLabelsType = tStateLabelsType;
 
     ////////////////////////////////////////////////////////////////
     // general constructors
@@ -87,6 +97,11 @@ namespace basis {
     // default constructor
     //   Implicitly invoked by derived class.
     BaseDegenerateSubspace() : full_dimension_(0) {}
+
+    // pass-through constructor accepting labels
+    explicit BaseDegenerateSubspace(const SubspaceLabelsType& labels)
+      : full_dimension_{0}, BaseSubspaceType{labels}
+    {}
 
     ////////////////////////////////////////////////////////////////
     // accessors for substate information
@@ -137,7 +152,7 @@ namespace basis {
     // labels) for a state.
     {
       // push state itself
-      BaseSubspace<tSubspaceLabelsType,tStateLabelsType>::PushStateLabels(state_labels);
+      BaseSubspaceType::PushStateLabels(state_labels);
 
       // push substate information
       state_offsets_.push_back(full_dimension_);
@@ -177,14 +192,21 @@ namespace basis {
     : public BaseState<tSubspaceType>
     {
 
+      private:
+
+      ////////////////////////////////////////////////////////////////
+      // private (convenience) typedefs
+      ////////////////////////////////////////////////////////////////
+      using BaseStateType = BaseState<tSubspaceType>;
+
       public:
 
       ////////////////////////////////////////////////////////////////
       // common typedefs
       ////////////////////////////////////////////////////////////////
 
-      typedef tSubspaceType SubspaceType;
-      typedef typename SubspaceType::StateLabelsType StateLabelsType;
+      using SubspaceType = tSubspaceType;
+      using StateLabelsType = typename SubspaceType::StateLabelsType;
 
       ////////////////////////////////////////////////////////////////
       // general constructors
@@ -199,13 +221,13 @@ namespace basis {
 
       BaseDegenerateState(const SubspaceType& subspace, std::size_t index)
         // Construct state, given index within subspace.
-        : BaseState<tSubspaceType>(subspace,index)
+        : BaseStateType(subspace,index)
       {
       }
 
       BaseDegenerateState(const SubspaceType& subspace, const StateLabelsType& state_labels)
         // Construct state, by reverse lookup on labels within subspace.
-        : BaseState<tSubspaceType>(subspace,state_labels)
+        : BaseStateType(subspace,state_labels)
         {
         }
 
@@ -215,12 +237,12 @@ namespace basis {
 
       std::size_t offset() const
       {
-        return BaseState<tSubspaceType>::subspace().state_offsets()[BaseState<tSubspaceType>::index()];
+        return BaseStateType::subspace().state_offsets()[BaseStateType::index()];
       }
 
       int degeneracy() const
       {
-        return BaseState<tSubspaceType>::subspace().state_degeneracies()[BaseState<tSubspaceType>::index()];
+        return BaseStateType::subspace().state_degeneracies()[BaseStateType::index()];
       }
 
 
@@ -243,13 +265,36 @@ namespace basis {
     : public BaseSpace<tSubspaceType,tSpaceLabelsType>
     {
 
+      private:
+
+      ////////////////////////////////////////////////////////////////
+      // private (convenience) typedefs
+      ////////////////////////////////////////////////////////////////
+      using BaseSpaceType = BaseSpace<tSubspaceType,tSpaceLabelsType>;
+
       public:
 
       ////////////////////////////////////////////////////////////////
       // common typedefs
       ////////////////////////////////////////////////////////////////
 
-      typedef tSubspaceType SubspaceType;
+      using SubspaceType = tSubspaceType;
+      using SpaceLabelsType = tSpaceLabelsType;
+
+      ////////////////////////////////////////////////////////////////
+      // general constructors
+      ////////////////////////////////////////////////////////////////
+
+      // default constructor
+      //   Implicitly invoked by derived class.
+      BaseDegenerateSpace() = default;
+
+      // pass-through constructor accepting labels
+      //   n.b. this template here is SFINAE black magic
+      template<typename T = SpaceLabelsType>
+      explicit BaseDegenerateSpace(const T& labels)
+        : BaseSpaceType{labels}
+      {}
 
       ////////////////////////////////////////////////////////////////
       // size retrieval
@@ -285,7 +330,7 @@ namespace basis {
       /// the space.
       {
         assert(degeneracy_index <= subspace_degeneracies_.at(i));
-        return (BaseSpace<tSubspaceType,tSpaceLabelsType>::GetSubspaceOffset(i)
+        return (BaseSpaceType::GetSubspaceOffset(i)
           +(degeneracy_index-1)*this->GetSubspace(i).dimension());
       }
 
