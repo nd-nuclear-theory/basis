@@ -66,6 +66,7 @@
   + 06/03/19 (pjf): Add OrbitalPNInfo constructor which takes tz.
   + 09/06/19 (pjf): Add TruncateOrbitalList.
   + 10/10/19 (pjf): Fix standalone output of 15200 orbital files.
+  + 07/03/21 (pjf): Call base class constructor for initializing labels.
 
 ****************************************************************/
 
@@ -282,7 +283,7 @@ namespace basis {
 
       // accessors
 
-      OrbitalSpeciesPN orbital_species() const {return std::get<0>(labels_);}
+      OrbitalSpeciesPN orbital_species() const {return std::get<0>(labels());}
       HalfInt Tz() const {return kOrbitalSpeciesPNCodeTz[int(orbital_species())];}
       double weight_max() const {return weight_max_;}
       bool is_oscillator_like() const {return is_oscillator_like_;}
@@ -505,10 +506,10 @@ namespace basis {
 
       // accessors
 
-      OrbitalSpeciesPN orbital_species() const {return std::get<0>(labels_);}
+      OrbitalSpeciesPN orbital_species() const {return std::get<0>(labels());}
       HalfInt Tz() const {return kOrbitalSpeciesPNCodeTz[int(orbital_species())];}
-      int l() const {return std::get<1>(labels_);}
-      HalfInt j() const {return std::get<2>(labels_);}
+      int l() const {return std::get<1>(labels());}
+      HalfInt j() const {return std::get<2>(labels());}
       int g() const {return l()%2;}
       double weight_max() const {return weight_max_;}
       bool is_oscillator_like() const {return is_oscillator_like_;}

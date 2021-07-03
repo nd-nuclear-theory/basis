@@ -42,6 +42,7 @@
     integer overflow.
   + 09/06/19 (pjf): Move WeightMax to many_body.h.
   + 12/12/19 (pjf): Fix UB in TwoBodySpaceJJJPN construction.
+  + 07/03/21 (pjf): Call base class constructor for initializing labels.
 ****************************************************************/
 
 #ifndef BASIS_JJJPN_SCHEME_H_
@@ -150,9 +151,9 @@ namespace basis {
       // Set up indexing.
 
       // accessors
-      TwoBodySpeciesPN two_body_species() const {return std::get<0>(labels_);}
-      int J() const {return std::get<1>(labels_);}
-      int g() const {return std::get<2>(labels_);}
+      TwoBodySpeciesPN two_body_species() const {return std::get<0>(labels());}
+      int J() const {return std::get<1>(labels());}
+      int g() const {return std::get<2>(labels());}
       int Tz() const {return basis::kTwoBodySpeciesPNCodeTz[int(two_body_species())];}
       const WeightMax& weight_max() const {return weight_max_;}
       const OrbitalSubspacePN& orbital_subspace1() const {return *orbital_subspace1_ptr_;}

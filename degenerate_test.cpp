@@ -53,11 +53,11 @@ namespace basis {
 
       // accessors
 
-      int L() const {return std::get<0>(labels_);}
-      int S() const {return std::get<1>(labels_);}
-      int J() const {return std::get<2>(labels_);}
-      int T() const {return std::get<3>(labels_);}
-      int g() const {return std::get<4>(labels_);}
+      int L() const {return std::get<0>(labels());}
+      int S() const {return std::get<1>(labels());}
+      int J() const {return std::get<2>(labels());}
+      int T() const {return std::get<3>(labels());}
+      int g() const {return std::get<4>(labels());}
       int Nmax() const {return Nmax_;}
 
       // diagnostic strings
@@ -112,7 +112,7 @@ namespace basis {
   // space
 
   class RelativeDegenerateSpaceLSJT
-    : public BaseDegenerateSpace<RelativeDegenerateSubspaceLSJT>
+    : public BaseDegenerateSpace<RelativeDegenerateSubspaceLSJT, std::tuple<int,int>>
   {
 
     public:
@@ -123,7 +123,7 @@ namespace basis {
     // default constructor -- provided since required for certain
     // purposes by STL container classes (e.g., std::vector::resize)
 
-    RelativeDegenerateSpaceLSJT(int Nmax, int Jmax);
+    RelativeDegenerateSpaceLSJT(int Nmax, int Jmax, std::tuple<int,int> labels);
     // Enumerate all relative LSJT subspaces of given dimension up to
     // a given relative oscillator cutoff and relative angular
     // momentum cutoff.
@@ -156,11 +156,9 @@ namespace basis {
   ////////////////////////////////////////////////////////////////
 
   RelativeDegenerateSubspaceLSJT::RelativeDegenerateSubspaceLSJT(int L, int S, int J, int T, int g, int Nmax)
+    : BaseDegenerateSubspace<RelativeSubspaceLSJTLabels, RelativeStateLSJTLabels>{{L,S,J,T,g}},
+      Nmax_{Nmax}
   {
-
-    // set values
-    labels_ = SubspaceLabelsType(L,S,J,T,g);
-    Nmax_ = Nmax;
 
     // validate subspace labels
     assert(ValidLabels());
@@ -259,8 +257,8 @@ namespace basis {
   }
 
 
-  RelativeDegenerateSpaceLSJT::RelativeDegenerateSpaceLSJT(int Nmax, int Jmax)
-    : Nmax_(Nmax), Jmax_(Jmax)
+  RelativeDegenerateSpaceLSJT::RelativeDegenerateSpaceLSJT(int Nmax, int Jmax, std::tuple<int,int> labels)
+    : Nmax_(Nmax), Jmax_(Jmax), BaseDegenerateSpace<RelativeDegenerateSubspaceLSJT, std::tuple<int,int>>(labels)
   {
 
     // iterate over L
@@ -335,7 +333,7 @@ void Test()
   int N_max = 2;
   int J_max = 3;
 
-  basis::RelativeDegenerateSpaceLSJT space(N_max,J_max);
+  basis::RelativeDegenerateSpaceLSJT space(N_max,J_max,{2,2});
   std::cout << space.DebugStr(true) << std::endl;
   std::cout
     << " " << "Size"

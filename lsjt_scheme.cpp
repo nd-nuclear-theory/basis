@@ -23,11 +23,9 @@ namespace basis {
   ////////////////////////////////////////////////////////////////
 
   RelativeSubspaceLSJT::RelativeSubspaceLSJT(int L, int S, int J, int T, int g, int Nmax)
+    : BaseSubspace<RelativeSubspaceLSJTLabels, RelativeStateLSJTLabels>{{L,S,J,T,g}},
+      Nmax_{Nmax}
   {
-
-    // set values
-    labels_ = SubspaceLabelsType(L,S,J,T,g);
-    Nmax_ = Nmax;
 
     // validate subspace labels
     assert(ValidLabels());
@@ -225,11 +223,9 @@ namespace basis {
   ////////////////////////////////////////////////////////////////
 
   RelativeCMSubspaceLSJT::RelativeCMSubspaceLSJT(int L, int S, int J, int T, int g, int Nmax)
+    : BaseSubspace<RelativeCMSubspaceLSJTLabels, RelativeCMStateLSJTLabels>{{L,S,J,T,g}},
+      Nmax_{Nmax}
   {
-
-    // set values
-    labels_ = SubspaceLabelsType(L,S,J,T,g);
-    Nmax_ = Nmax;
 
     // validate subspace labels
     assert(ValidLabels());
@@ -416,11 +412,9 @@ namespace basis {
   ////////////////////////////////////////////////////////////////
 
   RelativeCMSubspaceLSJTN::RelativeCMSubspaceLSJTN(int L, int S, int J, int T, int g, int N)
+    : BaseSubspace<RelativeCMSubspaceLSJTNLabels, RelativeCMStateLSJTNLabels>{{L,S,J,T,g,N}},
+      N_{N}
   {
-
-    // set values (MODIFICATION for subspacing by N)
-    labels_ = SubspaceLabelsType(L,S,J,T,g,N);
-    N_ = N;
 
     // validate subspace labels
     assert(ValidLabels());
@@ -609,10 +603,10 @@ namespace basis {
       int L, int S, int J, int T, int g,
       basis::Rank truncation_rank, int truncation_cutoff
     )
+    : BaseSubspace<TwoBodySubspaceLSJTLabels, TwoBodyStateLSJTLabels>{{L,S,J,T,g}}
   {
 
     // set labels
-    labels_ = SubspaceLabelsType(L,S,J,T,g);
     std::tie(N1max_,N2max_) = basis::TwoBodyCutoffs(truncation_rank,truncation_cutoff);
 
     // validate subspace labels
@@ -819,11 +813,11 @@ namespace basis {
       int L, int S, int J, int T, int g, int N,
       basis::Rank truncation_rank, int truncation_cutoff
     )
+    : BaseSubspace<TwoBodySubspaceLSJTNLabels, TwoBodyStateLSJTNLabels>{{L,S,J,T,g,N}},
+      N_{N}
   {
 
     // set labels (MODIFICATION for subspacing by N)
-    labels_ = SubspaceLabelsType(L,S,J,T,g,N);
-    N_ = N;
     std::tie(N1max_,N2max_) = basis::TwoBodyCutoffs(truncation_rank,truncation_cutoff);
 
     // validate subspace labels

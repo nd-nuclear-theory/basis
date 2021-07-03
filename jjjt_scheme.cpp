@@ -26,10 +26,10 @@ namespace basis {
       int J, int T, int g,
       basis::Rank truncation_rank, int truncation_cutoff
     )
+    : BaseSubspace<TwoBodySubspaceJJJTLabels, TwoBodyStateJJJTLabels>{{J,T,g}}
   {
 
     // set labels
-    labels_ = SubspaceLabelsType(J,T,g);
     std::tie(N1max_,N2max_) = basis::TwoBodyCutoffs(truncation_rank,truncation_cutoff);
 
     // validate subspace labels
@@ -229,11 +229,11 @@ namespace basis {
       int J, int T, int g, int N,
       basis::Rank truncation_rank, int truncation_cutoff
     )
+    : BaseSubspace<TwoBodySubspaceJJJTNLabels, TwoBodyStateJJJTNLabels>{{J,T,g,N}},
+      N_{N}
   {
 
     // set labels (MODIFICATION for subspacing by N)
-    labels_ = SubspaceLabelsType(J,T,g,N);
-    N_ = N;
     std::tie(N1max_,N2max_) = basis::TwoBodyCutoffs(truncation_rank,truncation_cutoff);
 
     // validate subspace labels
@@ -426,4 +426,4 @@ namespace basis {
 
   ////////////////////////////////////////////////////////////////
   ////////////////////////////////////////////////////////////////
-} // namespace
+} // namespace basis

@@ -27,6 +27,8 @@ namespace basis {
       TwoBodySpeciesPN two_body_species, int J, int g,
       const WeightMax& weight_max
     )
+    : BaseSubspace<TwoBodySubspaceJJJPNLabels, TwoBodyStateJJJPNLabels>{{two_body_species,J,g}},
+      weight_max_{weight_max}
   {
 
     // std::cout << "Subspace construction"
@@ -34,10 +36,6 @@ namespace basis {
     //           << " " << J
     //           << " " << g
     //           << std::endl;
-
-    // set values
-    labels_ = SubspaceLabelsType(two_body_species,J,g);
-    weight_max_ = weight_max;
 
     // identify orbital subspaces
     OrbitalSpeciesPN orbital_species1 =

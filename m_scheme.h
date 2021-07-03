@@ -11,6 +11,7 @@
   + 07/10/16 (pjf): Created (m_scheme), building on code from nlj_orbital.
   + 05/09/19 (pjf): Use std::size_t for indices and sizes, to prevent
     integer overflow.
+  + 07/03/21 (pjf): Call base class constructor for initializing labels.
 */
 #ifndef BASIS_M_SCHEME_H_
 #define BASIS_M_SCHEME_H_
@@ -117,7 +118,7 @@ namespace basis {
 
 
       // accessors
-      OrbitalSpeciesPN orbital_species() const {return std::get<0>(labels_);}
+      OrbitalSpeciesPN orbital_species() const {return std::get<0>(labels());}
       HalfInt Tz() const {return kOrbitalSpeciesPNCodeTz[int(orbital_species())];}
       double weight_max() const {return weight_max_;}
       bool is_oscillator_like() const {return is_oscillator_like_;}
@@ -297,7 +298,7 @@ namespace basis {
   //
   //
   //     // accessors
-  //     OrbitalSpeciesPN orbital_species() const {return std::get<0>(labels_);}
+  //     OrbitalSpeciesPN orbital_species() const {return std::get<0>(labels());}
   //     HalfInt Tz() const {return kOrbitalSpeciesPNCodeTz[int(orbital_species())];}
   //     double weight_max() const {return weight_max_;}
   //     bool is_oscillator_like() const {return is_oscillator_like_;}

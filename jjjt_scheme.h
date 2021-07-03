@@ -38,6 +38,7 @@
   + 05/09/19 (pjf): Use std::size_t for indices and sizes, to prevent
     integer overflow.
   + 05/27/19 (pjf): Update to initialize BaseSectors with spaces.
+  + 07/03/21 (pjf): Call base class constructor for initializing labels.
 
 ****************************************************************/
 
@@ -156,9 +157,9 @@ namespace basis {
 
       // accessors
 
-      int J() const {return std::get<0>(labels_);}
-      int T() const {return std::get<1>(labels_);}
-      int g() const {return std::get<2>(labels_);}
+      int J() const {return std::get<0>(labels());}
+      int T() const {return std::get<1>(labels());}
+      int g() const {return std::get<2>(labels());}
       int N1max() const {return N1max_;}
       int N2max() const {return N2max_;}
 
@@ -387,10 +388,10 @@ namespace basis {
 
       // accessors
 
-      int J() const {return std::get<0>(labels_);}
-      int T() const {return std::get<1>(labels_);}
-      int g() const {return std::get<2>(labels_);}
-      int N() const {return std::get<3>(labels_);}  // (MODIFICATION for subspacing by N)
+      int J() const {return std::get<0>(labels());}
+      int T() const {return std::get<1>(labels());}
+      int g() const {return std::get<2>(labels());}
+      int N() const {return std::get<3>(labels());}  // (MODIFICATION for subspacing by N)
       int N1max() const {return N1max_;}
       int N2max() const {return N2max_;}
 

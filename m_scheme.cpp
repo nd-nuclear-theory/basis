@@ -34,11 +34,9 @@ namespace basis {
    * @param[in] orbital_subspace orbital subspace
    */
   SingleParticleSubspacePN::SingleParticleSubspacePN(const OrbitalSubspacePN& orbital_subspace)
+    : BaseSubspace<SingleParticleSubspacePNLabels, SingleParticleStatePNLabels>{orbital_subspace.labels()},
+      weight_max_{orbital_subspace.weight_max()}
   {
-
-    // set values
-    labels_ = SubspaceLabelsType(orbital_subspace.labels());
-    weight_max_ = orbital_subspace.weight_max();
 
     // iterate over all states, enumerating m-substates
     for (std::size_t i=0; i < orbital_subspace.size(); ++i) {
