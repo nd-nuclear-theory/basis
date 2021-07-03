@@ -130,6 +130,9 @@
   + 07/03/21 (pjf):
     - Remove BaseLabeling and replace with inheritance from partial
       template specialization.
+    - Mark labels_ as private and const to prevent modification
+      after construction.
+    - Mark constructors as protected to prevent direct initialization.
 ****************************************************************/
 
 #ifndef BASIS_BASIS_H_
@@ -210,6 +213,8 @@ namespace basis {
     using SubspaceLabelsType = tSubspaceLabelsType;
     using StateLabelsType = tStateLabelsType;
 
+    protected:
+
     ////////////////////////////////////////////////////////////////
     // general constructors
     ////////////////////////////////////////////////////////////////
@@ -222,6 +227,8 @@ namespace basis {
     explicit BaseSubspace(const SubspaceLabelsType& labels)
       : dimension_{0}, labels_{labels}
     {}
+
+    public:
 
     ////////////////////////////////////////////////////////////////
     // retrieval
@@ -316,6 +323,8 @@ namespace basis {
       dimension_++;
     };
 
+    private:
+
     ////////////////////////////////////////////////////////////////
     // private storage
     ////////////////////////////////////////////////////////////////
@@ -365,6 +374,8 @@ namespace basis {
       using SubspaceType = tSubspaceType;
       using StateLabelsType = typename SubspaceType::StateLabelsType;
 
+      protected:
+
       ////////////////////////////////////////////////////////////////
       // general constructors
       ////////////////////////////////////////////////////////////////
@@ -399,6 +410,8 @@ namespace basis {
           index_ = subspace.LookUpStateIndex(state_labels);
           assert(index_!=basis::kNone);
         }
+
+      public:
 
       ////////////////////////////////////////////////////////////////
       // retrieval
@@ -536,6 +549,7 @@ namespace basis {
 
       using SubspaceType = tSubspaceType;
 
+      protected:
 
       ////////////////////////////////////////////////////////////////
       // constructors
@@ -555,6 +569,7 @@ namespace basis {
 #endif
       }
 
+      public:
 
       ////////////////////////////////////////////////////////////////
       // subspace lookup and retrieval
@@ -868,6 +883,8 @@ namespace basis {
       typedef typename tSpaceType::SubspaceType SubspaceType;
       typedef BaseSector<SubspaceType> SectorType;
 
+      protected:
+
       ////////////////////////////////////////////////////////////////
       // constructors
       ////////////////////////////////////////////////////////////////
@@ -883,6 +900,8 @@ namespace basis {
       BaseSectors(const SpaceType& bra_space, const SpaceType& ket_space)
         : bra_space_(bra_space), ket_space_(ket_space)
       {}
+
+      public:
 
       ////////////////////////////////////////////////////////////////
       // sector lookup and retrieval
@@ -995,16 +1014,15 @@ namespace basis {
         PushSector(sector.Key());
       }
 
+      private:
       ////////////////////////////////////////////////////////////////
       // internal storage
       ////////////////////////////////////////////////////////////////
 
-      protected:
       // spaces
       SpaceType bra_space_;
       SpaceType ket_space_;
 
-      private:
       // sector keys (accessible by index)
       std::vector<typename SectorType::KeyType> keys_;
 

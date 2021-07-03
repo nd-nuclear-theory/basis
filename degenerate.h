@@ -33,6 +33,7 @@
     - Add private convenience typedefs to access base class.
     - Replace `typedef`s with alias declarations (`using`).
     - Add constructors for BaseSubspace and BaseSpace which accept labels.
+  + 07/03/21 (pjf): Update access specifiers.
 ****************************************************************/
 
 #ifndef BASIS_DEGENERATE_H_
@@ -87,8 +88,10 @@ namespace basis {
     // from BaseSubspace (they are not recognized as inherited types
     // below)
 
-    using SubspaceLabelsType = tSubspaceLabelsType;
-    using StateLabelsType = tStateLabelsType;
+    using SubspaceLabelsType = typename BaseSubspaceType::SubspaceLabelsType;
+    using StateLabelsType = typename BaseSubspaceType::StateLabelsType;
+
+    protected:
 
     ////////////////////////////////////////////////////////////////
     // general constructors
@@ -102,6 +105,8 @@ namespace basis {
     explicit BaseDegenerateSubspace(const SubspaceLabelsType& labels)
       : full_dimension_{0}, BaseSubspaceType{labels}
     {}
+
+    public:
 
     ////////////////////////////////////////////////////////////////
     // accessors for substate information
@@ -160,6 +165,8 @@ namespace basis {
       full_dimension_ += degeneracy;
     };
 
+    private:
+
     ////////////////////////////////////////////////////////////////
     // private storage
     ////////////////////////////////////////////////////////////////
@@ -205,8 +212,10 @@ namespace basis {
       // common typedefs
       ////////////////////////////////////////////////////////////////
 
-      using SubspaceType = tSubspaceType;
-      using StateLabelsType = typename SubspaceType::StateLabelsType;
+      using SubspaceType = typename BaseStateType::SubspaceType;
+      using StateLabelsType = typename BaseStateType::StateLabelsType;
+
+      protected:
 
       ////////////////////////////////////////////////////////////////
       // general constructors
@@ -230,6 +239,8 @@ namespace basis {
         : BaseStateType(subspace,state_labels)
         {
         }
+
+      public:
 
       ////////////////////////////////////////////////////////////////
       // retrieval of substate information
@@ -278,8 +289,10 @@ namespace basis {
       // common typedefs
       ////////////////////////////////////////////////////////////////
 
-      using SubspaceType = tSubspaceType;
-      using SpaceLabelsType = tSpaceLabelsType;
+      using SubspaceType = typename BaseSpaceType::SubspaceType;
+      using SpaceLabelsType = typename BaseSpaceType::SpaceLabelsType;
+
+      protected:
 
       ////////////////////////////////////////////////////////////////
       // general constructors
@@ -295,6 +308,8 @@ namespace basis {
       explicit BaseDegenerateSpace(const T& labels)
         : BaseSpaceType{labels}
       {}
+
+      public:
 
       ////////////////////////////////////////////////////////////////
       // size retrieval
@@ -371,12 +386,14 @@ namespace basis {
         this->dimension_ += this->subspaces_->back().dimension()*degeneracy;
       }
 
-    ////////////////////////////////////////////////////////////////
-    // private storage
-    ////////////////////////////////////////////////////////////////
+    private:
 
-    // degeneracy counting information
-    std::vector<int> subspace_degeneracies_;  // given subspace's number of sub-subspaces
+      ////////////////////////////////////////////////////////////////
+      // private storage
+      ////////////////////////////////////////////////////////////////
+
+      // degeneracy counting information
+      std::vector<int> subspace_degeneracies_;  // given subspace's number of sub-subspaces
 
     };
 
