@@ -127,6 +127,9 @@
   + 07/02/21 (pjf):
     - Replace `typedef`s with alias declarations (`using`).
     - Add constructors for BaseSubspace and BaseSpace which accept labels.
+  + 07/03/21 (pjf):
+    - Remove BaseLabeling and replace with inheritance from partial
+      template specialization.
 ****************************************************************/
 
 #ifndef BASIS_BASIS_H_
@@ -172,53 +175,6 @@ namespace basis {
   /// tuple<int> (as opposed to plain int) to make the two forms of the
   /// state constructor syntactically distinct.
 
-  template <typename tLabelsType>
-  class BaseLabeling
-  {
-    public:
-
-    ////////////////////////////////////////////////////////////////
-    //  common typedefs
-    ////////////////////////////////////////////////////////////////
-
-    using LabelsType = tLabelsType;
-
-    ////////////////////////////////////////////////////////////////
-    // retrieval
-    ////////////////////////////////////////////////////////////////
-
-    const LabelsType& labels() const
-    /// Return the labels of the subspace itself.
-    {
-      return labels_;
-    }
-
-#ifdef BASIS_ALLOW_DEPRECATED
-    DEPRECATED("use labels() instead")
-    const LabelsType& GetSubspaceLabels() const
-    /// Return the labels of the subspace itself.
-    ///
-    /// DEPRECATED in favor of labels().
-    ///
-    /// To fix: grep GetSubspaceLabels -R --include="*.cpp"
-    {
-      return labels_;
-    }
-#endif
-
-    protected:
-    ////////////////////////////////////////////////////////////////
-    // private storage
-    ////////////////////////////////////////////////////////////////
-
-    // subspace properties
-    LabelsType labels_;
-
-  };
-
-  // empty labels if none defined
-  template<> class BaseLabeling<void> {};
-
   static constexpr std::size_t kNone = std::numeric_limits<std::size_t>::max();
   // Flag value for missing target in index lookups.
 
@@ -241,7 +197,7 @@ namespace basis {
   /// state constructor syntactically distinct.
 
   template <typename tSubspaceLabelsType, typename tStateLabelsType>
-    class BaseSubspace : public BaseLabeling<tSubspaceLabelsType>
+    class BaseSubspace
   {
 
     public:
@@ -250,6 +206,7 @@ namespace basis {
     //  common typedefs
     ////////////////////////////////////////////////////////////////
 
+    using LabelsType = tSubspaceLabelsType;
     using SubspaceLabelsType = tSubspaceLabelsType;
     using StateLabelsType = tStateLabelsType;
 
@@ -263,12 +220,31 @@ namespace basis {
 
     // pass-through constructor accepting labels
     explicit BaseSubspace(const SubspaceLabelsType& labels)
-      : dimension_(0), BaseLabeling<SubspaceLabelsType>{labels}
+      : dimension_{0}, labels_{labels}
     {}
 
     ////////////////////////////////////////////////////////////////
     // retrieval
     ////////////////////////////////////////////////////////////////
+
+    const SubspaceLabelsType& labels() const
+    /// Return the labels of the subspace itself.
+    {
+      return labels_;
+    }
+
+#ifdef BASIS_ALLOW_DEPRECATED
+    DEPRECATED("use labels() instead")
+    const SubspaceLabelsType& GetSubspaceLabels() const
+    /// Return the labels of the subspace itself.
+    ///
+    /// DEPRECATED in favor of labels().
+    ///
+    /// To fix: grep GetSubspaceLabels -R --include="*.cpp"
+    {
+      return labels_;
+    }
+#endif
 
     const StateLabelsType& GetStateLabels(std::size_t index) const
     /// Retrieve the labels of a state within the subspace, given its
@@ -345,6 +321,7 @@ namespace basis {
     ////////////////////////////////////////////////////////////////
 
     // subspace properties
+    const SubspaceLabelsType labels_;
     std::size_t dimension_;
 
     // state labels (accessible by index)
@@ -541,9 +518,15 @@ namespace basis {
   ///
   /// Template arguments:
   ///   tSubspaceType (typename) : type for subspace
+  ///   tSpaceLabelsType (typename, optional) : type for space labels
 
+  // declare BaseSpace template
   template <typename tSubspaceType, typename tSpaceLabelsType = void>
-    class BaseSpace : public BaseLabeling<tSpaceLabelsType>
+    class BaseSpace;
+
+  // specialize class for case with no labels
+  template <typename tSubspaceType>
+    class BaseSpace<tSubspaceType, void>
     {
       public:
 
@@ -552,7 +535,7 @@ namespace basis {
       ////////////////////////////////////////////////////////////////
 
       using SubspaceType = tSubspaceType;
-      using SpaceLabelsType = tSpaceLabelsType;
+
 
       ////////////////////////////////////////////////////////////////
       // constructors
@@ -560,23 +543,6 @@ namespace basis {
 
       BaseSpace()
         : dimension_{0}
-      {
-        subspaces_ = std::make_shared<std::vector<SubspaceType>>();
-#ifdef BASIS_HASH
-        lookup_ = std::make_shared<std::unordered_map<
-            typename SubspaceType::LabelsType,std::size_t,
-            boost::hash<typename SubspaceType::LabelsType>
-          >>();
-#else
-        lookup_ = std::make_shared<std::map<typename SubspaceType::LabelsType,std::size_t>>();
-#endif
-      }
-
-      // pass-through constructor accepting labels
-      //   n.b. this template here is SFINAE black magic
-      template<typename T = SpaceLabelsType>
-      explicit BaseSpace(const T& labels)
-        : dimension_(0), BaseLabeling<SpaceLabelsType>{labels}
       {
         subspaces_ = std::make_shared<std::vector<SubspaceType>>();
 #ifdef BASIS_HASH
@@ -731,6 +697,54 @@ namespace basis {
 #else
       std::shared_ptr<std::map<typename SubspaceType::LabelsType,std::size_t>> lookup_;
 #endif
+    };
+
+  // inherit from BaseSpace and add labels
+  template <typename tSubspaceType, typename tSpaceLabelsType>
+    class BaseSpace : public BaseSpace<tSubspaceType, void>
+    {
+      public:
+
+      ////////////////////////////////////////////////////////////////
+      // common typedefs
+      ////////////////////////////////////////////////////////////////
+
+      using LabelsType = tSpaceLabelsType;
+      using SpaceLabelsType = tSpaceLabelsType;
+
+      protected:
+
+      ////////////////////////////////////////////////////////////////
+      // constructors
+      ////////////////////////////////////////////////////////////////
+
+      BaseSpace() = default;
+
+      // pass-through constructor accepting labels
+      explicit BaseSpace(const SpaceLabelsType& labels)
+        : labels_{labels}
+      {}
+
+      public:
+
+      ////////////////////////////////////////////////////////////////
+      // retrieval
+      ////////////////////////////////////////////////////////////////
+
+      const SpaceLabelsType& labels() const
+      /// Return the labels of the subspace itself.
+      {
+        return labels_;
+      }
+
+      private:
+
+      ////////////////////////////////////////////////////////////////
+      // internal storage
+      ////////////////////////////////////////////////////////////////
+
+      /// space labels
+      const SpaceLabelsType labels_;
     };
 
   ////////////////////////////////////////////////////////////////
