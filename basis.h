@@ -29,12 +29,12 @@
     "sector enumeration".  Its definition depends upon the "space"
     type, and therefore indirectly on the "subspace" type.
 
-    So notice that the hiererchy of dependencies of template
+    So notice that the hierarchy of dependencies of template
     definitions
 
         state <- subspace -> space -> sectors
 
-    does not quite parallel the mathematical hiererchy
+    does not quite parallel the mathematical hierarchy
 
         state -> subspace -> space -> sectors.
 
@@ -133,6 +133,10 @@
     - Mark labels_ as private and const to prevent modification
       after construction.
     - Mark constructors as protected to prevent direct initialization.
+  + 07/04/21 (pjf):
+    - Add tDerivedSubspaceType and tStateType as template arguments to
+      BaseSubspace.
+    - Add GetState accessors to BaseSubspace.
 ****************************************************************/
 
 #ifndef BASIS_BASIS_H_
@@ -191,16 +195,25 @@ namespace basis {
   /// The derived class is expected to set up a constructor and
   /// friendlier accessors for the individual labels.
   ///
+  /// The derived class passes itself as the first template argument, as an
+  /// example of the Curiously Recurring Template Pattern (CRTP). This allows
+  /// BaseSubspace access to the full type information of the derived class.
+  ///
   /// Template arguments:
+  ///   tDerivedSubspaceType : type of the derived subspace class (for CRTP)
   ///   tSubspaceLabelsType : tuple for subspace labels, e.g., std::tuple<int,int,int,int,int>
+  ///   tStateType : type (possibly incomplete) for states
   ///   tStateLabelsType : tuple for state labels, e.g., std::tuple<int>
   ///
   /// Note: Even if only a single integer label is needed, we must use
   /// tuple<int> (as opposed to plain int) to make the two forms of the
   /// state constructor syntactically distinct.
 
-  template <typename tSubspaceLabelsType, typename tStateLabelsType>
-    class BaseSubspace
+  template <
+      typename tDerivedSubspaceType, typename tSubspaceLabelsType,
+      typename tStateType, typename tStateLabelsType
+    >
+  class BaseSubspace
   {
 
     public:
@@ -292,6 +305,18 @@ namespace basis {
         return pos->second;
     };
 
+    tStateType GetState(std::size_t index) const;
+    /// Given the index for a state, construct the corresponding state object.
+    ///
+    /// Defined below, outside the definition of the class, so that
+    /// instantiation is deferred until tStateType is a complete type.
+
+    tStateType GetState(const StateLabelsType& state_labels) const;
+    /// Given the labels for a state, construct the corresponding state object.
+    ///
+    /// Defined below, outside the definition of the class, so that
+    /// instantiation is deferred until tStateType is a complete type.
+
     ////////////////////////////////////////////////////////////////
     // size retrieval
     ////////////////////////////////////////////////////////////////
@@ -344,6 +369,32 @@ namespace basis {
 #endif
 
   };
+
+  // implementations of BaseSubspace::GetState; we do this outside the class
+  // declaration to delay instantiation until tDerivedSubspaceType and
+  // tStateType are complete types
+
+  template <
+      typename tDerivedSubspaceType, typename tSubspaceLabelsType,
+      typename tStateType, typename tStateLabelsType
+    >
+  tStateType BaseSubspace<tDerivedSubspaceType,tSubspaceLabelsType,tStateType,tStateLabelsType>::GetState(
+      std::size_t index
+    ) const
+  {
+    return tStateType{*static_cast<const tDerivedSubspaceType*>(this), index};
+  }
+
+  template <
+      typename tDerivedSubspaceType, typename tSubspaceLabelsType,
+      typename tStateType, typename tStateLabelsType
+    >
+  tStateType BaseSubspace<tDerivedSubspaceType,tSubspaceLabelsType,tStateType,tStateLabelsType>::GetState(
+      const tStateLabelsType& state_labels
+    ) const
+  {
+    return tStateType{*static_cast<const tDerivedSubspaceType*>(this), state_labels};
+  }
 
   ////////////////////////////////////////////////////////////////
   // generic state realized within subspace
