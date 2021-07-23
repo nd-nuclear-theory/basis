@@ -39,6 +39,8 @@
     integer overflow.
   + 05/27/19 (pjf): Update to initialize BaseSectors with spaces.
   + 07/03/21 (pjf): Call base class constructor for initializing labels.
+  + 07/04/21 (pjf): Pass derived subspace class as template argument to
+    BaseSubspace.
 
 ****************************************************************/
 
@@ -130,6 +132,11 @@ namespace basis {
   //
   ////////////////////////////////////////////////////////////////
 
+  // declarations
+  class TwoBodySubspaceJJJT;
+  class TwoBodyStateJJJT;
+  class TwoBodySpaceJJJT;
+
   // labels
 
   typedef std::tuple<int,int,int> TwoBodySubspaceJJJTLabels;
@@ -138,7 +145,7 @@ namespace basis {
   // subspace
 
   class TwoBodySubspaceJJJT
-    : public BaseSubspace<TwoBodySubspaceJJJTLabels,TwoBodyStateJJJTLabels>
+    : public BaseSubspace<TwoBodySubspaceJJJT,TwoBodySubspaceJJJTLabels,TwoBodyStateJJJT,TwoBodyStateJJJTLabels>
     {
 
       public:
@@ -360,6 +367,10 @@ namespace basis {
   // -> JJJTN plus specific mods as flagged by MODIFICATION comments
   // in code.
 
+  // declarations
+  class TwoBodySubspaceJJJTN;
+  class TwoBodyStateJJJTN;
+  class TwoBodySpaceJJJTN;
 
   // labels
 
@@ -369,7 +380,7 @@ namespace basis {
   // subspace
 
   class TwoBodySubspaceJJJTN
-    : public BaseSubspace<TwoBodySubspaceJJJTNLabels,TwoBodyStateJJJTNLabels>
+    : public BaseSubspace<TwoBodySubspaceJJJTN,TwoBodySubspaceJJJTNLabels,TwoBodyStateJJJTN,TwoBodyStateJJJTNLabels>
     {
 
       public:

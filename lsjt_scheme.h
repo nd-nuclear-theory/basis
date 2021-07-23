@@ -69,6 +69,8 @@
     integer overflow.
   + 05/27/19 (pjf): Update to initialize BaseSectors with spaces.
   + 07/03/21 (pjf): Call base class constructor for initializing labels.
+  + 07/04/21 (pjf): Pass derived subspace class as template argument to
+    BaseSubspace.
 
 ****************************************************************/
 
@@ -143,6 +145,11 @@ namespace basis {
   //
   ////////////////////////////////////////////////////////////////
 
+  // declarations
+  class RelativeSubspaceLSJT;
+  class RelativeStateLSJT;
+  class RelativeSpaceLSJT;
+
   // labels
 
   typedef std::tuple<int,int,int,int,int> RelativeSubspaceLSJTLabels;
@@ -151,7 +158,7 @@ namespace basis {
   // subspace
 
   class RelativeSubspaceLSJT
-    : public BaseSubspace<RelativeSubspaceLSJTLabels,RelativeStateLSJTLabels>
+    : public BaseSubspace<RelativeSubspaceLSJT,RelativeSubspaceLSJTLabels,RelativeStateLSJT,RelativeStateLSJTLabels>
     {
 
       public:
@@ -369,6 +376,11 @@ namespace basis {
   //
   ////////////////////////////////////////////////////////////////
 
+  // declarations
+  class RelativeCMSubspaceLSJT;
+  class RelativeCMStateLSJT;
+  class RelativeCMSpaceLSJT;
+
   // labels
 
   typedef std::tuple<int,int,int,int,int> RelativeCMSubspaceLSJTLabels;
@@ -377,7 +389,7 @@ namespace basis {
   //subspace
 
   class RelativeCMSubspaceLSJT
-    : public BaseSubspace<RelativeCMSubspaceLSJTLabels,RelativeCMStateLSJTLabels>
+    : public BaseSubspace<RelativeCMSubspaceLSJT,RelativeCMSubspaceLSJTLabels,RelativeCMStateLSJT,RelativeCMStateLSJTLabels>
     {
 
       public:
@@ -561,6 +573,11 @@ namespace basis {
   // -> LSJTN plus specific mods as flagged by MODIFICATION comments
   // in code.
 
+  // declarations
+  class RelativeCMSubspaceLSJTN;
+  class RelativeCMStateLSJTN;
+  class RelativeCMSpaceLSJTN;
+
   // labels
 
   typedef std::tuple<int,int,int,int,int,int> RelativeCMSubspaceLSJTNLabels;  // (MODIFICATION for subspacing by N)
@@ -569,7 +586,7 @@ namespace basis {
   //subspace
 
   class RelativeCMSubspaceLSJTN
-    : public BaseSubspace<RelativeCMSubspaceLSJTNLabels,RelativeCMStateLSJTNLabels>
+    : public BaseSubspace<RelativeCMSubspaceLSJTN,RelativeCMSubspaceLSJTNLabels,RelativeCMStateLSJTN,RelativeCMStateLSJTNLabels>
     {
 
       public:
@@ -774,6 +791,11 @@ namespace basis {
   //
   ////////////////////////////////////////////////////////////////
 
+  // declarations
+  class TwoBodySubspaceLSJT;
+  class TwoBodyStateLSJT;
+  class TwoBodySpaceLSJT;
+
   // labels
 
   typedef std::tuple<int,int,int,int,int> TwoBodySubspaceLSJTLabels;
@@ -782,7 +804,7 @@ namespace basis {
   //subspace
 
   class TwoBodySubspaceLSJT
-    : public BaseSubspace<TwoBodySubspaceLSJTLabels,TwoBodyStateLSJTLabels>
+    : public BaseSubspace<TwoBodySubspaceLSJT,TwoBodySubspaceLSJTLabels,TwoBodyStateLSJT,TwoBodyStateLSJTLabels>
     {
 
       public:
@@ -971,6 +993,10 @@ namespace basis {
   // -> LSJTN plus specific mods as flagged by MODIFICATION comments
   // in code.
 
+  // declarations
+  class TwoBodySubspaceLSJTN;
+  class TwoBodyStateLSJTN;
+  class TwoBodySpaceLSJTN;
 
   // labels
 
@@ -980,7 +1006,7 @@ namespace basis {
   //subspace
 
   class TwoBodySubspaceLSJTN
-    : public BaseSubspace<TwoBodySubspaceLSJTNLabels,TwoBodyStateLSJTNLabels>
+    : public BaseSubspace<TwoBodySubspaceLSJTN,TwoBodySubspaceLSJTNLabels,TwoBodyStateLSJTN,TwoBodyStateLSJTNLabels>
     {
 
       public:

@@ -12,6 +12,8 @@
   + 05/09/19 (pjf): Use std::size_t for indices and sizes, to prevent
     integer overflow.
   + 07/03/21 (pjf): Call base class constructor for initializing labels.
+  + 07/04/21 (pjf): Pass derived subspace class as template argument to
+    BaseSubspace.
 */
 #ifndef BASIS_M_SCHEME_H_
 #define BASIS_M_SCHEME_H_
@@ -88,6 +90,11 @@ namespace basis {
   //
   ///////////////////////////////////////////////////////////////
 
+  // declarations
+  class SingleParticleSubspacePN;
+  class SingleParticleStatePN;
+  class SingleParticleSpacePN;
+
   // labels
 
   typedef std::tuple<OrbitalSpeciesPN> SingleParticleSubspacePNLabels;
@@ -97,7 +104,7 @@ namespace basis {
   // subspace
 
   class SingleParticleSubspacePN
-    : public BaseSubspace<SingleParticleSubspacePNLabels,SingleParticleStatePNLabels>
+    : public BaseSubspace<SingleParticleSubspacePN,SingleParticleSubspacePNLabels,SingleParticleStatePN,SingleParticleStatePNLabels>
   {
 
     public:

@@ -34,7 +34,7 @@ namespace basis {
    * @param[in] orbital_subspace orbital subspace
    */
   SingleParticleSubspacePN::SingleParticleSubspacePN(const OrbitalSubspacePN& orbital_subspace)
-    : BaseSubspace<SingleParticleSubspacePNLabels, SingleParticleStatePNLabels>{orbital_subspace.labels()},
+    : BaseSubspace{orbital_subspace.labels()},
       weight_max_{orbital_subspace.weight_max()}
   {
 

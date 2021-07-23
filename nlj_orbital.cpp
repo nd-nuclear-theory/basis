@@ -231,8 +231,8 @@ namespace basis {
    * @param[in] Nmax number of oscillator quanta
    */
   OrbitalSubspacePN::OrbitalSubspacePN(OrbitalSpeciesPN orbital_species, int Nmax)
-    : BaseSubspace<OrbitalSubspacePNLabels, OrbitalStatePNLabels>{{orbital_species}},
-      weight_max_{double(Nmax)}, is_oscillator_like_{true}, Nmax_{Nmax}
+    : BaseSubspace{{orbital_species}}, weight_max_{double(Nmax)},
+      is_oscillator_like_{true}, Nmax_{Nmax}
   {
 
     // iterate over total oscillator quanta
@@ -260,8 +260,7 @@ namespace basis {
    */
   OrbitalSubspacePN::OrbitalSubspacePN(OrbitalSpeciesPN orbital_species,
                                        const OrbitalPNList& states)
-    : BaseSubspace<OrbitalSubspacePNLabels, OrbitalStatePNLabels>{{orbital_species}},
-      weight_max_{0.0}
+    : BaseSubspace{{orbital_species}}, weight_max_{0.}
   {
 
     // iterate over all states, picking out those which belong to this subspace
@@ -601,8 +600,8 @@ namespace basis {
   OrbitalSubspaceLJPN::OrbitalSubspaceLJPN(
       OrbitalSpeciesPN orbital_species, int l, HalfInt j, int Nmax
     )
-    : BaseSubspace<OrbitalSubspaceLJPNLabels, OrbitalStateLJPNLabels>{{orbital_species,l,j}},
-      weight_max_{double(Nmax)}, is_oscillator_like_{true}, Nmax_{Nmax}
+    : BaseSubspace{{orbital_species,l,j}}, weight_max_{double(Nmax)},
+      is_oscillator_like_{true}, Nmax_{Nmax}
   {
     // iterate over radial quantum number
     for (int n = 0; (2*n+l) <= Nmax; ++n) {
@@ -627,8 +626,7 @@ namespace basis {
       OrbitalSpeciesPN orbital_species, int l, HalfInt j,
       const OrbitalPNList& states
     )
-    : BaseSubspace<OrbitalSubspaceLJPNLabels, OrbitalStateLJPNLabels>{{orbital_species,l,j}},
-      weight_max_{0.0}
+    : BaseSubspace{{orbital_species,l,j}}, weight_max_{0.0}
   {
     for (auto&& state : states) {
       if (state.orbital_species == orbital_species

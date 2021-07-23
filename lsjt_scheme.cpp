@@ -23,8 +23,7 @@ namespace basis {
   ////////////////////////////////////////////////////////////////
 
   RelativeSubspaceLSJT::RelativeSubspaceLSJT(int L, int S, int J, int T, int g, int Nmax)
-    : BaseSubspace<RelativeSubspaceLSJTLabels, RelativeStateLSJTLabels>{{L,S,J,T,g}},
-      Nmax_{Nmax}
+    : BaseSubspace{{L,S,J,T,g}}, Nmax_{Nmax}
   {
 
     // validate subspace labels
@@ -223,8 +222,7 @@ namespace basis {
   ////////////////////////////////////////////////////////////////
 
   RelativeCMSubspaceLSJT::RelativeCMSubspaceLSJT(int L, int S, int J, int T, int g, int Nmax)
-    : BaseSubspace<RelativeCMSubspaceLSJTLabels, RelativeCMStateLSJTLabels>{{L,S,J,T,g}},
-      Nmax_{Nmax}
+    : BaseSubspace{{L,S,J,T,g}}, Nmax_{Nmax}
   {
 
     // validate subspace labels
@@ -412,8 +410,7 @@ namespace basis {
   ////////////////////////////////////////////////////////////////
 
   RelativeCMSubspaceLSJTN::RelativeCMSubspaceLSJTN(int L, int S, int J, int T, int g, int N)
-    : BaseSubspace<RelativeCMSubspaceLSJTNLabels, RelativeCMStateLSJTNLabels>{{L,S,J,T,g,N}},
-      N_{N}
+    : BaseSubspace{{L,S,J,T,g,N}}, N_{N}
   {
 
     // validate subspace labels
@@ -603,7 +600,7 @@ namespace basis {
       int L, int S, int J, int T, int g,
       basis::Rank truncation_rank, int truncation_cutoff
     )
-    : BaseSubspace<TwoBodySubspaceLSJTLabels, TwoBodyStateLSJTLabels>{{L,S,J,T,g}}
+    : BaseSubspace{{L,S,J,T,g}}
   {
 
     // set labels
@@ -813,8 +810,7 @@ namespace basis {
       int L, int S, int J, int T, int g, int N,
       basis::Rank truncation_rank, int truncation_cutoff
     )
-    : BaseSubspace<TwoBodySubspaceLSJTNLabels, TwoBodyStateLSJTNLabels>{{L,S,J,T,g,N}},
-      N_{N}
+    : BaseSubspace{{L,S,J,T,g,N}}, N_{N}
   {
 
     // set labels (MODIFICATION for subspacing by N)

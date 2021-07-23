@@ -3,7 +3,7 @@
 
   Language: C++11
 
-  Mark A. Caprio
+  Mark A. Caprio, Patrick J. Fasano
   University of Notre Dame
 
 ****************************************************************/
@@ -29,6 +29,11 @@ namespace basis {
   //
   ////////////////////////////////////////////////////////////////
 
+  // declarations
+  class RelativeDegenerateSubspaceLSJT;
+  class RelativeDegenerateStateLSJT;
+  class RelativeDegenerateSpaceLSJT;
+
   // labels
 
   typedef std::tuple<int,int,int,int,int> RelativeSubspaceLSJTLabels;
@@ -37,7 +42,7 @@ namespace basis {
   // subspace
 
   class RelativeDegenerateSubspaceLSJT
-    : public BaseDegenerateSubspace<RelativeSubspaceLSJTLabels,RelativeStateLSJTLabels>
+    : public BaseDegenerateSubspace<RelativeDegenerateSubspaceLSJT,RelativeSubspaceLSJTLabels,RelativeDegenerateStateLSJT,RelativeStateLSJTLabels>
     {
 
       public:
@@ -156,8 +161,7 @@ namespace basis {
   ////////////////////////////////////////////////////////////////
 
   RelativeDegenerateSubspaceLSJT::RelativeDegenerateSubspaceLSJT(int L, int S, int J, int T, int g, int Nmax)
-    : BaseDegenerateSubspace<RelativeSubspaceLSJTLabels, RelativeStateLSJTLabels>{{L,S,J,T,g}},
-      Nmax_{Nmax}
+    : BaseDegenerateSubspace{{L,S,J,T,g}}, Nmax_{Nmax}
   {
 
     // validate subspace labels
@@ -217,7 +221,7 @@ namespace basis {
 
     for (std::size_t state_index=0; state_index<size(); ++state_index)
       {
-        RelativeDegenerateStateLSJT state(*this,state_index);
+        auto state = GetState(state_index);
 
         os
           << "  "  // extra indent

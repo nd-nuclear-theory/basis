@@ -67,6 +67,8 @@
   + 09/06/19 (pjf): Add TruncateOrbitalList.
   + 10/10/19 (pjf): Fix standalone output of 15200 orbital files.
   + 07/03/21 (pjf): Call base class constructor for initializing labels.
+  + 07/04/21 (pjf): Pass derived subspace class as template argument to
+    BaseSubspace.
 
 ****************************************************************/
 
@@ -250,6 +252,11 @@ namespace basis {
   ////////////////////////////////////////////////////////////////
   /// @{
 
+  // declarations
+  class OrbitalSubspacePN;
+  class OrbitalStatePN;
+  class OrbitalSpacePN;
+
   // labels
 
   typedef std::tuple<OrbitalSpeciesPN> OrbitalSubspacePNLabels;
@@ -259,7 +266,7 @@ namespace basis {
   // subspace
 
   class OrbitalSubspacePN
-    : public BaseSubspace<OrbitalSubspacePNLabels,OrbitalStatePNLabels>
+    : public BaseSubspace<OrbitalSubspacePN,OrbitalSubspacePNLabels,OrbitalStatePN,OrbitalStatePNLabels>
     {
 
       public:
@@ -474,6 +481,11 @@ namespace basis {
   ////////////////////////////////////////////////////////////////
   /// @{
 
+  // declarations
+  class OrbitalSubspaceLJPN;
+  class OrbitalStateLJPN;
+  class OrbitalSpaceLJPN;
+
   // labels
 
   typedef std::tuple<OrbitalSpeciesPN,int,HalfInt> OrbitalSubspaceLJPNLabels;
@@ -482,7 +494,7 @@ namespace basis {
   // subspace
 
   class OrbitalSubspaceLJPN
-    : public BaseSubspace<OrbitalSubspaceLJPNLabels,OrbitalStateLJPNLabels>
+    : public BaseSubspace<OrbitalSubspaceLJPN,OrbitalSubspaceLJPNLabels,OrbitalStateLJPN,OrbitalStateLJPNLabels>
     {
 
       public:

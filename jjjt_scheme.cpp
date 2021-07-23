@@ -26,7 +26,7 @@ namespace basis {
       int J, int T, int g,
       basis::Rank truncation_rank, int truncation_cutoff
     )
-    : BaseSubspace<TwoBodySubspaceJJJTLabels, TwoBodyStateJJJTLabels>{{J,T,g}}
+    : BaseSubspace{{J,T,g}}
   {
 
     // set labels
@@ -229,8 +229,7 @@ namespace basis {
       int J, int T, int g, int N,
       basis::Rank truncation_rank, int truncation_cutoff
     )
-    : BaseSubspace<TwoBodySubspaceJJJTNLabels, TwoBodyStateJJJTNLabels>{{J,T,g,N}},
-      N_{N}
+    : BaseSubspace{{J,T,g,N}}, N_{N}
   {
 
     // set labels (MODIFICATION for subspacing by N)

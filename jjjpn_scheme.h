@@ -43,6 +43,8 @@
   + 09/06/19 (pjf): Move WeightMax to many_body.h.
   + 12/12/19 (pjf): Fix UB in TwoBodySpaceJJJPN construction.
   + 07/03/21 (pjf): Call base class constructor for initializing labels.
+  + 07/04/21 (pjf): Pass derived subspace class as template argument to
+    BaseSubspace.
 ****************************************************************/
 
 #ifndef BASIS_JJJPN_SCHEME_H_
@@ -124,6 +126,11 @@ namespace basis {
   //
   ////////////////////////////////////////////////////////////////
 
+  // declarations
+  class TwoBodySubspaceJJJPN;
+  class TwoBodyStateJJJPN;
+  class TwoBodySpaceJJJPN;
+
   // labels
 
   typedef std::tuple<TwoBodySpeciesPN,int,int> TwoBodySubspaceJJJPNLabels;
@@ -132,7 +139,7 @@ namespace basis {
   // subspace
 
   class TwoBodySubspaceJJJPN
-    : public BaseSubspace<TwoBodySubspaceJJJPNLabels,TwoBodyStateJJJPNLabels>
+    : public BaseSubspace<TwoBodySubspaceJJJPN,TwoBodySubspaceJJJPNLabels,TwoBodyStateJJJPN,TwoBodyStateJJJPNLabels>
     {
 
       public:

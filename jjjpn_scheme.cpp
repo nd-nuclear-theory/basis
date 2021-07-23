@@ -27,8 +27,7 @@ namespace basis {
       TwoBodySpeciesPN two_body_species, int J, int g,
       const WeightMax& weight_max
     )
-    : BaseSubspace<TwoBodySubspaceJJJPNLabels, TwoBodyStateJJJPNLabels>{{two_body_species,J,g}},
-      weight_max_{weight_max}
+    : BaseSubspace{{two_body_species,J,g}}, weight_max_{weight_max}
   {
 
     // std::cout << "Subspace construction"
