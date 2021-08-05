@@ -37,6 +37,10 @@
   + 02/01/19 (pjf): Update comment on OperatorLinearCombination.
   + 05/09/19 (pjf): Use std::size_t for indices and sizes, to prevent
     integer overflow.
+  + 08/04/21 (pjf):
+    - Disambiguate between size() and dimension().
+    - Use SetOperatorToZero() in SetOperatorToDiagonalConstant().
+    - Make SetOperatorToIdentity a special case of SetOperatorToDiagonalConstant().
 
 ****************************************************************/
 
@@ -138,14 +142,14 @@ namespace basis {
           if (sector.IsDiagonal())
             // diagonal sector
             {
-              std::size_t dimension = sector.ket_subspace().size();
+              std::size_t dimension = sector.ket_subspace().dimension();
               sector_entries = dimension*(dimension+1)/2;
             }
           else if (sector.IsUpperTriangle())
             // upper triangle sector (but not diagonal)
             {
-              std::size_t bra_dimension = sector.bra_subspace().size();
-              std::size_t ket_dimension = sector.ket_subspace().size();
+              std::size_t bra_dimension = sector.bra_subspace().dimension();
+              std::size_t ket_dimension = sector.ket_subspace().dimension();
               sector_entries = bra_dimension*ket_dimension;
             }
 
@@ -188,73 +192,7 @@ namespace basis {
         const typename tSectorsType::SubspaceType& ket_subspace = sector.ket_subspace();
 
         // generate matrix for sector
-        matrices[sector_index] = basis::OperatorBlock<tFloat>::Zero(bra_subspace.size(),ket_subspace.size());
-
-      }
-  }
-
-  ////////////////////////////////////////////////////////////////
-  // identity operator
-  ////////////////////////////////////////////////////////////////
-
-  template <typename tSectorsType, typename tFloat>
-  void SetOperatorToIdentity(
-      const tSectorsType& sectors,
-      basis::OperatorBlocks<tFloat>& matrices
-    )
-    // Set operator to "naive" identity operator.
-    //
-    // The matrices for off-diagonal sectors are set to zero
-    // matrices, and the matrices for diagonal sectors are set to
-    // identity matrices.
-    //
-    // This is a "naive" identity operator, in that it may or may
-    // not actually represent the identity operator, depending upon
-    // normalization conventions.  For instance, for matrix elements
-    // taken in an orthonormal basis this *will* represent the
-    // identity operator, and likewise for reduced matrix elements
-    // under group theory (Rose) normalization conventions in an
-    // orthonormal basis.  But dimension factors will be missing if
-    // the operator is represented by its reduced matrix elements
-    // under angular-momentum (Edmonds) normalization conventions.
-    // And normalization factors will be missing if the basis consists
-    // of, e.g., two-body antisymmetrized (AS), as opposed to
-    // normalized antisymmetrized (NAS), states.
-    //
-    // RELATIONS: This could be absorbed as a special case of
-    // SetOperatorToDiagonalConstant.
-    //
-    // Arguments:
-    //   sectors (input): the set of sectors on
-    //     which the operator is defined
-    //   matrices (output): matrices to hold operator
-
-  {
-
-    // clear vector of matrices
-    matrices.clear();
-    matrices.resize(sectors.size());
-
-    // iterate over sectors
-    for (std::size_t sector_index = 0; sector_index < sectors.size(); ++sector_index)
-      {
-
-        // extract sector
-        const typename tSectorsType::SectorType& sector = sectors.GetSector(sector_index);
-
-        // extract sector subspaces
-        const typename tSectorsType::SubspaceType& bra_subspace = sector.bra_subspace();
-        const typename tSectorsType::SubspaceType& ket_subspace = sector.ket_subspace();
-
-        // generate matrix for sector
-        if (sector.IsDiagonal())
-          {
-            matrices[sector_index] = basis::OperatorBlock<tFloat>::Identity(bra_subspace.size(),ket_subspace.size());
-          }
-        else
-          {
-            matrices[sector_index] = basis::OperatorBlock<tFloat>::Zero(bra_subspace.size(),ket_subspace.size());
-          }
+        matrices[sector_index] = basis::OperatorBlock<tFloat>::Zero(bra_subspace.dimension(),ket_subspace.dimension());
 
       }
   }
@@ -297,8 +235,7 @@ namespace basis {
   {
 
     // clear vector of matrices
-    matrices.clear();
-    matrices.resize(sectors.size());
+    SetOperatorToZero(sectors, matrices);
 
     // iterate over sectors
     for (std::size_t sector_index = 0; sector_index < sectors.size(); ++sector_index)
@@ -314,14 +251,47 @@ namespace basis {
         // generate matrix for sector
         if (sector.IsDiagonal())
           {
-            matrices[sector_index] = c*basis::OperatorBlock<tFloat>::Identity(bra_subspace.size(),ket_subspace.size());
-          }
-        else
-          {
-            matrices[sector_index] = basis::OperatorBlock<tFloat>::Zero(bra_subspace.size(),ket_subspace.size());
+            matrices[sector_index] = c*basis::OperatorBlock<tFloat>::Identity(bra_subspace.dimension(),ket_subspace.dimension());
           }
 
       }
+  }
+
+  ////////////////////////////////////////////////////////////////
+  // identity operator
+  ////////////////////////////////////////////////////////////////
+
+  template <typename tSectorsType, typename tFloat>
+  inline void SetOperatorToIdentity(
+      const tSectorsType& sectors,
+      basis::OperatorBlocks<tFloat>& matrices
+    )
+    // Set operator to "naive" identity operator.
+    //
+    // The matrices for off-diagonal sectors are set to zero
+    // matrices, and the matrices for diagonal sectors are set to
+    // identity matrices.
+    //
+    // This is a "naive" identity operator, in that it may or may
+    // not actually represent the identity operator, depending upon
+    // normalization conventions.  For instance, for matrix elements
+    // taken in an orthonormal basis this *will* represent the
+    // identity operator, and likewise for reduced matrix elements
+    // under group theory (Rose) normalization conventions in an
+    // orthonormal basis.  But dimension factors will be missing if
+    // the operator is represented by its reduced matrix elements
+    // under angular-momentum (Edmonds) normalization conventions.
+    // And normalization factors will be missing if the basis consists
+    // of, e.g., two-body antisymmetrized (AS), as opposed to
+    // normalized antisymmetrized (NAS), states.
+    //
+    // Arguments:
+    //   sectors (input): the set of sectors on
+    //     which the operator is defined
+    //   matrices (output): matrices to hold operator
+
+  {
+    SetOperatorToDiagonalConstant(sectors, matrices, 1.0);
   }
 
   ////////////////////////////////////////////////////////////////
