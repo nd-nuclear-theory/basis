@@ -14,6 +14,7 @@
   + 04/22/17 (aem): Fix error in hypersector constructor.
   + 05/09/19 (pjf): Use std::size_t for indices and sizes, to prevent
     integer overflow.
+  + 08/04/21 (pjf): Fix use of size() vs. dimension().
 ****************************************************************/
 
 #ifndef BASIS_HYPERSECTOR_H_
@@ -237,13 +238,16 @@ namespace basis {
           os << "  hypersector " << hypersector_index
              << "  bra index " << hypersector.bra_subspace_index()
              << " labels " << hypersector.bra_subspace().LabelStr()
-             << " dim " << hypersector.bra_subspace().size()
+             << " size " << hypersector.bra_subspace().size()
+             << " dim " << hypersector.bra_subspace().dimension()
              << "  ket index " << hypersector.ket_subspace_index()
              << " labels " << hypersector.ket_subspace().LabelStr()
-             << " dim " << hypersector.ket_subspace().size()
+             << " size " << hypersector.ket_subspace().size()
+             << " dim " << hypersector.ket_subspace().dimension()
              << "  operator index " << hypersector.operator_subspace_index()
              << " labels " << hypersector.operator_subspace().LabelStr()
-             << " dim " << hypersector.operator_subspace().size()
+             << " size " << hypersector.operator_subspace().size()
+             << " dim " << hypersector.operator_subspace().dimension()
              << "  multiplicity index " << hypersector.multiplicity_index()
              << std::endl;
         }
@@ -302,7 +306,7 @@ namespace basis {
         matrices[hypersector_index].resize(operator_subspace.size());
         for (std::size_t operator_index = 0; operator_index < operator_subspace.size(); ++operator_index)
           matrices[hypersector_index][operator_index]
-            = basis::OperatorBlock<tFloat>::Zero(bra_subspace.size(),ket_subspace.size());
+            = basis::OperatorBlock<tFloat>::Zero(bra_subspace.dimension(),ket_subspace.dimension());
       }
   }
 
@@ -337,7 +341,7 @@ namespace basis {
 
         // generate matrices for hypersector (by operator)
         for (std::size_t operator_index = 0; operator_index < operator_subspace.size(); ++operator_index)
-          num_rmes+=bra_subspace.size()*ket_subspace.size();
+          num_rmes+=bra_subspace.dimension()*ket_subspace.dimension();
       }
     return num_rmes;
   }
