@@ -69,6 +69,8 @@
   + 07/03/21 (pjf): Call base class constructor for initializing labels.
   + 07/04/21 (pjf): Pass derived subspace class as template argument to
     BaseSubspace.
+  + 08/06/21 (pjf): Require BASIS_ALLOW_DEPRECATED macro for deprecated
+    OrbitalSectorsLJPN constructors.
 
 ****************************************************************/
 
@@ -661,6 +663,7 @@ namespace basis {
     // default constructor -- provided since required for certain
     // purposes by STL container classes (e.g., std::vector::resize)
 
+    #ifdef BASIS_ALLOW_DEPRECATED
     DEPRECATED("all-to-all enumeration is now deprecated")
     OrbitalSectorsLJPN(
       const OrbitalSpaceLJPN& bra_space, const OrbitalSpaceLJPN& ket_space
@@ -672,6 +675,7 @@ namespace basis {
     // Enumerate all sector pairs ("all-to-all" sector enumeration).
     //
     // Sectors are enumerated in lexicographical order by (bra)(ket).
+    #endif  // BASIS_ALLOW_DEPRECATED
 
     OrbitalSectorsLJPN(
       const OrbitalSpaceLJPN& bra_space, const OrbitalSpaceLJPN& ket_space,

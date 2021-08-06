@@ -931,6 +931,7 @@ namespace basis {
 
   }
 
+  #ifdef BASIS_ALLOW_DEPRECATED
   OrbitalSectorsLJPN::OrbitalSectorsLJPN(
       const OrbitalSpaceLJPN& bra_space, const OrbitalSpaceLJPN& ket_space
     )
@@ -947,6 +948,7 @@ namespace basis {
       }
     }
   }
+  #endif  // BASIS_ALLOW_DEPRECATED
 
   OrbitalSectorsLJPN::OrbitalSectorsLJPN(
       const OrbitalSpaceLJPN& bra_space, const OrbitalSpaceLJPN& ket_space,
