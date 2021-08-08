@@ -138,9 +138,11 @@ void TestLJSectors() {
   basis::OrbitalSpaceLJPN space(Nmax);
   std::cout << space.DebugStr();
 
+  #ifdef BASIS_ALLOW_DEPRECATED
   std::cout << "Sectors -- all-to-all" << std::endl;
   basis::OrbitalSectorsLJPN sectors(space);
   std::cout << sectors.DebugStr();
+  #endif
 
   std::cout << "Sectors -- j0 = 2, g0 = 0, Tz0 = 0" << std::endl;
   basis::OrbitalSectorsLJPN constrained_sectors(space, 2, 0, 0);
@@ -153,9 +155,11 @@ void TestLJSectors() {
   basis::OrbitalSpaceLJPN ket_space(Nmax);
   std::cout << ket_space.DebugStr();
 
+  #ifdef BASIS_ALLOW_DEPRECATED
   std::cout << "Sectors -- all-to-all distinct spaces" << std::endl;
   basis::OrbitalSectorsLJPN distinct_space_sectors(bra_space, ket_space);
   std::cout << distinct_space_sectors.DebugStr();
+  #endif
 
   std::cout << "Sectors -- distinct spaces, j0 = 2, g0 = 0, Tz0 = 0" << std::endl;
   basis::OrbitalSectorsLJPN constrained_distinct_space_sectors(bra_space, ket_space, 2, 0, 0);
