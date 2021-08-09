@@ -137,6 +137,11 @@
     - Add tDerivedSubspaceType and tStateType as template arguments to
       BaseSubspace.
     - Add GetState accessors to BaseSubspace.
+  + 08/08/21 (pjf):
+    - Modify BaseSector and BaseSectors to allow bra and ket space types to
+      differ.
+    - Add additional template argument to BaseSectors so that custom sector type
+      can be used, instead of default instantiation of BaseSector.
 ****************************************************************/
 
 #ifndef BASIS_BASIS_H_
@@ -828,10 +833,20 @@ namespace basis {
   // multiplicity index.
 
 
+  // declare BaseSectors template
+  template <
+      typename tBraSubspaceType, typename tKetSubspaceType = tBraSubspaceType,
+      bool = std::is_same_v<tBraSubspaceType, tKetSubspaceType>
+    >
+    class BaseSector;
+
   /// BaseSector -- provide storage of information for a single sector
 
-  template <typename tSubspaceType>
-    class BaseSector
+  // Here we specialize the template for the case where the bra and ket
+  // subspaces are of different types. For the case where they are the same
+  // (below), we will inherit from this specialization.
+  template <typename tBraSubspaceType, typename tKetSubspaceType>
+    class BaseSector<tBraSubspaceType, tKetSubspaceType, false>
     // Store indexing and subspace reference information for a sector.
     //
     // Allows for multiplicity index on sector, for symmetry sectors
@@ -843,7 +858,8 @@ namespace basis {
       ////////////////////////////////////////////////////////////////
 
       public:
-      typedef tSubspaceType SubspaceType;
+      using BraSubspaceType = tBraSubspaceType;
+      using KetSubspaceType = tKetSubspaceType;
       typedef std::tuple<std::size_t,std::size_t,std::size_t> KeyType;
 
       ////////////////////////////////////////////////////////////////
@@ -852,7 +868,7 @@ namespace basis {
 
       BaseSector(
           std::size_t bra_subspace_index, std::size_t ket_subspace_index,
-          const SubspaceType& bra_subspace, const SubspaceType& ket_subspace,
+          const BraSubspaceType& bra_subspace, const KetSubspaceType& ket_subspace,
           std::size_t multiplicity_index=1
         )
         : bra_subspace_index_(bra_subspace_index),
@@ -878,8 +894,8 @@ namespace basis {
       std::size_t ket_subspace_index() const {return ket_subspace_index_;}
       // Return integer index of bra/ket subspace.
 
-      const SubspaceType& bra_subspace() const {return *bra_subspace_ptr_;}
-      const SubspaceType& ket_subspace() const {return *ket_subspace_ptr_;}
+      const BraSubspaceType& bra_subspace() const {return *bra_subspace_ptr_;}
+      const KetSubspaceType& ket_subspace() const {return *ket_subspace_ptr_;}
       // Return reference to bra/ket subspace.
 
       std::size_t multiplicity_index() const {return multiplicity_index_;}
@@ -899,9 +915,40 @@ namespace basis {
 
       private:
       std::size_t bra_subspace_index_, ket_subspace_index_;
-      const SubspaceType* bra_subspace_ptr_;
-      const SubspaceType* ket_subspace_ptr_;
+      const BraSubspaceType* bra_subspace_ptr_;
+      const KetSubspaceType* ket_subspace_ptr_;
       std::size_t multiplicity_index_;
+    };
+
+  // Here we specialize to the case where the bra and ket subspaces have the
+  // same type. We inherit all the functionality from the case where they
+  // differ, and add an additional type alias.
+  template<typename tSubspaceType>
+    class BaseSector<tSubspaceType, tSubspaceType, true>
+      : public BaseSector<tSubspaceType, tSubspaceType, false>
+    {
+      public:
+
+      ////////////////////////////////////////////////////////////////
+      // common typedefs
+      ////////////////////////////////////////////////////////////////
+
+      using SubspaceType = tSubspaceType;
+
+      ////////////////////////////////////////////////////////////////
+      // constructors
+      ////////////////////////////////////////////////////////////////
+
+      inline BaseSector(
+          std::size_t bra_subspace_index, std::size_t ket_subspace_index,
+          const SubspaceType& bra_subspace, const SubspaceType& ket_subspace,
+          std::size_t multiplicity_index=1
+        )
+        : BaseSector<tSubspaceType, tSubspaceType, false>{
+            bra_subspace_index, ket_subspace_index,
+            bra_subspace,ket_subspace, multiplicity_index
+        }
+        {}
     };
 
   // SectorDirection -- sector direction specifier
@@ -919,10 +966,25 @@ namespace basis {
   // lookup by sector labels
   //
   // Template arguments:
-  //   tSpaceType (typename) : type for space
+  //   tBraSpaceType (typename) : type for bra space
+  //   tKetSpaceType (typename) : type for ket space
+  //   tSectorType (typename) : type for sector
+  //   (bool): true if tBraSpaceType and tKetSpaceType are the same
 
-  template <typename tSpaceType>
-    class BaseSectors
+  // declare BaseSectors template
+  template <
+      typename tBraSpaceType, typename tKetSpaceType = tBraSpaceType,
+      typename tSectorType
+        = BaseSector<typename tBraSpaceType::SubspaceType, typename tKetSpaceType::SubspaceType>,
+      bool = std::is_same_v<tBraSpaceType, tKetSpaceType>
+    >
+    class BaseSectors;
+
+  // Here we specialize the template for the case where the bra and ket spaces
+  // are of different types. For the case where they are the same (below), we
+  // will inherit from this specialization.
+  template<typename tBraSpaceType, typename tKetSpaceType, typename tSectorType>
+    class BaseSectors<tBraSpaceType, tKetSpaceType, tSectorType, false>
     {
       public:
 
@@ -930,9 +992,13 @@ namespace basis {
       // common typedefs
       ////////////////////////////////////////////////////////////////
 
-      typedef tSpaceType SpaceType;
-      typedef typename tSpaceType::SubspaceType SubspaceType;
-      typedef BaseSector<SubspaceType> SectorType;
+      using BraSpaceType = tBraSpaceType;
+      using KetSpaceType = tKetSpaceType;
+
+      using BraSubspaceType = typename tBraSpaceType::SubspaceType;
+      using KetSubspaceType = typename tKetSpaceType::SubspaceType;
+      using SectorType = tSectorType;
+
 
       protected:
 
@@ -944,11 +1010,7 @@ namespace basis {
       // default constructor -- provided since required for certain
       // purposes by STL container classes (e.g., std::vector::resize)
 
-      explicit BaseSectors(const SpaceType& space)
-        : bra_space_(space), ket_space_(space)
-      {}
-
-      BaseSectors(const SpaceType& bra_space, const SpaceType& ket_space)
+      BaseSectors(const BraSpaceType& bra_space, const KetSpaceType& ket_space)
         : bra_space_(bra_space), ket_space_(ket_space)
       {}
 
@@ -1055,6 +1117,7 @@ namespace basis {
         PushSector(typename SectorType::KeyType{bra_subspace_index, ket_subspace_index, multiplicity_index});
       }
 
+      #ifdef BASIS_ALLOW_DEPRECATED
       DEPRECATED("use index- or key-based PushSector() instead")
       void PushSector(const SectorType& sector)
       // Create indexing information (in both directions, index <->
@@ -1064,6 +1127,7 @@ namespace basis {
       {
         PushSector(sector.Key());
       }
+      #endif
 
       private:
       ////////////////////////////////////////////////////////////////
@@ -1071,8 +1135,8 @@ namespace basis {
       ////////////////////////////////////////////////////////////////
 
       // spaces
-      SpaceType bra_space_;
-      SpaceType ket_space_;
+      BraSpaceType bra_space_;
+      KetSpaceType ket_space_;
 
       // sector keys (accessible by index)
       std::vector<typename SectorType::KeyType> keys_;
@@ -1089,8 +1153,41 @@ namespace basis {
 
     };
 
-  template <typename tSpaceType>
-    std::string BaseSectors<tSpaceType>::DebugStr() const
+  // Here we specialize to the case where the bra and ket spaces have the same
+  // type. We inherit all the functionality from the case where they differ, and
+  // add some additional type aliases and constructors.
+  template<typename tSpaceType, typename tSectorType>
+    class BaseSectors<tSpaceType, tSpaceType, tSectorType, true>
+      : public BaseSectors<tSpaceType, tSpaceType, tSectorType, false>
+    {
+      public:
+
+      ////////////////////////////////////////////////////////////////
+      // common typedefs
+      ////////////////////////////////////////////////////////////////
+
+      using SpaceType = tSpaceType;
+      using SubspaceType = typename SpaceType::SubspaceType;
+
+      protected:
+
+      ////////////////////////////////////////////////////////////////
+      // constructors
+      ////////////////////////////////////////////////////////////////
+
+      BaseSectors() = default;
+      inline explicit BaseSectors(const SpaceType& space)
+        : BaseSectors{space, space}
+      {}
+
+      inline BaseSectors(const SpaceType& bra_space, const SpaceType& ket_space)
+        : BaseSectors<tSpaceType, tSpaceType, tSectorType, false>{bra_space, ket_space}
+      {}
+
+    };
+
+  template <typename tBraSpaceType, typename tKetSpaceType, typename tSectorType>
+    std::string BaseSectors<tBraSpaceType, tKetSpaceType, tSectorType, false>::DebugStr() const
     {
       std::ostringstream os;
       for (std::size_t sector_index=0; sector_index<size(); ++sector_index)
