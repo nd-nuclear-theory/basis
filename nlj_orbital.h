@@ -378,7 +378,7 @@ namespace basis {
   // space
 
   class OrbitalSpacePN
-    : public BaseSpace<OrbitalSubspacePN>
+    : public BaseSpace<OrbitalSpacePN, OrbitalSubspacePN>
   {
 
     public:
@@ -601,7 +601,7 @@ namespace basis {
   // space
 
   class OrbitalSpaceLJPN
-    : public BaseSpace<OrbitalSubspaceLJPN>
+    : public BaseSpace<OrbitalSpaceLJPN, OrbitalSubspaceLJPN>
   {
 
     public:

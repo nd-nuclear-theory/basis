@@ -117,7 +117,7 @@ namespace basis {
   // space
 
   class RelativeDegenerateSpaceLSJT
-    : public BaseDegenerateSpace<RelativeDegenerateSubspaceLSJT, std::tuple<int,int>>
+    : public BaseDegenerateSpace<RelativeDegenerateSpaceLSJT, RelativeDegenerateSubspaceLSJT, std::tuple<int,int>>
   {
 
     public:
@@ -262,7 +262,7 @@ namespace basis {
 
 
   RelativeDegenerateSpaceLSJT::RelativeDegenerateSpaceLSJT(int Nmax, int Jmax, std::tuple<int,int> labels)
-    : Nmax_(Nmax), Jmax_(Jmax), BaseDegenerateSpace<RelativeDegenerateSubspaceLSJT, std::tuple<int,int>>(labels)
+    : Nmax_(Nmax), Jmax_(Jmax), BaseDegenerateSpace(labels)
   {
 
     // iterate over L

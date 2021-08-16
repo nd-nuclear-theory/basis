@@ -237,7 +237,7 @@ namespace basis {
   // space
 
   class RelativeSpaceLSJT
-    : public BaseSpace<RelativeSubspaceLSJT>
+    : public BaseSpace<RelativeSpaceLSJT, RelativeSubspaceLSJT>
   {
 
     public:
@@ -465,7 +465,7 @@ namespace basis {
   // space
 
   class RelativeCMSpaceLSJT
-    : public BaseSpace<RelativeCMSubspaceLSJT>
+    : public BaseSpace<RelativeCMSpaceLSJT, RelativeCMSubspaceLSJT>
   {
 
     public:
@@ -664,7 +664,7 @@ namespace basis {
   // space
 
   class RelativeCMSpaceLSJTN
-    : public BaseSpace<RelativeCMSubspaceLSJTN>
+    : public BaseSpace<RelativeCMSpaceLSJTN, RelativeCMSubspaceLSJTN>
   {
 
     public:
@@ -884,7 +884,7 @@ namespace basis {
   // space
 
   class TwoBodySpaceLSJT
-    : public BaseSpace<TwoBodySubspaceLSJT>
+    : public BaseSpace<TwoBodySpaceLSJT, TwoBodySubspaceLSJT>
   {
 
     public:
@@ -1088,7 +1088,7 @@ namespace basis {
   // space
 
   class TwoBodySpaceLSJTN
-    : public BaseSpace<TwoBodySubspaceLSJTN>
+    : public BaseSpace<TwoBodySpaceLSJTN, TwoBodySubspaceLSJTN>
   {
 
     public:

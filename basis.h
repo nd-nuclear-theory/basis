@@ -142,6 +142,11 @@
       differ.
     - Add additional template argument to BaseSectors so that custom sector type
       can be used, instead of default instantiation of BaseSector.
+  + 08/16/21 (pjf):
+    - Switch from storing shared_ptr<vector> to vector<shared_ptr> in BaseSpace.
+    - Add tDerivedSpaceType as template argument to BaseSpace for CRTP with
+      std::enable_shared_from_this.
+    - Replace raw pointers with shared_ptr in BaseSector.
 ****************************************************************/
 
 #ifndef BASIS_BASIS_H_
@@ -219,6 +224,7 @@ namespace basis {
       typename tStateType, typename tStateLabelsType
     >
   class BaseSubspace
+      : public std::enable_shared_from_this<tDerivedSubspaceType>
   {
 
     public:
@@ -590,12 +596,13 @@ namespace basis {
   ///   tSpaceLabelsType (typename, optional) : type for space labels
 
   // declare BaseSpace template
-  template <typename tSubspaceType, typename tSpaceLabelsType = void>
+  template <typename tDerivedSpaceType, typename tSubspaceType, typename tSpaceLabelsType = void>
     class BaseSpace;
 
   // specialize class for case with no labels
-  template <typename tSubspaceType>
-    class BaseSpace<tSubspaceType, void>
+  template <typename tDerivedSpaceType, typename tSubspaceType>
+    class BaseSpace<tDerivedSpaceType, tSubspaceType, void>
+        : public std::enable_shared_from_this<tDerivedSpaceType>
     {
       public:
 
@@ -612,18 +619,8 @@ namespace basis {
       ////////////////////////////////////////////////////////////////
 
       BaseSpace()
-        : dimension_{0}
-      {
-        subspaces_ = std::make_shared<std::vector<SubspaceType>>();
-#ifdef BASIS_HASH
-        lookup_ = std::make_shared<std::unordered_map<
-            typename SubspaceType::LabelsType,std::size_t,
-            boost::hash<typename SubspaceType::LabelsType>
-          >>();
-#else
-        lookup_ = std::make_shared<std::map<typename SubspaceType::LabelsType,std::size_t>>();
-#endif
-      }
+        : dimension_{0}, subspace_ptrs_{}, lookup_{}
+      {}
 
       public:
 
@@ -635,7 +632,7 @@ namespace basis {
       /// Given the labels for a subspace, returns whether or not the
       /// subspace is found within the space.
       {
-        return lookup_->count(subspace_labels);
+        return lookup_.count(subspace_labels);
       }
 
       std::size_t LookUpSubspaceIndex(
@@ -651,8 +648,8 @@ namespace basis {
         // assert(ContainsSubspace(subspace_labels));
         // return lookup_.at(subspace_labels);
 
-        auto pos = lookup_->find(subspace_labels);
-        if (pos==lookup_->end())
+        auto pos = lookup_.find(subspace_labels);
+        if (pos==lookup_.end())
           return kNone;
         else
           return pos->second;
@@ -670,14 +667,14 @@ namespace basis {
 
         std::size_t subspace_index = LookUpSubspaceIndex(subspace_labels);
         assert(subspace_index!=kNone);
-        return subspaces_->at(subspace_index);
+        return *(subspace_ptrs_.at(subspace_index));
       };
 
       const SubspaceType& GetSubspace(std::size_t i) const
       /// Given the index for a subspace, return a reference to the
       /// subspace.
       {
-        return subspaces_->at(i);
+        return *(subspace_ptrs_.at(i));
       };
 
       std::size_t GetSubspaceOffset(std::size_t i) const
@@ -694,7 +691,7 @@ namespace basis {
       std::size_t size() const
       /// Return the number of subspaces within the space.
       {
-        return subspaces_->size();
+        return subspace_ptrs_.size();
       };
 
       std::size_t dimension() const
@@ -721,13 +718,17 @@ namespace basis {
       // subspace push (for initial construction)
       ////////////////////////////////////////////////////////////////
 
-      void PushSubspace(const SubspaceType& subspace)
+      template<typename T, typename std::enable_if_t<std::is_same_v<std::decay_t<T>, SubspaceType>>* = nullptr>
+      void PushSubspace(T&& subspace)
       /// Create indexing information (in both directions, index <->
       /// labels) for a subspace.
       {
+        const std::size_t index = subspace_ptrs_.size();  // index for lookup
         subspace_offsets_.push_back(dimension_);
-        (*lookup_)[subspace.labels()] = subspaces_->size();  // index for lookup
-        subspaces_->push_back(subspace);  // save space
+        subspace_ptrs_.push_back(
+            std::make_shared<const SubspaceType>(std::forward<T>(subspace))
+          );  // save subspace
+        lookup_[subspace.labels()] = index;  // index for lookup
         dimension_ += subspace.dimension();
       };
 
@@ -736,43 +737,45 @@ namespace basis {
       /// Create indexing information (in both directions, index <->
       /// labels) for a subspace.
       {
-        std::size_t index = subspaces_->size();  // index for lookup
+        const std::size_t index = subspace_ptrs_.size();  // index for lookup
         subspace_offsets_.push_back(dimension_);
-        subspaces_->emplace_back(std::forward<Args>(args)...);
-        (*lookup_)[subspaces_->back().labels()] = index;
-        dimension_ += subspaces_->back().dimension();
+        subspace_ptrs_.push_back(
+            std::make_shared<const SubspaceType>(std::forward<Args>(args)...)
+          );
+        const SubspaceType& subspace = *(subspace_ptrs_.back());
+        lookup_[subspace.labels()] = index;
+        dimension_ += subspace.dimension();
       }
 
       private:
 
       // allow BaseDegenerateSpace to access private members to override
       // PushSubspace and EmplaceSubspace
-      template<typename T, typename U> friend class BaseDegenerateSpace;
+      template<typename, typename, typename> friend class BaseDegenerateSpace;
 
       ////////////////////////////////////////////////////////////////
       // internal storage
       ////////////////////////////////////////////////////////////////
 
       /// subspaces (accessible by index)
-      std::shared_ptr<std::vector<SubspaceType>> subspaces_;
+      std::vector<std::shared_ptr<const SubspaceType>> subspace_ptrs_;
       std::vector<std::size_t> subspace_offsets_;
       std::size_t dimension_;
 
       // subspace index lookup by labels
 #ifdef BASIS_HASH
-      std::shared_ptr<
       std::unordered_map<
           typename SubspaceType::LabelsType,std::size_t,
           boost::hash<typename SubspaceType::LabelsType>
-        >> lookup_;
+        > lookup_;
 #else
-      std::shared_ptr<std::map<typename SubspaceType::LabelsType,std::size_t>> lookup_;
+      std::map<typename SubspaceType::LabelsType,std::size_t> lookup_;
 #endif
     };
 
   // inherit from BaseSpace and add labels
-  template <typename tSubspaceType, typename tSpaceLabelsType>
-    class BaseSpace : public BaseSpace<tSubspaceType, void>
+  template <typename tDerivedSpaceType, typename tSubspaceType, typename tSpaceLabelsType>
+    class BaseSpace : public BaseSpace<tDerivedSpaceType, tSubspaceType, void>
     {
       public:
 
@@ -873,11 +876,10 @@ namespace basis {
         )
         : bra_subspace_index_(bra_subspace_index),
           ket_subspace_index_(ket_subspace_index),
-          multiplicity_index_(multiplicity_index)
-      {
-        bra_subspace_ptr_ = &bra_subspace;
-        ket_subspace_ptr_ = &ket_subspace;
-      }
+          multiplicity_index_(multiplicity_index),
+          bra_subspace_ptr_(bra_subspace.shared_from_this()),
+          ket_subspace_ptr_(ket_subspace.shared_from_this())
+      {}
 
       ////////////////////////////////////////////////////////////////
       // accessors
@@ -915,8 +917,8 @@ namespace basis {
 
       private:
       std::size_t bra_subspace_index_, ket_subspace_index_;
-      const BraSubspaceType* bra_subspace_ptr_;
-      const KetSubspaceType* ket_subspace_ptr_;
+      const std::shared_ptr<const BraSubspaceType> bra_subspace_ptr_;
+      const std::shared_ptr<const KetSubspaceType> ket_subspace_ptr_;
       std::size_t multiplicity_index_;
     };
 

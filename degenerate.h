@@ -36,6 +36,8 @@
   + 07/03/21 (pjf): Update access specifiers.
   + 07/04/21 (pjf): Add additional template parameters to BaseDegenerateSubspace
     for pass-through to BaseSubspace.
+  + 08/16/21 (pjf): Add additional template parameter to BaseDegenerateSpace for
+    pass-through to BaseSpace.
 ****************************************************************/
 
 #ifndef BASIS_DEGENERATE_H_
@@ -277,9 +279,9 @@ namespace basis {
   // Template arguments:
   //   tSubspaceType (typename) : type for subspace
 
-  template <typename tSubspaceType, typename tSpaceLabelsType = void>
+  template <typename tDerivedSpaceType, typename tSubspaceType, typename tSpaceLabelsType = void>
   class BaseDegenerateSpace
-    : public BaseSpace<tSubspaceType,tSpaceLabelsType>
+    : public BaseSpace<tDerivedSpaceType, tSubspaceType, tSpaceLabelsType>
   {
 
     private:
@@ -287,7 +289,7 @@ namespace basis {
     ////////////////////////////////////////////////////////////////
     // private (convenience) typedefs
     ////////////////////////////////////////////////////////////////
-    using BaseSpaceType = BaseSpace<tSubspaceType,tSpaceLabelsType>;
+    using BaseSpaceType = BaseSpace<tDerivedSpaceType, tSubspaceType,tSpaceLabelsType>;
 
     public:
 
@@ -361,16 +363,21 @@ namespace basis {
     // subspace push (for initial construction)
     ////////////////////////////////////////////////////////////////
 
-    void PushSubspace(const SubspaceType& subspace) = delete;
+    template<typename T, typename std::enable_if_t<std::is_same_v<std::decay_t<T>, SubspaceType>>* = nullptr>
+    void PushSubspace(T&& subspace) = delete;
     // Prevent use of PushSubspace without degeneracy.
 
-    void PushSubspace(const SubspaceType& subspace, int degeneracy)
+    template<typename T, typename std::enable_if_t<std::is_same_v<std::decay_t<T>, SubspaceType>>* = nullptr>
+    void PushSubspace(T&& subspace, int degeneracy)
     /// Create indexing information (in both directions, index <->
     /// labels) for a subspace.
     {
+      const std::size_t index = this->subspace_ptrs_.size();  // index for lookup
       this->subspace_offsets_.push_back(this->dimension_);
-      (*(this->lookup_))[subspace.labels()] = this->subspaces_->size();  // index for lookup
-      this->subspaces_->push_back(subspace);  // save space
+      this->subspace_ptrs_.push_back(
+          std::make_shared<const SubspaceType>(std::forward<T>(subspace))
+        );  // save space
+      (this->lookup_)[subspace.labels()] = index;
       subspace_degeneracies_.push_back(degeneracy);  // save degeneracy
       this->dimension_ += subspace.dimension()*degeneracy;
     };
@@ -384,12 +391,15 @@ namespace basis {
     /// Create indexing information (in both directions, index <->
     /// labels) for a subspace.
     {
-      std::size_t index = this->subspaces_->size();  // index for lookup
+      const std::size_t index = this->subspace_ptrs_.size();  // index for lookup
       this->subspace_offsets_.push_back(this->dimension_);
-      this->subspaces_->emplace_back(std::forward<Args>(args)...);
-      (*(this->lookup_))[this->subspaces_->back().labels()] = index;
+      this->subspace_ptrs_.push_back(
+          std::make_shared<SubspaceType>(std::forward<Args>(args)...)
+        );
+      const SubspaceType& subspace = *(this->subspace_ptrs_.back());
+      (this->lookup_)[subspace.labels()] = index;
       subspace_degeneracies_.push_back(degeneracy);  // save degeneracy
-      this->dimension_ += this->subspaces_->back().dimension()*degeneracy;
+      this->dimension_ += subspace.dimension()*degeneracy;
     }
 
   private:

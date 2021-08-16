@@ -206,7 +206,7 @@ namespace basis {
   // space
 
   class SingleParticleSpacePN
-    : public BaseSpace<SingleParticleSubspacePN>
+    : public BaseSpace<SingleParticleSpacePN, SingleParticleSubspacePN>
   {
 
     public:
