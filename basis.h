@@ -350,6 +350,28 @@ namespace basis {
     protected:
 
     ////////////////////////////////////////////////////////////////
+    // state label storage management (for initial construction)
+    ////////////////////////////////////////////////////////////////
+
+    inline void reserve(std::size_t new_cap)
+    // Reserve storage for labels.
+    {
+      state_table_.reserve(new_cap);
+    }
+
+    inline std::size_t capacity() const noexcept
+    // Reserve storage for labels.
+    {
+      return state_table_.capacity();
+    }
+
+    inline void shrink_to_fit()
+    // Reserve storage for labels.
+    {
+      state_table_.shrink_to_fit();
+    }
+
+    ////////////////////////////////////////////////////////////////
     // state label push (for initial construction)
     ////////////////////////////////////////////////////////////////
 
@@ -716,6 +738,28 @@ namespace basis {
 #endif
 
       protected:
+
+    ////////////////////////////////////////////////////////////////
+    // subspace storage management (for initial construction)
+    ////////////////////////////////////////////////////////////////
+
+    inline void reserve(std::size_t new_cap)
+    // Reserve storage for labels.
+    {
+      subspace_ptrs_.reserve(new_cap);
+    }
+
+    inline std::size_t capacity() const noexcept
+    // Reserve storage for labels.
+    {
+      return subspace_ptrs_.capacity();
+    }
+
+    inline void shrink_to_fit()
+    // Reserve storage for labels.
+    {
+      subspace_ptrs_.shrink_to_fit();
+    }
 
       ////////////////////////////////////////////////////////////////
       // subspace push (for initial construction)
