@@ -147,6 +147,9 @@
     - Add tDerivedSpaceType as template argument to BaseSpace for CRTP with
       std::enable_shared_from_this.
     - Replace raw pointers with shared_ptr in BaseSector.
+  + 08/17/21 (pjf):
+    - Revert to storing instances of sector in BaseSectors rather than just keys.
+    - Only copy space into BaseSectors if it is not managed by a shared_ptr.
 ****************************************************************/
 
 #ifndef BASIS_BASIS_H_
@@ -917,9 +920,9 @@ namespace basis {
 
       private:
       std::size_t bra_subspace_index_, ket_subspace_index_;
+      std::size_t multiplicity_index_;
       const std::shared_ptr<const BraSubspaceType> bra_subspace_ptr_;
       const std::shared_ptr<const KetSubspaceType> ket_subspace_ptr_;
-      std::size_t multiplicity_index_;
     };
 
   // Here we specialize to the case where the bra and ket subspaces have the
@@ -1012,29 +1015,71 @@ namespace basis {
       // default constructor -- provided since required for certain
       // purposes by STL container classes (e.g., std::vector::resize)
 
-      BaseSectors(const BraSpaceType& bra_space, const KetSpaceType& ket_space)
-        : bra_space_(bra_space), ket_space_(ket_space)
-      {}
+      template<
+          typename T, typename U,
+          typename std::enable_if_t<std::is_same_v<std::decay_t<T>, BraSpaceType>>* = nullptr,
+          typename std::enable_if_t<std::is_same_v<std::decay_t<U>, KetSpaceType>>* = nullptr
+        >
+      BaseSectors(T&& bra_space, U&& ket_space)
+        : bra_space_ptr_(bra_space.weak_from_this().lock()),
+          ket_space_ptr_(ket_space.weak_from_this().lock())
+      {
+        // if bra_space or ket_space is not managed by a shared_ptr, make copy
+        // or move it to a locally-created shared_ptr.
+        //
+        // Note: this is probably safe, since the spaces themselves store
+        // vectors of shared_ptrs to subspaces, so a copy only involves copying
+        // those vectors and maps
+        if (!bra_space_ptr_)
+          bra_space_ptr_
+            = std::make_shared<const BraSpaceType>(std::forward<T>(bra_space));
+        if (!ket_space_ptr_)
+        {
+          // if bra and ket spaces are identical, we can share the new copy we
+          // just made for the bra_space_ptr_
+          //
+          // note: this also ensures that if bra_space and ket_space are the
+          // same object, then if we just moved from bra_space we don't try to
+          // move from it again (which would be UB)
+          if (&ket_space == &bra_space)
+            ket_space_ptr_ = bra_space_ptr_;
+          else
+            ket_space_ptr_
+              = std::make_shared<const KetSpaceType>(std::forward<U>(ket_space));
+        }
+      }
 
       public:
+
+      ////////////////////////////////////////////////////////////////
+      // space accessors
+      ////////////////////////////////////////////////////////////////
+
+      const BraSpaceType& bra_space() const
+      {
+        return *bra_space_ptr_;
+      }
+
+      const KetSpaceType& ket_space() const
+      {
+        return *ket_space_ptr_;
+      }
 
       ////////////////////////////////////////////////////////////////
       // sector lookup and retrieval
       ////////////////////////////////////////////////////////////////
 
-      SectorType GetSector(std::size_t sector_index) const
+      const SectorType& GetSector(std::size_t sector_index) const
       // Given sector index, return reference to sector itself.
       {
-        const typename SectorType::KeyType& key = keys_.at(sector_index);
-        std::size_t bra_subspace_index, ket_subspace_index, multiplicity_index;
-        std::tie(bra_subspace_index, ket_subspace_index, multiplicity_index) = key;
-        const auto& bra_subspace = bra_space_.GetSubspace(bra_subspace_index);
-        const auto& ket_subspace = ket_space_.GetSubspace(ket_subspace_index);
-        return SectorType(
-            bra_subspace_index, ket_subspace_index,
-            bra_subspace, ket_subspace,
-            multiplicity_index
-          );
+        return sectors_.at(sector_index);
+      };
+
+      bool ContainsSector(typename SectorType::KeyType key) const
+      // Given the labels for a sector, returns whether or not the sector
+      // is found within the the sector set.
+      {
+        return lookup_.count(key);
       };
 
       bool ContainsSector(
@@ -1045,8 +1090,9 @@ namespace basis {
       // Given the labels for a sector, returns whether or not the sector
       // is found within the the sector set.
       {
-        typename SectorType::KeyType key(bra_subspace_index,ket_subspace_index,multiplicity_index);
-        return lookup_.count(key);
+        return ContainsSector(
+            typename SectorType::KeyType{bra_subspace_index,ket_subspace_index,multiplicity_index}
+          );
       };
 
       std::size_t LookUpSectorIndex(const typename SectorType::KeyType& key) const
@@ -1072,9 +1118,11 @@ namespace basis {
       //
       // If no such labels are found, basis::kNone is returned.
       {
-        const typename SectorType::KeyType key(bra_subspace_index,ket_subspace_index,multiplicity_index);
-        return LookUpSectorIndex(key);
+        return LookUpSectorIndex(
+            typename SectorType::KeyType{bra_subspace_index,ket_subspace_index,multiplicity_index}
+          );
       }
+
       ////////////////////////////////////////////////////////////////
       // size retrieval
       ////////////////////////////////////////////////////////////////
@@ -1082,7 +1130,7 @@ namespace basis {
       std::size_t size() const
       // Return number of sectors within sector set.
       {
-        return keys_.size();
+        return sectors_.size();
       };
 
       ////////////////////////////////////////////////////////////////
@@ -1100,15 +1148,31 @@ namespace basis {
       // sector push (for initial construction)
       ////////////////////////////////////////////////////////////////
 
-      void PushSector(const typename SectorType::KeyType& key)
+      template<
+          typename T,
+          typename std::enable_if_t<std::is_same_v<std::decay_t<T>,SectorType>>* = nullptr
+        >
+      void PushSector(T&& sector)
       // Create indexing information (in both directions, index <->
-      // labels) for a sector, given key.
+      // labels) for a sector.
       {
-        lookup_[key] = keys_.size(); // index for lookup
-        keys_.push_back(key);  // save sector
+        const std::size_t index = sectors_.size();
+        sectors_.push_back(std::forward<T>(sector));  // save sector
+        lookup_[sector.Key()] = index; // index for lookup
       };
 
-      void PushSector(
+      template<typename... Args>
+      void EmplaceSector(Args&&... args)
+      // Create indexing information (in both directions, index <->
+      // labels) for a sector.
+      {
+        const std::size_t index = sectors_.size();
+        sectors_.emplace_back(std::forward<Args>(args)...);  // save sector
+        const SectorType& sector = sectors_.back();
+        lookup_[sector.Key()] = index; // index for lookup
+      };
+
+      inline void PushSector(
           std::size_t bra_subspace_index,
           std::size_t ket_subspace_index,
           std::size_t multiplicity_index=1
@@ -1116,20 +1180,21 @@ namespace basis {
       // Create indexing information (in both directions, index <->
       // labels) for a sector, given indices.
       {
-        PushSector(typename SectorType::KeyType{bra_subspace_index, ket_subspace_index, multiplicity_index});
+        EmplaceSector(
+            bra_subspace_index, ket_subspace_index,
+            bra_space_ptr_->GetSubspace(bra_subspace_index),
+            ket_space_ptr_->GetSubspace(ket_subspace_index),
+            multiplicity_index
+          );  // save sector
       }
 
-      #ifdef BASIS_ALLOW_DEPRECATED
-      DEPRECATED("use index- or key-based PushSector() instead")
-      void PushSector(const SectorType& sector)
+      inline void PushSector(const typename SectorType::KeyType& key)
       // Create indexing information (in both directions, index <->
-      // labels) for a sector, given a sector.
-      //
-      // DEPRECATED -- use index- or key-based PushSector() instead
+      // labels) for a sector, given key.
       {
-        PushSector(sector.Key());
-      }
-      #endif
+        const auto& [bra_subspace_index,ket_subspace_index,multiplicity_index] = key;
+        PushSector(bra_subspace_index, ket_subspace_index, multiplicity_index);
+      };
 
       private:
       ////////////////////////////////////////////////////////////////
@@ -1137,11 +1202,11 @@ namespace basis {
       ////////////////////////////////////////////////////////////////
 
       // spaces
-      BraSpaceType bra_space_;
-      KetSpaceType ket_space_;
+      std::shared_ptr<const BraSpaceType> bra_space_ptr_;
+      std::shared_ptr<const KetSpaceType> ket_space_ptr_;
 
-      // sector keys (accessible by index)
-      std::vector<typename SectorType::KeyType> keys_;
+      // sectors (accessible by index)
+      std::vector<SectorType> sectors_;
 
       // sector index lookup by subspace indices
 #ifdef BASIS_HASH
@@ -1178,12 +1243,24 @@ namespace basis {
       ////////////////////////////////////////////////////////////////
 
       BaseSectors() = default;
-      inline explicit BaseSectors(const SpaceType& space)
-        : BaseSectors{space, space}
+
+      template<
+          typename T,
+          typename std::enable_if_t<std::is_same_v<std::decay_t<T>, SpaceType>>* = nullptr
+        >
+      inline explicit BaseSectors(T&& space)
+        : BaseSectors{std::forward<T>(space), std::forward<T>(space)}
       {}
 
-      inline BaseSectors(const SpaceType& bra_space, const SpaceType& ket_space)
-        : BaseSectors<tSpaceType, tSpaceType, tSectorType, false>{bra_space, ket_space}
+      template<
+          typename T, typename U,
+          typename std::enable_if_t<std::is_same_v<std::decay_t<T>, SpaceType>>* = nullptr,
+          typename std::enable_if_t<std::is_same_v<std::decay_t<U>, SpaceType>>* = nullptr
+        >
+      BaseSectors(T&& bra_space, U&& ket_space)
+        : BaseSectors<tSpaceType, tSpaceType, tSectorType, false>{
+              std::forward<T>(bra_space), std::forward<U>(ket_space)
+            }
       {}
 
     };
