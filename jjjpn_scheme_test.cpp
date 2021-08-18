@@ -118,7 +118,8 @@ void TestTwoBodyTz()
     );
   basis::TwoBodySpaceJJJPN space(
       orbital_space,
-      basis::WeightMax(basis::Rank::kTwoBody,2)
+      basis::WeightMax(basis::Rank::kTwoBody,2),
+      basis::TwoBodySpaceJJJPNOrdering::kTz
     );
 
   int J0 = 0;  // try: J0=0 for interaction, J0=2 for quadrupole operator
@@ -126,12 +127,7 @@ void TestTwoBodyTz()
 
   for (int Tz0 : {-2,-1,0,+1,+2})
     {
-      // impose upper triangularity for Tz0=0 only
-      basis::SectorDirection sector_direction;
-      if (Tz0==0)
-        sector_direction = basis::SectorDirection::kCanonical;
-      else
-        sector_direction = basis::SectorDirection::kBoth;
+      basis::SectorDirection sector_direction = basis::SectorDirection::kCanonical;
 
       std::cout << " J0 " << J0 << " g0 " << g0 << " Tz0 " << Tz0 << " sector_direction " << int(sector_direction) << std::endl;
       basis::TwoBodySectorsJJJPN sectors(space,J0,g0,Tz0,sector_direction);
