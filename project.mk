@@ -5,7 +5,7 @@
 project_name := basis
 
 ################################################################
-# modules -- list of directories in which to search 
+# modules -- list of directories in which to search
 # for module.mk include files
 ################################################################
 
@@ -17,7 +17,7 @@ project_name := basis
 # course, they are only template libraries, so nobody needs to link to
 # them).
 
-modules += .
+modules += . ../am ../mcutils ../fmt
 
 MAKEFILE_STANDALONE = true
 
@@ -54,7 +54,3 @@ CPPFLAGS += -DBASIS_HASH
 # subdirectories, though.  These must be defined separately through
 
 CPPFLAGS += -I..
-
-# link to neghboring libraries
-LDFLAGS += -L../am -L../mcutils
-LDLIBS +=  -lam -lmcutils
