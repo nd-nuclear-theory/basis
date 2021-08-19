@@ -23,8 +23,8 @@
 #include <cstddef>
 #include <string>
 
-#include "basis/nlj_orbital.h"
-#include "basis/operator.h"
+#include "nlj_orbital.h"
+#include "operator.h"
 
 namespace basis {
 

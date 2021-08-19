@@ -28,9 +28,9 @@
 #include <tuple>
 #include <vector>
 
-#include "basis/jt_operator.h"
-#include "basis/jjjt_scheme.h"
-#include "basis/operator.h"
+#include "jt_operator.h"
+#include "jjjt_scheme.h"
+#include "operator.h"
 
 namespace basis {
 

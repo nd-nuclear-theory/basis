@@ -22,8 +22,8 @@
 
 #include <cstddef>
 
-#include "basis/basis.h"
-#include "basis/operator.h"
+#include "basis.h"
+#include "operator.h"
 
 namespace basis {
 

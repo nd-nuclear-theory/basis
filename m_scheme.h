@@ -24,9 +24,9 @@
 
 #include "am/halfint.h"
 
-#include "basis/basis.h"
-#include "basis/proton_neutron.h"
-#include "basis/nlj_orbital.h"
+#include "basis.h"
+#include "proton_neutron.h"
+#include "nlj_orbital.h"
 
 namespace basis {
 

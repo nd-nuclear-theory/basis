@@ -84,9 +84,9 @@
 #include "am/halfint.h"
 #include "mcutils/parsing.h"
 
-#include "basis/basis.h"
-#include "basis/many_body.h"
-#include "basis/proton_neutron.h"
+#include "basis.h"
+#include "many_body.h"
+#include "proton_neutron.h"
 
 namespace basis {
 

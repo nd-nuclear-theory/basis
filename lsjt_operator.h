@@ -86,9 +86,9 @@
 
 #include "am/am.h"
 
-#include "basis/lsjt_scheme.h"
-#include "basis/operator.h"
-#include "basis/jt_operator.h"
+#include "lsjt_scheme.h"
+#include "operator.h"
+#include "jt_operator.h"
 
 namespace basis {
 

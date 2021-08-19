@@ -6,10 +6,10 @@
 
 ****************************************************************/
 
-#include "basis/hypersector.h"
+#include "hypersector.h"
 
 #include "am/am.h"
-#include "basis/lsjt_scheme.h"
+#include "lsjt_scheme.h"
 
 
 ////////////////////////////////////////////////////////////////

@@ -80,8 +80,8 @@
 #include <cstddef>
 #include <string>
 
-#include "basis/basis.h"
-#include "basis/many_body.h"
+#include "basis.h"
+#include "many_body.h"
 
 namespace basis {
 
