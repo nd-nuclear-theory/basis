@@ -56,10 +56,10 @@
 
 #include "am/halfint.h"
 
-#include "basis/basis.h"
-#include "basis/many_body.h"
-#include "basis/proton_neutron.h"
-#include "basis/nlj_orbital.h"
+#include "basis.h"
+#include "many_body.h"
+#include "proton_neutron.h"
+#include "nlj_orbital.h"
 
 namespace basis {
 

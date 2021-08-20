@@ -18,9 +18,9 @@
 
 #include "am/am.h"
 #include "mcutils/parsing.h"
-#include "basis/proton_neutron.h"
+#include "proton_neutron.h"
 
-#include "basis/m_scheme.h"
+#include "m_scheme.h"
 
 namespace basis {
 

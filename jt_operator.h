@@ -44,7 +44,7 @@
 #include <array>
 #include <tuple>
 
-#include "basis/operator.h"
+#include "operator.h"
 
 #include "am/am.h"
 

@@ -47,7 +47,7 @@
 #include <utility>
 #include <vector>
 
-#include "basis/basis.h"
+#include "basis.h"
 
 namespace basis {
 

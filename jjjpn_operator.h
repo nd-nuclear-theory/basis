@@ -22,8 +22,8 @@
 #ifndef BASIS_JJJPN_OPERATOR_H_
 #define BASIS_JJJPN_OPERATOR_H_
 
-#include "basis/jjjpn_scheme.h"
-#include "basis/operator.h"
+#include "jjjpn_scheme.h"
+#include "operator.h"
 
 namespace basis {
 

@@ -52,7 +52,7 @@
 
 #include "eigen3/Eigen/Dense"
 
-#include "basis/basis.h"
+#include "basis.h"
 
 // emit warnings on deprecated
 #include "mcutils/deprecated.h"

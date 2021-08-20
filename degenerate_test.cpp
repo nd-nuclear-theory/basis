@@ -8,7 +8,7 @@
 
 ****************************************************************/
 
-#include "basis/degenerate.h"
+#include "degenerate.h"
 
 #include "am/am.h"
 
