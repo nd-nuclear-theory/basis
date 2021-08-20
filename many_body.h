@@ -16,6 +16,7 @@
 #ifndef BASIS_MANY_BODY_H_
 #define BASIS_MANY_BODY_H_
 
+#include <array>
 #include <cassert>
 #include <tuple>
 
