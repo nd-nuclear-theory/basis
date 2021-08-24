@@ -21,9 +21,20 @@
 #define BASIS_HYPERSECTOR_H_
 
 #include <cstddef>
+#include <iosfwd>
+#include <string>
+#include <tuple>
+#include <vector>
 
 #include "basis.h"
 #include "operator.h"
+
+#ifdef BASIS_HASH
+#include <unordered_map>
+#include "boost/functional/hash.hpp"
+#else
+#include <map>
+#endif
 
 namespace basis {
 

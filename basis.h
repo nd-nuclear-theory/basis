@@ -160,15 +160,18 @@
 #include <limits>
 #include <memory>
 #include <tuple>
+#include <type_traits>
 #include <utility>
 #include <vector>
 
 // for DebugStr
-#include <iomanip>
-#include <sstream>
+#include <iosfwd>
+#include <string>
 
+#ifdef BASIS_ALLOW_DEPRECATED
 // emit warnings on deprecated
 #include "mcutils/deprecated.h"
+#endif
 
 #ifdef BASIS_HASH
 #include <unordered_map>
