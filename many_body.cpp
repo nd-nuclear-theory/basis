@@ -7,6 +7,8 @@
 
 #include "many_body.h"
 
+#include <cassert>
+
 namespace basis {
 
   std::tuple<int,int> TwoBodyCutoffs(basis::Rank truncation_rank, int truncation_cutoff)
@@ -22,7 +24,7 @@ namespace basis {
       N2max = 2*truncation_cutoff;
     else if (truncation_rank==basis::Rank::kTwoBody)
       N2max = truncation_cutoff;
-    
+
     // package return values
     return std::tuple<int,int>(N1max,N2max);
   }

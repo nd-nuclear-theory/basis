@@ -41,6 +41,7 @@
 #ifndef BASIS_DEGENERATE_H_
 #define BASIS_DEGENERATE_H_
 
+#include <cassert>
 #include <cstddef>
 #include <utility>
 #include <vector>

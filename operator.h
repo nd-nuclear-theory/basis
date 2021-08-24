@@ -48,11 +48,11 @@
 #define BASIS_OPERATOR_H_
 
 #include <cstddef>
+#include <tuple>
+#include <utility>
 #include <vector>
 
 #include "eigen3/Eigen/Dense"
-
-#include "basis.h"
 
 // emit warnings on deprecated
 #include "mcutils/deprecated.h"

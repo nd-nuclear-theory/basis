@@ -156,11 +156,14 @@
 #include <vector>
 
 // for DebugStr
-#include <iomanip>
+#include <iosfwd>
 #include <sstream>
+#include <string>
 
+#ifdef BASIS_ALLOW_DEPRECATED
 // emit warnings on deprecated
 #include "mcutils/deprecated.h"
+#endif
 
 #ifdef BASIS_HASH
 #include <unordered_map>
