@@ -6,9 +6,14 @@
 
 ****************************************************************/
 
+#include <cstdlib>
+#include <algorithm>
+#include <iostream>
+
 #include "hypersector.h"
 
 #include "am/am.h"
+#include "basis.h"
 #include "lsjt_scheme.h"
 
 

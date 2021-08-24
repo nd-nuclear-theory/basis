@@ -6,11 +6,13 @@
 
 ****************************************************************/
 
-#include <fstream>
-#include <iomanip>
 #include <iostream>
 
 #include "jjjpn_scheme.h"
+#include "basis.h"
+#include "many_body.h"
+#include "nlj_orbital.h"
+#include "proton_neutron.h"
 
 ////////////////////////////////////////////////////////////////
 // test code

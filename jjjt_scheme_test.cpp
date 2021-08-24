@@ -11,6 +11,9 @@
 
 
 #include "jjjt_scheme.h"
+#include "basis.h"
+#include "many_body.h"
+
 
 ////////////////////////////////////////////////////////////////
 // test code

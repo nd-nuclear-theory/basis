@@ -10,6 +10,8 @@
 #include <iostream>
 
 #include "lsjt_scheme.h"
+#include "basis.h"
+#include "many_body.h"
 
 ////////////////////////////////////////////////////////////////
 // test code

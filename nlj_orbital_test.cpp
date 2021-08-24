@@ -7,7 +7,6 @@
 ****************************************************************/
 
 #include <fstream>
-#include <iomanip>
 #include <iostream>
 
 #include "nlj_orbital.h"
