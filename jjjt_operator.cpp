@@ -6,9 +6,24 @@
 
 ****************************************************************/
 
+#include <cassert>
+#include <cmath>
 #include <cstddef>
+#include <cstdlib>
+#include <iomanip>
+#include <ostream>
+#include <tuple>
+#include <vector>
 
 #include "jjjt_operator.h"
+
+#include "am/halfint.h"
+#include "eigen3/Eigen/Core"
+#include "basis.h"
+#include "many_body.h"
+#include "jjjt_scheme.h"
+#include "jt_operator.h"
+#include "operator.h"
 
 namespace basis {
 

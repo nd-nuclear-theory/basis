@@ -11,16 +11,11 @@
 
 #include <cstddef>
 #include <iomanip>  // for debugging output
-#include <iostream>
 #include <sstream>
-#include <set>
-#include <algorithm>
-
-#include "am/am.h"
-#include "mcutils/parsing.h"
-#include "proton_neutron.h"
 
 #include "m_scheme.h"
+#include "basis.h"
+#include "nlj_orbital.h"
 
 namespace basis {
 

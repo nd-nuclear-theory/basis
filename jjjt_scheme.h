@@ -49,6 +49,7 @@
 
 #include <cstddef>
 #include <string>
+#include <tuple>
 
 #include "am/halfint.h"
 

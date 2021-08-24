@@ -6,8 +6,18 @@
 
 ****************************************************************/
 
+#include <cassert>
 #include <cstddef>
+#include <cstdlib>
+#include <iostream>
+
+#include "am/halfint.h"
+
 #include "nlj_operator.h"
+#include "basis.h"
+#include "nlj_orbital.h"
+#include "operator.h"
+#include "proton_neutron.h"
 
 namespace basis {
 

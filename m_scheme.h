@@ -18,9 +18,12 @@
 #ifndef BASIS_M_SCHEME_H_
 #define BASIS_M_SCHEME_H_
 
+#include <cassert>
 #include <cstddef>
+#include <array>
 #include <tuple>
 #include <vector>
+#include <string>
 
 #include "am/halfint.h"
 

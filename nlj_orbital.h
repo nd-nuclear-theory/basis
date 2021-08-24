@@ -77,12 +77,16 @@
 #ifndef BASIS_NLJ_ORBITAL_H_
 #define BASIS_NLJ_ORBITAL_H_
 
+#include <cassert>
+#include <cmath>
 #include <cstddef>
 #include <array>
+#include <iosfwd>
 #include <string>
+#include <tuple>
+#include <vector>
 
 #include "am/halfint.h"
-#include "mcutils/parsing.h"
 
 #include "basis.h"
 #include "many_body.h"
@@ -132,7 +136,7 @@ namespace basis {
     {
       bool equiv = true;
       equiv &= (this->Key()==rhs.Key());
-      equiv &= (fabs(this->weight-rhs.weight)<kWeightTolerance);
+      equiv &= (std::fabs(this->weight-rhs.weight)<kWeightTolerance);
       return equiv;
     }
 

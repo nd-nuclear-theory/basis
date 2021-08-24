@@ -8,16 +8,19 @@
 
 
 #include <cstddef>
-#include <iomanip>  // for debugging output
-#include <iostream>
-#include <sstream>
-#include <set>
 #include <algorithm>
+#include <iomanip>  // for debugging output
+#include <set>
+#include <istream>
+#include <sstream>
 
 #include "am/am.h"
 #include "mcutils/parsing.h"
 
 #include "nlj_orbital.h"
+#include "basis.h"
+#include "many_body.h"
+#include "proton_neutron.h"
 
 namespace basis {
 
@@ -790,7 +793,7 @@ namespace basis {
    * @param[in] Nmax number of oscillator quanta
    */
   OrbitalSpaceLJPN::OrbitalSpaceLJPN(int Nmax)
-    : weight_max_{double(Nmax_)}, is_oscillator_like_{true}, Nmax_{Nmax}
+    : weight_max_{double(Nmax)}, is_oscillator_like_{true}, Nmax_{Nmax}
   {
     // iterate over species
     for (OrbitalSpeciesPN orbital_species :

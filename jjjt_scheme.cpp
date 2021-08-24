@@ -7,14 +7,17 @@
 ****************************************************************/
 
 
+#include <cassert>
 #include <cstddef>
 #include <iomanip>  // for debugging output
-#include <iostream>
 #include <sstream>
+#include <utility>
 
 #include "am/am.h"
 
 #include "jjjt_scheme.h"
+#include "basis.h"
+#include "many_body.h"
 
 namespace basis {
 
