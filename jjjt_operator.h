@@ -20,16 +20,13 @@
 #ifndef BASIS_JJJT_OPERATOR_H_
 #define BASIS_JJJT_OPERATOR_H_
 
-#include <cassert>
-#include <cstdlib>
-#include <iomanip>
-#include <iostream>
-#include <map>
-#include <tuple>
-#include <vector>
+#include <array>
+#include <iosfwd>
+
 
 #include "jt_operator.h"
 #include "jjjt_scheme.h"
+#include "many_body.h"
 #include "operator.h"
 
 namespace basis {

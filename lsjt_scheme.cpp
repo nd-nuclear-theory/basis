@@ -7,14 +7,18 @@
 ****************************************************************/
 
 
+#include <cassert>
+#include <cstdlib>
 #include <cstddef>
 #include <iomanip>  // for debugging output
-#include <iostream>
 #include <sstream>
+#include <utility>
 
 #include "am/am.h"
 
 #include "lsjt_scheme.h"
+#include "basis.h"
+#include "many_body.h"
 
 namespace basis {
 
@@ -115,7 +119,7 @@ namespace basis {
 
             // iterate over J
             int J_limit = std::min(L+S,Jmax);
-            for (int J=abs(L-S); J<=J_limit; ++J)
+            for (int J=std::abs(L-S); J<=J_limit; ++J)
               {
                 // downshift Nmax to match parity of subspace
                 // required to pass label validity tests
@@ -324,7 +328,7 @@ namespace basis {
         for (int S=0; S<=1; ++S)
             // iterate over J
             // imposing triangularity (LSJ)
-            for (int J=abs(L-S); J<=L+S; ++J)
+            for (int J=std::abs(L-S); J<=L+S; ++J)
                 // iterate over T
                 for (int T=0; T<=1; ++T)
                     // iterate over g
@@ -513,7 +517,7 @@ namespace basis {
         for (int S=0; S<=1; ++S)
             // iterate over J
             // imposing triangularity (LSJ)
-            for (int J=abs(L-S); J<=L+S; ++J)
+            for (int J=std::abs(L-S); J<=L+S; ++J)
                 // iterate over T
                 for (int T=0; T<=1; ++T)
                     // iterate over g
@@ -719,7 +723,7 @@ namespace basis {
         for (int S=0; S<=1; ++S)
             // iterate over J
             // imposing triangularity (LSJ)
-            for (int J=abs(L-S); J<=L+S; ++J)
+            for (int J=std::abs(L-S); J<=L+S; ++J)
                 // iterate over T
                 for (int T=0; T<=1; ++T)
                     // iterate over g
@@ -929,7 +933,7 @@ namespace basis {
         for (int S=0; S<=1; ++S)
             // iterate over J
             // imposing triangularity (LSJ)
-            for (int J=abs(L-S); J<=L+S; ++J)
+            for (int J=std::abs(L-S); J<=L+S; ++J)
                 // iterate over T
                 for (int T=0; T<=1; ++T)
                     // iterate over g

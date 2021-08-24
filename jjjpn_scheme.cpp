@@ -7,12 +7,18 @@
 ****************************************************************/
 
 
+#include <cassert>
 #include <cstddef>
+#include <algorithm>
 #include <iomanip>  // for debugging output
-#include <iostream>
 #include <sstream>
 
 #include "am/am.h"
+#include "am/halfint.h"
+#include "basis.h"
+#include "many_body.h"
+#include "nlj_orbital.h"
+#include "proton_neutron.h"
 
 #include "jjjpn_scheme.h"
 

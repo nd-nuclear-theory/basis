@@ -22,6 +22,7 @@
 
 #include <cstddef>
 #include <string>
+#include <tuple>
 
 #include "nlj_orbital.h"
 #include "operator.h"

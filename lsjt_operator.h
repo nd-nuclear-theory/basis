@@ -74,21 +74,14 @@
 #ifndef BASIS_LSJT_OPERATOR_H_
 #define BASIS_LSJT_OPERATOR_H_
 
-#include <cassert>
-#include <cstdlib>
-#include <iomanip>
-#include <iostream>
-#include <map>
-#include <tuple>
-#include <vector>
-
-//#include "eigen3/Eigen/Core"
-
-#include "am/am.h"
+#include <array>
+#include <iosfwd>
+#include <string>
 
 #include "lsjt_scheme.h"
-#include "operator.h"
 #include "jt_operator.h"
+#include "many_body.h"
+#include "operator.h"
 
 namespace basis {
 

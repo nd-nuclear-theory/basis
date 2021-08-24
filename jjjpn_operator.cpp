@@ -8,9 +8,18 @@
 
 #include "jjjpn_operator.h"
 
+#include <cmath>
+#include <cassert>
 #include <cstddef>
+#include <array>
 #include <iomanip>
-#include <iostream>
+#include <ostream>
+
+#include "basis.h"
+#include "jjjpn_scheme.h"
+#include "many_body.h"
+#include "operator.h"
+#include "proton_neutron.h"
 
 namespace basis {
 
@@ -63,19 +72,19 @@ namespace basis {
                 {
                   if (bra.two_body_species()!=basis::TwoBodySpeciesPN::kPN)
                     if (bra.index1()==bra.index2())
-                      conversion_factor *= (1/sqrt(2.));
+                      conversion_factor *= (1/std::sqrt(2.));
                   if (ket.two_body_species()!=basis::TwoBodySpeciesPN::kPN)
                     if (ket.index1()==ket.index2())
-                      conversion_factor *= (1/sqrt(2.));
+                      conversion_factor *= (1/std::sqrt(2.));
                 }
               else if (conversion_mode == basis::NormalizationConversion::kNASToAS)
                 {
                   if (bra.two_body_species()!=basis::TwoBodySpeciesPN::kPN)
                     if (bra.index1()==bra.index2())
-                      conversion_factor *= (sqrt(2.));
+                      conversion_factor *= (std::sqrt(2.));
                   if (ket.two_body_species()!=basis::TwoBodySpeciesPN::kPN)
                     if (ket.index1()==ket.index2())
-                      conversion_factor *= (sqrt(2.));
+                      conversion_factor *= (std::sqrt(2.));
                 }
 
               // extract matrix element

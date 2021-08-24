@@ -8,10 +8,22 @@
 
 #include "lsjt_operator.h"
 
-#include <cstddef>
+#include <cmath>
+#include <cassert>
+#include <cstdlib>
+#include <iomanip>
 #include <fstream>
+#include <tuple>
+#include <utility>
+#include <vector>
 
+#include "basis.h"
+#include "jt_operator.h"
+#include "lsjt_scheme.h"
+#include "many_body.h"
+#include "operator.h"
 #include "mcutils/parsing.h"
+#include "eigen3/Eigen/Core"
 
 namespace basis {
 

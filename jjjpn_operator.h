@@ -22,7 +22,10 @@
 #ifndef BASIS_JJJPN_OPERATOR_H_
 #define BASIS_JJJPN_OPERATOR_H_
 
+#include <iosfwd>
+
 #include "jjjpn_scheme.h"
+#include "many_body.h"
 #include "operator.h"
 
 namespace basis {

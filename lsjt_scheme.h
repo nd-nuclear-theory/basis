@@ -79,6 +79,7 @@
 
 #include <cstddef>
 #include <string>
+#include <tuple>
 
 #include "basis.h"
 #include "many_body.h"
