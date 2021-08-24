@@ -22,6 +22,7 @@
 
 #include <cstddef>
 #include <iosfwd>
+#include <sstream>
 #include <string>
 #include <tuple>
 #include <vector>

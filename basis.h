@@ -166,6 +166,7 @@
 
 // for DebugStr
 #include <iosfwd>
+#include <sstream>
 #include <string>
 
 #ifdef BASIS_ALLOW_DEPRECATED
