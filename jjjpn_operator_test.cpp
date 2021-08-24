@@ -7,9 +7,13 @@
 ****************************************************************/
 
 #include <fstream>
-#include <iomanip>
+#include <string>
 
 #include "jjjpn_operator.h"
+#include "jjjpn_scheme.h"
+#include "many_body.h"
+#include "nlj_orbital.h"
+#include "operator.h"
 
 
 void WriteTest(const std::string& filename)

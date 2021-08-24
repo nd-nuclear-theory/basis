@@ -7,9 +7,13 @@
 ****************************************************************/
 
 #include <fstream>
-#include <iomanip>
+#include <iostream>
 
 #include "lsjt_operator.h"
+#include "jt_operator.h"
+#include "lsjt_scheme.h"
+#include "many_body.h"
+#include "operator.h"
 
 ////////////////////////////////////////////////////////////////
 // test parts

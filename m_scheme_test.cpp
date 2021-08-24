@@ -6,11 +6,10 @@
 
 ****************************************************************/
 
-#include <fstream>
-#include <iomanip>
 #include <iostream>
 
 #include "m_scheme.h"
+#include "nlj_orbital.h"
 
 ////////////////////////////////////////////////////////////////
 // test code

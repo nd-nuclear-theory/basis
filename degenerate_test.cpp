@@ -8,6 +8,14 @@
 
 ****************************************************************/
 
+#include <cstdlib>
+#include <algorithm>
+#include <iomanip>
+#include <iostream>
+#include <string>
+#include <tuple>
+
+#include "basis.h"
 #include "degenerate.h"
 
 #include "am/am.h"
@@ -279,7 +287,7 @@ namespace basis {
 
             // iterate over J
             int J_limit = std::min(L+S,Jmax);
-            for (int J=abs(L-S); J<=J_limit; ++J)
+            for (int J=std::abs(L-S); J<=J_limit; ++J)
               {
                 // downshift Nmax to match parity of subspace
                 // required to pass label validity tests
