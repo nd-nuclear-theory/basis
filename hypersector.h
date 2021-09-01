@@ -32,7 +32,7 @@
 
 #ifdef BASIS_HASH
 #include <unordered_map>
-#include "boost/functional/hash.hpp"
+#include <boost/container_hash/hash.hpp>
 #else
 #include <map>
 #endif

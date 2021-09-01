@@ -54,7 +54,7 @@
     BASIS_HASH: In lookup tables, replace std::map with
       std::unordered_map, using boost hash extensions.
 
-  Library dependences:
+  Library dependencies:
 
     boost -- only if BASIS_HASH enabled
 
@@ -167,7 +167,7 @@
 
 #ifdef BASIS_HASH
 #include <unordered_map>
-#include "boost/functional/hash.hpp"
+#include <boost/container_hash/hash.hpp>
 #else
 #include <map>
 #endif

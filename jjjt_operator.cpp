@@ -18,7 +18,7 @@
 #include "jjjt_operator.h"
 
 #include "am/halfint.h"
-#include "eigen3/Eigen/Core"
+#include <Eigen/Core>
 #include "basis.h"
 #include "many_body.h"
 #include "jjjt_scheme.h"
