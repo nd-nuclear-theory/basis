@@ -822,6 +822,39 @@ namespace basis {
     };
 
   ////////////////////////////////////////////////////////////////
+  // type trait helpers
+  //
+  // for use with SFINAE
+  ////////////////////////////////////////////////////////////////
+
+  template<typename, typename, typename = void>
+  struct is_subspace
+      : std::false_type
+  {};
+
+  template<typename Subspace, typename Space>
+  struct is_subspace<
+      Subspace, Space,
+      std::enable_if_t<std::is_same_v<Subspace, typename Space::SubspaceType>>
+    >
+      : std::true_type
+  {};
+
+  template<typename Subspace, typename Space>
+  struct is_subspace<
+      Subspace, Space,
+      std::enable_if_t<
+          is_subspace<Subspace, typename Space::SubspaceType>::value
+        >
+    >
+      : std::true_type
+  {};
+
+  template<typename T, typename U>
+  constexpr bool is_subspace_v = is_subspace<T, U>::value;
+
+
+  ////////////////////////////////////////////////////////////////
   // sector indexing
   ////////////////////////////////////////////////////////////////
 
