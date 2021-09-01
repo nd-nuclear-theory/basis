@@ -23,7 +23,7 @@
 #include "many_body.h"
 #include "operator.h"
 #include "mcutils/parsing.h"
-#include "eigen3/Eigen/Core"
+#include <Eigen/Core>
 
 namespace basis {
 

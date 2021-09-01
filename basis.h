@@ -54,7 +54,7 @@
     BASIS_HASH: In lookup tables, replace std::map with
       std::unordered_map, using boost hash extensions.
 
-  Library dependences:
+  Library dependencies:
 
     boost -- only if BASIS_HASH enabled
 
@@ -176,7 +176,7 @@
 
 #ifdef BASIS_HASH
 #include <unordered_map>
-#include "boost/functional/hash.hpp"
+#include <boost/container_hash/hash.hpp>
 #else
 #include <map>
 #endif
@@ -871,6 +871,39 @@ namespace basis {
       /// space labels
       const SpaceLabelsType labels_;
     };
+
+  ////////////////////////////////////////////////////////////////
+  // type trait helpers
+  //
+  // for use with SFINAE
+  ////////////////////////////////////////////////////////////////
+
+  template<typename, typename, typename = void>
+  struct is_subspace
+      : std::false_type
+  {};
+
+  template<typename Subspace, typename Space>
+  struct is_subspace<
+      Subspace, Space,
+      std::enable_if_t<std::is_same_v<Subspace, typename Space::SubspaceType>>
+    >
+      : std::true_type
+  {};
+
+  template<typename Subspace, typename Space>
+  struct is_subspace<
+      Subspace, Space,
+      std::enable_if_t<
+          is_subspace<Subspace, typename Space::SubspaceType>::value
+        >
+    >
+      : std::true_type
+  {};
+
+  template<typename T, typename U>
+  constexpr bool is_subspace_v = is_subspace<T, U>::value;
+
 
   ////////////////////////////////////////////////////////////////
   // sector indexing

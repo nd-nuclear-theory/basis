@@ -17,6 +17,9 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 set(CMAKE_CXX_EXTENSIONS False)
 
+option(ENABLE_BASIS_HASH "use Boost hash for unordered_map" ON)
+option(ENABLE_BASIS_DEPRECATED "enable deprecated basis APIs" OFF)
+
 # add headers and sources
 set(basis_headers
     basis.h
@@ -58,8 +61,8 @@ add_library(basis::basis ALIAS basis)
 # find external projects/dependencies
 # ##############################################################################
 
-if(NOT TARGET fmt::fmt)
-  find_package(fmt REQUIRED)
+if(NOT TARGET Eigen3::Eigen)
+  find_package(Eigen3 REQUIRED NO_MODULE)
 endif()
 
 if(NOT TARGET mcutils::mcutils)
@@ -71,10 +74,25 @@ if(NOT TARGET am::am)
 endif()
 
 # ##############################################################################
+# configure optional features
+# ##############################################################################
+
+if(ENABLE_BASIS_HASH)
+  if(NOT TARGET Boost::headers)
+    find_package(Boost REQUIRED)
+  endif()
+  target_compile_definitions(basis PUBLIC BASIS_HASH)
+  target_link_libraries(basis PUBLIC Boost::headers)
+endif()
+if(ENABLE_BASIS_DEPRECATED)
+  target_compile_definitions(basis BASIS_ALLOW_DEPRECATED)
+endif()
+
+# ##############################################################################
 # link dependencies
 # ##############################################################################
 
-target_link_libraries(basis am::am fmt::fmt mcutils::mcutils)
+target_link_libraries(basis PUBLIC m am::am Eigen3::Eigen mcutils::mcutils)
 
 # ##############################################################################
 # define include directory

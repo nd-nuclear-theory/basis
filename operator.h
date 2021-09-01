@@ -8,7 +8,7 @@
 
   Note: Eigen should be installed, and the compiler include path
   should be set ("-I") to include the appropriate *parent* directory
-  such that the subdirectory chain "eigen3/Eigen/" stems from this
+  such that the subdirectory chain "Eigen/" stems from this
   directory.
 
   Language: C++11
@@ -52,7 +52,7 @@
 #include <utility>
 #include <vector>
 
-#include "eigen3/Eigen/Dense"
+#include <Eigen/Dense>
 
 // emit warnings on deprecated
 #include "mcutils/deprecated.h"
