@@ -17,8 +17,8 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 set(CMAKE_CXX_EXTENSIONS False)
 
-option(ENABLE_BASIS_HASH "use Boost hash for unordered_map" ON)
-option(ENABLE_BASIS_DEPRECATED "enable deprecated basis APIs" OFF)
+option(BASIS_ENABLE_HASH "use Boost hash for unordered_map" ON)
+option(BASIS_ENABLE_DEPRECATED "enable deprecated basis APIs" OFF)
 
 # add headers and sources
 set(basis_headers
@@ -77,14 +77,14 @@ endif()
 # configure optional features
 # ##############################################################################
 
-if(ENABLE_BASIS_HASH)
+if(BASIS_ENABLE_HASH)
   if(NOT TARGET Boost::headers)
     find_package(Boost REQUIRED)
   endif()
   target_compile_definitions(basis PUBLIC BASIS_HASH)
   target_link_libraries(basis PUBLIC Boost::headers)
 endif()
-if(ENABLE_BASIS_DEPRECATED)
+if(BASIS_ENABLE_DEPRECATED)
   target_compile_definitions(basis BASIS_ALLOW_DEPRECATED)
 endif()
 
