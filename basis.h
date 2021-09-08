@@ -774,13 +774,12 @@ namespace basis {
       /// Create indexing information (in both directions, index <->
       /// labels) for a subspace.
       {
-        const std::size_t index = subspace_ptrs_.size();  // index for lookup
         subspace_offsets_.push_back(dimension_);
+        lookup_[subspace.labels()] = size();  // index for lookup
+        dimension_ += subspace.dimension();
         subspace_ptrs_.push_back(
             std::make_shared<const SubspaceType>(std::forward<T>(subspace))
           );  // save subspace
-        lookup_[subspace.labels()] = index;  // index for lookup
-        dimension_ += subspace.dimension();
       };
 
       template <class... Args>
@@ -788,7 +787,7 @@ namespace basis {
       /// Create indexing information (in both directions, index <->
       /// labels) for a subspace.
       {
-        const std::size_t index = subspace_ptrs_.size();  // index for lookup
+        const std::size_t index = size();  // index for lookup
         subspace_offsets_.push_back(dimension_);
         subspace_ptrs_.push_back(
             std::make_shared<const SubspaceType>(std::forward<Args>(args)...)

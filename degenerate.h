@@ -375,14 +375,13 @@ namespace basis {
     /// Create indexing information (in both directions, index <->
     /// labels) for a subspace.
     {
-      const std::size_t index = this->subspace_ptrs_.size();  // index for lookup
-      this->subspace_offsets_.push_back(this->dimension_);
+      this->subspace_offsets_.push_back(this->dimension_);  // save offset
+      (this->lookup_)[subspace.labels()] = BaseSpaceType::size();  // save index
+      subspace_degeneracies_.push_back(degeneracy);  // save degeneracy
+      this->dimension_ += subspace.dimension()*degeneracy;  // save dimension
       this->subspace_ptrs_.push_back(
           std::make_shared<const SubspaceType>(std::forward<T>(subspace))
         );  // save space
-      (this->lookup_)[subspace.labels()] = index;
-      subspace_degeneracies_.push_back(degeneracy);  // save degeneracy
-      this->dimension_ += subspace.dimension()*degeneracy;
     };
 
     template <class... Args>
@@ -394,15 +393,15 @@ namespace basis {
     /// Create indexing information (in both directions, index <->
     /// labels) for a subspace.
     {
-      const std::size_t index = this->subspace_ptrs_.size();  // index for lookup
-      this->subspace_offsets_.push_back(this->dimension_);
+      const std::size_t index = BaseSpaceType::size();  // index for lookup
+      this->subspace_offsets_.push_back(this->dimension_);  // save offset
       this->subspace_ptrs_.push_back(
           std::make_shared<SubspaceType>(std::forward<Args>(args)...)
-        );
+        );  // construct/emplace space
       const SubspaceType& subspace = *(this->subspace_ptrs_.back());
-      (this->lookup_)[subspace.labels()] = index;
+      (this->lookup_)[subspace.labels()] = index;  // save index for lookup
       subspace_degeneracies_.push_back(degeneracy);  // save degeneracy
-      this->dimension_ += subspace.dimension()*degeneracy;
+      this->dimension_ += subspace.dimension()*degeneracy;  // save dimension
     }
 
   private:
