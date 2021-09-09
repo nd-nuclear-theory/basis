@@ -12,6 +12,10 @@ endif()
 
 project(basis CXX)
 
+if(BASIS_MASTER_PROJECT AND NOT CMAKE_BUILD_TYPE)
+  set(CMAKE_BUILD_TYPE Release)
+endif()
+
 # specify the C++ standard
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
@@ -19,43 +23,6 @@ set(CMAKE_CXX_EXTENSIONS False)
 
 option(BASIS_ENABLE_HASH "use Boost hash for unordered_map" ON)
 option(BASIS_ENABLE_DEPRECATED "enable deprecated basis APIs" OFF)
-
-# add headers and sources
-set(basis_headers
-    basis.h
-    degenerate.h
-    hypersector.h
-    operator.h
-    jt_operator.h
-    many_body.h
-    proton_neutron.h
-    lsjt_scheme.h
-    lsjt_operator.h
-    jjjt_scheme.h
-    jjjt_operator.h
-    jjjpn_scheme.h
-    jjjpn_operator.h
-    nlj_orbital.h
-    nlj_operator.h
-    m_scheme.h
-)
-set(basis_sources
-    jjjpn_operator.cpp
-    jjjpn_scheme.cpp
-    jjjt_operator.cpp
-    jjjt_scheme.cpp
-    lsjt_operator.cpp
-    lsjt_scheme.cpp
-    m_scheme.cpp
-    many_body.cpp
-    nlj_operator.cpp
-    nlj_orbital.cpp
-    proton_neutron.cpp
-)
-
-# define basis library and add source files
-add_library(basis ${basis_sources})
-add_library(basis::basis ALIAS basis)
 
 # ##############################################################################
 # find external projects/dependencies
@@ -73,19 +40,57 @@ if(NOT TARGET am::am)
   find_package(am REQUIRED)
 endif()
 
+if(BASIS_ENABLE_HASH)
+  if(NOT TARGET Boost::headers)
+    find_package(Boost REQUIRED COMPONENTS headers)
+  endif()
+endif()
+
+# ##############################################################################
+# define basis headers and sources
+# ##############################################################################
+
+# define units
+set(basis_UNITS_H basis degenerate hypersector operator jt_operator)
+set(basis_UNITS_H_CPP
+    many_body
+    proton_neutron
+    lsjt_scheme
+    lsjt_operator
+    jjjt_scheme
+    jjjt_operator
+    jjjpn_scheme
+    jjjpn_operator
+    nlj_orbital
+    nlj_operator
+    m_scheme
+)
+
+# construct lists of headers and sources
+set(basis_HEADERS ${basis_UNITS_H} ${basis_UNITS_H_CPP})
+list(TRANSFORM basis_HEADERS APPEND .h)
+set(basis_SOURCES ${basis_UNITS_H_CPP})
+list(TRANSFORM basis_SOURCES APPEND .cpp)
+
+# define basis library and add source/header files
+add_library(basis ${basis_SOURCES})
+add_library(basis::basis ALIAS basis)
+foreach(header IN LISTS basis_HEADERS)
+  target_sources(
+    basis INTERFACE $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/${header}>
+                    $<INSTALL_INTERFACE:include/basis/${header}>
+  )
+endforeach()
+
 # ##############################################################################
 # configure optional features
 # ##############################################################################
 
 if(BASIS_ENABLE_HASH)
-  if(NOT TARGET Boost::headers)
-    find_package(Boost REQUIRED)
-  endif()
   target_compile_definitions(basis PUBLIC BASIS_HASH)
-  target_link_libraries(basis PUBLIC Boost::headers)
 endif()
 if(BASIS_ENABLE_DEPRECATED)
-  target_compile_definitions(basis BASIS_ALLOW_DEPRECATED)
+  target_compile_definitions(basis PUBLIC BASIS_ALLOW_DEPRECATED)
 endif()
 
 # ##############################################################################
@@ -93,6 +98,9 @@ endif()
 # ##############################################################################
 
 target_link_libraries(basis PUBLIC m am::am Eigen3::Eigen mcutils::mcutils)
+if(BASIS_ENABLE_HASH)
+  target_link_libraries(basis PUBLIC Boost::headers)
+endif()
 
 # ##############################################################################
 # define include directory
@@ -111,7 +119,7 @@ install(
   DESTINATION lib
   EXPORT basisTargets
 )
-install(FILES ${basis_headers} DESTINATION include/basis)
+install(FILES ${basis_HEADERS} DESTINATION include/basis)
 
 install(
   EXPORT basisTargets
@@ -146,3 +154,31 @@ export(
   NAMESPACE basis::
   FILE "${CMAKE_CURRENT_BINARY_DIR}/basisTargets.cmake"
 )
+
+# ##############################################################################
+# define tests
+# ##############################################################################
+
+set(basis_UNITS_TEST
+    degenerate_test
+    hypersector_test
+    lsjt_scheme_test
+    lsjt_operator_test
+    jjjt_scheme_test
+    jjjpn_scheme_test
+    jjjpn_operator_test
+    m_scheme_test
+    nlj_orbital_test
+)
+
+add_custom_target(basis_tests)
+foreach(test_name IN LISTS basis_UNITS_TEST)
+  add_executable(${test_name} EXCLUDE_FROM_ALL ${test_name}.cpp)
+  target_link_libraries(${test_name} basis::basis)
+  add_dependencies(basis_tests ${test_name})
+endforeach()
+
+if(BASIS_MASTER_PROJECT)
+  add_custom_target(tests)
+  add_dependencies(tests basis_tests)
+endif()
