@@ -8,8 +8,8 @@ get_target_property(
 )
 
 find_dependency(Eigen3 REQUIRED NO_MODULE)
-find_dependency(mcutils REQUIRED)
-find_dependency(am REQUIRED)
+find_dependency(mcutils)
+find_dependency(am)
 if(Boost::headers IN_LIST basis_INTERFACE_LINK_LIBRARIES)
   find_dependency(Boost REQUIRED COMPONENTS headers)
 endif()
