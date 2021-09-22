@@ -154,6 +154,7 @@
     BaseSpace.
   + 09/22/21 (pjf):
     - Improve reserve() in BaseSubspace and BaseSpace.
+    - Add iterator support to BaseSubspace, BaseSpace, and BaseSectors.
 ****************************************************************/
 
 #ifndef BASIS_BASIS_H_
@@ -161,6 +162,7 @@
 
 #include <cassert>
 #include <cstddef>
+#include <iterator>
 #include <limits>
 #include <memory>
 #include <tuple>
@@ -264,6 +266,90 @@ namespace basis {
     {}
 
     public:
+
+    ////////////////////////////////////////////////////////////////
+    // iterators
+    ////////////////////////////////////////////////////////////////
+
+    struct iterator
+    {
+      using iterator_category = std::input_iterator_tag;  // we don't satisfy the requirements of forward_iterator_tag because we return temporaries
+      using difference_type = unsigned int;
+      using value_type = tStateType;
+      using pointer = void*;
+      // using pointer = value_type*;  // n.b. we can't return a pointer to a temporary
+      using reference = value_type;  // n.b. this can't be a reference since value_type is always a temporary
+
+      iterator(const tDerivedSubspaceType* subspace_ptr, std::size_t index)
+        : subspace_ptr_{subspace_ptr}, index_{index}
+      {}
+
+      reference operator*() const { return subspace_ptr_->GetState(index_); }
+      reference operator[](std::size_t index) const { return subspace_ptr_->GetState(index_+index); }
+      iterator& operator++() { index_++; return *this; }
+      iterator operator++(int) { iterator tmp = *this; ++(*this); return tmp; }
+      iterator& operator--() { index_--; return *this; }
+      iterator operator--(int) { iterator tmp = *this; --(*this); return tmp; }
+      iterator& operator+=(difference_type n) { index_ += n; return *this; }
+      iterator& operator-=(difference_type n) { index_ -= n; return *this; }
+      friend iterator operator+(iterator it, difference_type n) { it += n; return it; }
+      friend iterator operator-(iterator it, difference_type n) { it -= n; return it; }
+      friend difference_type operator-(const iterator& lhs, const iterator& rhs)
+      {
+        return (lhs.index_ - rhs.index_);
+      }
+      friend bool operator==(const iterator& lhs, const iterator& rhs)
+      {
+        return (lhs.subspace_ptr_==rhs.subspace_ptr_) && (lhs.index_==rhs.index_);
+      }
+      friend bool operator!=(const iterator& lhs, const iterator& rhs)
+      {
+        return (lhs.subspace_ptr_!=rhs.subspace_ptr_) || (lhs.index_!=rhs.index_);
+      }
+      friend bool operator<(const iterator& lhs, const iterator& rhs)
+      {
+        return (lhs.index_<rhs.index_);
+      }
+      friend bool operator>(const iterator& lhs, const iterator& rhs)
+      {
+        return (lhs.index_>rhs.index_);
+      }
+      friend bool operator<=(const iterator& lhs, const iterator& rhs)
+      {
+        return (lhs.index_<=rhs.index_);
+      }
+      friend bool operator>=(const iterator& lhs, const iterator& rhs)
+      {
+        return (lhs.index_>=rhs.index_);
+      }
+
+      private:
+      const tDerivedSubspaceType* subspace_ptr_;
+      std::size_t index_;
+    };
+
+    using value_type = tStateType;
+    using size_type = std::size_t;
+    using difference_type = unsigned int;
+    using const_reference = const tStateType&;
+    using const_iterator = iterator;
+
+    iterator begin() const
+    {
+      return iterator{static_cast<const tDerivedSubspaceType*>(this), 0};
+    }
+    iterator end() const
+    {
+      return iterator{static_cast<const tDerivedSubspaceType*>(this), size()};
+    }
+    iterator cbegin() const
+    {
+      return iterator{static_cast<const tDerivedSubspaceType*>(this), 0};
+    }
+    iterator cend() const
+    {
+      return iterator{static_cast<const tDerivedSubspaceType*>(this), size()};
+    }
 
     ////////////////////////////////////////////////////////////////
     // retrieval
@@ -657,6 +743,78 @@ namespace basis {
       {}
 
       public:
+
+      ////////////////////////////////////////////////////////////////
+      // iterators
+      ////////////////////////////////////////////////////////////////
+
+      struct iterator
+      {
+        using iterator_category = std::random_access_iterator_tag;
+        using difference_type = unsigned int;
+        using value_type = const SubspaceType;
+        using pointer = const SubspaceType*;
+        using reference = const SubspaceType&;
+
+        iterator(const tDerivedSpaceType* space_ptr, std::size_t index)
+          : space_ptr_{space_ptr}, index_{index}
+        {}
+
+        reference operator*() const { return space_ptr_->GetSubspace(index_); }
+        pointer operator->() const { return &(*this); }
+        reference operator[](std::size_t index) const { return space_ptr_->GetSubspace(index_+index); }
+        iterator& operator++() { index_++; return *this; }
+        iterator operator++(int) { iterator tmp = *this; ++(*this); return tmp; }
+        iterator& operator--() { index_--; return *this; }
+        iterator operator--(int) { iterator tmp = *this; --(*this); return tmp; }
+        iterator& operator+=(difference_type n) { index_ += n; return *this; }
+        iterator& operator-=(difference_type n) { index_ -= n; return *this; }
+        friend iterator operator+(iterator it, difference_type n) { it += n; return it; }
+        friend iterator operator-(iterator it, difference_type n) { it -= n; return it; }
+        friend difference_type operator-(const iterator& lhs, const iterator& rhs)
+        {
+          return (lhs.index_ - rhs.index_);
+        }
+        friend bool operator==(const iterator& lhs, const iterator& rhs)
+        {
+          return (lhs.space_ptr_==rhs.space_ptr_) && (lhs.index_==rhs.index_);
+        }
+        friend bool operator!=(const iterator& lhs, const iterator& rhs)
+        {
+          return (lhs.space_ptr_!=rhs.space_ptr_) || (lhs.index_!=rhs.index_);
+        }
+        friend bool operator<(const iterator& lhs, const iterator& rhs)
+        {
+          return (lhs.index_<rhs.index_);
+        }
+        friend bool operator>(const iterator& lhs, const iterator& rhs)
+        {
+          return (lhs.index_>rhs.index_);
+        }
+        friend bool operator<=(const iterator& lhs, const iterator& rhs)
+        {
+          return (lhs.index_<=rhs.index_);
+        }
+        friend bool operator>=(const iterator& lhs, const iterator& rhs)
+        {
+          return (lhs.index_>=rhs.index_);
+        }
+
+        private:
+        const tDerivedSpaceType* space_ptr_;
+        std::size_t index_;
+      };
+
+      using value_type = tSubspaceType;
+      using size_type = std::size_t;
+      using difference_type = unsigned int;
+      using const_reference = const tSubspaceType&;
+      using const_iterator = iterator;
+
+      iterator begin()  const { return iterator(static_cast<const tDerivedSpaceType*>(this), 0); }
+      iterator end()    const { return iterator(static_cast<const tDerivedSpaceType*>(this), size()); }
+      iterator cbegin() const { return iterator(static_cast<const tDerivedSpaceType*>(this), 0); }
+      iterator cend()   const { return iterator(static_cast<const tDerivedSpaceType*>(this), size()); }
 
       ////////////////////////////////////////////////////////////////
       // subspace lookup and retrieval
@@ -1151,6 +1309,22 @@ namespace basis {
       {
         return *ket_space_ptr_;
       }
+
+      ////////////////////////////////////////////////////////////////
+      // iterators
+      ////////////////////////////////////////////////////////////////
+
+      using value_type = SectorType;
+      using size_type = std::size_t;
+      using difference_type = unsigned int;
+      using const_reference = const SectorType&;
+      using iterator = typename std::vector<SectorType>::iterator;
+      using const_iterator = typename std::vector<SectorType>::const_iterator;
+
+      iterator begin()  const { return sectors_.begin(); }
+      iterator end()    const { return sectors_.end(); }
+      iterator cbegin() const { return sectors_.cbegin(); }
+      iterator cend()   const { return sectors_.cend(); }
 
       ////////////////////////////////////////////////////////////////
       // sector lookup and retrieval
