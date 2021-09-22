@@ -150,6 +150,10 @@
   + 08/17/21 (pjf):
     - Revert to storing instances of sector in BaseSectors rather than just keys.
     - Only copy space into BaseSectors if it is not managed by a shared_ptr.
+  + 08/18/21 (pjf): Add std::vector-like size management to BaseSubspace and
+    BaseSpace.
+  + 09/22/21 (pjf):
+    - Improve reserve() in BaseSubspace and BaseSpace.
 ****************************************************************/
 
 #ifndef BASIS_BASIS_H_
@@ -361,6 +365,7 @@ namespace basis {
     // Reserve storage for labels.
     {
       state_table_.reserve(new_cap);
+      lookup_.reserve(new_cap);
     }
 
     inline std::size_t capacity() const noexcept
@@ -751,6 +756,8 @@ namespace basis {
     // Reserve storage for labels.
     {
       subspace_ptrs_.reserve(new_cap);
+      subspace_offsets_.reserve(new_cap);
+      lookup_.reserve(new_cap);
     }
 
     inline std::size_t capacity() const noexcept
