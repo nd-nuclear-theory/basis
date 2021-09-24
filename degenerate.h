@@ -38,6 +38,9 @@
     for pass-through to BaseSubspace.
   + 08/16/21 (pjf): Add additional template parameter to BaseDegenerateSpace for
     pass-through to BaseSpace.
+  + 09/24/21 (pjf):
+    - Create BaseDegenerateSector for sectors between subspaces in
+      a BaseDegenerateSpace.
 ****************************************************************/
 
 #ifndef BASIS_DEGENERATE_H_
@@ -412,6 +415,78 @@ namespace basis {
 
     // degeneracy counting information
     std::vector<int> subspace_degeneracies_;  // given subspace's number of sub-subspaces
+
+  };
+
+  ////////////////////////////////////////////////////////////////
+  // generic sector -- sector between subspaces which have both
+  //   an index and degeneracy, i.e. live within a BaseDegenerateSpace
+  ////////////////////////////////////////////////////////////////
+
+  // BaseDegenerateSector
+
+  template<typename tBraSubspaceType, typename tKetSubspaceType = tBraSubspaceType>
+  class BaseDegenerateSector
+    : public BaseSector<tBraSubspaceType, tKetSubspaceType>
+  {
+    private:
+
+    ////////////////////////////////////////////////////////////////
+    // private (convenience) typedefs
+    ////////////////////////////////////////////////////////////////
+    using BaseSectorType = BaseSector<tBraSubspaceType, tKetSubspaceType>;
+
+    public:
+
+    ////////////////////////////////////////////////////////////////
+    // common typedefs
+    ////////////////////////////////////////////////////////////////
+
+    using BraSubspaceType = typename BaseSectorType::BraSubspaceType;
+    using KetSubspaceType = typename BaseSectorType::KetSubspaceType;
+
+    ////////////////////////////////////////////////////////////////
+    // constructors
+    ////////////////////////////////////////////////////////////////
+
+    BaseDegenerateSector(
+        std::size_t bra_subspace_index, std::size_t ket_subspace_index,
+        unsigned int bra_subspace_degeneracy, unsigned int ket_subspace_degeneracy,
+        const BraSubspaceType& bra_subspace, const KetSubspaceType& ket_subspace,
+        std::size_t multiplicity_index=1
+      )
+      : BaseSectorType{
+            bra_subspace_index, ket_subspace_index,
+            bra_subspace, ket_subspace,
+            multiplicity_index
+          },
+        bra_subspace_degeneracy_{bra_subspace_degeneracy},
+        ket_subspace_degeneracy_{ket_subspace_degeneracy}
+    {}
+
+    ////////////////////////////////////////////////////////////////
+    // accessors
+    ////////////////////////////////////////////////////////////////
+
+    inline unsigned int bra_subspace_degeneracy() const
+    {
+      return bra_subspace_degeneracy_;
+    }
+
+    inline unsigned int ket_subspace_degeneracy() const
+    {
+      return ket_subspace_degeneracy_;
+    }
+
+    inline std::size_t num_elements() const
+    {
+      return (bra_subspace_degeneracy_ * BaseSectorType::bra_subspace().dimension())
+        * (ket_subspace_degeneracy_ * BaseSectorType::ket_subspace().dimension());
+    }
+
+    private:
+
+    unsigned int bra_subspace_degeneracy_, ket_subspace_degeneracy_;
 
   };
 

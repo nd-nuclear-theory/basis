@@ -163,6 +163,43 @@ namespace basis {
 
   };
 
+  // sectors
+
+  class RelativeDegenerateSectorsLSJT
+    : public BaseSectors<
+          RelativeDegenerateSpaceLSJT, RelativeDegenerateSpaceLSJT,
+          basis::BaseDegenerateSector<RelativeDegenerateSubspaceLSJT>
+        >
+  {
+    public:
+    RelativeDegenerateSectorsLSJT() = default;
+
+    RelativeDegenerateSectorsLSJT(const RelativeDegenerateSpaceLSJT& space, int J0)
+    {
+      for (std::size_t bra_index = 0; bra_index < space.size(); ++ bra_index)
+        for (std::size_t ket_index = 0; ket_index < space.size(); ++ ket_index)
+        {
+          if (bra_index > ket_index)
+            continue;
+
+          const auto& bra_subspace = space.GetSubspace(bra_index);
+          const auto& ket_subspace = space.GetSubspace(ket_index);
+
+          if (!am::AllowedTriangle(bra_subspace.J(), J0, ket_subspace.J()))
+            continue;
+
+          const auto bra_degeneracy = space.GetSubspaceDegeneracy(bra_index);
+          const auto ket_degeneracy = space.GetSubspaceDegeneracy(ket_index);
+
+          EmplaceSector(
+              bra_index, ket_index,
+              bra_degeneracy, ket_degeneracy,
+              bra_subspace, ket_subspace
+            );
+        }
+    }
+  };
+
 
   ////////////////////////////////////////////////////////////////
   // implementation
@@ -355,6 +392,8 @@ void Test()
     << std::endl;
   std::cout << std::endl;
 
+  basis::RelativeDegenerateSectorsLSJT sectors(space, 1);
+  std::cout << sectors.DebugStr() << std::endl;
   // for (std::size_t subspace_index=0; subspace_index<space.size(); ++subspace_index)
   //   {
   //     const basis::RelativeDegenerateSubspaceLSJT& subspace = space.GetSubspace(subspace_index);
