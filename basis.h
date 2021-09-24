@@ -159,6 +159,7 @@
     - Fix use-after-move in BaseSectors::PushBack.
     - Add indexing offsets for BaseSectors, and num_elements accessor to
       both BaseSectors and BaseSector.
+    - Fix BaseSectors::DebugStr for size/dimension distinction.
 ****************************************************************/
 
 #ifndef BASIS_BASIS_H_
@@ -1566,10 +1567,12 @@ namespace basis {
           os << "  sector " << sector_index
              << "  bra index " << sector.bra_subspace_index()
              << " labels " << sector.bra_subspace().LabelStr()
-             << " dim " << sector.bra_subspace().size()
+             << " size " << sector.bra_subspace().size()
+             << " dim " << sector.bra_subspace().dimension()
              << "  ket index " << sector.ket_subspace_index()
              << " labels " << sector.ket_subspace().LabelStr()
-             << " dim " << sector.ket_subspace().size()
+             << " size " << sector.ket_subspace().size()
+             << " dim " << sector.ket_subspace().dimension()
              << "  multiplicity index " << sector.multiplicity_index()
              << "  elements " << sector.num_elements()
              << std::endl;
