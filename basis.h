@@ -155,6 +155,8 @@
   + 09/22/21 (pjf):
     - Improve reserve() in BaseSubspace and BaseSpace.
     - Add iterator support to BaseSubspace, BaseSpace, and BaseSectors.
+  + 09/24/21 (pjf):
+    - Fix use-after-move in BaseSectors::PushBack.
 ****************************************************************/
 
 #ifndef BASIS_BASIS_H_
@@ -1417,9 +1419,8 @@ namespace basis {
       // Create indexing information (in both directions, index <->
       // labels) for a sector.
       {
-        const std::size_t index = sectors_.size();
+        lookup_[sector.Key()] = size(); // index for lookup
         sectors_.push_back(std::forward<T>(sector));  // save sector
-        lookup_[sector.Key()] = index; // index for lookup
       };
 
       template<typename... Args>
