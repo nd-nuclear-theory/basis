@@ -41,6 +41,7 @@
   + 09/24/21 (pjf):
     - Create BaseDegenerateSector for sectors between subspaces in
       a BaseDegenerateSpace.
+    - Make all degeneracy indices unsigned int.
 ****************************************************************/
 
 #ifndef BASIS_DEGENERATE_H_
@@ -131,7 +132,7 @@ namespace basis {
       return state_offsets_;
     }
 
-    const std::vector<int>& state_degeneracies() const
+    const std::vector<unsigned int>& state_degeneracies() const
     {
       return state_degeneracies_;
     }
@@ -142,7 +143,7 @@ namespace basis {
       return state_offsets()[i]+(degeneracy_index-1);
     }
 
-    std::size_t GetStateDegeneracy(std::size_t i) const
+    unsigned int GetStateDegeneracy(std::size_t i) const
     {
       return state_degeneracies_.at(i);
     }
@@ -187,7 +188,7 @@ namespace basis {
 
     // degeneracy counting information
     std::vector<std::size_t> state_offsets_;  // offset to given state's starting substate
-    std::vector<int> state_degeneracies_;  // given state's number of substates
+    std::vector<unsigned int> state_degeneracies_;  // given state's number of substates
     std::size_t full_dimension_;  // total number of substates
 
   };
@@ -265,7 +266,7 @@ namespace basis {
       return BaseStateType::subspace().state_offsets()[BaseStateType::index()];
     }
 
-    int degeneracy() const
+    unsigned int degeneracy() const
     {
       return BaseStateType::subspace().state_degeneracies()[BaseStateType::index()];
     }
@@ -346,7 +347,7 @@ namespace basis {
     // subspace lookup and retrieval
     ////////////////////////////////////////////////////////////////
 
-    int GetSubspaceDegeneracy(std::size_t i) const
+    unsigned int GetSubspaceDegeneracy(std::size_t i) const
     /// Given the index for a subspace, return the degeneracy of the
     /// subspace within the space.
     {
@@ -414,7 +415,7 @@ namespace basis {
     ////////////////////////////////////////////////////////////////
 
     // degeneracy counting information
-    std::vector<int> subspace_degeneracies_;  // given subspace's number of sub-subspaces
+    std::vector<unsigned int> subspace_degeneracies_;  // given subspace's number of sub-subspaces
 
   };
 
