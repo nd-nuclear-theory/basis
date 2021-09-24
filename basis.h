@@ -157,6 +157,8 @@
     - Add iterator support to BaseSubspace, BaseSpace, and BaseSectors.
   + 09/24/21 (pjf):
     - Fix use-after-move in BaseSectors::PushBack.
+    - Add indexing offsets for BaseSectors, and num_elements accessor to
+      both BaseSectors and BaseSector.
 ****************************************************************/
 
 #ifndef BASIS_BASIS_H_
@@ -1165,6 +1167,11 @@ namespace basis {
         return (bra_subspace_index()<=ket_subspace_index());
       }
 
+      inline std::size_t num_elements() const
+      {
+        return (bra_subspace().dimension() * ket_subspace().dimension());
+      }
+
       private:
       std::size_t bra_subspace_index_, ket_subspace_index_;
       std::size_t multiplicity_index_;
@@ -1386,6 +1393,13 @@ namespace basis {
           );
       }
 
+      std::size_t GetSectorOffset(std::size_t i) const
+      /// Given the index for a sector, return the offset of the sector in
+      /// the full matrix indexing.
+      {
+        return sector_offsets_.at(i);
+      }
+
       ////////////////////////////////////////////////////////////////
       // size retrieval
       ////////////////////////////////////////////////////////////////
@@ -1394,6 +1408,12 @@ namespace basis {
       // Return number of sectors within sector set.
       {
         return sectors_.size();
+      };
+
+      std::size_t num_elements() const
+      // Return number of matrix elements within sector set
+      {
+        return num_elements_;
       };
 
       ////////////////////////////////////////////////////////////////
@@ -1419,7 +1439,9 @@ namespace basis {
       // Create indexing information (in both directions, index <->
       // labels) for a sector.
       {
+        sector_offsets_.push_back(num_elements());
         lookup_[sector.Key()] = size(); // index for lookup
+        num_elements_ += sector.num_elements();
         sectors_.push_back(std::forward<T>(sector));  // save sector
       };
 
@@ -1429,9 +1451,11 @@ namespace basis {
       // labels) for a sector.
       {
         const std::size_t index = sectors_.size();
+        sector_offsets_.push_back(num_elements());
         sectors_.emplace_back(std::forward<Args>(args)...);  // save sector
         const SectorType& sector = sectors_.back();
         lookup_[sector.Key()] = index; // index for lookup
+        num_elements_ += sector.num_elements();
       };
 
       inline void PushSector(
@@ -1479,6 +1503,10 @@ namespace basis {
 #else
       std::map<typename SectorType::KeyType,std::size_t> lookup_;
 #endif
+
+      // indexing
+      std::vector<std::size_t> sector_offsets_;
+      std::size_t num_elements_;
 
     };
 
@@ -1543,6 +1571,7 @@ namespace basis {
              << " labels " << sector.ket_subspace().LabelStr()
              << " dim " << sector.ket_subspace().size()
              << "  multiplicity index " << sector.multiplicity_index()
+             << "  elements " << sector.num_elements()
              << std::endl;
         }
       return os.str();
