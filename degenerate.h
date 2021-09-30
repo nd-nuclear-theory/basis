@@ -42,6 +42,7 @@
     - Create BaseDegenerateSector for sectors between subspaces in
       a BaseDegenerateSpace.
     - Make all degeneracy indices unsigned int.
+  + 09/30/21 (pjf): Add BaseDegenerateSpace::full_size() accessor.
 ****************************************************************/
 
 #ifndef BASIS_DEGENERATE_H_
@@ -320,8 +321,8 @@ namespace basis {
     // pass-through constructor accepting labels
     //   n.b. this template here is SFINAE black magic
     template<typename T = SpaceLabelsType>
-    explicit BaseDegenerateSpace(const T& labels)
-      : BaseSpaceType{labels}
+    explicit BaseDegenerateSpace(T&& labels)
+      : BaseSpaceType{std::forward<T>(labels)}, full_size_{0}
     {}
 
     public:
@@ -364,6 +365,9 @@ namespace basis {
         +(degeneracy_index-1)*this->GetSubspace(i).dimension());
     }
 
+    inline std::size_t full_size() const { return full_size_; }
+    /// Get the total number of subspaces, considering degeneracies.
+
     protected:
 
     ////////////////////////////////////////////////////////////////
@@ -382,6 +386,7 @@ namespace basis {
       this->subspace_offsets_.push_back(this->dimension_);  // save offset
       (this->lookup_)[subspace.labels()] = BaseSpaceType::size();  // save index
       subspace_degeneracies_.push_back(degeneracy);  // save degeneracy
+      full_size += degeneracy;
       this->dimension_ += subspace.dimension()*degeneracy;  // save dimension
       this->subspace_ptrs_.push_back(
           std::make_shared<const SubspaceType>(std::forward<T>(subspace))
@@ -405,6 +410,7 @@ namespace basis {
       const SubspaceType& subspace = *(this->subspace_ptrs_.back());
       (this->lookup_)[subspace.labels()] = index;  // save index for lookup
       subspace_degeneracies_.push_back(degeneracy);  // save degeneracy
+      full_size_ += degeneracy;
       this->dimension_ += subspace.dimension()*degeneracy;  // save dimension
     }
 
@@ -416,6 +422,7 @@ namespace basis {
 
     // degeneracy counting information
     std::vector<unsigned int> subspace_degeneracies_;  // given subspace's number of sub-subspaces
+    std::size_t full_size_;  // total number of sub-subspaces
 
   };
 

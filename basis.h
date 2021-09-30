@@ -160,6 +160,7 @@
     - Add indexing offsets for BaseSectors, and num_elements accessor to
       both BaseSectors and BaseSector.
     - Fix BaseSectors::DebugStr for size/dimension distinction.
+  + 09/30/21 (pjf): Add BaseSpace::full_size() accessor.
 ****************************************************************/
 
 #ifndef BASIS_BASIS_H_
@@ -890,6 +891,9 @@ namespace basis {
       {
         return subspace_ptrs_.size();
       };
+
+      inline std::size_t full_size() const { return size(); }
+      /// Get the total number of subspaces, considering degeneracies.
 
       std::size_t dimension() const
       // Return the total dimension of all subspaces within the space.
