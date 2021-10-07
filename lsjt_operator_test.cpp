@@ -1,7 +1,7 @@
 /****************************************************************
   lsjt_operator_test.cpp
 
-  Mark A. Caprio
+  Mark A. Caprio, Patrick J. Fasano
   University of Notre Dame
 
 ****************************************************************/
@@ -241,7 +241,7 @@ void ReadTestRelative(const std::string& filename)
     );
 }
 
-void WriteTestRelativeCM(const std::string& filename)
+void WriteTestRelativeCMManual(const std::string& filename)
 {
   ////////////////////////////////////////////////////////////////
   // defining operator
@@ -296,6 +296,63 @@ void WriteTestRelativeCM(const std::string& filename)
   std::ofstream ofile(filename.c_str());
   ofile << os.str();
 
+}
+
+void WriteTestRelativeCM(const std::string& filename)
+// Write using WriteRelativeOperatorLSJT().
+{
+  ////////////////////////////////////////////////////////////////
+  // defining operator
+  ////////////////////////////////////////////////////////////////
+
+  std::cout << "Setup" << std::endl;
+
+  // set tensorial labels
+  basis::OperatorLabelsJT operator_labels;
+  operator_labels.J0=0;
+  operator_labels.g0=0;
+  operator_labels.symmetry_phase_mode=basis::SymmetryPhaseMode::kHermitian;
+  operator_labels.T0_min=0;
+  operator_labels.T0_max=2;
+
+  // set basis parameters
+  int Nmax=2;
+  int Jmax = Nmax+1;
+
+  // set up relative space
+  basis::RelativeCMSpaceLSJT relative_cm_space(Nmax);
+
+  // populate operator containers
+  std::array<basis::RelativeCMSectorsLSJT,3> relative_cm_component_sectors;
+  std::array<basis::OperatorBlocks<double>,3> relative_cm_component_matrices;
+  basis::ConstructIdentityOperatorRelativeCMLSJT(
+      operator_labels,
+      relative_cm_space,
+      relative_cm_component_sectors,
+      relative_cm_component_matrices
+    );
+
+  basis::WriteRelativeCMOperatorLSJT(
+      filename,
+      relative_cm_space,
+      operator_labels,relative_cm_component_sectors,relative_cm_component_matrices,
+      true  // verbose
+    );
+
+}
+
+void ReadTestRelativeCM(const std::string& filename)
+{
+  basis::RelativeCMSpaceLSJT relative_cm_space;
+  basis::RelativeCMOperatorParametersLSJT operator_parameters;
+  std::array<basis::RelativeCMSectorsLSJT,3> relative_cm_component_sectors;
+  std::array<basis::OperatorBlocks<double>,3> relative_cm_component_matrices;
+  basis::ReadRelativeCMOperatorLSJT(
+      filename,
+      relative_cm_space,
+      operator_parameters,relative_cm_component_sectors,relative_cm_component_matrices,
+      true  // verbose
+    );
 }
 
 void WriteTestTwoBody(const std::string& filename)
@@ -365,12 +422,21 @@ void WriteTestTwoBody(const std::string& filename)
 int main(int argc, char **argv)
 {
 
-  std::string relative_filename("lsjt_operator_test_relative_identity_Nmax02.dat");
-  WriteTestRelative(relative_filename);
-  ReadTestRelative(relative_filename);
+  std::string relative_filename_text("lsjt_operator_test_relative_identity_Nmax02.dat");
+  WriteTestRelative(relative_filename_text);
+  ReadTestRelative(relative_filename_text);
 
-  std::string relative_cm_filename("lsjt_operator_test_relative_cm_identity_Nmax02.dat");
-  WriteTestRelativeCM(relative_cm_filename);
+  std::string relative_filename_binary("lsjt_operator_test_relative_identity_Nmax02.bin");
+  WriteTestRelative(relative_filename_binary);
+  ReadTestRelative(relative_filename_binary);
+
+  std::string relative_cm_filename_text("lsjt_operator_test_relative_cm_identity_Nmax02.dat");
+  WriteTestRelativeCM(relative_cm_filename_text);
+  ReadTestRelativeCM(relative_cm_filename_text);
+
+  std::string relative_cm_filename_binary("lsjt_operator_test_relative_cm_identity_Nmax02.bin");
+  WriteTestRelativeCM(relative_cm_filename_binary);
+  ReadTestRelativeCM(relative_cm_filename_binary);
 
   std::string two_body_filename("lsjt_operator_test_two_body_identity_nas_Nmax02.dat");
   WriteTestTwoBody(two_body_filename);

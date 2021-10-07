@@ -16,7 +16,7 @@
 
   Language: C++11
 
-  Mark A. Caprio
+  Mark A. Caprio, Patrick J. Fasano
   University of Notre Dame
 
   + 11/21/15 (mac): Created (lsjt_interaction.h), from code in
@@ -68,6 +68,7 @@
     - Add ScatterOperatorRelativeCMLSJTToRelativeCMLSJTN.
   + 05/09/19 (pjf): Use std::size_t for indices and sizes, to prevent
     integer overflow.
+  + 10/07/21 (pjf): Add binary I/O formats.
 
 ****************************************************************/
 
@@ -82,6 +83,7 @@
 #include "jt_operator.h"
 #include "many_body.h"
 #include "operator.h"
+#include "mcutils/io.h"
 
 namespace basis {
 
@@ -255,6 +257,14 @@ namespace basis {
   //   considering oscillator functions as members of SU(3) irreps.
   //   So it may be necessary to convert to this convention for
   //   internal use in SU(3) calculations.
+  //
+  // Binary format
+  //
+  //   A binary I/O mode is provided. The header fields are stored as
+  //   32-bit signed integers in the same order as in the text format.
+  //   Matrix element labels are not stored, but follow the same order
+  //   and indexing as the text format. Matrix elements are stored as
+  //   double-precision floating-point numbers.
 
   ////////////////////////////////////////////////////////////////
   // operator labeling information
@@ -288,7 +298,8 @@ namespace basis {
 
   void ReadRelativeOperatorParametersLSJT(
       std::istream& is,
-      basis::RelativeOperatorParametersLSJT& parameters
+      basis::RelativeOperatorParametersLSJT& parameters,
+      mcutils::IOMode io_mode = mcutils::IOMode::kText
     );
   // Read file header for relative operator in LSJT scheme.
   //
@@ -299,7 +310,8 @@ namespace basis {
 
   void WriteRelativeOperatorParametersLSJT(
       std::ostream& os,
-      const basis::RelativeOperatorParametersLSJT& parameters
+      const basis::RelativeOperatorParametersLSJT& parameters,
+      mcutils::IOMode io_mode = mcutils::IOMode::kText
     );
   // Write file header for relative operator in LSJT scheme.
   //
@@ -312,7 +324,8 @@ namespace basis {
       std::istream& is,
       int T0,
       const basis::RelativeSectorsLSJT& sectors,
-      basis::OperatorBlocks<double>& matrices
+      basis::OperatorBlocks<double>& matrices,
+      mcutils::IOMode io_mode = mcutils::IOMode::kText
     );
   // Read single isospin component of a relative operator in LSJT
   // scheme.
@@ -327,7 +340,8 @@ namespace basis {
       std::ostream& os,
       int T0,
       const basis::RelativeSectorsLSJT& sectors,
-      const basis::OperatorBlocks<double>& matrices
+      const basis::OperatorBlocks<double>& matrices,
+      mcutils::IOMode io_mode = mcutils::IOMode::kText
     );
   // Write single isospin component of a relative operator in LSJT
   // scheme.
@@ -495,9 +509,9 @@ namespace basis {
   //
   //   See the documentation of the *relative* LSJT operator file format for
   //   further general discussion: "Iteration order and symmetry", "Conjugation
-  //   symmetry", and "Radial oscillator phase convention".  These discussions
-  //   are generic to the LSJT scheme and apply the same to relative or
-  //   relative-cm operators.
+  //   symmetry", "Radial oscillator phase convention", and "Binary format".
+  //   These discussions are generic to the LSJT scheme and apply the same to
+  //   relative or relative-cm operators.
 
   ////////////////////////////////////////////////////////////////
   // operator labeling information
@@ -531,7 +545,8 @@ namespace basis {
 
   void ReadRelativeCMOperatorParametersLSJT(
       std::istream& is,
-      basis::RelativeCMOperatorParametersLSJT& parameters
+      basis::RelativeCMOperatorParametersLSJT& parameters,
+      mcutils::IOMode io_mode = mcutils::IOMode::kText
     );
   // Read file header for relative-cm operator in LSJT scheme.
   //
@@ -542,7 +557,8 @@ namespace basis {
 
   void WriteRelativeCMOperatorParametersLSJT(
       std::ostream& os,
-      const basis::RelativeCMOperatorParametersLSJT& parameters
+      const basis::RelativeCMOperatorParametersLSJT& parameters,
+      mcutils::IOMode io_mode = mcutils::IOMode::kText
     );
   // Write file header for relative-cm operator in LSJT scheme.
   //
@@ -555,7 +571,8 @@ namespace basis {
       std::istream& is,
       int T0,
       const basis::RelativeCMSectorsLSJT& sectors,
-      basis::OperatorBlocks<double>& matrices
+      basis::OperatorBlocks<double>& matrices,
+      mcutils::IOMode io_mode = mcutils::IOMode::kText
     );
   // Read single isospin component of a relative-cm operator in LSJT
   // scheme.
@@ -570,7 +587,8 @@ namespace basis {
       std::ostream& os,
       int T0,
       const basis::RelativeCMSectorsLSJT& sectors,
-      const basis::OperatorBlocks<double>& matrices
+      const basis::OperatorBlocks<double>& matrices,
+      mcutils::IOMode io_mode = mcutils::IOMode::kText
     );
   // Write single isospin component of a relative-cm operator in LSJT
   // scheme.
@@ -685,6 +703,46 @@ namespace basis {
   //   relative_cm_lsjtn_space (...): target space
   //   relative_cm_lsjtn_component_sectors (...): target sectors
   //   relative_cm_lsjtn_component_matrices (...): target matrices
+
+  ////////////////////////////////////////////////////////////////
+  // relative LSJT operator construction
+  ////////////////////////////////////////////////////////////////
+
+  void ConstructZeroOperatorRelativeCMLSJT(
+      const basis::OperatorLabelsJT& operator_labels,
+      const basis::RelativeCMSpaceLSJT& relative_cm_space,
+      std::array<basis::RelativeCMSectorsLSJT,3>& relative_cm_component_sectors,
+      std::array<basis::OperatorBlocks<double>,3>& relative_cm_component_matrices
+    );
+  // Construct zero operator in relative-cm LSJT basis.
+  //
+  // See notes on "internal representation of an operator in JT
+  // scheme" in lsjt_operator.h for the general principles of how the
+  // operators are represented.
+  //
+  // Arguments:
+  //   operator_labels (input): tensorial properties of operator
+  //   relative_cm_space (input): target space
+  //   relative_cm_component_sectors (output): target sectors
+  //   relative_cm_component_matrices (output): target matrices
+
+  void ConstructIdentityOperatorRelativeCMLSJT(
+      const basis::OperatorLabelsJT& operator_labels,
+      const basis::RelativeCMSpaceLSJT& relative_cm_space,
+      std::array<basis::RelativeCMSectorsLSJT,3>& relative_cm_component_sectors,
+      std::array<basis::OperatorBlocks<double>,3>& relative_cm_component_matrices
+    );
+  // Construct identity operator in relative-cm LSJT basis.
+  //
+  // See notes on "internal representation of an operator in JT
+  // scheme" in lsjt_operator.h for the general principles of how the
+  // operators are represented.
+  //
+  // Arguments:
+  //   operator_labels (input): tensorial properties of operator
+  //   relative_cm_space (input): target space
+  //   relative_cm_component_sectors (output): target sectors
+  //   relative_cm_component_matrices (output): target matrices
 
   ////////////////////////////////////////////////////////////////
   ////////////////////////////////////////////////////////////////
