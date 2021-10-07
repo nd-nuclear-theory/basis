@@ -2,7 +2,8 @@
 
   lsjt_operator.cpp
 
-  Mark A. Caprio, University of Notre Dame.
+  Mark A. Caprio, Patrick J. Fasano
+  University of Notre Dame.
 
 ****************************************************************/
 
@@ -23,6 +24,7 @@
 #include "many_body.h"
 #include "operator.h"
 #include "mcutils/parsing.h"
+#include "mcutils/io.h"
 #include <Eigen/Core>
 
 namespace basis {
@@ -33,57 +35,100 @@ namespace basis {
 
   void ReadRelativeOperatorParametersLSJT(
       std::istream& is,
-      basis::RelativeOperatorParametersLSJT& parameters
+      basis::RelativeOperatorParametersLSJT& parameters,
+      mcutils::IOMode io_mode
     )
   {
 
     std::string line;
 
-    // line 1: version -- but first gobble any comment lines
-    while (std::getline(is,line), line[0]=='#') {};
-    int version;
-    std::stringstream(line) >> version;
-    assert(version==1);
+    if (io_mode == mcutils::IOMode::kText)
+    {
+      // line 1: version -- but first gobble any comment lines
+      while (std::getline(is,line), line[0]=='#') {};
+      int version;
+      std::stringstream(line) >> version;
+      assert(version==1);
 
-    // line 2: operator tensor properties
-    std::getline(is,line);
-    int symmetry_phase_mode_int;
-    std::stringstream(line)
-      >> parameters.J0 >> parameters.g0
-      >> parameters.T0_min >> parameters.T0_max
-      >> symmetry_phase_mode_int;
-    assert (symmetry_phase_mode_int==0);
-    parameters.symmetry_phase_mode = basis::SymmetryPhaseMode(symmetry_phase_mode_int);
+      // line 2: operator tensor properties
+      std::getline(is,line);
+      int symmetry_phase_mode_int;
+      std::stringstream(line)
+        >> parameters.J0 >> parameters.g0
+        >> parameters.T0_min >> parameters.T0_max
+        >> symmetry_phase_mode_int;
+      assert (symmetry_phase_mode_int==0);
+      parameters.symmetry_phase_mode = basis::SymmetryPhaseMode(symmetry_phase_mode_int);
 
-    // line 3: relative basis truncation
-    std::getline(is,line);
-    std::stringstream(line) >> parameters.Nmax >> parameters.Jmax;
+      // line 3: relative basis truncation
+      std::getline(is,line);
+      std::stringstream(line) >> parameters.Nmax >> parameters.Jmax;
+    }
+    else // if (io_mode == mcutils::IOMode::kBinary)
+    {
+      // field 1: version
+      mcutils::VerifyBinary<int32_t>(is, 1, "Invalid version", "version");
+
+      // fields 2-6: operator tensor properties
+      mcutils::ReadBinary<int32_t>(is, parameters.J0);
+      mcutils::ReadBinary<int32_t>(is, parameters.g0);
+      mcutils::ReadBinary<int32_t>(is, parameters.T0_min);
+      mcutils::ReadBinary<int32_t>(is, parameters.T0_max);
+      mcutils::VerifyBinary<int32_t>(is, 0, "Unsupported symmetry phase mode", "symmetry phase mode");
+      parameters.symmetry_phase_mode = basis::SymmetryPhaseMode::kHermitian;
+
+      // fields 7-8: relative basis truncation
+      mcutils::ReadBinary<int32_t>(is, parameters.Nmax);
+      mcutils::ReadBinary<int32_t>(is, parameters.Jmax);
+    }
   }
 
   void WriteRelativeOperatorParametersLSJT(
       std::ostream& os,
-      const basis::RelativeOperatorParametersLSJT& parameters
+      const basis::RelativeOperatorParametersLSJT& parameters,
+      mcutils::IOMode io_mode
     )
   {
     int version = 1;
-    os
-      << "# RELATIVE LSJT" << std::endl
-      << "#   version" << std::endl
-      << "#   J0 g0 T0_min T0_max symmetry_phase_mode  [P0=(-)^g0]" << std::endl
-      << "#   Nmax Jmax" << std::endl
-      << "#   T0   N' L' S' J' T'   N L S J T   JT-RME" << std::endl
-      << " " << version << std::endl
-      << " " << parameters.J0 << " " << parameters.g0
-      << " " << parameters.T0_min << " " << parameters.T0_max
-      << " " << int(parameters.symmetry_phase_mode) << std::endl
-      << " " << parameters.Nmax << " " << parameters.Jmax << std::endl;
+    if (io_mode == mcutils::IOMode::kText)
+    {
+      os
+        << "# RELATIVE LSJT" << std::endl
+        << "#   version" << std::endl
+        << "#   J0 g0 T0_min T0_max symmetry_phase_mode  [P0=(-)^g0]" << std::endl
+        << "#   Nmax Jmax" << std::endl
+        << "#   T0   N' L' S' J' T'   N L S J T   JT-RME" << std::endl
+        << " " << version << std::endl
+        << " " << parameters.J0 << " " << parameters.g0
+        << " " << parameters.T0_min << " " << parameters.T0_max
+        << " " << int(parameters.symmetry_phase_mode) << std::endl
+        << " " << parameters.Nmax << " " << parameters.Jmax << std::endl;
+    }
+    else  // if (io_mode == mcutils::IOMode::kBinary)
+    {
+      // field 1: version
+      mcutils::WriteBinary<int32_t>(os, version);
+
+      // fields 2-6: operator tensor properties
+      mcutils::WriteBinary<int32_t>(os, parameters.J0);
+      mcutils::WriteBinary<int32_t>(os, parameters.g0);
+      mcutils::WriteBinary<int32_t>(os, parameters.T0_min);
+      mcutils::WriteBinary<int32_t>(os, parameters.T0_max);
+      assert(parameters.symmetry_phase_mode==basis::SymmetryPhaseMode::kHermitian);
+      mcutils::WriteBinary<int32_t>(os, static_cast<int32_t>(parameters.symmetry_phase_mode));
+
+      // fields 7-8: relative basis truncation
+      mcutils::WriteBinary<int32_t>(os, parameters.Nmax);
+      mcutils::WriteBinary<int32_t>(os, parameters.Jmax);
+    }
   }
 
   void ReadRelativeOperatorComponentLSJT(
       std::istream& is,
       int T0,
       const RelativeSectorsLSJT& sectors,
-      OperatorBlocks<double>& matrices
+      OperatorBlocks<double>& matrices,
+      mcutils::IOMode io_mode
     )
   {
 
@@ -99,6 +144,32 @@ namespace basis {
         // construct zero matrix for sector
         Eigen::MatrixXd sector_matrix = Eigen::MatrixXd::Zero(bra_subspace.size(),ket_subspace.size());
 
+        std::vector<double> buffer;
+        if (io_mode == mcutils::IOMode::kBinary)
+          {
+                  // calculate number of matrix elements in sector
+            std::size_t sector_entries = 0;
+            if (sector.IsDiagonal())
+              // diagonal sector
+              {
+                std::size_t dimension = ket_subspace.size();
+                sector_entries = dimension*(dimension+1)/2;
+              }
+            else  // if (sector.IsUpperTriangle())
+              // upper triangle sector (but not diagonal)
+              {
+                std::size_t bra_dimension = bra_subspace.size();
+                std::size_t ket_dimension = ket_subspace.size();
+                sector_entries = bra_dimension*ket_dimension;
+              }
+
+            // read entire sector to temporary buffer
+            buffer.resize(sector_entries, 0.);
+            mcutils::ReadBinary<double>(is, buffer.data(), sector_entries);
+
+          }
+
+        std::size_t i = 0;
         // retrieve matrix elements
         for (std::size_t bra_index=0; bra_index<bra_subspace.size(); ++bra_index)
           for (std::size_t ket_index=0; ket_index<ket_subspace.size(); ++ket_index)
@@ -109,52 +180,59 @@ namespace basis {
                 if (!(bra_index<=ket_index))
                   continue;
 
-              // define states
-              const basis::RelativeStateLSJT bra(bra_subspace,bra_index);
-              const basis::RelativeStateLSJT ket(ket_subspace,ket_index);
-
-              // read numbers from input line
-              int
-                input_T0,
-                bra_N,
-                bra_L,
-                bra_S,
-                bra_J,
-                bra_T,
-                ket_N,
-                ket_L,
-                ket_S,
-                ket_J,
-                ket_T;
               double matrix_element;
-              is
-                >> input_T0
-                >> bra_N
-                >> bra_L
-                >> bra_S
-                >> bra_J
-                >> bra_T
-                >> ket_N
-                >> ket_L
-                >> ket_S
-                >> ket_J
-                >> ket_T
-                >> matrix_element;
+              if (io_mode == mcutils::IOMode::kText)
+              {
+                // define states
+                const basis::RelativeStateLSJT bra(bra_subspace,bra_index);
+                const basis::RelativeStateLSJT ket(ket_subspace,ket_index);
 
-              // validate labels
-              bool expected_labels = true
-                && (input_T0==T0)
-                && (bra_N==bra.N())
-                && (bra_L==bra.L())
-                && (bra_S==bra.S())
-                && (bra_J==bra.J())
-                && (bra_T==bra.T())
-                && (ket_N==ket.N())
-                && (ket_L==ket.L())
-                && (ket_S==ket.S())
-                && (ket_J==ket.J())
-                && (ket_T==ket.T());
-              assert(expected_labels);
+                // read numbers from input line
+                int
+                  input_T0,
+                  bra_N,
+                  bra_L,
+                  bra_S,
+                  bra_J,
+                  bra_T,
+                  ket_N,
+                  ket_L,
+                  ket_S,
+                  ket_J,
+                  ket_T;
+                is
+                  >> input_T0
+                  >> bra_N
+                  >> bra_L
+                  >> bra_S
+                  >> bra_J
+                  >> bra_T
+                  >> ket_N
+                  >> ket_L
+                  >> ket_S
+                  >> ket_J
+                  >> ket_T
+                  >> matrix_element;
+
+                // validate labels
+                bool expected_labels = true
+                  && (input_T0==T0)
+                  && (bra_N==bra.N())
+                  && (bra_L==bra.L())
+                  && (bra_S==bra.S())
+                  && (bra_J==bra.J())
+                  && (bra_T==bra.T())
+                  && (ket_N==ket.N())
+                  && (ket_L==ket.L())
+                  && (ket_S==ket.S())
+                  && (ket_J==ket.J())
+                  && (ket_T==ket.T());
+                assert(expected_labels);
+              }
+              else
+              {
+                matrix_element = buffer[i++];
+              }
 
               // save matrix element
               sector_matrix(bra_index,ket_index) = matrix_element;
@@ -170,7 +248,8 @@ namespace basis {
       std::ostream& os,
       int T0,
       const RelativeSectorsLSJT& sectors,
-      const OperatorBlocks<double>& matrices
+      const OperatorBlocks<double>& matrices,
+      mcutils::IOMode io_mode
     )
   {
 
@@ -190,7 +269,32 @@ namespace basis {
         // sectors are stored.
         assert(sector.bra_subspace_index()<=sector.ket_subspace_index());
 
+        // temporary buffer for binary write
+        std::vector<double> buffer;
+        std::size_t sector_entries = 0;
+        if (io_mode == mcutils::IOMode::kBinary)
+          {
+            // calculate number of matrix elements in sector
+            if (sector.IsDiagonal())
+              // diagonal sector
+              {
+                const std::size_t& dimension = ket_subspace.size();
+                sector_entries = dimension*(dimension+1)/2;
+              }
+            else  // if (sector.IsUpperTriangle())
+              // upper triangle sector (but not diagonal)
+              {
+                const std::size_t& bra_dimension = bra_subspace.size();
+                const std::size_t& ket_dimension = ket_subspace.size();
+                sector_entries = bra_dimension*ket_dimension;
+              }
+
+            // allocate buffer
+            buffer.resize(sector_entries, 0.);
+          }
+
         // iterate over matrix elements
+        std::size_t i = 0;
         for (std::size_t bra_index=0; bra_index<bra_subspace.size(); ++bra_index)
           for (std::size_t ket_index=0; ket_index<ket_subspace.size(); ++ket_index)
             {
@@ -205,33 +309,42 @@ namespace basis {
               const basis::RelativeStateLSJT ket(ket_subspace,ket_index);
 
               // extract matrix element factor
-                    const double matrix_element = matrices[sector_index](bra_index,ket_index);
+              const double matrix_element = matrices[sector_index](bra_index,ket_index);
 
-              // generate output line
-              const int width = 3;
-              const int precision = 14;  // less than 16 to provide some roundoff and avoid ugliness on doubles
-              os << std::setprecision(precision);
-              os
-                << " " << std::setw(width) << T0
-                << " " << "  "
-                << " " << std::setw(width) << bra.N()
-                << " " << std::setw(width) << bra.L()
-                << " " << std::setw(width) << bra.S()
-                << " " << std::setw(width) << bra.J()
-                << " " << std::setw(width) << bra.T()
-                << " " << "  "
-                << " " << std::setw(width) << ket.N()
-                << " " << std::setw(width) << ket.L()
-                << " " << std::setw(width) << ket.S()
-                << " " << std::setw(width) << ket.J()
-                << " " << std::setw(width) << ket.T()
-                << " " << "  "
-                << " " << std::showpoint << std::scientific << matrix_element
-                << std::endl;
-
+              if (io_mode == mcutils::IOMode::kText)
+                {
+                  // generate output line
+                  const int width = 3;
+                  const int precision = 14;  // less than 16 to provide some roundoff and avoid ugliness on doubles
+                  os << std::setprecision(precision);
+                  os
+                    << " " << std::setw(width) << T0
+                    << " " << "  "
+                    << " " << std::setw(width) << bra.N()
+                    << " " << std::setw(width) << bra.L()
+                    << " " << std::setw(width) << bra.S()
+                    << " " << std::setw(width) << bra.J()
+                    << " " << std::setw(width) << bra.T()
+                    << " " << "  "
+                    << " " << std::setw(width) << ket.N()
+                    << " " << std::setw(width) << ket.L()
+                    << " " << std::setw(width) << ket.S()
+                    << " " << std::setw(width) << ket.J()
+                    << " " << std::setw(width) << ket.T()
+                    << " " << "  "
+                    << " " << std::showpoint << std::scientific << matrix_element
+                    << std::endl;
+                }
+              else  // if (io_mode == mcutils::IOMode::kText)
+                {
+                  buffer[i++] = matrix_element;
+                }
             }
 
-      };
+        // write temporary buffer to file
+        if (io_mode == mcutils::IOMode::kBinary)
+          mcutils::WriteBinary<double>(os,buffer.data(),sector_entries);
+      }
   }
 
   void ReadRelativeOperatorLSJT(
@@ -246,17 +359,25 @@ namespace basis {
   // FUTURE: check file status on open
   {
 
+    // deduce I/O mode
+    mcutils::IOMode io_mode = mcutils::DeducedIOMode(relative_filename);
+
     // open stream for reading
     if (verbose)
       {
         std::cout
           << "Reading relative operator file..." << std::endl
-          << "  Filename: " << relative_filename << std::endl;
+          << "  Filename: " << relative_filename << std::endl
+          << "  Mode: " << ((io_mode == mcutils::IOMode::kText) ? "text" : "binary")
+          << std::endl;
       }
-    std::ifstream is(relative_filename.c_str());
+    std::ios_base::openmode mode_argument = std::ios_base::in;
+    if (io_mode==mcutils::IOMode::kBinary)
+      mode_argument |= std::ios_base::binary;
+    std::ifstream is(relative_filename.c_str(), mode_argument);
 
     // read header parameters
-    basis::ReadRelativeOperatorParametersLSJT(is,operator_parameters);
+    basis::ReadRelativeOperatorParametersLSJT(is,operator_parameters,io_mode);
     if (verbose)
       {
         std::cout
@@ -290,7 +411,8 @@ namespace basis {
         basis::ReadRelativeOperatorComponentLSJT(
             is,
             T0,
-            relative_component_sectors[T0],relative_component_matrices[T0]
+            relative_component_sectors[T0],relative_component_matrices[T0],
+            io_mode
           );
       }
 
@@ -319,6 +441,9 @@ namespace basis {
   // FUTURE: check file status on open
   {
 
+    // deduce I/O mode
+    mcutils::IOMode io_mode = mcutils::DeducedIOMode(relative_filename);
+
     // open stream for writing
     if (verbose)
       {
@@ -326,7 +451,10 @@ namespace basis {
           << "Writing relative operator file..." << std::endl
           << "  Filename: " << relative_filename << std::endl;
       }
-    std::ofstream os(relative_filename.c_str());
+    std::ios_base::openmode mode_argument = std::ios_base::out;
+    if (io_mode==mcutils::IOMode::kBinary)
+      mode_argument |= std::ios_base::binary;
+    std::ofstream os(relative_filename.c_str(), mode_argument);
 
     // set up full operator file parameters
     int Nmax = relative_space.Nmax();
@@ -349,7 +477,7 @@ namespace basis {
       }
 
     // write header parameters
-    basis::WriteRelativeOperatorParametersLSJT(os,operator_parameters);
+    basis::WriteRelativeOperatorParametersLSJT(os,operator_parameters,io_mode);
 
     // write matrices
     for (int T0=operator_parameters.T0_min; T0<=operator_parameters.T0_max; ++T0)
@@ -357,7 +485,8 @@ namespace basis {
         basis::WriteRelativeOperatorComponentLSJT(
             os,
             T0,
-            relative_component_sectors[T0],relative_component_matrices[T0]
+            relative_component_sectors[T0],relative_component_matrices[T0],
+            io_mode
           );
       }
 
@@ -1021,57 +1150,100 @@ namespace basis {
 
   void ReadRelativeCMOperatorParametersLSJT(
       std::istream& is,
-      basis::RelativeCMOperatorParametersLSJT& parameters
+      basis::RelativeCMOperatorParametersLSJT& parameters,
+      mcutils::IOMode io_mode
     )
   {
 
     std::string line;
 
-    // line 1: version -- but first gobble any comment lines
-    while (std::getline(is,line), line[0]=='#') {};
-    int version;
-    std::stringstream(line) >> version;
-    assert(version==1);
+    if (io_mode == mcutils::IOMode::kText)
+    {
+      // line 1: version -- but first gobble any comment lines
+      while (std::getline(is,line), line[0]=='#') {};
+      int version;
+      std::stringstream(line) >> version;
+      assert(version==1);
 
-    // line 2: operator tensor properties
-    std::getline(is,line);
-    int symmetry_phase_mode_int;
-    std::stringstream(line)
-      >> parameters.J0 >> parameters.g0
-      >> parameters.T0_min >> parameters.T0_max
-      >> symmetry_phase_mode_int;
-    assert (symmetry_phase_mode_int==0);
-    parameters.symmetry_phase_mode = basis::SymmetryPhaseMode(symmetry_phase_mode_int);
+      // line 2: operator tensor properties
+      std::getline(is,line);
+      int symmetry_phase_mode_int;
+      std::stringstream(line)
+        >> parameters.J0 >> parameters.g0
+        >> parameters.T0_min >> parameters.T0_max
+        >> symmetry_phase_mode_int;
+      assert (symmetry_phase_mode_int==0);
+      parameters.symmetry_phase_mode = basis::SymmetryPhaseMode(symmetry_phase_mode_int);
 
-    // line 3: relative basis truncation
-    std::getline(is,line);
-    std::stringstream(line) >> parameters.Nmax;
+      // line 3: relative basis truncation
+      std::getline(is,line);
+      std::stringstream(line) >> parameters.Nmax;
+    }
+    else // if (io_mode == mcutils::IOMode::kBinary)
+    {
+      // field 1: version
+      mcutils::VerifyBinary<int32_t>(is, 1, "Invalid version", "version");
+
+      // fields 2-6: operator tensor properties
+      int symmetry_phase_mode_int;
+      mcutils::ReadBinary<int32_t>(is, parameters.J0);
+      mcutils::ReadBinary<int32_t>(is, parameters.g0);
+      mcutils::ReadBinary<int32_t>(is, parameters.T0_min);
+      mcutils::ReadBinary<int32_t>(is, parameters.T0_max);
+      mcutils::ReadBinary<int32_t>(is, symmetry_phase_mode_int);
+      assert(symmetry_phase_mode_int==0);
+      parameters.symmetry_phase_mode = basis::SymmetryPhaseMode(symmetry_phase_mode_int);
+
+      // field 7: relative basis truncation
+      mcutils::ReadBinary<int32_t>(is, parameters.Nmax);
+    }
   }
 
   void WriteRelativeCMOperatorParametersLSJT(
       std::ostream& os,
-      const basis::RelativeCMOperatorParametersLSJT& parameters
+      const basis::RelativeCMOperatorParametersLSJT& parameters,
+      mcutils::IOMode io_mode
     )
   {
     int version = 1;
-    os
-      << "# RELATIVE-CM LSJT" << std::endl
-      << "#   version" << std::endl
-      << "#   J0 g0 T0_min T0_max symmetry_phase_mode  [P0=(-)^g0]" << std::endl
-      << "#   Nmax" << std::endl
-      << "#   T0   Nr' lr' Nc' lc' L' S' J' T' g'   Nr lr Nc lc L S J T g   JT-RME" << std::endl
-      << " " << version << std::endl
-      << " " << parameters.J0 << " " << parameters.g0
-      << " " << parameters.T0_min << " " << parameters.T0_max
-      << " " << int(parameters.symmetry_phase_mode) << std::endl
-      << " " << parameters.Nmax << std::endl;
+    if (io_mode == mcutils::IOMode::kText)
+    {
+      os
+        << "# RELATIVE-CM LSJT" << std::endl
+        << "#   version" << std::endl
+        << "#   J0 g0 T0_min T0_max symmetry_phase_mode  [P0=(-)^g0]" << std::endl
+        << "#   Nmax" << std::endl
+        << "#   T0   Nr' lr' Nc' lc' L' S' J' T' g'   Nr lr Nc lc L S J T g   JT-RME" << std::endl
+        << " " << version << std::endl
+        << " " << parameters.J0 << " " << parameters.g0
+        << " " << parameters.T0_min << " " << parameters.T0_max
+        << " " << int(parameters.symmetry_phase_mode) << std::endl
+        << " " << parameters.Nmax << std::endl;
+    }
+    else  // if (io_mode == mcutils::IOMode::kBinary)
+    {
+      // field 1: version
+      mcutils::WriteBinary<int32_t>(os, version);
+
+      // fields 2-6: operator tensor properties
+      mcutils::WriteBinary<int32_t>(os, parameters.J0);
+      mcutils::WriteBinary<int32_t>(os, parameters.g0);
+      mcutils::WriteBinary<int32_t>(os, parameters.T0_min);
+      mcutils::WriteBinary<int32_t>(os, parameters.T0_max);
+      assert(parameters.symmetry_phase_mode==basis::SymmetryPhaseMode::kHermitian);
+      mcutils::WriteBinary<int32_t>(os, static_cast<int32_t>(parameters.symmetry_phase_mode));
+
+      // fields 7: relative basis truncation
+      mcutils::WriteBinary<int32_t>(os, parameters.Nmax);
+    }
   }
 
   void ReadRelativeCMOperatorComponentLSJT(
       std::istream& is,
       int T0,
       const basis::RelativeCMSectorsLSJT& sectors,
-      basis::OperatorBlocks<double>& matrices
+      basis::OperatorBlocks<double>& matrices,
+      mcutils::IOMode io_mode
     )
   {
     std::string line;
@@ -1096,6 +1268,32 @@ namespace basis {
         basis::OperatorBlock<double> sector_matrix =
           basis::OperatorBlock<double>::Zero(bra_subspace.size(),ket_subspace.size());
 
+        std::vector<double> buffer;
+        if (io_mode == mcutils::IOMode::kBinary)
+          {
+                  // calculate number of matrix elements in sector
+            std::size_t sector_entries = 0;
+            if (sector.IsDiagonal())
+              // diagonal sector
+              {
+                std::size_t dimension = ket_subspace.size();
+                sector_entries = dimension*(dimension+1)/2;
+              }
+            else  // if (sector.IsUpperTriangle())
+              // upper triangle sector (but not diagonal)
+              {
+                std::size_t bra_dimension = bra_subspace.size();
+                std::size_t ket_dimension = ket_subspace.size();
+                sector_entries = bra_dimension*ket_dimension;
+              }
+
+            // read entire sector to temporary buffer
+            buffer.resize(sector_entries, 0.);
+            mcutils::ReadBinary<double>(is, buffer.data(), sector_entries);
+
+          }
+
+        std::size_t i = 0;
         // iterate over matrix elements
         for (std::size_t bra_index=0; bra_index<bra_subspace.size(); ++bra_index)
           for (std::size_t ket_index=0; ket_index<ket_subspace.size(); ++ket_index)
@@ -1106,27 +1304,29 @@ namespace basis {
                 if (!(bra_index<=ket_index))
                   continue;
 
-              // define states
-              const basis::RelativeCMStateLSJT bra(bra_subspace,bra_index);
-              const basis::RelativeCMStateLSJT ket(ket_subspace,ket_index);
-
-              // define input variables
-              int input_T0;
-              int bra_Nr, bra_lr, bra_Nc, bra_lc, bra_L, bra_S, bra_J, bra_T, bra_g;
-              int ket_Nr, ket_lr, ket_Nc, ket_lc, ket_L, ket_S, ket_J, ket_T, ket_g;
               double matrix_element;
+              if (io_mode == mcutils::IOMode::kText)
+              {
+                // define states
+                const basis::RelativeCMStateLSJT bra(bra_subspace,bra_index);
+                const basis::RelativeCMStateLSJT ket(ket_subspace,ket_index);
 
-              // read input line
-              mcutils::GetLine(is, line, line_count);
-              std::istringstream line_stream(line);
-              line_stream
-                >> input_T0
-                >> bra_Nr >> bra_lr >> bra_Nc >> bra_lc
-                >> bra_L  >> bra_S  >> bra_J  >> bra_T  >> bra_g
-                >> ket_Nr >> ket_lr >> ket_Nc >> ket_lc
-                >> ket_L  >> ket_S  >> ket_J  >> ket_T  >> ket_g
-                >> matrix_element;
-              mcutils::ParsingCheck(line_stream, line_count, line);
+                // define input variables
+                int input_T0;
+                int bra_Nr, bra_lr, bra_Nc, bra_lc, bra_L, bra_S, bra_J, bra_T, bra_g;
+                int ket_Nr, ket_lr, ket_Nc, ket_lc, ket_L, ket_S, ket_J, ket_T, ket_g;
+
+                // read input line
+                mcutils::GetLine(is, line, line_count);
+                std::istringstream line_stream(line);
+                line_stream
+                  >> input_T0
+                  >> bra_Nr >> bra_lr >> bra_Nc >> bra_lc
+                  >> bra_L  >> bra_S  >> bra_J  >> bra_T  >> bra_g
+                  >> ket_Nr >> ket_lr >> ket_Nc >> ket_lc
+                  >> ket_L  >> ket_S  >> ket_J  >> ket_T  >> ket_g
+                  >> matrix_element;
+                mcutils::ParsingCheck(line_stream, line_count, line);
 
                 // validate labels
                 bool expected_labels = true
@@ -1148,9 +1348,15 @@ namespace basis {
                   && (ket_J==ket.J())
                   && (ket_T==ket.T());
                 assert(expected_labels);
-                // save matrix element
-                sector_matrix(bra_index,ket_index) = matrix_element;
               }
+              else
+              {
+                matrix_element = buffer[i++];
+              }
+
+              // save matrix element
+              sector_matrix(bra_index,ket_index) = matrix_element;
+            }
 
           // store matrix for sector
           matrices.push_back(std::move(sector_matrix));
@@ -1161,7 +1367,8 @@ namespace basis {
       std::ostream& os,
       int T0,
       const basis::RelativeCMSectorsLSJT& sectors,
-      const basis::OperatorBlocks<double>& matrices
+      const basis::OperatorBlocks<double>& matrices,
+      mcutils::IOMode io_mode
     )
   {
 
@@ -1181,7 +1388,32 @@ namespace basis {
         // sectors are stored.
         assert(sector.bra_subspace_index()<=sector.ket_subspace_index());
 
+        // temporary buffer for binary write
+        std::vector<double> buffer;
+        std::size_t sector_entries = 0;
+        if (io_mode == mcutils::IOMode::kBinary)
+          {
+            // calculate number of matrix elements in sector
+            if (sector.IsDiagonal())
+              // diagonal sector
+              {
+                const std::size_t& dimension = ket_subspace.size();
+                sector_entries = dimension*(dimension+1)/2;
+              }
+            else  // if (sector.IsUpperTriangle())
+              // upper triangle sector (but not diagonal)
+              {
+                const std::size_t& bra_dimension = bra_subspace.size();
+                const std::size_t& ket_dimension = ket_subspace.size();
+                sector_entries = bra_dimension*ket_dimension;
+              }
+
+            // allocate buffer
+            buffer.resize(sector_entries, 0.);
+          }
+
         // iterate over matrix elements
+        std::size_t i = 0;
         for (std::size_t bra_index=0; bra_index<bra_subspace.size(); ++bra_index)
           for (std::size_t ket_index=0; ket_index<ket_subspace.size(); ++ket_index)
             {
@@ -1198,39 +1430,49 @@ namespace basis {
               // extract matrix element
               const double matrix_element = matrices[sector_index](bra_index,ket_index);
 
-              // generate output line
-              const int width = 3;
-              const int precision = 8;  // for approximately single precision output
-              os << std::setprecision(precision);
-              os
-                << " " << std::setw(width) << T0
-                << " " << "  "
-                << " " << std::setw(width) << bra.Nr()
-                << " " << std::setw(width) << bra.lr()
-                << " " << std::setw(width) << bra.Nc()
-                << " " << std::setw(width) << bra.lc()
-                << " " << std::setw(width) << bra.L()
-                << " " << std::setw(width) << bra.S()
-                << " " << std::setw(width) << bra.J()
-                << " " << std::setw(width) << bra.T()
-                << " " << std::setw(width) << bra.g()
-                << " " << "    "
-                << " " << std::setw(width) << ket.Nr()
-                << " " << std::setw(width) << ket.lr()
-                << " " << std::setw(width) << ket.Nc()
-                << " " << std::setw(width) << ket.lc()
-                << " " << std::setw(width) << ket.L()
-                << " " << std::setw(width) << ket.S()
-                << " " << std::setw(width) << ket.J()
-                << " " << std::setw(width) << ket.T()
-                << " " << std::setw(width) << ket.g()
-                << " " << "    "
-                << " " << std::showpoint << std::scientific << matrix_element
-                << std::endl;
+              if (io_mode == mcutils::IOMode::kText)
+                {
+                  // generate output line
+                  const int width = 3;
+                  const int precision = 8;  // for approximately single precision output
+                  os << std::setprecision(precision);
+                  os
+                    << " " << std::setw(width) << T0
+                    << " " << "  "
+                    << " " << std::setw(width) << bra.Nr()
+                    << " " << std::setw(width) << bra.lr()
+                    << " " << std::setw(width) << bra.Nc()
+                    << " " << std::setw(width) << bra.lc()
+                    << " " << std::setw(width) << bra.L()
+                    << " " << std::setw(width) << bra.S()
+                    << " " << std::setw(width) << bra.J()
+                    << " " << std::setw(width) << bra.T()
+                    << " " << std::setw(width) << bra.g()
+                    << " " << "    "
+                    << " " << std::setw(width) << ket.Nr()
+                    << " " << std::setw(width) << ket.lr()
+                    << " " << std::setw(width) << ket.Nc()
+                    << " " << std::setw(width) << ket.lc()
+                    << " " << std::setw(width) << ket.L()
+                    << " " << std::setw(width) << ket.S()
+                    << " " << std::setw(width) << ket.J()
+                    << " " << std::setw(width) << ket.T()
+                    << " " << std::setw(width) << ket.g()
+                    << " " << "    "
+                    << " " << std::showpoint << std::scientific << matrix_element
+                    << std::endl;
+                }
+              else  // if (io_mode == mcutils::IOMode::kText)
+                {
+                  buffer[i++] = matrix_element;
+                }
 
             }
 
-      };
+        // write temporary buffer to file
+        if (io_mode == mcutils::IOMode::kBinary)
+          mcutils::WriteBinary<double>(os,buffer.data(),sector_entries);
+      }
   }
 
 
@@ -1246,17 +1488,25 @@ namespace basis {
   // FUTURE: check file status on open
   {
 
+    // deduce I/O mode
+    mcutils::IOMode io_mode = mcutils::DeducedIOMode(filename);
+
     // open stream for reading
     if (verbose)
       {
         std::cout
           << "Reading relative-cm operator file..." << std::endl
-          << "  Filename: " << filename << std::endl;
+          << "  Filename: " << filename << std::endl
+          << "  Mode: " << ((io_mode == mcutils::IOMode::kText) ? "text" : "binary")
+          << std::endl;
       }
-    std::ifstream is(filename.c_str());
+    std::ios_base::openmode mode_argument = std::ios_base::in;
+    if (io_mode==mcutils::IOMode::kBinary)
+      mode_argument |= std::ios_base::binary;
+    std::ifstream is(filename.c_str(), mode_argument);
 
     // read header parameters
-    basis::ReadRelativeCMOperatorParametersLSJT(is, operator_parameters);
+    basis::ReadRelativeCMOperatorParametersLSJT(is, operator_parameters, io_mode);
     if (verbose)
       {
         std::cout
@@ -1289,7 +1539,8 @@ namespace basis {
         basis::ReadRelativeCMOperatorComponentLSJT(
             is,
             T0,
-            component_sectors[T0], component_matrices[T0]
+            component_sectors[T0], component_matrices[T0],
+            io_mode
           );
       }
 
@@ -1318,14 +1569,22 @@ namespace basis {
   // FUTURE: check file status on open
   {
 
+    // deduce I/O mode
+    mcutils::IOMode io_mode = mcutils::DeducedIOMode(filename);
+
     // open stream for writing
     if (verbose)
       {
         std::cout
           << "Writing relative-cm operator file..." << std::endl
-          << "  Filename: " << filename << std::endl;
+          << "  Filename: " << filename << std::endl
+          << "  Mode: " << ((io_mode == mcutils::IOMode::kText) ? "text" : "binary")
+          << std::endl;
       }
-    std::ofstream os(filename.c_str());
+    std::ios_base::openmode mode_argument = std::ios_base::out;
+    if (io_mode==mcutils::IOMode::kBinary)
+      mode_argument |= std::ios_base::binary;
+    std::ofstream os(filename.c_str(), mode_argument);
 
     // set up full operator file parameters
     int Nmax = space.Nmax();
@@ -1346,7 +1605,7 @@ namespace basis {
       }
 
     // write header parameters
-    basis::WriteRelativeCMOperatorParametersLSJT(os,operator_parameters);
+    basis::WriteRelativeCMOperatorParametersLSJT(os,operator_parameters,io_mode);
 
     // write matrices
     for (int T0=operator_parameters.T0_min; T0<=operator_parameters.T0_max; ++T0)
@@ -1354,10 +1613,68 @@ namespace basis {
         basis::WriteRelativeCMOperatorComponentLSJT(
             os,
             T0,
-            component_sectors[T0], component_matrices[T0]
+            component_sectors[T0], component_matrices[T0],
+            io_mode
           );
       }
 
+  }
+
+  ////////////////////////////////////////////////////////////////
+  // relative LSJT operator construction
+  ////////////////////////////////////////////////////////////////
+
+  void ConstructZeroOperatorRelativeCMLSJT(
+      const basis::OperatorLabelsJT& operator_labels,
+      const basis::RelativeCMSpaceLSJT& relative_cm_space,
+      std::array<basis::RelativeCMSectorsLSJT,3>& relative_cm_component_sectors,
+      std::array<basis::OperatorBlocks<double>,3>& relative_cm_component_matrices
+    )
+  {
+
+    for (int T0=operator_labels.T0_min; T0<=operator_labels.T0_max; ++T0)
+      // for each isospin component
+      {
+
+        // enumerate sectors
+        relative_cm_component_sectors[T0]
+          = basis::RelativeCMSectorsLSJT(relative_cm_space,operator_labels.J0,T0,operator_labels.g0);
+
+        // populate matrices
+        relative_cm_component_matrices[T0].resize(relative_cm_component_sectors[T0].size());
+        basis::SetOperatorToZero(relative_cm_component_sectors[T0],relative_cm_component_matrices[T0]);
+      }
+  }
+
+  void ConstructIdentityOperatorRelativeCMLSJT(
+      const basis::OperatorLabelsJT& operator_labels,
+      const basis::RelativeCMSpaceLSJT& relative_cm_space,
+      std::array<basis::RelativeCMSectorsLSJT,3>& relative_cm_component_sectors,
+      std::array<basis::OperatorBlocks<double>,3>& relative_cm_component_matrices
+    )
+  {
+
+    // validate operator labels
+    assert(operator_labels.J0==0);
+    assert(operator_labels.g0==0);
+    assert(operator_labels.symmetry_phase_mode==basis::SymmetryPhaseMode::kHermitian);
+
+    for (int T0=operator_labels.T0_min; T0<=operator_labels.T0_max; ++T0)
+      // for each isospin component
+      {
+
+        // enumerate sectors
+        relative_cm_component_sectors[T0]
+          = basis::RelativeCMSectorsLSJT(relative_cm_space,operator_labels.J0,T0,operator_labels.g0);
+
+        // populate matrices
+        relative_cm_component_matrices[T0].resize(relative_cm_component_sectors[T0].size());
+        if (T0==0)
+          // identity matrices in
+          basis::SetOperatorToIdentity(relative_cm_component_sectors[T0],relative_cm_component_matrices[T0]);
+        else
+          basis::SetOperatorToZero(relative_cm_component_sectors[T0],relative_cm_component_matrices[T0]);
+      }
   }
 
   ////////////////////////////////////////////////////////////////
