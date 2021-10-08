@@ -386,7 +386,7 @@ namespace basis {
       this->subspace_offsets_.push_back(this->dimension_);  // save offset
       (this->lookup_)[subspace.labels()] = BaseSpaceType::size();  // save index
       subspace_degeneracies_.push_back(degeneracy);  // save degeneracy
-      full_size += degeneracy;
+      full_size_ += degeneracy;
       this->dimension_ += subspace.dimension()*degeneracy;  // save dimension
       this->subspace_ptrs_.push_back(
           std::make_shared<const SubspaceType>(std::forward<T>(subspace))
