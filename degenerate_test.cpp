@@ -182,10 +182,10 @@ namespace basis {
           if (bra_index > ket_index)
             continue;
 
-          const auto& bra_subspace = space.GetSubspace(bra_index);
-          const auto& ket_subspace = space.GetSubspace(ket_index);
+          const auto& bra_subspace_ptr = space.GetSubspacePtr(bra_index);
+          const auto& ket_subspace_ptr = space.GetSubspacePtr(ket_index);
 
-          if (!am::AllowedTriangle(bra_subspace.J(), J0, ket_subspace.J()))
+          if (!am::AllowedTriangle(bra_subspace_ptr->J(), J0, ket_subspace_ptr->J()))
             continue;
 
           const auto bra_degeneracy = space.GetSubspaceDegeneracy(bra_index);
@@ -194,7 +194,7 @@ namespace basis {
           EmplaceSector(
               bra_index, ket_index,
               bra_degeneracy, ket_degeneracy,
-              bra_subspace, ket_subspace
+              bra_subspace_ptr, ket_subspace_ptr
             );
         }
     }

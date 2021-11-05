@@ -161,6 +161,11 @@
       both BaseSectors and BaseSector.
     - Fix BaseSectors::DebugStr for size/dimension distinction.
   + 09/30/21 (pjf): Add BaseSpace::full_size() accessor.
+  + 11/04/21 (pjf):
+    - Revert to shared pointer to vector in BaseSpace.
+    - Remove std::enable_shared_from_this.
+    - Add GetSubspacePtr() accessor to BaseSpace using shared_ptr aliasing.
+    - Make BaseSector take shared pointers instead of const references.
 ****************************************************************/
 
 #ifndef BASIS_BASIS_H_
@@ -243,7 +248,6 @@ namespace basis {
       typename tStateType, typename tStateLabelsType
     >
   class BaseSubspace
-      : public std::enable_shared_from_this<tDerivedSubspaceType>
   {
 
     public:
@@ -728,7 +732,6 @@ namespace basis {
   // specialize class for case with no labels
   template <typename tDerivedSpaceType, typename tSubspaceType>
     class BaseSpace<tDerivedSpaceType, tSubspaceType, void>
-        : public std::enable_shared_from_this<tDerivedSpaceType>
     {
       public:
 
@@ -745,8 +748,10 @@ namespace basis {
       ////////////////////////////////////////////////////////////////
 
       BaseSpace()
-        : dimension_{0}, subspace_ptrs_{}, lookup_{}
-      {}
+        : dimension_{0}, subspaces_ptr_{}, lookup_{}
+      {
+        subspaces_ptr_ = std::make_shared<std::vector<SubspaceType>>();
+      }
 
       public:
 
@@ -865,14 +870,23 @@ namespace basis {
 
         std::size_t subspace_index = LookUpSubspaceIndex(subspace_labels);
         assert(subspace_index!=kNone);
-        return *(subspace_ptrs_.at(subspace_index));
+        return subspaces_ptr_->at(subspace_index);
       };
 
       const SubspaceType& GetSubspace(std::size_t i) const
       /// Given the index for a subspace, return a reference to the
       /// subspace.
       {
-        return *(subspace_ptrs_.at(i));
+        return subspaces_ptr_->at(i);
+      };
+
+      std::shared_ptr<const SubspaceType> GetSubspacePtr(std::size_t i) const
+      /// Given the index for a subspace, return a shared pointer to the
+      /// subspace.
+      {
+        return std::shared_ptr<const SubspaceType>(
+            subspaces_ptr_, &(subspaces_ptr_->at(i))
+          );
       };
 
       std::size_t GetSubspaceOffset(std::size_t i) const
@@ -889,7 +903,7 @@ namespace basis {
       std::size_t size() const
       /// Return the number of subspaces within the space.
       {
-        return subspace_ptrs_.size();
+        return subspaces_ptr_->size();
       };
 
       inline std::size_t full_size() const { return size(); }
@@ -922,7 +936,7 @@ namespace basis {
     inline void reserve(std::size_t new_cap)
     // Reserve storage for labels.
     {
-      subspace_ptrs_.reserve(new_cap);
+      subspaces_ptr_->reserve(new_cap);
       subspace_offsets_.reserve(new_cap);
       lookup_.reserve(new_cap);
     }
@@ -930,13 +944,13 @@ namespace basis {
     inline std::size_t capacity() const noexcept
     // Reserve storage for labels.
     {
-      return subspace_ptrs_.capacity();
+      return subspaces_ptr_->capacity();
     }
 
     inline void shrink_to_fit()
     // Reserve storage for labels.
     {
-      subspace_ptrs_.shrink_to_fit();
+      subspaces_ptr_->shrink_to_fit();
     }
 
       ////////////////////////////////////////////////////////////////
@@ -951,9 +965,7 @@ namespace basis {
         subspace_offsets_.push_back(dimension_);
         lookup_[subspace.labels()] = size();  // index for lookup
         dimension_ += subspace.dimension();
-        subspace_ptrs_.push_back(
-            std::make_shared<const SubspaceType>(std::forward<T>(subspace))
-          );  // save subspace
+        subspaces_ptr_->push_back(std::forward<T>(subspace));  // save subspace
       };
 
       template <class... Args>
@@ -963,10 +975,8 @@ namespace basis {
       {
         const std::size_t index = size();  // index for lookup
         subspace_offsets_.push_back(dimension_);
-        subspace_ptrs_.push_back(
-            std::make_shared<const SubspaceType>(std::forward<Args>(args)...)
-          );
-        const SubspaceType& subspace = *(subspace_ptrs_.back());
+        subspaces_ptr_->emplace_back(std::forward<Args>(args)...);
+        const SubspaceType& subspace = subspaces_ptr_->back();
         lookup_[subspace.labels()] = index;
         dimension_ += subspace.dimension();
       }
@@ -982,7 +992,7 @@ namespace basis {
       ////////////////////////////////////////////////////////////////
 
       /// subspaces (accessible by index)
-      std::vector<std::shared_ptr<const SubspaceType>> subspace_ptrs_;
+      std::shared_ptr<std::vector<SubspaceType>> subspaces_ptr_;
       std::vector<std::size_t> subspace_offsets_;
       std::size_t dimension_;
 
@@ -1128,14 +1138,15 @@ namespace basis {
 
       BaseSector(
           std::size_t bra_subspace_index, std::size_t ket_subspace_index,
-          const BraSubspaceType& bra_subspace, const KetSubspaceType& ket_subspace,
+          std::shared_ptr<const BraSubspaceType> bra_subspace_ptr,
+          std::shared_ptr<const KetSubspaceType> ket_subspace_ptr,
           std::size_t multiplicity_index=1
         )
         : bra_subspace_index_(bra_subspace_index),
           ket_subspace_index_(ket_subspace_index),
           multiplicity_index_(multiplicity_index),
-          bra_subspace_ptr_(bra_subspace.shared_from_this()),
-          ket_subspace_ptr_(ket_subspace.shared_from_this())
+          bra_subspace_ptr_(std::move(bra_subspace_ptr)),
+          ket_subspace_ptr_(std::move(ket_subspace_ptr))
       {}
 
       ////////////////////////////////////////////////////////////////
@@ -1156,6 +1167,16 @@ namespace basis {
       const BraSubspaceType& bra_subspace() const {return *bra_subspace_ptr_;}
       const KetSubspaceType& ket_subspace() const {return *ket_subspace_ptr_;}
       // Return reference to bra/ket subspace.
+
+      std::shared_ptr<const BraSubspaceType> bra_subspace_ptr() const
+      {
+        return bra_subspace_ptr_;
+      }
+      std::shared_ptr<const KetSubspaceType> ket_subspace_ptr() const
+      {
+        return ket_subspace_ptr_;
+      }
+      // Return shared pointer to bra/ket subspace.
 
       std::size_t multiplicity_index() const {return multiplicity_index_;}
       // Return multiplicity index of this sector.
@@ -1205,12 +1226,13 @@ namespace basis {
 
       inline BaseSector(
           std::size_t bra_subspace_index, std::size_t ket_subspace_index,
-          const SubspaceType& bra_subspace, const SubspaceType& ket_subspace,
+          std::shared_ptr<const SubspaceType> bra_subspace_ptr,
+          std::shared_ptr<const SubspaceType> ket_subspace_ptr,
           std::size_t multiplicity_index=1
         )
         : BaseSector<tSubspaceType, tSubspaceType, false>{
             bra_subspace_index, ket_subspace_index,
-            bra_subspace,ket_subspace, multiplicity_index
+            bra_subspace_ptr, ket_subspace_ptr, multiplicity_index
         }
         {}
     };
@@ -1274,14 +1296,29 @@ namespace basis {
       // default constructor -- provided since required for certain
       // purposes by STL container classes (e.g., std::vector::resize)
 
+      BaseSectors(
+            const std::shared_ptr<const BraSpaceType>& bra_space_ptr,
+            const std::shared_ptr<const KetSpaceType>& ket_space_ptr
+          )
+          : bra_space_ptr_{bra_space_ptr}, ket_space_ptr_{ket_space_ptr}
+      {}
+
+      BaseSectors(
+            std::shared_ptr<const BraSpaceType>&& bra_space_ptr,
+            std::shared_ptr<const KetSpaceType>&& ket_space_ptr
+          )
+          : bra_space_ptr_{std::move(bra_space_ptr)},
+            ket_space_ptr_{std::move(ket_space_ptr)}
+      {}
+
       template<
           typename T, typename U,
           typename std::enable_if_t<std::is_same_v<std::decay_t<T>, BraSpaceType>>* = nullptr,
           typename std::enable_if_t<std::is_same_v<std::decay_t<U>, KetSpaceType>>* = nullptr
         >
       BaseSectors(T&& bra_space, U&& ket_space)
-        : bra_space_ptr_(bra_space.weak_from_this().lock()),
-          ket_space_ptr_(ket_space.weak_from_this().lock())
+        // : bra_space_ptr_(bra_space.weak_from_this().lock()),
+        //   ket_space_ptr_(ket_space.weak_from_this().lock())
       {
         // if bra_space or ket_space is not managed by a shared_ptr, make copy
         // or move it to a locally-created shared_ptr.
@@ -1289,10 +1326,10 @@ namespace basis {
         // Note: this is probably safe, since the spaces themselves store
         // vectors of shared_ptrs to subspaces, so a copy only involves copying
         // those vectors and maps
-        if (!bra_space_ptr_)
+        // if (!bra_space_ptr_)
           bra_space_ptr_
             = std::make_shared<const BraSpaceType>(std::forward<T>(bra_space));
-        if (!ket_space_ptr_)
+        // if (!ket_space_ptr_)
         {
           // if bra and ket spaces are identical, we can share the new copy we
           // just made for the bra_space_ptr_
@@ -1322,6 +1359,16 @@ namespace basis {
       const KetSpaceType& ket_space() const
       {
         return *ket_space_ptr_;
+      }
+
+      std::shared_ptr<const BraSpaceType> bra_space_ptr() const
+      {
+        return bra_space_ptr_;
+      }
+
+      std::shared_ptr<const KetSpaceType> ket_space_ptr() const
+      {
+        return ket_space_ptr_;
       }
 
       ////////////////////////////////////////////////////////////////
@@ -1473,8 +1520,8 @@ namespace basis {
       {
         EmplaceSector(
             bra_subspace_index, ket_subspace_index,
-            bra_space_ptr_->GetSubspace(bra_subspace_index),
-            ket_space_ptr_->GetSubspace(ket_subspace_index),
+            bra_space_ptr_->GetSubspacePtr(bra_subspace_index),
+            ket_space_ptr_->GetSubspacePtr(ket_subspace_index),
             multiplicity_index
           );  // save sector
       }
@@ -1538,6 +1585,20 @@ namespace basis {
       ////////////////////////////////////////////////////////////////
 
       BaseSectors() = default;
+
+      inline explicit BaseSectors(std::shared_ptr<SpaceType> space_ptr)
+        : BaseSectors{space_ptr, std::move(space_ptr)}
+      {}
+      // construct from shared_ptr to space
+
+      inline explicit BaseSectors(
+          std::shared_ptr<SpaceType> bra_space_ptr,
+          std::shared_ptr<SpaceType> ket_space_ptr
+        )
+        : BaseSectors<tSpaceType, tSpaceType, tSectorType, false>{
+              std::move(bra_space_ptr), std::move(ket_space_ptr)
+            }
+      {}
 
       template<
           typename T,

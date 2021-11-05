@@ -43,6 +43,7 @@
       a BaseDegenerateSpace.
     - Make all degeneracy indices unsigned int.
   + 09/30/21 (pjf): Add BaseDegenerateSpace::full_size() accessor.
+  + 11/04/21 (pjf): Update for basis.h shared pointer changes.
 ****************************************************************/
 
 #ifndef BASIS_DEGENERATE_H_
@@ -388,9 +389,7 @@ namespace basis {
       subspace_degeneracies_.push_back(degeneracy);  // save degeneracy
       full_size_ += degeneracy;
       this->dimension_ += subspace.dimension()*degeneracy;  // save dimension
-      this->subspace_ptrs_.push_back(
-          std::make_shared<const SubspaceType>(std::forward<T>(subspace))
-        );  // save space
+      this->subspaces_ptr_->push_back(std::forward<T>(subspace));  // save space
     };
 
     template <class... Args>
@@ -404,10 +403,8 @@ namespace basis {
     {
       const std::size_t index = BaseSpaceType::size();  // index for lookup
       this->subspace_offsets_.push_back(this->dimension_);  // save offset
-      this->subspace_ptrs_.push_back(
-          std::make_shared<SubspaceType>(std::forward<Args>(args)...)
-        );  // construct/emplace space
-      const SubspaceType& subspace = *(this->subspace_ptrs_.back());
+      this->subspaces_ptr_->push_back(std::forward<Args>(args)...);  // construct/emplace space
+      const SubspaceType& subspace = this->subspaces_ptr_->back();
       (this->lookup_)[subspace.labels()] = index;  // save index for lookup
       subspace_degeneracies_.push_back(degeneracy);  // save degeneracy
       full_size_ += degeneracy;
@@ -460,12 +457,13 @@ namespace basis {
     BaseDegenerateSector(
         std::size_t bra_subspace_index, std::size_t ket_subspace_index,
         unsigned int bra_subspace_degeneracy, unsigned int ket_subspace_degeneracy,
-        const BraSubspaceType& bra_subspace, const KetSubspaceType& ket_subspace,
+        std::shared_ptr<const BraSubspaceType> bra_subspace_ptr,
+        std::shared_ptr<const KetSubspaceType> ket_subspace_ptr,
         std::size_t multiplicity_index=1
       )
       : BaseSectorType{
             bra_subspace_index, ket_subspace_index,
-            bra_subspace, ket_subspace,
+            bra_subspace_ptr, ket_subspace_ptr,
             multiplicity_index
           },
         bra_subspace_degeneracy_{bra_subspace_degeneracy},
