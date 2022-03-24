@@ -44,6 +44,7 @@
     - Make all degeneracy indices unsigned int.
   + 09/30/21 (pjf): Add BaseDegenerateSpace::full_size() accessor.
   + 11/04/21 (pjf): Update for basis.h shared pointer changes.
+  + 03/23/22 (pjf): Add offset accessors to BaseDegenerateSector.
 ****************************************************************/
 
 #ifndef BASIS_DEGENERATE_H_
@@ -482,6 +483,22 @@ namespace basis {
     inline unsigned int ket_subspace_degeneracy() const
     {
       return ket_subspace_degeneracy_;
+    }
+
+    inline unsigned int GetBlockOffset(
+        int bra_degeneracy_index, int ket_degeneracy_index
+      ) const
+    {
+      return
+        ((bra_degeneracy_index-1) * ket_subspace_degeneracy() + (ket_degeneracy_index-1))
+        * BaseSectorType::bra_subspace().dimension()
+        * BaseSectorType::ket_subspace().dimension();
+    }
+
+    inline std::size_t num_block_elements() const
+    {
+      return BaseSectorType::bra_subspace().dimension()
+        * BaseSectorType::ket_subspace().dimension();
     }
 
     inline std::size_t num_elements() const
