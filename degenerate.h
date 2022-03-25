@@ -45,6 +45,7 @@
   + 09/30/21 (pjf): Add BaseDegenerateSpace::full_size() accessor.
   + 11/04/21 (pjf): Update for basis.h shared pointer changes.
   + 03/23/22 (pjf): Add offset accessors to BaseDegenerateSector.
+  + 03/25/22 (pjf): Fix constructor templates when using `void` label types.
 ****************************************************************/
 
 #ifndef BASIS_DEGENERATE_H_
@@ -106,7 +107,6 @@ namespace basis {
     // from BaseSubspace (they are not recognized as inherited types
     // below)
 
-    using SubspaceLabelsType = typename BaseSubspaceType::SubspaceLabelsType;
     using StateLabelsType = typename BaseSubspaceType::StateLabelsType;
 
     protected:
@@ -120,8 +120,11 @@ namespace basis {
     BaseDegenerateSubspace() : full_dimension_(0) {}
 
     // pass-through constructor accepting labels
-    explicit BaseDegenerateSubspace(const SubspaceLabelsType& labels)
-      : full_dimension_{0}, BaseSubspaceType{labels}
+    //   n.b. the dummy argument "BST" is SFINAE black magic
+    //   see: https://stackoverflow.com/a/13401982
+    template<typename BST = BaseSubspaceType, typename T = typename BST::SubspaceLabelsType>
+    explicit BaseDegenerateSubspace(T&& labels)
+      : full_dimension_{0}, BaseSubspaceType{std::forward<T>(labels)}
     {}
 
     public:
@@ -308,7 +311,6 @@ namespace basis {
     ////////////////////////////////////////////////////////////////
 
     using SubspaceType = typename BaseSpaceType::SubspaceType;
-    using SpaceLabelsType = typename BaseSpaceType::SpaceLabelsType;
 
     protected:
 
@@ -321,8 +323,9 @@ namespace basis {
     BaseDegenerateSpace() = default;
 
     // pass-through constructor accepting labels
-    //   n.b. this template here is SFINAE black magic
-    template<typename T = SpaceLabelsType>
+    //   n.b. the dummy argument "BST" is SFINAE black magic
+    //   see: https://stackoverflow.com/a/13401982
+    template<typename BST = BaseSpaceType, typename T = typename BST::SpaceLabelsType>
     explicit BaseDegenerateSpace(T&& labels)
       : BaseSpaceType{std::forward<T>(labels)}, full_size_{0}
     {}
