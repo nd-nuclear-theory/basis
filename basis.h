@@ -166,6 +166,8 @@
     - Remove std::enable_shared_from_this.
     - Add GetSubspacePtr() accessor to BaseSpace using shared_ptr aliasing.
     - Make BaseSector take shared pointers instead of const references.
+  + 03/25/22 (pjf):
+    - Modify BaseSubspace to allow definition with `void` labels.
 ****************************************************************/
 
 #ifndef BASIS_BASIS_H_
@@ -243,11 +245,19 @@ namespace basis {
   /// tuple<int> (as opposed to plain int) to make the two forms of the
   /// state constructor syntactically distinct.
 
+  // declare BaseSubspace template
   template <
       typename tDerivedSubspaceType, typename tSubspaceLabelsType,
       typename tStateType, typename tStateLabelsType
     >
-  class BaseSubspace
+  class BaseSubspace;
+
+  // specialize class for case with no labels
+  template <
+      typename tDerivedSubspaceType,
+      typename tStateType, typename tStateLabelsType
+    >
+  class BaseSubspace<tDerivedSubspaceType, void, tStateType, tStateLabelsType>
   {
 
     public:
@@ -256,8 +266,6 @@ namespace basis {
     //  common typedefs
     ////////////////////////////////////////////////////////////////
 
-    using LabelsType = tSubspaceLabelsType;
-    using SubspaceLabelsType = tSubspaceLabelsType;
     using StateLabelsType = tStateLabelsType;
 
     protected:
@@ -269,11 +277,6 @@ namespace basis {
     /// default constructor
     //   Implicitly invoked by derived class.
     BaseSubspace() : dimension_(0) {}
-
-    // pass-through constructor accepting labels
-    explicit BaseSubspace(const SubspaceLabelsType& labels)
-      : dimension_{0}, labels_{labels}
-    {}
 
     public:
 
@@ -364,25 +367,6 @@ namespace basis {
     ////////////////////////////////////////////////////////////////
     // retrieval
     ////////////////////////////////////////////////////////////////
-
-    const SubspaceLabelsType& labels() const
-    /// Return the labels of the subspace itself.
-    {
-      return labels_;
-    }
-
-#ifdef BASIS_ALLOW_DEPRECATED
-    DEPRECATED("use labels() instead")
-    const SubspaceLabelsType& GetSubspaceLabels() const
-    /// Return the labels of the subspace itself.
-    ///
-    /// DEPRECATED in favor of labels().
-    ///
-    /// To fix: grep GetSubspaceLabels -R --include="*.cpp"
-    {
-      return labels_;
-    }
-#endif
 
     const StateLabelsType& GetStateLabels(std::size_t index) const
     /// Retrieve the labels of a state within the subspace, given its
@@ -496,7 +480,6 @@ namespace basis {
     ////////////////////////////////////////////////////////////////
 
     // subspace properties
-    const SubspaceLabelsType labels_;
     std::size_t dimension_;
 
     // state labels (accessible by index)
@@ -516,10 +499,10 @@ namespace basis {
   // tStateType are complete types
 
   template <
-      typename tDerivedSubspaceType, typename tSubspaceLabelsType,
+      typename tDerivedSubspaceType,
       typename tStateType, typename tStateLabelsType
     >
-  tStateType BaseSubspace<tDerivedSubspaceType,tSubspaceLabelsType,tStateType,tStateLabelsType>::GetState(
+  tStateType BaseSubspace<tDerivedSubspaceType,void,tStateType,tStateLabelsType>::GetState(
       std::size_t index
     ) const
   {
@@ -527,15 +510,82 @@ namespace basis {
   }
 
   template <
-      typename tDerivedSubspaceType, typename tSubspaceLabelsType,
+      typename tDerivedSubspaceType,
       typename tStateType, typename tStateLabelsType
     >
-  tStateType BaseSubspace<tDerivedSubspaceType,tSubspaceLabelsType,tStateType,tStateLabelsType>::GetState(
+  tStateType BaseSubspace<tDerivedSubspaceType,void,tStateType,tStateLabelsType>::GetState(
       const tStateLabelsType& state_labels
     ) const
   {
     return tStateType{*static_cast<const tDerivedSubspaceType*>(this), state_labels};
   }
+
+  // inherit from BaseSpace and add labels
+  template <
+      typename tDerivedSubspaceType, typename tSubspaceLabelsType,
+      typename tStateType, typename tStateLabelsType
+    >
+  class BaseSubspace : public BaseSubspace<tDerivedSubspaceType, void, tStateType, tStateLabelsType>
+  {
+
+    public:
+
+    ////////////////////////////////////////////////////////////////
+    //  common typedefs
+    ////////////////////////////////////////////////////////////////
+
+    using LabelsType = tSubspaceLabelsType;
+    using SubspaceLabelsType = tSubspaceLabelsType;
+
+    protected:
+
+    ////////////////////////////////////////////////////////////////
+    // general constructors
+    ////////////////////////////////////////////////////////////////
+
+    /// default constructor
+    //   Implicitly invoked by derived class.
+    BaseSubspace() = default;
+
+    // pass-through constructor accepting labels
+    explicit BaseSubspace(const SubspaceLabelsType& labels)
+      : labels_{labels}
+    {}
+
+    public:
+
+    ////////////////////////////////////////////////////////////////
+    // retrieval
+    ////////////////////////////////////////////////////////////////
+
+    const SubspaceLabelsType& labels() const
+    /// Return the labels of the subspace itself.
+    {
+      return labels_;
+    }
+
+#ifdef BASIS_ALLOW_DEPRECATED
+    DEPRECATED("use labels() instead")
+    const SubspaceLabelsType& GetSubspaceLabels() const
+    /// Return the labels of the subspace itself.
+    ///
+    /// DEPRECATED in favor of labels().
+    ///
+    /// To fix: grep GetSubspaceLabels -R --include="*.cpp"
+    {
+      return labels_;
+    }
+#endif
+
+    private:
+
+    ////////////////////////////////////////////////////////////////
+    // private storage
+    ////////////////////////////////////////////////////////////////
+
+    // subspace properties
+    const SubspaceLabelsType labels_;
+  };
 
   ////////////////////////////////////////////////////////////////
   // generic state realized within subspace
