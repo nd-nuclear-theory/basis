@@ -168,8 +168,11 @@
     - Make BaseSector take shared pointers instead of const references.
   + 03/25/22 (pjf):
     - Modify BaseSubspace to allow definition with `void` labels.
-  + 04/02/22 (pjf): Defer initialization of shared_ptr in BaseSpace until
-    PushSubspace/EmplaceSubspace/reserve.
+  + 04/02/22 (pjf):
+    - Defer initialization of shared_ptr in BaseSpace until
+      PushSubspace/EmplaceSubspace/reserve.
+    - Make labels in BaseSubspace and BaseSpace non-const, to avoid deleting
+      copy and move constructors.
 ****************************************************************/
 
 #ifndef BASIS_BASIS_H_
@@ -586,7 +589,7 @@ namespace basis {
     ////////////////////////////////////////////////////////////////
 
     // subspace properties
-    const SubspaceLabelsType labels_;
+    SubspaceLabelsType labels_;
   };
 
   ////////////////////////////////////////////////////////////////
@@ -1120,7 +1123,7 @@ namespace basis {
       ////////////////////////////////////////////////////////////////
 
       /// space labels
-      const SpaceLabelsType labels_;
+      SpaceLabelsType labels_;
     };
 
   ////////////////////////////////////////////////////////////////
