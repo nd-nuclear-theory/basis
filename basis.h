@@ -168,6 +168,8 @@
     - Make BaseSector take shared pointers instead of const references.
   + 03/25/22 (pjf):
     - Modify BaseSubspace to allow definition with `void` labels.
+  + 04/02/22 (pjf): Defer initialization of shared_ptr in BaseSpace until
+    PushSubspace/EmplaceSubspace/reserve.
 ****************************************************************/
 
 #ifndef BASIS_BASIS_H_
@@ -442,20 +444,20 @@ namespace basis {
     ////////////////////////////////////////////////////////////////
 
     inline void reserve(std::size_t new_cap)
-    // Reserve storage for labels.
+    /// Reserve storage for labels.
     {
       state_table_.reserve(new_cap);
       lookup_.reserve(new_cap);
     }
 
     inline std::size_t capacity() const noexcept
-    // Reserve storage for labels.
+    /// Get size of reserved storage for labels.
     {
       return state_table_.capacity();
     }
 
     inline void shrink_to_fit()
-    // Reserve storage for labels.
+    /// Shrink reserved storage for labels to fit contents.
     {
       state_table_.shrink_to_fit();
     }
@@ -520,7 +522,7 @@ namespace basis {
     return tStateType{*static_cast<const tDerivedSubspaceType*>(this), state_labels};
   }
 
-  // inherit from BaseSpace and add labels
+  // inherit from BaseSubspace and add labels
   template <
       typename tDerivedSubspaceType, typename tSubspaceLabelsType,
       typename tStateType, typename tStateLabelsType
@@ -797,11 +799,7 @@ namespace basis {
       // constructors
       ////////////////////////////////////////////////////////////////
 
-      BaseSpace()
-        : dimension_{0}, subspaces_ptr_{}, lookup_{}
-      {
-        subspaces_ptr_ = std::make_shared<std::vector<SubspaceType>>();
-      }
+      BaseSpace() = default;
 
       public:
 
@@ -885,7 +883,7 @@ namespace basis {
       /// Given the labels for a subspace, returns whether or not the
       /// subspace is found within the space.
       {
-        return lookup_.count(subspace_labels);
+        return (subspaces_ptr_) && lookup_.count(subspace_labels);
       }
 
       std::size_t LookUpSubspaceIndex(
@@ -896,10 +894,13 @@ namespace basis {
       ///
       /// If no such labels are found, basis::kNone is returned.
       {
-
         // PREVIOUSLY: trap failed lookup with assert for easier debugging
         // assert(ContainsSubspace(subspace_labels));
         // return lookup_.at(subspace_labels);
+
+        // short-circuit if subspaces_ptr_ is nullptr
+        if (!subspaces_ptr_)
+          return kNone;
 
         auto pos = lookup_.find(subspace_labels);
         if (pos==lookup_.end())
@@ -914,12 +915,13 @@ namespace basis {
       /// Given the labels for a subspace, retrieve a reference to the
       /// subspace.
       ///
-      /// If no such labels are found, an exception will result
-      /// (enforced by LookUpSubspaceIndex).
+      /// If no such labels are found, an exception will result.
       {
-
+        if (!subspaces_ptr_)
+          throw std::out_of_range("empty space");
         std::size_t subspace_index = LookUpSubspaceIndex(subspace_labels);
-        assert(subspace_index!=kNone);
+        if (subspace_index==kNone)
+          throw std::out_of_range("key not found");
         return subspaces_ptr_->at(subspace_index);
       };
 
@@ -927,6 +929,8 @@ namespace basis {
       /// Given the index for a subspace, return a reference to the
       /// subspace.
       {
+        if (!subspaces_ptr_)
+          throw std::out_of_range("empty space");
         return subspaces_ptr_->at(i);
       };
 
@@ -934,6 +938,8 @@ namespace basis {
       /// Given the index for a subspace, return a shared pointer to the
       /// subspace.
       {
+        if (!subspaces_ptr_)
+          throw std::out_of_range("empty space");
         return std::shared_ptr<const SubspaceType>(
             subspaces_ptr_, &(subspaces_ptr_->at(i))
           );
@@ -953,6 +959,8 @@ namespace basis {
       std::size_t size() const
       /// Return the number of subspaces within the space.
       {
+        if (!subspaces_ptr_)
+          return 0;
         return subspaces_ptr_->size();
       };
 
@@ -984,23 +992,29 @@ namespace basis {
     ////////////////////////////////////////////////////////////////
 
     inline void reserve(std::size_t new_cap)
-    // Reserve storage for labels.
+    /// Reserve storage for subspaces and labels.
     {
+      if (!subspaces_ptr_)
+        subspaces_ptr_ = std::make_shared<std::vector<SubspaceType>>();
       subspaces_ptr_->reserve(new_cap);
       subspace_offsets_.reserve(new_cap);
       lookup_.reserve(new_cap);
     }
 
     inline std::size_t capacity() const noexcept
-    // Reserve storage for labels.
+    /// Get current storage reserved for subspaces.
     {
+      if (!subspaces_ptr_)
+        return 0;
       return subspaces_ptr_->capacity();
     }
 
     inline void shrink_to_fit()
-    // Reserve storage for labels.
+    /// Shrink reserved storage for labels and offsets to fit contents.
     {
-      subspaces_ptr_->shrink_to_fit();
+      if (!subspaces_ptr_)
+        subspaces_ptr_->shrink_to_fit();
+      subspace_offsets_.shrink_to_fit();
     }
 
       ////////////////////////////////////////////////////////////////
@@ -1012,6 +1026,8 @@ namespace basis {
       /// Create indexing information (in both directions, index <->
       /// labels) for a subspace.
       {
+        if (!subspaces_ptr_)
+          subspaces_ptr_ = std::make_shared<std::vector<SubspaceType>>();
         subspace_offsets_.push_back(dimension_);
         lookup_[subspace.labels()] = size();  // index for lookup
         dimension_ += subspace.dimension();
@@ -1023,6 +1039,8 @@ namespace basis {
       /// Create indexing information (in both directions, index <->
       /// labels) for a subspace.
       {
+        if (!subspaces_ptr_)
+          subspaces_ptr_ = std::make_shared<std::vector<SubspaceType>>();
         const std::size_t index = size();  // index for lookup
         subspace_offsets_.push_back(dimension_);
         subspaces_ptr_->emplace_back(std::forward<Args>(args)...);

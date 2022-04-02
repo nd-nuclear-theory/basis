@@ -46,6 +46,8 @@
   + 11/04/21 (pjf): Update for basis.h shared pointer changes.
   + 03/23/22 (pjf): Add offset accessors to BaseDegenerateSector.
   + 03/25/22 (pjf): Fix constructor templates when using `void` label types.
+  + 04/02/22 (pjf): Defer initialization of shared_ptr in BaseSpace until
+    PushSubspace/EmplaceSubspace/reserve.
 ****************************************************************/
 
 #ifndef BASIS_DEGENERATE_H_
@@ -168,6 +170,29 @@ namespace basis {
 #endif
 
     protected:
+
+    ////////////////////////////////////////////////////////////////
+    // state label storage management (for initial construction)
+    ////////////////////////////////////////////////////////////////
+
+    inline void reserve(std::size_t new_cap)
+    /// Reserve storage for labels.
+    {
+      BaseSubspaceType::reserve(new_cap);
+      state_offsets_.reserve(new_cap);
+      state_degeneracies_.reserve(new_cap);
+    }
+
+    // inline std::size_t capacity() const noexcept;
+    //   inherited from BaseSpace
+
+    inline void shrink_to_fit()
+    /// Shrink reserved storage for labels to fit contents.
+    {
+      BaseSubspaceType::shrink_to_fit();
+      state_offsets_.shrink_to_fit();
+      state_degeneracies_.shrink_to_fit();
+    }
 
     ////////////////////////////////////////////////////////////////
     // state label push (for initial construction)
@@ -376,6 +401,27 @@ namespace basis {
     protected:
 
     ////////////////////////////////////////////////////////////////
+    // subspace storage management (for initial construction)
+    ////////////////////////////////////////////////////////////////
+
+    inline void reserve(std::size_t new_cap)
+    /// Reserve storage for subspaces and labels.
+    {
+      BaseSpaceType::reserve(new_cap);
+      subspace_degeneracies_.reserve(new_cap);
+    }
+
+    // inline std::size_t capacity() const noexcept;
+    //   inherited from BaseSpace
+
+    inline void shrink_to_fit()
+    /// Shrink reserved storage for labels to fit contents.
+    {
+      BaseSpaceType::shrink_to_fit();
+      subspace_degeneracies_.shrink_to_fit();
+    }
+
+    ////////////////////////////////////////////////////////////////
     // subspace push (for initial construction)
     ////////////////////////////////////////////////////////////////
 
@@ -388,6 +434,8 @@ namespace basis {
     /// Create indexing information (in both directions, index <->
     /// labels) for a subspace.
     {
+      if (!this->subspaces_ptr_)
+        this->subspaces_ptr_ = std::make_shared<std::vector<SubspaceType>>();
       this->subspace_offsets_.push_back(this->dimension_);  // save offset
       (this->lookup_)[subspace.labels()] = BaseSpaceType::size();  // save index
       subspace_degeneracies_.push_back(degeneracy);  // save degeneracy
@@ -405,6 +453,8 @@ namespace basis {
     /// Create indexing information (in both directions, index <->
     /// labels) for a subspace.
     {
+      if (!this->subspaces_ptr_)
+        this->subspaces_ptr_ = std::make_shared<std::vector<SubspaceType>>();
       const std::size_t index = BaseSpaceType::size();  // index for lookup
       this->subspace_offsets_.push_back(this->dimension_);  // save offset
       this->subspaces_ptr_->push_back(std::forward<Args>(args)...);  // construct/emplace space
