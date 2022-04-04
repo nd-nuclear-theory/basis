@@ -173,6 +173,8 @@
       PushSubspace/EmplaceSubspace/reserve.
     - Make labels in BaseSubspace and BaseSpace non-const, to avoid deleting
       copy and move constructors.
+  + 04/03/22 (pjf): Normalize all constructors so that fields get initialized
+    correctly.
 ****************************************************************/
 
 #ifndef BASIS_BASIS_H_
@@ -281,7 +283,9 @@ namespace basis {
 
     /// default constructor
     //   Implicitly invoked by derived class.
-    BaseSubspace() : dimension_(0) {}
+    BaseSubspace()
+      : dimension_{}
+    {}
 
     public:
 
@@ -553,8 +557,13 @@ namespace basis {
     BaseSubspace() = default;
 
     // pass-through constructor accepting labels
-    explicit BaseSubspace(const SubspaceLabelsType& labels)
-      : labels_{labels}
+    template<
+        typename T = SubspaceLabelsType,
+        std::enable_if_t<std::is_constructible_v<SubspaceLabelsType, T>>* = nullptr
+      >
+    explicit BaseSubspace(T&& labels)
+      : BaseSubspace<tDerivedSubspaceType, void, tStateType, tStateLabelsType>{},
+        labels_{std::forward<T>(labels)}
     {}
 
     public:
@@ -802,7 +811,9 @@ namespace basis {
       // constructors
       ////////////////////////////////////////////////////////////////
 
-      BaseSpace() = default;
+      BaseSpace()
+        : dimension_{0}
+      {}
 
       public:
 
@@ -1099,9 +1110,14 @@ namespace basis {
 
       BaseSpace() = default;
 
-      // pass-through constructor accepting labels
-      explicit BaseSpace(const SpaceLabelsType& labels)
-        : labels_{labels}
+     // pass-through constructor accepting labels
+      template<
+          typename T = SpaceLabelsType,
+          std::enable_if_t<std::is_constructible_v<SpaceLabelsType, T>>* = nullptr
+        >
+      explicit BaseSpace(T&& labels)
+        : BaseSpace<tDerivedSpaceType, tSubspaceType,void>{},
+          labels_{std::forward<T>(labels)}
       {}
 
       public:
@@ -1207,17 +1223,22 @@ namespace basis {
       // constructors
       ////////////////////////////////////////////////////////////////
 
+      BaseSector()
+        : bra_subspace_index_{}, ket_subspace_index_{}, multiplicity_index_{}
+      {}
+      // default constructor
+
       BaseSector(
           std::size_t bra_subspace_index, std::size_t ket_subspace_index,
           std::shared_ptr<const BraSubspaceType> bra_subspace_ptr,
           std::shared_ptr<const KetSubspaceType> ket_subspace_ptr,
           std::size_t multiplicity_index=1
         )
-        : bra_subspace_index_(bra_subspace_index),
-          ket_subspace_index_(ket_subspace_index),
-          multiplicity_index_(multiplicity_index),
-          bra_subspace_ptr_(std::move(bra_subspace_ptr)),
-          ket_subspace_ptr_(std::move(ket_subspace_ptr))
+        : bra_subspace_index_{bra_subspace_index},
+          ket_subspace_index_{ket_subspace_index},
+          multiplicity_index_{multiplicity_index},
+          bra_subspace_ptr_{std::move(bra_subspace_ptr)},
+          ket_subspace_ptr_{std::move(ket_subspace_ptr)}
       {}
 
       ////////////////////////////////////////////////////////////////
@@ -1295,6 +1316,8 @@ namespace basis {
       // constructors
       ////////////////////////////////////////////////////////////////
 
+      BaseSector() = default;
+
       inline BaseSector(
           std::size_t bra_subspace_index, std::size_t ket_subspace_index,
           std::shared_ptr<const SubspaceType> bra_subspace_ptr,
@@ -1303,7 +1326,8 @@ namespace basis {
         )
         : BaseSector<tSubspaceType, tSubspaceType, false>{
             bra_subspace_index, ket_subspace_index,
-            bra_subspace_ptr, ket_subspace_ptr, multiplicity_index
+            std::move(bra_subspace_ptr), std::move(ket_subspace_ptr),
+            multiplicity_index
         }
         {}
     };
@@ -1363,7 +1387,9 @@ namespace basis {
       // constructors
       ////////////////////////////////////////////////////////////////
 
-      BaseSectors() = default;
+      BaseSectors()
+        : num_elements_{}
+      {}
       // default constructor -- provided since required for certain
       // purposes by STL container classes (e.g., std::vector::resize)
 
@@ -1371,7 +1397,9 @@ namespace basis {
             const std::shared_ptr<const BraSpaceType>& bra_space_ptr,
             const std::shared_ptr<const KetSpaceType>& ket_space_ptr
           )
-          : bra_space_ptr_{bra_space_ptr}, ket_space_ptr_{ket_space_ptr}
+          : bra_space_ptr_{bra_space_ptr},
+            ket_space_ptr_{ket_space_ptr},
+            num_elements_{}
       {}
 
       BaseSectors(
@@ -1379,7 +1407,8 @@ namespace basis {
             std::shared_ptr<const KetSpaceType>&& ket_space_ptr
           )
           : bra_space_ptr_{std::move(bra_space_ptr)},
-            ket_space_ptr_{std::move(ket_space_ptr)}
+            ket_space_ptr_{std::move(ket_space_ptr)},
+            num_elements_{}
       {}
 
       template<
@@ -1390,6 +1419,7 @@ namespace basis {
       BaseSectors(T&& bra_space, U&& ket_space)
         // : bra_space_ptr_(bra_space.weak_from_this().lock()),
         //   ket_space_ptr_(ket_space.weak_from_this().lock())
+        : num_elements_{}
       {
         // if bra_space or ket_space is not managed by a shared_ptr, make copy
         // or move it to a locally-created shared_ptr.

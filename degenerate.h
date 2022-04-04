@@ -48,6 +48,8 @@
   + 03/25/22 (pjf): Fix constructor templates when using `void` label types.
   + 04/02/22 (pjf): Defer initialization of shared_ptr in BaseSpace until
     PushSubspace/EmplaceSubspace/reserve.
+  + 04/03/22 (pjf): Normalize all constructors so that fields get initialized
+    correctly.
 ****************************************************************/
 
 #ifndef BASIS_DEGENERATE_H_
@@ -126,7 +128,7 @@ namespace basis {
     //   see: https://stackoverflow.com/a/13401982
     template<typename BST = BaseSubspaceType, typename T = typename BST::SubspaceLabelsType>
     explicit BaseDegenerateSubspace(T&& labels)
-      : full_dimension_{0}, BaseSubspaceType{std::forward<T>(labels)}
+      : BaseSubspaceType{std::forward<T>(labels)}, full_dimension_{0}
     {}
 
     public:
@@ -268,7 +270,7 @@ namespace basis {
     ////////////////////////////////////////////////////////////////
 
     // default constructor -- disabled
-    BaseDegenerateState();
+    BaseDegenerateState() = delete;
 
     // copy constructor -- synthesized
 
@@ -345,7 +347,7 @@ namespace basis {
 
     // default constructor
     //   Implicitly invoked by derived class.
-    BaseDegenerateSpace() = default;
+    BaseDegenerateSpace() : full_size_{} {}
 
     // pass-through constructor accepting labels
     //   n.b. the dummy argument "BST" is SFINAE black magic
