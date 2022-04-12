@@ -175,6 +175,7 @@
       copy and move constructors.
   + 04/03/22 (pjf): Normalize all constructors so that fields get initialized
     correctly.
+  + 04/12/22 (pjf): Allow BaseSectors between non-direct subspace of space.
 ****************************************************************/
 
 #ifndef BASIS_BASIS_H_
@@ -1376,9 +1377,17 @@ namespace basis {
       using BraSpaceType = tBraSpaceType;
       using KetSpaceType = tKetSpaceType;
 
-      using BraSubspaceType = typename tBraSpaceType::SubspaceType;
-      using KetSubspaceType = typename tKetSpaceType::SubspaceType;
       using SectorType = tSectorType;
+      using BraSubspaceType = typename SectorType::BraSubspaceType;
+      static_assert(
+          is_subspace_v<BraSubspaceType,BraSpaceType>,
+          "BraSubspaceType must be subspace of BraSpaceType"
+        );
+      using KetSubspaceType = typename SectorType::KetSubspaceType;
+      static_assert(
+          is_subspace_v<KetSubspaceType,KetSpaceType>,
+          "KetSubspaceType must be subspace of KetSpaceType"
+        );
 
 
       protected:
@@ -1611,6 +1620,11 @@ namespace basis {
         num_elements_ += sector.num_elements();
       };
 
+      template<
+          typename T = SectorType,
+          std::enable_if_t<std::is_same_v<typename T::BraSubspaceType,typename BraSpaceType::SubspaceType>>* = nullptr,
+          std::enable_if_t<std::is_same_v<typename T::KetSubspaceType,typename KetSpaceType::SubspaceType>>* = nullptr
+        >
       inline void PushSector(
           std::size_t bra_subspace_index,
           std::size_t ket_subspace_index,
@@ -1627,6 +1641,11 @@ namespace basis {
           );  // save sector
       }
 
+      template<
+          typename T = SectorType,
+          std::enable_if_t<std::is_same_v<typename T::BraSubspaceType,typename BraSpaceType::SubspaceType>>* = nullptr,
+          std::enable_if_t<std::is_same_v<typename T::KetSubspaceType,typename KetSpaceType::SubspaceType>>* = nullptr
+        >
       inline void PushSector(const typename SectorType::KeyType& key)
       // Create indexing information (in both directions, index <->
       // labels) for a sector, given key.
@@ -1677,7 +1696,17 @@ namespace basis {
       ////////////////////////////////////////////////////////////////
 
       using SpaceType = tSpaceType;
-      using SubspaceType = typename SpaceType::SubspaceType;
+      // TODO (pjf): Fix up template type here so that SubspaceType only
+      // gets defined if unambiguous
+      // template<
+      //     typename T = tSectorType,
+      //     std::enable_if_t<std::is_same_v<typename T::BraSubspaceType, typename T::KetSubspaceType>>* = nullptr
+      //   >
+      static_assert(
+          std::is_same_v<typename tSectorType::BraSubspaceType, typename tSectorType::KetSubspaceType>,
+          "same-Space BaseSectors currently allowed with same-Subspace BaseSector"
+        );
+      using SubspaceType = typename tSectorType::BraSubspaceType;
 
       protected:
 
