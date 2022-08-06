@@ -275,6 +275,8 @@ namespace basis {
     assert(sector_direction == basis::SectorDirection::kCanonical);
     // enforce nonzero-Tz0 only if {pp,pn,nn} ordering
     assert((Tz0_ == 0) || (space.space_ordering() == basis::TwoBodySpaceJJJPNOrdering::kTz));
+    // enforce non-negative Tz0 (implied by canonical SectorDirection)
+    assert((Tz0_ >= 0));
 
     for (std::size_t bra_subspace_index=0; bra_subspace_index<space.size(); ++bra_subspace_index)
       for (std::size_t ket_subspace_index=0; ket_subspace_index<space.size(); ++ket_subspace_index)
