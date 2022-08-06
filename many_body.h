@@ -53,7 +53,7 @@ namespace basis {
 
     // constructor
 
-    WeightMax() {};
+    WeightMax() = default;
     // default constructor
 
     WeightMax(double wp, double wn, double wpp, double wnn, double wpn)

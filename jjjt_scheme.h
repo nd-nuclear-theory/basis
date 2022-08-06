@@ -153,7 +153,7 @@ namespace basis {
 
       // constructor
 
-      TwoBodySubspaceJJJT() {};
+      TwoBodySubspaceJJJT() = default;
       // default constructor -- provided since required for certain
       // purposes by STL container classes (e.g., std::vector::resize)
 
@@ -242,7 +242,7 @@ namespace basis {
 
     // constructor
 
-    TwoBodySpaceJJJT() {};
+    TwoBodySpaceJJJT() = default;
     // default constructor -- provided since required for certain
     // purposes by STL container classes (e.g., std::vector::resize)
 
@@ -388,7 +388,7 @@ namespace basis {
 
       // constructor
 
-      TwoBodySubspaceJJJTN() {};
+      TwoBodySubspaceJJJTN() = default;
       // default constructor -- provided since required for certain
       // purposes by STL container classes (e.g., std::vector::resize)
 
@@ -479,7 +479,7 @@ namespace basis {
 
     // constructor
 
-    TwoBodySpaceJJJTN() {};
+    TwoBodySpaceJJJTN() = default;
     // default constructor -- provided since required for certain
     // purposes by STL container classes (e.g., std::vector::resize)
 

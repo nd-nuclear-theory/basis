@@ -167,7 +167,7 @@ namespace basis {
 
       // constructor
 
-      RelativeSubspaceLSJT() {};
+      RelativeSubspaceLSJT() = default;
       // default constructor -- provided since required for certain
       // purposes by STL container classes (e.g., std::vector::resize)
 
@@ -246,7 +246,7 @@ namespace basis {
 
     // constructor
 
-    RelativeSpaceLSJT() {};
+    RelativeSpaceLSJT() = default;
     // default constructor -- provided since required for certain
     // purposes by STL container classes (e.g., std::vector::resize)
 
@@ -398,7 +398,7 @@ namespace basis {
 
       // constructor
 
-      RelativeCMSubspaceLSJT() {};
+      RelativeCMSubspaceLSJT() = default;
       // default constructor -- provided since required for certain
       // purposes by STL container classes (e.g., std::vector::resize)
 
@@ -476,7 +476,7 @@ namespace basis {
 
     // constructor
 
-    RelativeCMSpaceLSJT() {};
+    RelativeCMSpaceLSJT() = default;
     // default constructor -- provided since required for certain
     // purposes by STL container classes (e.g., std::vector::resize)
 
@@ -597,7 +597,7 @@ namespace basis {
 
       // constructor
 
-      RelativeCMSubspaceLSJTN() {};
+      RelativeCMSubspaceLSJTN() = default;
       // default constructor -- provided since required for certain
       // purposes by STL container classes (e.g., std::vector::resize)
 
@@ -675,7 +675,7 @@ namespace basis {
 
     // constructor
 
-    RelativeCMSpaceLSJTN() {};
+    RelativeCMSpaceLSJTN() = default;
     // default constructor -- provided since required for certain
     // purposes by STL container classes (e.g., std::vector::resize)
 
@@ -815,7 +815,7 @@ namespace basis {
 
       // constructor
 
-      TwoBodySubspaceLSJT() {};
+      TwoBodySubspaceLSJT() = default;
       // default constructor -- provided since required for certain
       // purposes by STL container classes (e.g., std::vector::resize)
 
@@ -895,7 +895,7 @@ namespace basis {
 
     // constructor
 
-    TwoBodySpaceLSJT() {};
+    TwoBodySpaceLSJT() = default;
     // default constructor -- provided since required for certain
     // purposes by STL container classes (e.g., std::vector::resize)
 
@@ -1017,7 +1017,7 @@ namespace basis {
 
       // constructor
 
-      TwoBodySubspaceLSJTN() {};
+      TwoBodySubspaceLSJTN() = default;
       // default constructor -- provided since required for certain
       // purposes by STL container classes (e.g., std::vector::resize)
 
@@ -1099,7 +1099,7 @@ namespace basis {
 
     // constructor
 
-    TwoBodySpaceLSJTN() {};
+    TwoBodySpaceLSJTN() = default;
     // default constructor -- provided since required for certain
     // purposes by STL container classes (e.g., std::vector::resize)
 
