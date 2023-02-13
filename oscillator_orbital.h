@@ -34,6 +34,7 @@ namespace basis {
 
   ////////////////////////////////////////////////////////////////
   /// @defgroup oscillator-subspaces Oscillator orbitals
+  ///
   /// Harmonic oscillator spatial orbitals.
   ///
   /// ## Labeling ##
@@ -48,7 +49,7 @@ namespace basis {
   ///
   /// The parity for each orbital is deduced from the l quantum number:
   ///
-  ///  * g (int): grade (=0,1) for the parity P, given by g~l
+  ///  * g (int): grade (=0,1) for the parity P, given by g~l (mod 2)
   ///
   /// The oscillator quantum number is deduced from the
   /// n and l quantum numbers:
@@ -103,7 +104,7 @@ namespace basis {
       // purposes by STL container classes (e.g., std::vector::resize)
 
       OscillatorOrbitalSubspace(int l, int Nmax);
-      // Set up indexing in with truncation by oscillator quanta.
+      // Set up indexing with truncation by oscillator quanta.
 
       // accessors
 
@@ -120,6 +121,9 @@ namespace basis {
 
       private:
 
+      //validation
+      bool ValidLabels() const;
+
       // truncation
       int Nmax_;  // maximum oscillator quanta
 
@@ -127,53 +131,39 @@ namespace basis {
 
   // state
 
-  // WIP
-  
-  class OrbitalStatePN
-    : public BaseState<OrbitalSubspacePN>
+  class OscillatorOrbitalState
+    : public BaseState<OscillatorOrbitalSubspace>
   {
 
     public:
 
     // pass-through constructors
 
-    OrbitalStatePN(const SubspaceType& subspace, std::size_t index)
+    OscillatorOrbitalState(const SubspaceType& subspace, std::size_t index)
       // Construct state by index.
       : BaseState (subspace, index) {}
 
-    OrbitalStatePN(const SubspaceType& subspace, const StateLabelsType& state_labels)
+    OscillatorOrbitalState(const SubspaceType& subspace, const StateLabelsType& state_labels)
       // Construct state by reverse lookup on labels.
       : BaseState (subspace, state_labels) {}
 
-    // produce flattened orbital information
-    OrbitalPNInfo OrbitalInfo() const;
-
-    // pass-through accessors
-    OrbitalSpeciesPN orbital_species() const {return subspace().orbital_species();}
-    HalfInt Tz() const {return subspace().Tz();}
+    // pass-through accessors (from subspace)
+    int l() const {return subspace().l();}
+    int g() const {return subspace().g();}
 
     // state label accessors
     int n() const {return std::get<0>(labels());}
-    int l() const {return std::get<1>(labels());}
-    HalfInt j() const {return std::get<2>(labels());}
-    int g() const {return l()%2;}
-    FullOrbitalLabels full_labels() const
-    {
-      return std::make_tuple(orbital_species(),n(),l(),j());
-    }
 
-    // state weight accessors
-    double weight() const {return subspace().weights()[index()];}
-    // Look up floating-point weight.
+    // derived quantum numbers
     int N() const {return 2*n()+l();}
-    // Calculate hard-coded oscillator quantum number.
+    // Calculate oscillator quantum number.
 
     // diagnostic strings
     std::string LabelStr() const;
     // Provide string representation of state labels.
 
     // comparison
-    friend bool operator == (const basis::OrbitalStatePN& a1, const basis::OrbitalStatePN& a2)
+    friend bool operator == (const basis::OscillatorOrbitalState& a1, const basis::OscillatorOrbitalState& a2)
     // Equality test based on labels (so permits comparison across different subspace indexings).
     {
       return (a1.labels() == a2.labels()) && (a1.subspace().labels() == a2.subspace().labels());
@@ -182,6 +172,8 @@ namespace basis {
   };
 
   // space
+
+    /*
 
   class OrbitalSpacePN
     : public BaseSpace<OrbitalSubspacePN>
@@ -233,7 +225,6 @@ namespace basis {
   ////////////////////////////////////////////////////////////////
   /// @}
   ////////////////////////////////////////////////////////////////
-
 
 
   ////////////////////////////////////////////////////////////////
@@ -507,6 +498,8 @@ namespace basis {
     int j0_, g0_, Tz0_;
   };
 
+  */
+  
   ////////////////////////////////////////////////////////////////
   /// @}
   ////////////////////////////////////////////////////////////////

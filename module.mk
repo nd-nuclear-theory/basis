@@ -7,6 +7,7 @@ $(eval $(begin-module))
 # units
 module_units_h += basis degenerate hypersector operator jt_operator 
 module_units_cpp-h += many_body proton_neutron
+module_units_cpp-h += oscillator_orbital
 module_units_cpp-h += lsjt_scheme lsjt_operator jjjt_scheme jjjt_operator
 module_units_cpp-h += jjjpn_scheme jjjpn_operator nlj_orbital nlj_operator
 module_units_cpp-h += m_scheme
@@ -15,6 +16,7 @@ module_units_cpp-h += m_scheme
 module_programs_cpp += 
 
 # test programs
+module_programs_cpp_test += oscillator_orbital_test
 module_programs_cpp_test += degenerate_test hypersector_test
 module_programs_cpp_test += lsjt_scheme_test lsjt_operator_test jjjt_scheme_test
 module_programs_cpp_test += jjjpn_scheme_test jjjpn_operator_test
