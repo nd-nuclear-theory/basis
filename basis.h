@@ -142,6 +142,7 @@
       differ.
     - Add additional template argument to BaseSectors so that custom sector type
       can be used, instead of default instantiation of BaseSector.
+  + 02/03/22 (mac): Add alias StateType to BaseSubspace.
 ****************************************************************/
 
 #ifndef BASIS_BASIS_H_
@@ -233,6 +234,7 @@ namespace basis {
     using LabelsType = tSubspaceLabelsType;
     using SubspaceLabelsType = tSubspaceLabelsType;
     using StateLabelsType = tStateLabelsType;
+    using StateType = tStateType;
 
     protected:
 
