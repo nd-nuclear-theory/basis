@@ -143,7 +143,7 @@ void TestLJSectors() {
   std::cout << sectors.DebugStr();
   #endif
 
-  std::cout << "Sectors -- j0 = 2, g0 = 0, Tz0 = 0" << std::endl;
+  std::cout << "Sectors -- J0 = 2, g0 = 0, Tz0 = 0" << std::endl;
   basis::OrbitalSectorsLJPN constrained_sectors(space, 2, 0, 0);
   std::cout << constrained_sectors.DebugStr();
 
@@ -160,7 +160,7 @@ void TestLJSectors() {
   std::cout << distinct_space_sectors.DebugStr();
   #endif
 
-  std::cout << "Sectors -- distinct spaces, j0 = 2, g0 = 0, Tz0 = 0" << std::endl;
+  std::cout << "Sectors -- distinct spaces, J0 = 2, g0 = 0, Tz0 = 0" << std::endl;
   basis::OrbitalSectorsLJPN constrained_distinct_space_sectors(bra_space, ket_space, 2, 0, 0);
   std::cout << constrained_distinct_space_sectors.DebugStr();
 }

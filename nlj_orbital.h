@@ -71,6 +71,7 @@
     BaseSubspace.
   + 08/06/21 (pjf): Require BASIS_ALLOW_DEPRECATED macro for deprecated
     OrbitalSectorsLJPN constructors.
+  + 01/30/23 (pjf): Rename j0 -> J0.
 
 ****************************************************************/
 
@@ -683,12 +684,12 @@ namespace basis {
 
     OrbitalSectorsLJPN(
       const OrbitalSpaceLJPN& bra_space, const OrbitalSpaceLJPN& ket_space,
-      int j0, int g0, int Tz0
+      int J0, int g0, int Tz0
     );
     OrbitalSectorsLJPN(
         const OrbitalSpaceLJPN& space,
-        int j0, int g0, int Tz0
-    ) : OrbitalSectorsLJPN(space, space, j0, g0, Tz0) {}
+        int J0, int g0, int Tz0
+    ) : OrbitalSectorsLJPN(space, space, J0, g0, Tz0) {}
     // Enumerate sector pairs between two spaces connected by an operator of
     // given tensorial and parity character ("constrained" sector enumeration).
 
@@ -696,13 +697,18 @@ namespace basis {
     std::string DebugStr() const;
 
     // accessors
-    int j0()     const {return j0_;}
+    int J0()     const {return J0_;}
     int g0()     const {return g0_;}
     int Tz0()    const {return Tz0_;}
 
+    #ifdef BASIS_ALLOW_DEPRECATED
+    DEPRECATED("j0() accessor is deprecated; use J0() instead")
+    int j0()     const {return J0_;}
+    #endif  // BASIS_ALLOW_DEPRECATED
+
    private:
     // operator properties
-    int j0_, g0_, Tz0_;
+    int J0_, g0_, Tz0_;
   };
 
   ////////////////////////////////////////////////////////////////
