@@ -759,9 +759,9 @@ namespace basis {
       ////////////////////////////////////////////////////////////////
 
       /// subspaces (accessible by index)
-      std::shared_ptr<std::vector<SubspaceType>> subspaces_;
-      std::vector<std::size_t> subspace_offsets_;
-      std::size_t dimension_;
+      std::shared_ptr<std::vector<SubspaceType>> subspaces_;  // the subspaces contained in this space
+      std::vector<std::size_t> subspace_offsets_;  // offset of the subspace in the full space indexing, i.e., number of states is subspaces so far
+      std::size_t dimension_;  // total dimension (number of states in all subspaces)
 
       // subspace index lookup by labels
 #ifdef BASIS_HASH
@@ -1059,7 +1059,7 @@ namespace basis {
       ////////////////////////////////////////////////////////////////
 
       SectorType GetSector(std::size_t sector_index) const
-      // Given sector index, return reference to sector itself.
+      // Given sector index, create corresponding sector object.
       {
         const typename SectorType::KeyType& key = keys_.at(sector_index);
         std::size_t bra_subspace_index, ket_subspace_index, multiplicity_index;
