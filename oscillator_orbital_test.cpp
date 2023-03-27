@@ -357,7 +357,32 @@ void TestLadderOperators()
   basis::OperatorBlocks<double> number_operator_matrices;
 
   // construct number operator as spherical scalar product of ladder operators
+  //
+  // Apply Racah's "one-system" reduction formula, for the reduced matrix
+  // elements of the spherical tensor coupled product of two spherical tensor
+  // operators operating on a single space (here recall we are using Rose's
+  // normalization convention for the reduced matrix elements):
+  //
+  // < n' l || A_L0 . B_L0 || n l >
+  //     = sum_(n'' l'') (-)^(l''+l) * hat(l'') / hat(l)
+  //         * < n' l || A || n'' l''> < n'' l'' || B || n l >
+  //
+  // where A_L0 . B_L0 = (-)^L0 * hat(L0) * (A_L0 x B_L0)_00.
+  // [e.g., Brink & Satchler]
+  //
+  // Recall that in Rose convention, for a scalar operator, the RME and the
+  // matrix element are identical, with no angular momentum factor required.
+  //
+  // For our present case, L0=1.
+  //
+  // The sum over intermediate n'' is accomplished through the matrix
+  // multiplication of blocks.  The sum over intermediate l'' is subject to the
+  // triangle inequality triangle(l,L0,l) as well as the parity constraint
+  // pi(l'',1,l).  Thus, we have l'' in {l-1,l+1}, restricted to nonnegative
+  // values, while l''=l is excluded by parity.
+  
   // TODO
+  
   
 }
 
