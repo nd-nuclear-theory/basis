@@ -320,37 +320,63 @@ void TestLadderOperators()
   int Nmax = 4;
   basis::OscillatorOrbitalSpace space(Nmax);
 
-  // construct ladder operators -- L0=1, g0=1
-  basis::OscillatorOrbitalSectors ladder_operator_sectors(space, 1, 1);
-  basis::OperatorBlocks<double> raising_operator_matrices, lowering_operator_matrices;
-  LadderOperator(LadderOperatorType::kRaising, space, ladder_operator_sectors, raising_operator_matrices);
-  LadderOperator(LadderOperatorType::kLowering, space, ladder_operator_sectors, lowering_operator_matrices);
-  
-  // loop over sectors
-  for (std::size_t sector_index = 0; sector_index < ladder_operator_sectors.size(); ++sector_index)
-  {
-    // get sector and reference to block
-    const basis::OscillatorOrbitalSectors::SectorType sector =
-        ladder_operator_sectors.GetSector(sector_index);
+  // construct raising operator -- L0=1, g0=1
+  basis::OscillatorOrbitalSectors raising_operator_sectors(space, 1, 1);
+  basis::OperatorBlocks<double> raising_operator_matrices;
+  LadderOperator(LadderOperatorType::kRaising, space, raising_operator_sectors, raising_operator_matrices);
 
-    // print sector info
-    std::cout << "  sector " << sector_index
-              << "  bra index " << sector.bra_subspace_index()
-              << " labels " << sector.bra_subspace().LabelStr()
-              << " dim " << sector.bra_subspace().size()
-              << "  ket index " << sector.ket_subspace_index()
-              << " labels " << sector.ket_subspace().LabelStr()
-              << " dim " << sector.ket_subspace().size()
-              << "  multiplicity index " << sector.multiplicity_index()
-              << std::endl;
+  // inspect raising operator
+  std::cout << "raising" << std::endl;
+  for (std::size_t sector_index = 0; sector_index < raising_operator_sectors.size(); ++sector_index)
+    {
+      // get sector and reference to block
+      const basis::OscillatorOrbitalSectors::SectorType sector =
+        raising_operator_sectors.GetSector(sector_index);
+
+      // print sector info
+      std::cout << "  sector " << sector_index
+                << "  bra index " << sector.bra_subspace_index()
+                << " labels " << sector.bra_subspace().LabelStr()
+                << " dim " << sector.bra_subspace().size()
+                << "  ket index " << sector.ket_subspace_index()
+                << " labels " << sector.ket_subspace().LabelStr()
+                << " dim " << sector.ket_subspace().size()
+                << "  multiplicity index " << sector.multiplicity_index()
+                << std::endl;
 
       
-    // print matrices
-    std::cout << "raising" << std::endl;
-    std::cout << raising_operator_matrices[sector_index] << std::endl;
-    std::cout << "lowering" << std::endl;
-    std::cout << lowering_operator_matrices[sector_index] << std::endl;
-  }
+      // print matrices
+      std::cout << raising_operator_matrices[sector_index] << std::endl;
+    }
+  
+  // construct lowering operator -- L0=1, g0=1
+  basis::OscillatorOrbitalSectors lowering_operator_sectors(space, 1, 1);
+  basis::OperatorBlocks<double> lowering_operator_matrices;
+  LadderOperator(LadderOperatorType::kLowering, space, lowering_operator_sectors, lowering_operator_matrices);
+  
+  // inspect lowering operator
+  std::cout << "lowering" << std::endl;
+  for (std::size_t sector_index = 0; sector_index < lowering_operator_sectors.size(); ++sector_index)
+    {
+      // get sector and reference to block
+      const basis::OscillatorOrbitalSectors::SectorType sector =
+        lowering_operator_sectors.GetSector(sector_index);
+
+      // print sector info
+      std::cout << "  sector " << sector_index
+                << "  bra index " << sector.bra_subspace_index()
+                << " labels " << sector.bra_subspace().LabelStr()
+                << " dim " << sector.bra_subspace().size()
+                << "  ket index " << sector.ket_subspace_index()
+                << " labels " << sector.ket_subspace().LabelStr()
+                << " dim " << sector.ket_subspace().size()
+                << "  multiplicity index " << sector.multiplicity_index()
+                << std::endl;
+
+      
+      // print matrices
+      std::cout << lowering_operator_matrices[sector_index] << std::endl;
+    }
 
   // construct product operator -- L0=0, g0=0
   basis::OscillatorOrbitalSectors number_operator_sectors(space, 0, 0);
@@ -382,8 +408,83 @@ void TestLadderOperators()
   // values, while l''=l is excluded by parity.
   
   // TODO
+
   
-  
+
+  // construct blocks as products
+  basis::SetOperatorToZero(number_operator_sectors, number_operator_matrices);
+  for (
+      std::size_t number_operator_sector_index = 0;
+      number_operator_sector_index < number_operator_sectors.size();
+      ++number_operator_sector_index
+    )
+  {
+    // get sector and reference to block
+    const basis::OscillatorOrbitalSectors::SectorType number_operator_sector
+      = number_operator_sectors.GetSector(number_operator_sector_index);
+    basis::OperatorBlock<double>& number_operator_sector_matrix
+      = number_operator_matrices[number_operator_sector_index];
+
+    // extract target sector quantum numbers
+    //
+    // Note that this code is specialized to a rank 0 (dot) product, where
+    // therefore l_bra=l_ket.
+    assert(number_operator_sector.bra_subspace().l()==number_operator_sector.bra_subspace().l());
+    int l = number_operator_sector.bra_subspace().l();
+    std::cout << "l " << l << std::endl;
+      
+      
+    // accumulate contributions
+    //
+    // These are the contributions from ladder operator sectors corresponding to
+    // intermediate angular momenta l''.
+    //
+    // Approaches: We could either iterate over all sectors of operators A and B,
+    // and see which pairs satisfy the selection rules for the product, or we
+    // could be "mathematical" and try to figure out which values for the
+    // intermediate quantum numbers we specifically want to iterate over.
+
+    // Approach #1: Blind loop over factor operator sectors
+
+    // for each raising sector
+    for (
+        std::size_t raising_operator_sector_index = 0;
+        raising_operator_sector_index < raising_operator_sectors.size();
+        ++raising_operator_sector_index
+      )
+      {
+        for (
+            std::size_t lowering_operator_sector_index = 0;
+            lowering_operator_sector_index < lowering_operator_sectors.size();
+            ++lowering_operator_sector_index
+          )
+
+          {
+
+            // get sectors and references to blocks
+            const basis::OscillatorOrbitalSectors::SectorType raising_operator_sector
+              = raising_operator_sectors.GetSector(raising_operator_sector_index);
+            basis::OperatorBlock<double>& raising_operator_sector_matrix
+              = raising_operator_matrices[raising_operator_sector_index];
+            const basis::OscillatorOrbitalSectors::SectorType lowering_operator_sector
+              = lowering_operator_sectors.GetSector(lowering_operator_sector_index);
+            basis::OperatorBlock<double>& lowering_operator_sector_matrix
+              = lowering_operator_matrices[lowering_operator_sector_index];
+        
+            // check if this pair of raising and lowering operator sectors
+            bool target_subspaces_match = (
+                (number_operator_sector.bra_subspace().labels() == raising_operator_sector.bra_subspace().labels())
+                &&
+                (lowering_operator_sector.ket_subspace().labels() == number_operator_sector.ket_subspace().labels())
+              );
+            bool intermediate_subspaces_match = (
+                raising_operator_sector.ket_subspace().labels() == lowering_operator_sector.bra_subspace().labels()
+              );
+
+          }
+      }
+
+  }
 }
 
 ////////////////////////////////////////////////////////////////
