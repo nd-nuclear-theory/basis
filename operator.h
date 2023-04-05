@@ -185,11 +185,6 @@ namespace basis {
       {
 
         // extract sector
-        //
-        // TODO mac (04/03/23): Check... Is this a reference to a temporary
-        // object?  Is that dangerous?  Beware GetSector returns a freshly
-        // constructed object descended from BaseSector, in contrast to the
-        // other getters (such as GetSubspace), which return references.
         const typename tSectorsType::SectorType& sector = sectors.GetSector(sector_index);
 
         // extract sector subspaces
