@@ -442,23 +442,34 @@ void TestLadderOperators()
 //   so that for each sector of the source operators, we also consider the
 //   (unstored) transpose sectors.  This seems messy.
 //
-//   Approach2A -- Naively looping over the quantum numbers for the intermediate
-//   subspace and retrieving the appropriate sectors of the source operators
-//   again runs into trouble that only the upper triangle sectors are defined
-//   and stored.  We again keep this attempt as a pedagogical example of what
-//   goes wrong!
+//   Approach2A -- Naively looping over the allowed quantum numbers for the
+//   intermediate subspace and retrieving the appropriate sectors of the source
+//   operators again runs into trouble that only the upper triangle sectors are
+//   defined and stored.  We again keep this attempt as a pedagogical example of
+//   what goes wrong!
 //
 //   Approach2B -- As we loop over the quantum numbers for the intermediate
 //   subspace, and retrieve the appropriate sectors of the source operators, we
 //   make sure to "canonicalize" the sectors, flipping bra and ket subspaces as
 //   necessary, to ensure that we only attempt to retrieve upper triangle
 //   sectors.
+//
+//   Approach3A -- Naively looping over *all* subspaces as candidate
+//   intermediate subspaces, and checking to see if the corresponding sectors
+//   are defined for the source operators.  (This is what is done in shell's
+//   obme.cpp, where the "full" operator, not just the upper triangle, is
+//   stored.)  This makes sense if if is okay to assume that allowed sectors are
+//   "dense", or, in any case, looping over all subspaces as candidate
+//   intermediate subspaces is not overwhelmingly inefficient.
+//
+//   Approach3B -- As we check if the relevant sectors exist, first canonicalize
+//   the subspace pair...
 
 void PopulateProductOperatorApproach1A(
-      const basis::OscillatorOrbitalSectors& raising_operator_sectors, const basis::OperatorBlocks<double>& raising_operator_matrices,
-      const basis::OscillatorOrbitalSectors& lowering_operator_sectors, const basis::OperatorBlocks<double>& lowering_operator_matrices,
-      const basis::OscillatorOrbitalSectors& number_operator_sectors, basis::OperatorBlocks<double>& number_operator_matrices
-    )
+    const basis::OscillatorOrbitalSectors& raising_operator_sectors, const basis::OperatorBlocks<double>& raising_operator_matrices,
+    const basis::OscillatorOrbitalSectors& lowering_operator_sectors, const basis::OperatorBlocks<double>& lowering_operator_matrices,
+    const basis::OscillatorOrbitalSectors& number_operator_sectors, basis::OperatorBlocks<double>& number_operator_matrices
+  )
 // Naive implementation of Approach #1.  Fails to recognize that, for both the
 // raising an lower operators, only the sectors constituting the upper triangle
 // show up when iterating over sectors, and only this upper triangle is
@@ -487,7 +498,7 @@ void PopulateProductOperatorApproach1A(
 //           generating a scalar operator.
 {
 
-  // for each number operator block, accomulate contributions
+  // for each number (target) operator block, accumulate contributions
   for (
       std::size_t number_operator_sector_index = 0;
       number_operator_sector_index < number_operator_sectors.size();
@@ -595,6 +606,128 @@ void PopulateProductOperatorApproach1A(
         }
     }
   
+}
+
+void PopulateProductOperatorApproach3A(
+    const basis::OscillatorOrbitalSpace& space,
+    const basis::OscillatorOrbitalSectors& raising_operator_sectors, const basis::OperatorBlocks<double>& raising_operator_matrices,
+    const basis::OscillatorOrbitalSectors& lowering_operator_sectors, const basis::OperatorBlocks<double>& lowering_operator_matrices,
+    const basis::OscillatorOrbitalSectors& number_operator_sectors, basis::OperatorBlocks<double>& number_operator_matrices
+  )
+// Naive implementation of Approach #3.  Fails to recognize that, for both the
+// raising an lower operators, only the sectors constituting the upper triangle
+// show up when iterating over sectors, and only this upper triangle is
+// explicitly stored.
+{
+
+  // for each number (target) operator block, accumulate contributions
+  for (
+      std::size_t number_operator_sector_index = 0;
+      number_operator_sector_index < number_operator_sectors.size();
+      ++number_operator_sector_index
+    )
+    {
+      // make aliases for sector and block
+      const basis::OscillatorOrbitalSectors::SectorType& number_operator_sector
+        = number_operator_sectors.GetSector(number_operator_sector_index);
+      basis::OperatorBlock<double>& number_operator_sector_matrix
+        = number_operator_matrices[number_operator_sector_index];
+
+      // extract target sector quantum numbers
+      //
+      // Note that this code is specialized to a rank 0 (dot) product, where
+      // therefore l_bra=l_ket.
+      assert(number_operator_sector.bra_subspace().l()==number_operator_sector.bra_subspace().l());
+      int l = number_operator_sector.bra_subspace().l();
+      std::cout << "target sector: " << number_operator_sector.bra_subspace().LabelStr()
+                << " " << number_operator_sector.bra_subspace().LabelStr() << std::endl;
+
+      // extract target sector subspace indices
+      const std::size_t number_operator_bra_subspace_index = number_operator_sector.bra_subspace_index();
+      const std::size_t number_operator_ket_subspace_index = number_operator_sector.ket_subspace_index();
+      
+      for (
+          std::size_t inner_subspace_index = 0; inner_subspace_index < space.size();
+           ++inner_subspace_index
+        )
+        {
+
+          // short circuit: check if resulting sectors exist in source operators
+          if (
+              !(
+                  raising_operator_sectors.ContainsSector(number_operator_bra_subspace_index, inner_subspace_index)
+                  && lowering_operator_sectors.ContainsSector(inner_subspace_index, number_operator_ket_subspace_index)
+                )
+            )
+            continue;
+
+          // retrieve corresponding blocks
+          const std::size_t raising_operator_sector_index
+            = raising_operator_sectors.LookUpSectorIndex(number_operator_bra_subspace_index, inner_subspace_index);
+          const basis::OperatorBlock<double>& raising_operator_sector_matrix
+            = raising_operator_matrices[raising_operator_sector_index];
+          const std::size_t lowering_operator_sector_index
+            = lowering_operator_sectors.LookUpSectorIndex(inner_subspace_index, number_operator_ket_subspace_index);
+          const basis::OperatorBlock<double>& lowering_operator_sector_matrix
+            = lowering_operator_matrices[lowering_operator_sector_index];
+
+//               // diagnostic output
+//               std::cout
+//                 << " raising operator sector: " << raising_operator_sector.bra_subspace().LabelStr() << " " << raising_operator_sector.ket_subspace().LabelStr()
+//                 << std::endl
+//                 << " lowering operator sector: " << lowering_operator_sector.bra_subspace().LabelStr() << " " << lowering_operator_sector.ket_subspace().LabelStr()
+//                 << std::endl;
+//             
+//               // check if this pair of raising and lowering operator sectors contributes
+//               //
+//               //   - "outer" bra and ket match those of target sector (l',l),
+//               //     which in this example, for a scalar product operator, is
+//               //     simply (l,l)
+//               //
+//               //   - "inner" bra and ket match those of intermediate subspace (l'')
+//               //
+//               // A comparison of labels() is a tuple comparison on (l,), which,
+//               // for this basis scheme, is equivalent to a simple integer
+//               // comparison on l().  We use the generic notation labels() to
+//               // provide an easily generalizable idiom.
+//               bool target_subspaces_match = (
+//                   (number_operator_sector.bra_subspace().labels() == raising_operator_sector.bra_subspace().labels())
+//                   &&
+//                   (lowering_operator_sector.ket_subspace().labels() == number_operator_sector.ket_subspace().labels())
+//                 );
+//               bool intermediate_subspaces_match = (
+//                   raising_operator_sector.ket_subspace().labels() == lowering_operator_sector.bra_subspace().labels()
+//                 );
+//               if (!(target_subspaces_match && intermediate_subspaces_match))
+//                 continue;
+// 
+//               // calculate prefactor
+//               //
+//               //   (-)^(l''+l) * hat(l'') / hat(l)
+//               int lpp = raising_operator_sector.ket_subspace().l();
+//               double prefactor = ParitySign(l+lpp) * Hat(lpp) / Hat(l);
+//               number_operator_sector_matrix += prefactor * raising_operator_sector_matrix * lowering_operator_sector_matrix;
+// 
+//               // Note: In naive Approach 1A, we never even get here, since we
+//               // never encountered a valid pair of raising and lowering operator
+//               // sectors!
+//               
+//               std::cout << "matrix element calculation "
+//                         << " l " << l
+//                         << " lpp " << lpp
+//                         << " prefactor " << prefactor
+//                         << std::endl
+//                         << "raising matrix " << std::endl
+//                         << raising_operator_sector_matrix
+//                         << std::endl
+//                         << "lowering matrix " << std::endl
+//                         << lowering_operator_sector_matrix
+//                         << std::endl
+//                         << "product matrix " << std::endl
+//                         << raising_operator_sector_matrix * lowering_operator_sector_matrix
+//                         << std::endl;            
+        }
+    }
 }
 
 void TestProductOperator()
