@@ -176,6 +176,7 @@
   + 04/03/22 (pjf): Normalize all constructors so that fields get initialized
     correctly.
   + 04/12/22 (pjf): Allow BaseSectors between non-direct subspace of space.
+  + 05/09/23 (pjf): Fix comparison of pointers in BaseSectors.
 ****************************************************************/
 
 #ifndef BASIS_BASIS_H_
@@ -1447,7 +1448,7 @@ namespace basis {
           // note: this also ensures that if bra_space and ket_space are the
           // same object, then if we just moved from bra_space we don't try to
           // move from it again (which would be UB)
-          if (&ket_space == &bra_space)
+          if (static_cast<void*>(&ket_space) == static_cast<void*>(&bra_space))
             ket_space_ptr_ = bra_space_ptr_;
           else
             ket_space_ptr_
