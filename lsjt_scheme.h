@@ -71,6 +71,7 @@
   + 07/03/21 (pjf): Call base class constructor for initializing labels.
   + 07/04/21 (pjf): Pass derived subspace class as template argument to
     BaseSubspace.
+  + 06/03/22 (pjf): Add nr() and nc() accessors to RelativeCMStateLSJT.
 
 ****************************************************************/
 
@@ -457,8 +458,10 @@ namespace basis {
     // state label accessors
     int Nr() const {return std::get<0>(labels());}
     int lr() const {return std::get<1>(labels());}
+    int nr() const {return (Nr()-lr())/2;}
     int Nc() const {return std::get<2>(labels());}
     int lc() const {return std::get<3>(labels());}
+    int nc() const {return (Nc()-lc())/2;}
     int N() const {return  Nr()+Nc();}
 
   };
