@@ -1448,7 +1448,7 @@ namespace basis {
           // note: this also ensures that if bra_space and ket_space are the
           // same object, then if we just moved from bra_space we don't try to
           // move from it again (which would be UB)
-          if (static_cast<void*>(&ket_space) == static_cast<void*>(&bra_space))
+          if (static_cast<const void*>(&ket_space) == static_cast<const void*>(&bra_space))
             ket_space_ptr_ = bra_space_ptr_;
           else
             ket_space_ptr_
