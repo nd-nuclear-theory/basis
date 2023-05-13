@@ -179,6 +179,7 @@
   + 05/09/23 (pjf): Fix comparison of pointers in BaseSectors.
   + 05/12/23 (pjf):
     - Fix iterator types.
+    - Fix constness of member shared_ptr in BaseSector.
 ****************************************************************/
 
 #ifndef BASIS_BASIS_H_
@@ -1297,8 +1298,8 @@ namespace basis {
       private:
       std::size_t bra_subspace_index_, ket_subspace_index_;
       std::size_t multiplicity_index_;
-      const std::shared_ptr<const BraSubspaceType> bra_subspace_ptr_;
-      const std::shared_ptr<const KetSubspaceType> ket_subspace_ptr_;
+      std::shared_ptr<const BraSubspaceType> bra_subspace_ptr_;
+      std::shared_ptr<const KetSubspaceType> ket_subspace_ptr_;
     };
 
   // Here we specialize to the case where the bra and ket subspaces have the
