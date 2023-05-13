@@ -215,22 +215,6 @@
 
 namespace basis {
 
-  ////////////////////////////////////////////////////////////////
-  // generic subspace mixin
-  ////////////////////////////////////////////////////////////////
-
-  /// BaseLabeling -- holds labeling and accessors for subspaces
-  ///
-  /// Users are not expected to directly inherit from this class; instead,
-  /// use BaseSubspace and BaseSpace
-  ///
-  /// Template arguments:
-  ///   tSubspaceLabelsType : tuple for subspace labels, e.g., std::tuple<int,int,int,int,int>
-  ///
-  /// Note: Even if only a single integer label is needed, we must use
-  /// tuple<int> (as opposed to plain int) to make the two forms of the
-  /// state constructor syntactically distinct.
-
   static constexpr std::size_t kNone = std::numeric_limits<std::size_t>::max();
   // Flag value for missing target in index lookups.
 
