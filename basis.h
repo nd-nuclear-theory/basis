@@ -180,6 +180,7 @@
   + 05/12/23 (pjf):
     - Fix iterator types.
     - Fix constness of member shared_ptr in BaseSector.
+    - Use std::addressof for comparison of objects in BaseSectors.
 ****************************************************************/
 
 #ifndef BASIS_BASIS_H_
@@ -1451,7 +1452,7 @@ namespace basis {
           // note: this also ensures that if bra_space and ket_space are the
           // same object, then if we just moved from bra_space we don't try to
           // move from it again (which would be UB)
-          if (static_cast<const void*>(&ket_space) == static_cast<const void*>(&bra_space))
+          if (std::addressof(ket_space) == std::addressof(bra_space))
             ket_space_ptr_ = bra_space_ptr_;
           else
             ket_space_ptr_
