@@ -177,6 +177,8 @@
     correctly.
   + 04/12/22 (pjf): Allow BaseSectors between non-direct subspace of space.
   + 05/09/23 (pjf): Fix comparison of pointers in BaseSectors.
+  + 05/12/23 (pjf):
+    - Fix iterator types.
 ****************************************************************/
 
 #ifndef BASIS_BASIS_H_
@@ -298,7 +300,7 @@ namespace basis {
     struct iterator
     {
       using iterator_category = std::input_iterator_tag;  // we don't satisfy the requirements of forward_iterator_tag because we return temporaries
-      using difference_type = unsigned int;
+      using difference_type = std::make_signed_t<std::size_t>;
       using value_type = tStateType;
       using pointer = void*;
       // using pointer = value_type*;  // n.b. we can't return a pointer to a temporary
@@ -353,10 +355,10 @@ namespace basis {
     };
 
     using value_type = tStateType;
-    using size_type = std::size_t;
-    using difference_type = unsigned int;
     using const_reference = const tStateType&;
     using const_iterator = iterator;
+    using difference_type = typename iterator::difference_type;
+    using size_type = std::make_unsigned_t<difference_type>;
 
     iterator begin() const
     {
@@ -826,7 +828,7 @@ namespace basis {
       struct iterator
       {
         using iterator_category = std::random_access_iterator_tag;
-        using difference_type = unsigned int;
+        using difference_type = std::make_signed_t<std::size_t>;
         using value_type = const SubspaceType;
         using pointer = const SubspaceType*;
         using reference = const SubspaceType&;
@@ -881,10 +883,10 @@ namespace basis {
       };
 
       using value_type = tSubspaceType;
-      using size_type = std::size_t;
-      using difference_type = unsigned int;
       using const_reference = const tSubspaceType&;
       using const_iterator = iterator;
+      using difference_type = typename iterator::difference_type;
+      using size_type = std::make_unsigned_t<difference_type>;
 
       iterator begin()  const { return iterator(static_cast<const tDerivedSpaceType*>(this), 0); }
       iterator end()    const { return iterator(static_cast<const tDerivedSpaceType*>(this), size()); }
@@ -1487,16 +1489,16 @@ namespace basis {
       ////////////////////////////////////////////////////////////////
 
       using value_type = SectorType;
-      using size_type = std::size_t;
-      using difference_type = unsigned int;
       using const_reference = const SectorType&;
-      using iterator = typename std::vector<SectorType>::iterator;
-      using const_iterator = typename std::vector<SectorType>::const_iterator;
+      using iterator = decltype(std::declval<const std::vector<SectorType>>().begin());
+      using const_iterator = decltype(std::declval<const std::vector<SectorType>>().cbegin());
+      using difference_type = typename iterator::difference_type;
+      using size_type = std::make_unsigned_t<difference_type>;
 
       iterator begin()  const { return sectors_.begin(); }
       iterator end()    const { return sectors_.end(); }
-      iterator cbegin() const { return sectors_.cbegin(); }
-      iterator cend()   const { return sectors_.cend(); }
+      const_iterator cbegin() const { return sectors_.cbegin(); }
+      const_iterator cend()   const { return sectors_.cend(); }
 
       ////////////////////////////////////////////////////////////////
       // sector lookup and retrieval
