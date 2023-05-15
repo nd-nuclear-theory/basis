@@ -50,6 +50,7 @@
     PushSubspace/EmplaceSubspace/reserve.
   + 04/03/22 (pjf): Normalize all constructors so that fields get initialized
     correctly.
+  + 05/14/23 (pjf): Fix push_back vs. emplace_back in EmplaceSubspace().
 ****************************************************************/
 
 #ifndef BASIS_DEGENERATE_H_
@@ -459,7 +460,7 @@ namespace basis {
         this->subspaces_ptr_ = std::make_shared<std::vector<SubspaceType>>();
       const std::size_t index = BaseSpaceType::size();  // index for lookup
       this->subspace_offsets_.push_back(this->dimension_);  // save offset
-      this->subspaces_ptr_->push_back(std::forward<Args>(args)...);  // construct/emplace space
+      this->subspaces_ptr_->emplace_back(std::forward<Args>(args)...);  // construct/emplace space
       const SubspaceType& subspace = this->subspaces_ptr_->back();
       (this->lookup_)[subspace.labels()] = index;  // save index for lookup
       subspace_degeneracies_.push_back(degeneracy);  // save degeneracy
