@@ -125,6 +125,18 @@ void TestLJOrbitalsRead(const std::string& filename) {
 
       std::cout << subspace.DebugStr();
     }
+
+  // check states in first subspace
+  std::cout << "Subspace 0" << std::endl;
+  for (auto&& state : space.GetSubspace(0))
+    {
+      std::cout << " n " << state.n()
+                << " l " << state.l()
+                << " j " << state.j()
+                << " tz " << state.Tz()
+                << " weight " << state.weight()
+                << std::endl;
+    }
 }
 
 void TestLJSectors() {
