@@ -176,6 +176,7 @@
   + 04/03/22 (pjf): Normalize all constructors so that fields get initialized
     correctly.
   + 04/12/22 (pjf): Allow BaseSectors between non-direct subspace of space.
+  + 02/03/23 (mac): Add alias StateType to BaseSubspace.
   + 05/09/23 (pjf): Fix comparison of pointers in BaseSectors.
   + 05/12/23 (pjf):
     - Fix iterator types.
@@ -264,6 +265,7 @@ namespace basis {
     ////////////////////////////////////////////////////////////////
 
     using StateLabelsType = tStateLabelsType;
+    using StateType = tStateType;
 
     protected:
 
@@ -406,13 +408,13 @@ namespace basis {
         return pos->second;
     };
 
-    tStateType GetState(std::size_t index) const;
+    StateType GetState(std::size_t index) const;
     /// Given the index for a state, construct the corresponding state object.
     ///
     /// Defined below, outside the definition of the class, so that
     /// instantiation is deferred until tStateType is a complete type.
 
-    tStateType GetState(const StateLabelsType& state_labels) const;
+    StateType GetState(const StateLabelsType& state_labels) const;
     /// Given the labels for a state, construct the corresponding state object.
     ///
     /// Defined below, outside the definition of the class, so that
