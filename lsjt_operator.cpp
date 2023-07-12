@@ -308,7 +308,7 @@ namespace basis {
               const basis::RelativeStateLSJT bra(bra_subspace,bra_index);
               const basis::RelativeStateLSJT ket(ket_subspace,ket_index);
 
-              // extract matrix element factor
+              // extract matrix element
               const double matrix_element = matrices[sector_index](bra_index,ket_index);
 
               if (io_mode == mcutils::IOMode::kText)
