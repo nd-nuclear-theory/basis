@@ -31,10 +31,12 @@ cloned it):
   % git clone https://github.com/nd-nuclear-theory/ndconfig.git
   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+In the `fmt` repository, be sure to check out the `submodule` branch,
+as shown.
 
 Compilation also requires the Boost, GSL, and Eigen libraries. See the
 `INSTALL.md` file under the `ndconfig` repository for notes on installing or
-accessing these libraries.
+configuring access to these libraries.
 
 Then, provide symlinks to the make file and to the appropriate config file, e.g.:
 
