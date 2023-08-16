@@ -47,6 +47,12 @@ Then, provide symlinks to the make file and to the appropriate config file, e.g.
 
 See `ndconfig`'s `INSTALL.md` for further guidance on picking the config file.
 
+To compile the library itself:
+
+  ~~~~~~~~~~~~~~~~
+  % make all
+  ~~~~~~~~~~~~~~~~
+
 To compile the various test codes:
 
   ~~~~~~~~~~~~~~~~
