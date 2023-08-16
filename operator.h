@@ -52,7 +52,7 @@
 #include <utility>
 #include <vector>
 
-#include <Eigen/Dense>
+#include "eigen3/Eigen/Dense"
 
 // emit warnings on deprecated
 #include "mcutils/deprecated.h"

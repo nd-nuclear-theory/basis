@@ -18,6 +18,8 @@
 #include <utility>
 #include <vector>
 
+#include "eigen3/Eigen/Core"
+
 #include "basis.h"
 #include "jt_operator.h"
 #include "lsjt_scheme.h"
@@ -25,7 +27,6 @@
 #include "operator.h"
 #include "mcutils/parsing.h"
 #include "mcutils/io.h"
-#include <Eigen/Core>
 
 namespace basis {
 
