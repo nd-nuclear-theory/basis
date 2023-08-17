@@ -15,11 +15,10 @@
 #include <tuple>
 #include <vector>
 
-#include "eigen3/Eigen/Core"
-
 #include "jjjt_operator.h"
 
 #include "am/halfint.h"
+#include <Eigen/Core>
 #include "basis.h"
 #include "many_body.h"
 #include "jjjt_scheme.h"
