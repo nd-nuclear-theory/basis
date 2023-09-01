@@ -7,6 +7,7 @@ Physics Division, Argonne National Laboratory
 
 + 08/16/2023 (mac): Created.
 + 08/17/2023 (pjf): Switch to CMake.
++ 09/01/2023 (mac): Add notes on dependencies.
 
 ----------------------------------------------------------------
 
@@ -15,7 +16,7 @@ you are doing development work on `basis`, you may want to set up standalone
 compilation.
 
 You will first need to build (and optionally install) the various supporting
-modules.  Change to the intended parent directory for all the repositories
+libraries.  Change to the intended parent directory for all the repositories
 (including `basis`), e.g.:
 
   ~~~~~~~~~~~~~~~~
@@ -26,14 +27,17 @@ Then clone all the repositories (including `basis`, if you haven't already
 cloned it):
 
   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  % git clone https://github.com/fmtlib/fmt.git
   % git clone https://github.com/nd-nuclear-theory/am.git
   % git clone https://github.com/nd-nuclear-theory/mcutils.git
-  % git clone https://github.com/fmtlib/fmt.git
   % git clone https://github.com/nd-nuclear-theory/basis.git
   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-For each of `am`, `mcutils`, and `fmt`, you should use CMake to build (and
-optionally install) the library.
+First, for each of the supporting libraries `fmt`, `am`, `mcutils` you should
+use CMake to build (and optionally install) the library.  See the instructions
+in the `INSTALL.md` files for `am` and `mcutils`.  Because of package
+dependencies (namely, `am` depends upon `fmt`, and `mcutils` depends upon both),
+you will want to build them in this specific order `fmt` -> `am` -> `mcutils`.
 
 Compilation also requires the Boost, GSL, and Eigen libraries. See the
 `INSTALL.md` file under the `ndconfig` repository for notes on installing or
@@ -45,11 +49,11 @@ Next, configure the project using CMake using:
   % cmake -B build/ .
   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-If you have not installed the dependencies, but, e.g., only built them, you may
-need to tell CMake where to find the built-but-not-installed libraries:
+However, if you have not installed the dependencies, but only built them, you
+will need to tell CMake where to find the built-but-not-installed libraries:
 
   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  cmake -B build . \
+  % cmake -B build . \
       -Dam_DIR=~/code/am/build \
       -Dmcutils_DIR=~/code/mcutils/build \
       -Dfmt_DIR=~/code/fmt/build
