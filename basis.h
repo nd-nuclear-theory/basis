@@ -1019,7 +1019,7 @@ namespace basis {
     inline void shrink_to_fit()
     /// Shrink reserved storage for labels and offsets to fit contents.
     {
-      if (!subspaces_ptr_)
+      if (subspaces_ptr_)
         subspaces_ptr_->shrink_to_fit();
       subspace_offsets_.shrink_to_fit();
     }
