@@ -182,8 +182,6 @@
     - Fix iterator types.
     - Fix constness of member shared_ptr in BaseSector.
     - Use std::addressof for comparison of objects in BaseSectors.
-  + 09/06/23 (mac): Always expose both map and unordered_map regardless
-    of BASIS_HASH.
 ****************************************************************/
 
 #ifndef BASIS_BASIS_H_
@@ -193,11 +191,9 @@
 #include <cstddef>
 #include <iterator>
 #include <limits>
-#include <map>
 #include <memory>
 #include <tuple>
 #include <type_traits>
-#include <unordered_map>
 #include <utility>
 #include <vector>
 
@@ -212,7 +208,10 @@
 #endif
 
 #ifdef BASIS_HASH
+#include <unordered_map>
 #include <boost/container_hash/hash.hpp>
+#else
+#include <map>
 #endif
 
 namespace basis {
