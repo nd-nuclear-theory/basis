@@ -64,6 +64,7 @@ set(basis_UNITS_H_CPP
     nlj_orbital
     nlj_operator
     m_scheme
+    oscillator_orbital
 )
 
 # construct lists of headers and sources
@@ -169,6 +170,7 @@ set(basis_UNITS_TEST
     jjjpn_operator_test
     m_scheme_test
     nlj_orbital_test
+    oscillator_orbital_test
 )
 
 add_custom_target(basis_tests)
