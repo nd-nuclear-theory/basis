@@ -40,7 +40,7 @@ void TestOscillatorOrbitalSubspace()
   // Let us give the state type a more thorough workout.  Note that the state
   // type was already used in the implementation of the subspace's DebugStr()
   // above.
-  
+
   std::cout << std::endl;
   std::cout << "State construction" << std::endl;
   std::cout << std::endl;
@@ -48,7 +48,7 @@ void TestOscillatorOrbitalSubspace()
   // illustrate construction by index vs. state labels
 
   // construct by index -- invalid cases
-  
+
   if (false)
     {
       // Index -1 should be trapped and lead to assertion failure.
@@ -66,7 +66,7 @@ void TestOscillatorOrbitalSubspace()
       // But a very large negative integer could wrap and become a valid index again!
       //
       // std::size_t test_index = (std::size_t)(-18446744073709551615);
-      
+
       std::size_t max_size = std::numeric_limits<std::size_t>().max();
       std::size_t test_index = -max_size;  // should be equivalent to +1
       std::cout << "Constructing with index " << test_index << std::endl;
@@ -96,7 +96,13 @@ void TestOscillatorOrbitalSubspace()
             << " n " << state_from_labels.n()
             << " N " << state_from_labels.N()
             << std::endl;
-  
+
+  // try out accessors
+  std::cout << "Try out accessors" << std::endl;
+  std::cout << "subspace " << state_from_labels.subspace().LabelStr() << std::endl;
+  std::cout << "labels " << std::get<0>(state_from_labels.labels()) << std::endl;
+  std::cout << "index " << state_from_labels.index() << std::endl;
+
   // text equality operator
   std::cout << "  equality test " << (state_from_index == state_from_index) << std::endl;
   std::cout << "  equality test " << (state_from_index == state_from_labels) << std::endl;
@@ -107,7 +113,7 @@ void TestOscillatorOrbitalSubspace()
   std::cout << std::endl;
   std::cout << "Iterate over states in subspace" << std::endl;
   std::cout << std::endl;
-  
+
   // iterate by state index
   std::cout << "by index" << std::endl;
   for (std::size_t state_index=0; state_index<subspace.size(); ++state_index)
@@ -127,7 +133,7 @@ void TestOscillatorOrbitalSubspace()
     };
 
   std::cout << std::endl;
-  
+
 }
 
 
@@ -143,8 +149,20 @@ void TestOscillatorOrbitalSpace()
 
   // print diagnostics
   std::cout << space.DebugStr();
-  
+
   std::cout << std::endl;
+
+  // try out accessors
+  std::cout << "Try out accessors" << std::endl;
+  std::cout << "Nmax " << space.Nmax() << std::endl;
+  std::cout << "ContainsSubspace " << space.ContainsSubspace(basis::OscillatorOrbitalSubspace::SubspaceLabelsType(5)) << std::endl;
+  std::cout << "LookUpSubspaceIndex " << space.LookUpSubspaceIndex(basis::OscillatorOrbitalSubspace::SubspaceLabelsType(2)) << std::endl;
+  std::cout << "LookUpSubspace " << space.LookUpSubspace(basis::OscillatorOrbitalSubspace::SubspaceLabelsType(2)).LabelStr() << std::endl;
+  std::cout << "size " << space.size() << std::endl;
+  std::cout << "dimension " << space.dimension() << std::endl;
+
+  const basis::OscillatorOrbitalSubspace& subspace = space.LookUpSubspace(basis::OscillatorOrbitalSubspace::SubspaceLabelsType(2));
+  std::cout << "LookUpSubspace with a reference variable " << subspace.LabelStr() << std::endl;
 }
 
 void TestOscillatorOrbitalSectors()
@@ -162,13 +180,13 @@ void TestOscillatorOrbitalSectors()
   std::cout << "hamiltonian_sectors" << std::endl
             << hamiltonian_sectors.DebugStr()
             << std::endl;
-  
+
   // construct sectors -- L0=1, g0=1 (E1-like)
   basis::OscillatorOrbitalSectors e1_sectors(space, 1, 1);
   std::cout << "e1_sectors" << std::endl
             << e1_sectors.DebugStr()
             << std::endl;
-  
+
   // construct sectors -- L0=1, g0=1 (E1-like) -- but including noncanonical ("lower-triangle") sectors
   basis::OscillatorOrbitalSectors e1_sectors_both_ways(
       space, 1, 1,
@@ -177,7 +195,7 @@ void TestOscillatorOrbitalSectors()
   std::cout << "e1_sectors_both_ways" << std::endl
             << e1_sectors_both_ways.DebugStr()
             << std::endl;
-  
+
 
   // construct sectors -- L0=2, g0=0 (E2-like)
   basis::OscillatorOrbitalSectors e2_sectors(space, 2, 0);
@@ -228,7 +246,7 @@ void LadderOperator(
   const int L0 = sectors.L0();
   const int g0 = sectors.g0();
   assert((L0==1) && (g0==1));
-    
+
   // initialize output matrices
   basis::SetOperatorToZero(sectors, matrices);
 
@@ -249,14 +267,14 @@ void LadderOperator(
     const int ket_l = ket_subspace.l();
     const int delta_l = bra_l - ket_l;
     double angular_matrix_element=0;
-    
+
     if (delta_l==+1)
       angular_matrix_element = std::sqrt(float(ket_l+1)/(2*ket_l+3));
     else if (delta_l==-1)
       angular_matrix_element = std::sqrt(float(ket_l+1)/(2*ket_l+3));
     else
       assert(0);
-    
+
     // main loop
     //
     // Note: Here we are looping over all matrix elements.  However, the ladder
@@ -345,16 +363,16 @@ void TestLadderOperators()
                 << " dim " << sector.ket_subspace().size()
                 << "  multiplicity index " << sector.multiplicity_index()
                 << std::endl;
-      
+
       // print matrix
       std::cout << raising_operator_matrices[sector_index] << std::endl;
     }
-  
+
   // construct lowering operator -- L0=1, g0=1
   basis::OscillatorOrbitalSectors lowering_operator_sectors(space, 1, 1);
   basis::OperatorBlocks<double> lowering_operator_matrices;
   LadderOperator(LadderOperatorType::kLowering, space, lowering_operator_sectors, lowering_operator_matrices);
-  
+
   // inspect lowering operator
   std::cout << "lowering" << std::endl;
   for (std::size_t sector_index = 0; sector_index < lowering_operator_sectors.size(); ++sector_index)
@@ -373,7 +391,7 @@ void TestLadderOperators()
                 << " dim " << sector.ket_subspace().size()
                 << "  multiplicity index " << sector.multiplicity_index()
                 << std::endl;
-      
+
       // print matrix
       std::cout << lowering_operator_matrices[sector_index] << std::endl;
     }
@@ -553,7 +571,7 @@ void PopulateProductOperatorApproach1A(
                 << std::endl
                 << " lowering operator sector: " << lowering_operator_sector.bra_subspace().LabelStr() << " " << lowering_operator_sector.ket_subspace().LabelStr()
                 << std::endl;
-            
+
               // check if this pair of raising and lowering operator sectors contributes
               //
               //   - "outer" bra and ket match those of target sector (l',l),
@@ -587,7 +605,7 @@ void PopulateProductOperatorApproach1A(
               // Note: In naive Approach 1A, we never even get here, since we
               // never encountered a valid pair of raising and lowering operator
               // sectors!
-              
+
               std::cout << "matrix element calculation "
                         << " l " << l
                         << " lpp " << lpp
@@ -601,11 +619,11 @@ void PopulateProductOperatorApproach1A(
                         << std::endl
                         << "product matrix " << std::endl
                         << raising_operator_sector_matrix * lowering_operator_sector_matrix
-                        << std::endl;            
+                        << std::endl;
             }
         }
     }
-  
+
 }
 
 void PopulateProductOperatorApproach3A(
@@ -645,7 +663,7 @@ void PopulateProductOperatorApproach3A(
       // extract target sector subspace indices
       const std::size_t number_operator_bra_subspace_index = number_operator_sector.bra_subspace_index();
       const std::size_t number_operator_ket_subspace_index = number_operator_sector.ket_subspace_index();
-      
+
       for (
           std::size_t inner_subspace_index = 0; inner_subspace_index < space.size();
            ++inner_subspace_index
@@ -677,7 +695,7 @@ void PopulateProductOperatorApproach3A(
 //                 << std::endl
 //                 << " lowering operator sector: " << lowering_operator_sector.bra_subspace().LabelStr() << " " << lowering_operator_sector.ket_subspace().LabelStr()
 //                 << std::endl;
-//             
+//
 //               // check if this pair of raising and lowering operator sectors contributes
 //               //
 //               //   - "outer" bra and ket match those of target sector (l',l),
@@ -700,18 +718,18 @@ void PopulateProductOperatorApproach3A(
 //                 );
 //               if (!(target_subspaces_match && intermediate_subspaces_match))
 //                 continue;
-// 
+//
 //               // calculate prefactor
 //               //
 //               //   (-)^(l''+l) * hat(l'') / hat(l)
 //               int lpp = raising_operator_sector.ket_subspace().l();
 //               double prefactor = ParitySign(l+lpp) * Hat(lpp) / Hat(l);
 //               number_operator_sector_matrix += prefactor * raising_operator_sector_matrix * lowering_operator_sector_matrix;
-// 
+//
 //               // Note: In naive Approach 1A, we never even get here, since we
 //               // never encountered a valid pair of raising and lowering operator
 //               // sectors!
-//               
+//
 //               std::cout << "matrix element calculation "
 //                         << " l " << l
 //                         << " lpp " << lpp
@@ -725,7 +743,7 @@ void PopulateProductOperatorApproach3A(
 //                         << std::endl
 //                         << "product matrix " << std::endl
 //                         << raising_operator_sector_matrix * lowering_operator_sector_matrix
-//                         << std::endl;            
+//                         << std::endl;
         }
     }
 }
@@ -781,12 +799,12 @@ void TestProductOperator()
                 << " dim " << sector.ket_subspace().size()
                 << "  multiplicity index " << sector.multiplicity_index()
                 << std::endl;
-      
+
       // print matrix
       std::cout << number_operator_matrices[sector_index] << std::endl;
     }
 
-  
+
 }
 
 ////////////////////////////////////////////////////////////////
@@ -800,11 +818,11 @@ int main(int argc, char **argv)
   std::cout << std::endl;
 
   // TestOscillatorOrbitalSubspace();
-  // TestOscillatorOrbitalSpace();
+  TestOscillatorOrbitalSpace();
   // TestOscillatorOrbitalSectors();
   // TestLadderOperators();
-  TestProductOperator();
-  
+  // TestProductOperator();
+
   // termination
   return 0;
 }
