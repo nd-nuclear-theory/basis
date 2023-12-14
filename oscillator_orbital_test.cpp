@@ -181,6 +181,28 @@ void TestOscillatorOrbitalSectors()
             << hamiltonian_sectors.DebugStr()
             << std::endl;
 
+  // find indices for a matrix element from labels
+  std::cout << "Find indices for a matrix element from labels" << std::endl;
+  std::size_t bra_subspace_index=space.LookUpSubspaceIndex(basis::OscillatorOrbitalSubspace::SubspaceLabelsType(2));
+  std::size_t ket_subspace_index=space.LookUpSubspaceIndex(basis::OscillatorOrbitalSubspace::SubspaceLabelsType(2));
+  std::size_t sector_index=hamiltonian_sectors.LookUpSectorIndex(bra_subspace_index,ket_subspace_index);
+  std::cout << "sector index " << sector_index << std::endl;
+  basis::OscillatorOrbitalSectors::SectorType sector=hamiltonian_sectors.GetSector(sector_index);
+  // const basis::OscillatorOrbitalSectors::SectorType::BraSubspaceType& bra_subspace=sector.bra_subspace();
+  // const basis::OscillatorOrbitalSectors::SectorType::KetSubspaceType& ket_subspace=sector.ket_subspace();
+  const basis::OscillatorOrbitalSubspace& bra_subspace=sector.bra_subspace();
+  const basis::OscillatorOrbitalSubspace& ket_subspace=sector.ket_subspace();
+  // auto& bra_subspace=sector.bra_subspace();
+  // auto& ket_subspace=sector.ket_subspace();
+  std::cout << "bra_subspace " << bra_subspace.LabelStr() << std::endl;
+  std::cout << "ket_subspace " << ket_subspace.LabelStr() << std::endl;
+  std::cout << "bra_subspace " << std::endl << bra_subspace.DebugStr() << std::endl;
+  std::cout << "ket_subspace " << std::endl << ket_subspace.DebugStr() << std::endl;
+  std::size_t bra_state_index=bra_subspace.LookUpStateIndex(basis::OscillatorOrbitalState::StateLabelsType(0));
+  std::size_t ket_state_index=ket_subspace.LookUpStateIndex(basis::OscillatorOrbitalState::StateLabelsType(1));
+  std::cout << "bra state index " << bra_state_index << std::endl;
+  std::cout << "ket state index " << ket_state_index << std::endl;
+
   // construct sectors -- L0=1, g0=1 (E1-like)
   basis::OscillatorOrbitalSectors e1_sectors(space, 1, 1);
   std::cout << "e1_sectors" << std::endl
@@ -818,8 +840,8 @@ int main(int argc, char **argv)
   std::cout << std::endl;
 
   // TestOscillatorOrbitalSubspace();
-  TestOscillatorOrbitalSpace();
-  // TestOscillatorOrbitalSectors();
+  // TestOscillatorOrbitalSpace();
+  TestOscillatorOrbitalSectors();
   // TestLadderOperators();
   // TestProductOperator();
 
