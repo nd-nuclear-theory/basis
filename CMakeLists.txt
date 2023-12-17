@@ -59,6 +59,8 @@ set(basis_UNITS_H_CPP
     lsjt_operator
     jjjt_scheme
     jjjt_operator
+    jjjttz_scheme
+    jjjttz_operator
     jjjpn_scheme
     jjjpn_operator
     nlj_orbital
@@ -165,6 +167,8 @@ set(basis_UNITS_TEST
     lsjt_scheme_test
     lsjt_operator_test
     jjjt_scheme_test
+    jjjttz_scheme_test
+    jjjttz_operator_test
     jjjpn_scheme_test
     jjjpn_operator_test
     m_scheme_test
