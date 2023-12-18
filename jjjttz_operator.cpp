@@ -172,7 +172,7 @@ namespace basis {
         // std::cout << "bra state index " << bra_state_index << std::endl;
         // std::cout << "ket state index " << ket_state_index << std::endl;
         // std::cout << "matrix element " << matrix_element << std::endl;
-        // std::cout << "Can't find indexes for a non-zero matrix element." << std::endl;
+        std::cout << "Can't find indexes for a non-zero matrix element." << std::endl;
         exit(EXIT_FAILURE);
         // return;
       } else {
@@ -215,6 +215,9 @@ namespace basis {
     std::size_t ket_state_index=ket_subspace.LookUpStateIndex(state_labels_ket);
     // std::cout << "bra state index " << bra_state_index << std::endl;
     // std::cout << "ket state index " << ket_state_index << std::endl;
+    if ((bra_state_index==kNone)||(ket_state_index==kNone)) {
+      return 0;
+    }
     return matrices[sector_index](bra_state_index,ket_state_index);
   }
 
