@@ -197,6 +197,33 @@ namespace basis {
       }
   }
 
+  template <typename tFloat>
+  void SetOperatorToZeroLike(
+      const basis::OperatorBlocks<tFloat>& source_matrices,
+      basis::OperatorBlocks<tFloat>& matrices
+    )
+    // Set operator blocks to zero.
+    //
+    // Arguments:
+    //   source_matrices (input): matrices like those for which the operator is defined
+    //   matrices (output): matrices to hold blocks
+  {
+
+    // clear vector of matrices
+    matrices.clear();
+    matrices.resize(source_matrices.size());
+
+    // iterate over sectors
+    for (std::size_t sector_index = 0; sector_index < source_matrices.size(); ++sector_index)
+      {
+        // generate matrix for sector
+        matrices[sector_index] = basis::OperatorBlock<tFloat>::Zero(
+            source_matrices[sector_index].rows(),source_matrices[sector_index].cols()
+          );
+
+      }
+  }
+
   ////////////////////////////////////////////////////////////////
   // constant operator
   ////////////////////////////////////////////////////////////////
