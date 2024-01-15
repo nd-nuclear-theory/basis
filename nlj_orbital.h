@@ -701,6 +701,8 @@ namespace basis {
     int g0()     const {return g0_;}
     int Tz0()    const {return Tz0_;}
 
+    bool IsScalar() const {return (J0()==0 && g0()==0 && Tz0()==0);}
+
     #ifdef BASIS_ALLOW_DEPRECATED
     DEPRECATED("j0() accessor is deprecated; use J0() instead")
     int j0()     const {return J0_;}
