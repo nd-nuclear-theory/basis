@@ -1707,14 +1707,14 @@ namespace basis {
 
       BaseSectors() = default;
 
-      inline explicit BaseSectors(std::shared_ptr<SpaceType> space_ptr)
+      inline explicit BaseSectors(std::shared_ptr<const SpaceType> space_ptr)
         : BaseSectors{space_ptr, std::move(space_ptr)}
       {}
       // construct from shared_ptr to space
 
       inline explicit BaseSectors(
-          std::shared_ptr<SpaceType> bra_space_ptr,
-          std::shared_ptr<SpaceType> ket_space_ptr
+          std::shared_ptr<const SpaceType> bra_space_ptr,
+          std::shared_ptr<const SpaceType> ket_space_ptr
         )
         : BaseSectors<tSpaceType, tSpaceType, tSectorType, false>{
               std::move(bra_space_ptr), std::move(ket_space_ptr)
