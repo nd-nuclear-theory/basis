@@ -202,6 +202,8 @@
 #include <sstream>
 #include <string>
 
+#include <mcutils/meta.h>
+
 #ifdef BASIS_ALLOW_DEPRECATED
 // emit warnings on deprecated
 #include "mcutils/deprecated.h"
@@ -1393,21 +1395,23 @@ namespace basis {
       // default constructor -- provided since required for certain
       // purposes by STL container classes (e.g., std::vector::resize)
 
+      template<
+          typename T, typename U,
+          typename std::enable_if_t<std::is_constructible_v<
+              std::shared_ptr<const BraSpaceType>,
+              T
+            >>* = nullptr,
+          typename std::enable_if_t<std::is_constructible_v<
+              std::shared_ptr<const KetSpaceType>,
+              U
+            >>* = nullptr
+        >
       BaseSectors(
-            const std::shared_ptr<const BraSpaceType>& bra_space_ptr,
-            const std::shared_ptr<const KetSpaceType>& ket_space_ptr
+            T&& bra_space_ptr,
+            U&& ket_space_ptr
           )
-          : bra_space_ptr_{bra_space_ptr},
-            ket_space_ptr_{ket_space_ptr},
-            num_elements_{}
-      {}
-
-      BaseSectors(
-            std::shared_ptr<const BraSpaceType>&& bra_space_ptr,
-            std::shared_ptr<const KetSpaceType>&& ket_space_ptr
-          )
-          : bra_space_ptr_{std::move(bra_space_ptr)},
-            ket_space_ptr_{std::move(ket_space_ptr)},
+          : bra_space_ptr_{std::forward<T>(bra_space_ptr)},
+            ket_space_ptr_{std::forward<U>(ket_space_ptr)},
             num_elements_{}
       {}
 
@@ -1707,36 +1711,30 @@ namespace basis {
 
       BaseSectors() = default;
 
-      inline explicit BaseSectors(std::shared_ptr<const SpaceType> space_ptr)
-        : BaseSectors{space_ptr, std::move(space_ptr)}
+      template<
+          typename T,
+          typename std::enable_if_t<mcutils::is_derived_constructible_v<
+              BaseSectors<tSpaceType, tSpaceType, tSectorType, false>,
+              T, T
+            >>* = nullptr
+        >
+      inline explicit BaseSectors(T&& space_ptr)
+        : BaseSectors<tSpaceType, tSpaceType, tSectorType, false>{
+              space_ptr, std::forward<T>(space_ptr)
+          }
       {}
       // construct from shared_ptr to space
 
-      inline explicit BaseSectors(
-          std::shared_ptr<const SpaceType> bra_space_ptr,
-          std::shared_ptr<const SpaceType> ket_space_ptr
-        )
-        : BaseSectors<tSpaceType, tSpaceType, tSectorType, false>{
-              std::move(bra_space_ptr), std::move(ket_space_ptr)
-            }
-      {}
-
       template<
-          typename T,
-          typename std::enable_if_t<std::is_same_v<std::decay_t<T>, SpaceType>>* = nullptr
+          typename... Args,
+          typename std::enable_if_t<mcutils::is_derived_constructible_v<
+              BaseSectors<tSpaceType, tSpaceType, tSectorType, false>,
+              Args...
+            >>* = nullptr
         >
-      inline explicit BaseSectors(T&& space)
-        : BaseSectors{std::forward<T>(space), std::forward<T>(space)}
-      {}
-
-      template<
-          typename T, typename U,
-          typename std::enable_if_t<std::is_same_v<std::decay_t<T>, SpaceType>>* = nullptr,
-          typename std::enable_if_t<std::is_same_v<std::decay_t<U>, SpaceType>>* = nullptr
-        >
-      BaseSectors(T&& bra_space, U&& ket_space)
+      inline explicit BaseSectors(Args&&... args)
         : BaseSectors<tSpaceType, tSpaceType, tSectorType, false>{
-              std::forward<T>(bra_space), std::forward<U>(ket_space)
+              std::forward<Args>(args)...
             }
       {}
 
