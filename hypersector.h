@@ -30,12 +30,12 @@
 #include "basis.h"
 #include "operator.h"
 
-#ifdef BASIS_HASH
-#include <unordered_map>
-#include <boost/container_hash/hash.hpp>
-#else
-#include <map>
-#endif
+// #ifdef BASIS_HASH
+//#include <unordered_map>
+//#include <boost/container_hash/hash.hpp>
+//#else
+//#include <map>
+//#endif
 
 namespace basis {
 
@@ -43,46 +43,73 @@ namespace basis {
   // hypersector indexing
   ////////////////////////////////////////////////////////////////
 
+  // declare BaseSectors template
+  template <
+      typename tBraSubspaceType,
+      typename tOperatorSubspaceType,
+      typename tKetSubspaceType = tBraSubspaceType,
+      bool = std::is_same_v<tBraSubspaceType, tKetSubspaceType>
+    >
+    class BaseHypersector;
+
+
   // Note: A "hypersector" represents a triplet consisting of a pair
   // of "state" subspaces (which thus define a "sector" or block in
   // the matrix representation of an operator on the space) and an
   // "operator" subspace.  The hypersector may also be labeled with an
   // optional multiplicity index.
 
-  template <typename tSubspaceType, typename tOperatorSubspaceType>
-    class BaseHypersector
+
+  /// BaseHypersector -- provide storage of information for a single hypersector
+
+  // Here we specialize the template for the case where the bra and ket
+  // subspaces are of different types. For the case where they are the same
+  // (below), we will inherit from this specialization.
+  template <typename tBraSubspaceType, typename tOperatorSubspaceType, typename tKetSubspaceType>
+    class BaseHypersector<tBraSubspaceType, tOperatorSubspaceType, tKetSubspaceType, false>
+    : public BaseSector<tBraSubspaceType, tKetSubspaceType>
     // Store indexing and subspace reference information for a
     // hypersector.
-    //
-    // Allows for multiplicity index on sector, for symmetry sectors
-    // of groups with outer multiplicities.
     {
+      private:
+
+      ////////////////////////////////////////////////////////////////
+      // private (convenience) typedefs
+      ////////////////////////////////////////////////////////////////
+      using BaseSectorType = BaseSector<tBraSubspaceType, tKetSubspaceType>;
 
       ////////////////////////////////////////////////////////////////
       // typedefs
       ////////////////////////////////////////////////////////////////
 
       public:
-      typedef tSubspaceType SubspaceType;
-      typedef tOperatorSubspaceType OperatorSubspaceType;
-      typedef std::tuple<std::size_t,std::size_t,std::size_t,std::size_t> KeyType;
+      using BraSubspaceType = typename BaseSectorType::BraSubspaceType;
+      using KetSubspaceType = typename BaseSectorType::KetSubspaceType;
+      using OperatorSubspaceType = tOperatorSubspaceType;
+      using KeyType = std::tuple<std::size_t,std::size_t,std::size_t,std::size_t>;
 
       ////////////////////////////////////////////////////////////////
       // constructors
       ////////////////////////////////////////////////////////////////
+      BaseHypersector() = default;
 
-      BaseHypersector(
-          std::size_t bra_subspace_index, std::size_t ket_subspace_index, std::size_t operator_subspace_index,
-          const SubspaceType& bra_subspace, const SubspaceType& ket_subspace, const OperatorSubspaceType& operator_subspace,
+      inline BaseHypersector(
+          std::size_t bra_subspace_index,
+          std::size_t ket_subspace_index,
+          std::size_t operator_subspace_index,
+          std::shared_ptr<const BraSubspaceType> bra_subspace_ptr,
+          std::shared_ptr<const KetSubspaceType> ket_subspace_ptr,
+          std::shared_ptr<const OperatorSubspaceType> operator_subspace_ptr,
           std::size_t multiplicity_index=1
         )
-        : bra_subspace_index_(bra_subspace_index), ket_subspace_index_(ket_subspace_index),
-        operator_subspace_index_(operator_subspace_index), multiplicity_index_(multiplicity_index)
-      {
-        bra_subspace_ptr_ = &bra_subspace;
-        ket_subspace_ptr_ = &ket_subspace;
-        operator_subspace_ptr_ = &operator_subspace;
-      }
+        : BaseSectorType{
+            bra_subspace_index, ket_subspace_index,
+            std::move(bra_subspace_ptr), std::move(ket_subspace_ptr),
+            multiplicity_index
+          },
+        operator_subspace_index_{operator_subspace_index},
+        operator_subspace_ptr_{std::move(operator_subspace_ptr)}
+      {}
 
       ////////////////////////////////////////////////////////////////
       // accessors
@@ -92,41 +119,77 @@ namespace basis {
       // Return tuple key identifying sector for sorting/lookup
       // purposes.
       {
-        return KeyType(bra_subspace_index(),ket_subspace_index(),operator_subspace_index(),multiplicity_index());
+        return KeyType(
+            BaseSectorType::bra_subspace_index(), BaseSectorType::ket_subspace_index(),
+            operator_subspace_index(), BaseSectorType::multiplicity_index()
+          );
       }
 
-      std::size_t bra_subspace_index() const {return bra_subspace_index_;}
-      std::size_t ket_subspace_index() const {return ket_subspace_index_;}
-      std::size_t operator_subspace_index() const {return operator_subspace_index_;}
-      // Return integer index of bra/ket subspace.
-
-      const SubspaceType& bra_subspace() const {return *bra_subspace_ptr_;}
-      const SubspaceType& ket_subspace() const {return *ket_subspace_ptr_;}
-      const OperatorSubspaceType& operator_subspace() const {return *operator_subspace_ptr_;}
-      // Return reference to bra/ket/operator subspace.
-
-      std::size_t multiplicity_index() const {return multiplicity_index_;}
-      // Return multiplicity index of this sector.
-
-      inline bool IsDiagonal() const
-      // Test if sector is diagonal (i.e., within a single subspace).
+      std::size_t operator_subspace_index() const
       {
-        return (bra_subspace_index()==ket_subspace_index());
+        return operator_subspace_index_;
       }
-
-      inline bool IsUpperTriangle() const
-      // Test if sector is in upper triangle (includes diagonal).
+      // Return integer index of operator subspace.
+      const OperatorSubspaceType& operator_subspace() const
       {
-        return (bra_subspace_index()<=ket_subspace_index());
+        return *operator_subspace_ptr_;
       }
+      // Return reference to operator subspace.
+      std::shared_ptr<const OperatorSubspaceType> operator_subspace_ptr() const
+      {
+        return operator_subspace_ptr_;
+      }
+      // Return shared pointer to bra/ket subspace.
 
       private:
-      std::size_t bra_subspace_index_, ket_subspace_index_, operator_subspace_index_;
-      const SubspaceType* bra_subspace_ptr_;
-      const SubspaceType* ket_subspace_ptr_;
-      const OperatorSubspaceType* operator_subspace_ptr_;
-      std::size_t multiplicity_index_;
+      std::size_t operator_subspace_index_;
+      std::shared_ptr<const OperatorSubspaceType> operator_subspace_ptr_;
     };
+
+
+
+  // Here we specialize to the case where the bra and ket subspaces have the
+  // same type. We inherit all the functionality from the case where they
+  // differ, and add an additional type alias.
+  template<typename tSubspaceType,typename tOperatorSubspaceType>
+    class BaseHypersector<tSubspaceType, tOperatorSubspaceType, tSubspaceType, true>
+      : public BaseHypersector<tSubspaceType, tOperatorSubspaceType, tSubspaceType, false>
+    {
+      public:
+
+      ////////////////////////////////////////////////////////////////
+      // common typedefs
+      ////////////////////////////////////////////////////////////////
+
+      using SubspaceType = tSubspaceType;
+      using OperatorSubspaceType = tOperatorSubspaceType;
+
+      ////////////////////////////////////////////////////////////////
+      // constructors
+      ////////////////////////////////////////////////////////////////
+
+      BaseHypersector() = default;
+
+      inline BaseHypersector(
+          std::size_t bra_subspace_index,
+          std::size_t ket_subspace_index,
+          std::size_t operator_subspace_index,
+          std::shared_ptr<const SubspaceType> bra_subspace_ptr,
+          std::shared_ptr<const SubspaceType> ket_subspace_ptr,
+          std::shared_ptr<const OperatorSubspaceType> operator_subspace_ptr,
+          std::size_t multiplicity_index=1
+        )
+        : BaseHypersector<tSubspaceType,tOperatorSubspaceType,tSubspaceType, false>{
+            bra_subspace_index, ket_subspace_index,
+            operator_subspace_index,
+            std::move(bra_subspace_ptr), std::move(ket_subspace_ptr),
+            std::move(operator_subspace_ptr),
+            multiplicity_index
+          }
+      {}
+
+    };
+
 
   // BaseHypersectors -- container to hold a set of hypersectors with
   // reverse lookup by hypersector labels
@@ -135,20 +198,99 @@ namespace basis {
   //   tSpaceType (typename): type for bra/ket space
   //   tOperatorSpaceType (typename): type for operator space
 
-  template <typename tSpaceType, typename tOperatorSpaceType>
-    class BaseHypersectors
+  // declare BaseSectors template
+  template <
+      typename tBraSpaceType,
+      typename tOperatorSpaceType,
+      typename tKetSpaceType = tBraSpaceType,
+      typename tHypersectorType
+        = BaseHypersector<typename tBraSpaceType::SubspaceType, typename tKetSpaceType::SubspaceType>,
+      bool = std::is_same_v<tBraSpaceType, tKetSpaceType>
+    >
+    class BaseHypersectors;
+
+  template <typename tBraSpaceType, typename tOperatorSpaceType, typename tKetSpaceType, typename tHypersectorType>
+    class BaseHypersectors<tBraSpaceType, tOperatorSpaceType, tKetSpaceType, tHypersectorType, false>
+    : public BaseSectors<tBraSpaceType, tKetSpaceType, tHypersectorType>
     {
+      private:
+
+    ////////////////////////////////////////////////////////////////
+    // private (convenience) typedefs
+    ////////////////////////////////////////////////////////////////
+      using BaseSectorsType
+        = BaseSectors<tBraSpaceType, tKetSpaceType, tHypersectorType>;
+
       public:
 
       ////////////////////////////////////////////////////////////////
       // common typedefs
       ////////////////////////////////////////////////////////////////
 
-      typedef tSpaceType SpaceType;
-      typedef tOperatorSpaceType OperatorSpaceType;
-      typedef typename tSpaceType::SubspaceType SubspaceType;
-      typedef typename tOperatorSpaceType::SubspaceType OperatorSubspaceType;
-      typedef BaseHypersector<SubspaceType,OperatorSubspaceType> HypersectorType;
+
+      using BraSpaceType = typename BaseSectorsType::BraSpaceType;
+      using KetSpaceType = typename BaseSectorsType::KetSpaceType;
+      using OperatorSpaceType = tOperatorSpaceType;
+      using OperatorSubspaceType = typename tOperatorSpaceType::SubspaceType;
+      using HypersectorType = tHypersectorType;
+
+
+      BaseHypersectors() = default;
+
+      template<
+          typename T, typename U, typename V,
+          typename std::enable_if_t<mcutils::is_derived_constructible_v<
+              BaseSectorsType, T, U
+            >>* = nullptr,
+          typename std::enable_if_t<std::is_constructible_v<
+              std::shared_ptr<const OperatorSpaceType>, V
+            >>* = nullptr
+        >
+      BaseHypersectors(
+          T&& bra_space_or_ptr,
+          U&& ket_space_or_ptr,
+          V&& operator_space_ptr
+        )
+        : BaseSectorsType{
+              std::forward<T>(bra_space_or_ptr), std::forward<U>(ket_space_or_ptr)
+            },
+          operator_space_ptr_{std::forward<V>(operator_space_ptr)}
+      {}
+
+      template<
+          typename T, typename U, typename V,
+          typename std::enable_if_t<mcutils::is_derived_constructible_v<
+              BaseSectorsType,
+              T, U
+            >>* = nullptr,
+          typename std::enable_if_t<std::is_same_v<std::decay_t<V>, OperatorSpaceType>>* = nullptr
+        >
+      BaseHypersectors(
+          T&& bra_space_or_ptr,
+          U&& ket_space_or_ptr,
+          V&& operator_space
+        )
+        : BaseSectorsType{
+              std::forward<T>(bra_space_or_ptr), std::forward<U>(ket_space_or_ptr)
+            }
+      {
+          operator_space_ptr_
+            = std::make_shared<const OperatorSpaceType>(std::forward<V>(operator_space));
+      }
+
+      ////////////////////////////////////////////////////////////////
+      // space accessors
+      ////////////////////////////////////////////////////////////////
+
+      const OperatorSpaceType& operator_space() const
+      {
+        return *operator_space_ptr_;
+      }
+
+      std::shared_ptr<const BraSpaceType> operator_space_ptr() const
+      {
+        return operator_space_ptr_;
+      }
 
       ////////////////////////////////////////////////////////////////
       // sector lookup and retrieval
@@ -157,7 +299,14 @@ namespace basis {
       const HypersectorType& GetHypersector(std::size_t hypersector_index) const
       // Given sector index, return reference to sector itself.
       {
-        return hypersectors_[hypersector_index];
+        return BaseSectorsType::GetSector(hypersector_index);
+      };
+
+      bool ContainsHypersector(typename HypersectorType::KeyType key) const
+      // Given the labels for a sector, returns whether or not the sector
+      // is found within the the sector set.
+      {
+        return BaseSectorsType::ContainsSector(key);
       };
 
       bool ContainsHypersector(
@@ -167,11 +316,21 @@ namespace basis {
       // Given the labels for a sector, returns whether or not the sector
       // is found within the the sector set.
       {
-        typename HypersectorType::KeyType
-          key(bra_subspace_index,ket_subspace_index,operator_subspace_index,multiplicity_index);
-        return lookup_.count(key);
+        return ContainsHypersector(
+            typename HypersectorType::KeyType{
+                bra_subspace_index,ket_subspace_index,operator_subspace_index,multiplicity_index
+              }
+          );
       };
 
+      std::size_t LookUpHypersectorIndex(const typename HypersectorType::KeyType& key) const
+      // Given the key for a sector, look up its index within the
+      // sector set.
+      //
+      // If no such labels are found, basis::kNone is returned.
+      {
+        return BaseSectorsType::LookUpSectorIndex(key);
+      }
       std::size_t LookUpHypersectorIndex(
           std::size_t bra_subspace_index, std::size_t ket_subspace_index, std::size_t operator_subspace_index,
           std::size_t multiplicity_index=1
@@ -181,23 +340,11 @@ namespace basis {
       //
       // If no such labels are found, basis::kNone is returned.
       {
-        const typename HypersectorType::KeyType
-          key(bra_subspace_index,ket_subspace_index,operator_subspace_index,multiplicity_index);
-        auto pos = lookup_.find(key);
-        if (pos==lookup_.end())
-          return kNone;
-        else
-          return pos->second;
-      };
-
-      ////////////////////////////////////////////////////////////////
-      // size retrieval
-      ////////////////////////////////////////////////////////////////
-
-      std::size_t size() const
-      // Return number of hypersectors within hypersector set.
-      {
-        return hypersectors_.size();
+        return LookUpHypersectorIndex(
+            typename HypersectorType::KeyType{
+                bra_subspace_index,ket_subspace_index,operator_subspace_index,multiplicity_index
+              }
+          );
       };
 
       ////////////////////////////////////////////////////////////////
@@ -215,35 +362,159 @@ namespace basis {
       // hypersector push (for initial construction)
       ////////////////////////////////////////////////////////////////
 
-      void PushHypersector(const HypersectorType& hypersector)
+      template<
+          typename T,
+          typename std::enable_if_t<std::is_same_v<std::decay_t<T>,HypersectorType>>* = nullptr
+        >
+      void PushHypersector(T&& hypersector)
       // Create indexing information (in both directions, index <->
       // labels) for a sector.
       {
-        lookup_[hypersector.Key()] = hypersectors_.size(); // index for lookup
-        hypersectors_.push_back(hypersector);  // save hypersector
+        BaseSectorsType::PushSector(std::forward<T>(hypersector));
       };
 
+      template<typename... Args>
+      void EmplaceHypersector(Args&&... args)
+      // Create indexing information (in both directions, index <->
+      // labels) for a sector.
+      {
+        BaseSectorsType::EmplaceSector(std::forward<Args>(args)...);
+      }
+
+      template<
+          typename T = HypersectorType,
+          std::enable_if_t<std::is_same_v<typename T::BraSubspaceType,typename BraSpaceType::SubspaceType>>* = nullptr,
+          std::enable_if_t<std::is_same_v<typename T::KetSubspaceType,typename KetSpaceType::SubspaceType>>* = nullptr
+        >
+      inline void PushHypersector(
+          std::size_t bra_subspace_index,
+          std::size_t ket_subspace_index,
+          std::size_t operator_subspace_index,
+          std::size_t multiplicity_index=1
+        )
+      // Create indexing information (in both directions, index <->
+      // labels) for a sector, given indices.
+      {
+        EmplaceHypersector(
+            bra_subspace_index,
+            ket_subspace_index,
+            operator_subspace_index,
+            BaseSectorsType::bra_space().GetSubspacePtr(bra_subspace_index),
+            BaseSectorsType::ket_space().GetSubspacePtr(ket_subspace_index),
+            operator_space().GetSubspacePtr(operator_subspace_index),
+            multiplicity_index
+          );  // save sector
+      }
+
+      template<
+          typename T = HypersectorType,
+          std::enable_if_t<std::is_same_v<typename T::BraSubspaceType, typename BraSpaceType::SubspaceType>>* = nullptr,
+          std::enable_if_t<std::is_same_v<typename T::KetSubspaceType, typename KetSpaceType::SubspaceType>>* = nullptr
+        >
+      inline void PushHypersector(const typename HypersectorType::KeyType& key)
+      // Create indexing information (in both directions, index <->
+      // labels) for a sector, given key.
+      {
+        const auto& [bra_subspace_index,ket_subspace_index,operator_subspace_index,multiplicity_index] = key;
+        PushHypersector(bra_subspace_index, ket_subspace_index, operator_subspace_index, multiplicity_index);
+      };
+
+
+      private:
       ////////////////////////////////////////////////////////////////
       // internal storage
       ////////////////////////////////////////////////////////////////
 
-      // Hypersectors (accessible by index)
-      std::vector<HypersectorType> hypersectors_;
-
-      // sector index lookup by subspace indices
-#ifdef BASIS_HASH
-      std::unordered_map<typename HypersectorType::KeyType,std::size_t,boost::hash<typename HypersectorType::KeyType>> lookup_;
-#else
-      std::map<typename HypersectorType::KeyType,std::size_t> lookup_;
-#endif
+      // spaces
+      std::shared_ptr<const OperatorSpaceType> operator_space_ptr_;
 
     };
 
-  template <typename tSpaceType, typename tOperatorSpaceType>
-    std::string BaseHypersectors<tSpaceType,tOperatorSpaceType>::DebugStr() const
+  // Here we specialize to the case where the bra and ket spaces have the same
+  // type. We inherit all the functionality from the case where they differ, and
+  // add some additional type aliases and constructors.
+  template<typename tSpaceType, typename tOperatorSpaceType, typename tHypersectorType>
+    class BaseHypersectors<tSpaceType, tSpaceType, tOperatorSpaceType, tHypersectorType, true>
+      : public BaseHypersectors<tSpaceType, tSpaceType, tOperatorSpaceType, tHypersectorType, false>
+    {
+      private:
+
+      ////////////////////////////////////////////////////////////////
+      // private (convenience) typedefs
+      ////////////////////////////////////////////////////////////////
+      using BaseHypersectorsType
+        = BaseHypersectors<tSpaceType, tSpaceType, tOperatorSpaceType, tHypersectorType, false>;
+
+      public:
+
+      ////////////////////////////////////////////////////////////////
+      // common typedefs
+      ////////////////////////////////////////////////////////////////
+
+      using SpaceType = tSpaceType;
+      using OperatorSpaceType = tOperatorSpaceType;
+      // TODO (pjf): Fix up template type here so that SubspaceType only
+      // gets defined if unambiguous
+      // template<
+      //     typename T = tSectorType,
+      //     std::enable_if_t<std::is_same_v<typename T::BraSubspaceType, typename T::KetSubspaceType>>* = nullptr
+      //   >
+      static_assert(
+          std::is_same_v<typename tHypersectorType::BraSubspaceType, typename tHypersectorType::KetSubspaceType>,
+          "same-Space BaseHypersectors currently allowed with same-Subspace BaseHypersector"
+        );
+      using SubspaceType = typename tHypersectorType::BraSubspaceType;
+      using OperatorSubspaceType = typename tHypersectorType::OperatorSubspaceType;
+
+      protected:
+
+      ////////////////////////////////////////////////////////////////
+      // constructors
+      ////////////////////////////////////////////////////////////////
+
+      BaseHypersectors() = default;
+
+
+
+      template<
+          typename T, typename U,
+          typename std::enable_if_t<mcutils::is_derived_constructible_v<
+            BaseHypersectorsType, T, T, U
+          >>* = nullptr
+        >
+      inline BaseHypersectors(T&& space_or_ptr, U&& operator_space_or_ptr)
+      : BaseHypersectors<tSpaceType, tSpaceType, tOperatorSpaceType, tHypersectorType, false>{
+        space_or_ptr,
+        std::forward<T>(space_or_ptr),
+        std::forward<U>(operator_space_or_ptr)
+      }
+      {}
+
+      template<
+          typename T, typename U, typename V,
+          typename std::enable_if_t<mcutils::is_derived_constructible_v<
+            BaseHypersectorsType, T, U, V
+          >>* = nullptr
+        >
+      inline BaseHypersectors(
+          T&& bra_space_or_ptr,
+          U&& ket_space_or_ptr,
+          V&& operator_space_or_ptr
+        )
+        : BaseHypersectors<tSpaceType, tSpaceType, tOperatorSpaceType, tHypersectorType, false>{
+              std::forward<T>(bra_space_or_ptr),
+              std::forward<U>(ket_space_or_ptr),
+              std::forward<V>(operator_space_or_ptr)
+            }
+      {}
+
+    };
+
+  template <typename tBraSpaceType, typename tOperatorSpaceType, typename tKetSpaceType, typename tHypersectorType>
+    std::string BaseHypersectors<tBraSpaceType, tOperatorSpaceType, tKetSpaceType, tHypersectorType, false>::DebugStr() const
     {
       std::ostringstream os;
-      for (std::size_t hypersector_index=0; hypersector_index<size(); ++hypersector_index)
+      for (std::size_t hypersector_index=0; hypersector_index<BaseSectorsType::size(); ++hypersector_index)
         {
           const HypersectorType& hypersector = GetHypersector(hypersector_index);
 
@@ -363,6 +634,6 @@ namespace basis {
 
   ////////////////////////////////////////////////////////////////
   ////////////////////////////////////////////////////////////////
-} // namespace
+} // namespace basis
 
 #endif
