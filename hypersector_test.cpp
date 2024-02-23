@@ -85,10 +85,9 @@ namespace basis {
 
             // push hypersector
             if (allowed)
-              PushHypersector(HypersectorType(
-                             bra_subspace_index,ket_subspace_index,operator_subspace_index,
-                             bra_subspace,ket_subspace,operator_subspace
-                           ));
+              PushHypersector(
+                  bra_subspace_index,ket_subspace_index,operator_subspace_index
+                );
           }
   }
 
