@@ -103,12 +103,12 @@ namespace basis {
           std::size_t multiplicity_index=1
         )
         : BaseSectorType{
-            bra_subspace_index, ket_subspace_index,
-            std::move(bra_subspace_ptr), std::move(ket_subspace_ptr),
-            multiplicity_index
-          },
-        operator_subspace_index_{operator_subspace_index},
-        operator_subspace_ptr_{std::move(operator_subspace_ptr)}
+              bra_subspace_index, ket_subspace_index,
+              std::move(bra_subspace_ptr), std::move(ket_subspace_ptr),
+              multiplicity_index
+            },
+          operator_subspace_index_{operator_subspace_index},
+          operator_subspace_ptr_{std::move(operator_subspace_ptr)}
       {}
 
       ////////////////////////////////////////////////////////////////
@@ -155,6 +155,14 @@ namespace basis {
     class BaseHypersector<tSubspaceType, tOperatorSubspaceType, tSubspaceType, true>
       : public BaseHypersector<tSubspaceType, tOperatorSubspaceType, tSubspaceType, false>
     {
+      private:
+
+      ////////////////////////////////////////////////////////////////
+      // private (convenience) typedefs
+      ////////////////////////////////////////////////////////////////
+      using BaseHypersectorType
+        = BaseHypersector<tSubspaceType, tOperatorSubspaceType, tSubspaceType, false>;
+
       public:
 
       ////////////////////////////////////////////////////////////////
@@ -179,13 +187,13 @@ namespace basis {
           std::shared_ptr<const OperatorSubspaceType> operator_subspace_ptr,
           std::size_t multiplicity_index=1
         )
-        : BaseHypersector<tSubspaceType,tOperatorSubspaceType,tSubspaceType, false>{
-            bra_subspace_index, ket_subspace_index,
-            operator_subspace_index,
-            std::move(bra_subspace_ptr), std::move(ket_subspace_ptr),
-            std::move(operator_subspace_ptr),
-            multiplicity_index
-          }
+        : BaseHypersectorType{
+              bra_subspace_index, ket_subspace_index,
+              operator_subspace_index,
+              std::move(bra_subspace_ptr), std::move(ket_subspace_ptr),
+              std::move(operator_subspace_ptr),
+              multiplicity_index
+            }
       {}
 
     };
@@ -243,7 +251,7 @@ namespace basis {
 
 
       template<
-          typename T, typename V, typename U,
+          typename T, typename U, typename V,
           typename std::enable_if_t<mcutils::is_derived_constructible_v<
               BaseSectorsType, T, U
             >>* = nullptr,
@@ -263,7 +271,7 @@ namespace basis {
       {}
 
       template<
-          typename T, typename V, typename U,
+          typename T, typename U, typename V,
           typename std::enable_if_t<mcutils::is_derived_constructible_v<
               BaseSectorsType,
               T, U
@@ -484,21 +492,21 @@ namespace basis {
       template<
           typename T, typename U,
           typename std::enable_if_t<mcutils::is_derived_constructible_v<
-            BaseHypersectorsType, T, U, T
+            BaseHypersectorsType, T, T, U
           >>* = nullptr
         >
       inline BaseHypersectors(T&& space_or_ptr, U&& operator_space_or_ptr)
-      : BaseHypersectors<tSpaceType, tOperatorSpaceType, tSpaceType, tHypersectorType, false>{
-        space_or_ptr,
-        std::forward<T>(space_or_ptr),
-        std::forward<U>(operator_space_or_ptr)
-      }
+      : BaseHypersectorsType{
+            space_or_ptr,
+            std::forward<T>(space_or_ptr),
+            std::forward<U>(operator_space_or_ptr)
+          }
       {}
 
       template<
-          typename T, typename V, typename U,
+          typename T, typename U, typename V,
           typename std::enable_if_t<mcutils::is_derived_constructible_v<
-            BaseHypersectorsType, T, V, U
+            BaseHypersectorsType, T, U, V
           >>* = nullptr
         >
       inline BaseHypersectors(
@@ -506,7 +514,7 @@ namespace basis {
           U&& ket_space_or_ptr,
           V&& operator_space_or_ptr
         )
-        : BaseHypersectors<tSpaceType, tOperatorSpaceType, tSpaceType, tHypersectorType, false>{
+        : BaseHypersectorsType{
               std::forward<T>(bra_space_or_ptr),
               std::forward<U>(ket_space_or_ptr),
               std::forward<V>(operator_space_or_ptr)
