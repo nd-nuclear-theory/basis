@@ -174,7 +174,7 @@ namespace basis {
   // space
   
   class OscillatorOrbitalSpace
-    : public BaseSpace<OscillatorOrbitalSubspace>
+    : public BaseSpace<OscillatorOrbitalSpace,OscillatorOrbitalSubspace>
   {
 
     public:
