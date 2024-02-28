@@ -166,6 +166,7 @@
     - Remove std::enable_shared_from_this.
     - Add GetSubspacePtr() accessor to BaseSpace using shared_ptr aliasing.
     - Make BaseSector take shared pointers instead of const references.
+  + 02/03/22 (mac): Add alias StateType to BaseSubspace.
   + 03/25/22 (pjf):
     - Modify BaseSubspace to allow definition with `void` labels.
   + 04/02/22 (pjf):
@@ -778,6 +779,7 @@ namespace basis {
   /// subspace labels
   ///
   /// Template arguments:
+  ///   tDerivedSpaceType (typename) : TODO 02/28/24 (mac): document
   ///   tSubspaceType (typename) : type for subspace
   ///   tSpaceLabelsType (typename, optional) : type for space labels
 
@@ -1066,9 +1068,9 @@ namespace basis {
       ////////////////////////////////////////////////////////////////
 
       /// subspaces (accessible by index)
-      std::shared_ptr<std::vector<SubspaceType>> subspaces_ptr_;
-      std::vector<std::size_t> subspace_offsets_;
-      std::size_t dimension_;
+      std::shared_ptr<std::vector<SubspaceType>> subspaces_ptr_;  // the subspaces contained in this space
+      std::vector<std::size_t> subspace_offsets_;  // offset of the subspace in the full space indexing, i.e., number of states is subspaces so far
+      std::size_t dimension_;  // total dimension (number of states in all subspaces)
 
       // subspace index lookup by labels
 #ifdef BASIS_HASH
