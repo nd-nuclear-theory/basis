@@ -116,9 +116,10 @@ namespace basis {
   enum class NormalizationConversion {kNone, kASToNAS, kNASToAS};
   // Normalization scheme converson flag.
   //
-  // To be used as value for a mode parameter to requests on-the-fly
-  // conversion between antisymmetrized (AS) and normalized
-  // antisymmetrized (NAS) matrix elements on input/output.
+  // To be used as value for a mode parameter to requests on-the-fly conversion
+  // between antisymmetrized (AS) and normalized antisymmetrized (NAS) matrix
+  // elements on input/output (see Appendix C of csbasis [PRC 86, 034312 (2012),
+  // http://dx.doi.org/10.1103/PhysRevC.86.034312]).
 
 
 

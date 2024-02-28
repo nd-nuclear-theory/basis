@@ -235,7 +235,7 @@ namespace basis {
   // space
 
   class TwoBodySpaceJJJT
-    : public BaseSpace<TwoBodySubspaceJJJT>
+    : public BaseSpace<TwoBodySpaceJJJT, TwoBodySubspaceJJJT>
   {
 
     public:
@@ -472,7 +472,7 @@ namespace basis {
   // space
 
   class TwoBodySpaceJJJTN
-    : public BaseSpace<TwoBodySubspaceJJJTN>
+    : public BaseSpace<TwoBodySpaceJJJTN, TwoBodySubspaceJJJTN>
   {
 
     public:

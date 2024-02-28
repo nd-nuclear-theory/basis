@@ -44,6 +44,12 @@ void TestTwoBody()
   basis::TwoBodySpaceJJJT space(basis::Rank::kTwoBody,Nmax);
   std::cout << space.DebugStr();
 
+  for (const auto& subspace : space)
+  {
+    std::cout << "subspace: " << subspace.LabelStr() << std::endl;
+    std::cout << subspace.DebugStr();
+  }
+
   // then set up allowed sectors
   std::cout << "Two-body operator sectors" << std::endl;
   int J0 = 2;  // try: J0=0 for interaction, J0=2 for quadrupole operator
@@ -110,6 +116,12 @@ void TestTwoBodyN()
   int Nmax = 2;
   basis::TwoBodySpaceJJJTN space(basis::Rank::kTwoBody,Nmax);
   std::cout << space.DebugStr();
+
+  for (const auto& subspace : space)
+  {
+    std::cout << "subspace: " << subspace.LabelStr() << std::endl;
+    std::cout << subspace.DebugStr();
+  }
 
   // then set up allowed sectors
   std::cout << "Two-body operator sectors" << std::endl;

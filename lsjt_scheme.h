@@ -72,6 +72,9 @@
   + 07/04/21 (pjf): Pass derived subspace class as template argument to
     BaseSubspace.
   + 06/03/22 (pjf): Add nr() and nc() accessors to RelativeCMStateLSJT.
+  + 09/12/23 (pjf):
+    - Add nr() and nc() accessors to RelativeCMStateLSJTN.
+    - Add n1() and n2() accessors to TwoBodyStateLSJT and TwoBodyStateLSJTN.
 
 ****************************************************************/
 
@@ -239,7 +242,7 @@ namespace basis {
   // space
 
   class RelativeSpaceLSJT
-    : public BaseSpace<RelativeSubspaceLSJT>
+    : public BaseSpace<RelativeSpaceLSJT, RelativeSubspaceLSJT>
   {
 
     public:
@@ -469,7 +472,7 @@ namespace basis {
   // space
 
   class RelativeCMSpaceLSJT
-    : public BaseSpace<RelativeCMSubspaceLSJT>
+    : public BaseSpace<RelativeCMSpaceLSJT, RelativeCMSubspaceLSJT>
   {
 
     public:
@@ -659,8 +662,10 @@ namespace basis {
     // state label accessors
     int Nr() const {return std::get<0>(labels());}
     int lr() const {return std::get<1>(labels());}
+    int nr() const {return (Nr()-lr())/2;}
     int Nc() const {return std::get<2>(labels());}
     int lc() const {return std::get<3>(labels());}
+    int nc() const {return (Nc()-lc())/2;}
     int N() const {return  Nr()+Nc();}
 
   };
@@ -668,7 +673,7 @@ namespace basis {
   // space
 
   class RelativeCMSpaceLSJTN
-    : public BaseSpace<RelativeCMSubspaceLSJTN>
+    : public BaseSpace<RelativeCMSpaceLSJTN, RelativeCMSubspaceLSJTN>
   {
 
     public:
@@ -878,9 +883,11 @@ namespace basis {
     // state label accessors
     int N1() const {return std::get<0>(labels());}
     int l1() const {return std::get<1>(labels());}
+    int n1() const {return (N1()-l1())/2;}
     int N2() const {return std::get<2>(labels());}
     int l2() const {return std::get<3>(labels());}
 
+    int n2() const {return (N2()-l2())/2;}
     int N() const {return N1()+N2();}
 
   };
@@ -888,7 +895,7 @@ namespace basis {
   // space
 
   class TwoBodySpaceLSJT
-    : public BaseSpace<TwoBodySubspaceLSJT>
+    : public BaseSpace<TwoBodySpaceLSJT, TwoBodySubspaceLSJT>
   {
 
     public:
@@ -1082,9 +1089,11 @@ namespace basis {
     // state label accessors
     int N1() const {return std::get<0>(labels());}
     int l1() const {return std::get<1>(labels());}
+    int n1() const {return (N1()-l1())/2;}
     int N2() const {return std::get<2>(labels());}
     int l2() const {return std::get<3>(labels());}
 
+    int n2() const {return (N2()-l2())/2;}
     int N() const {return N1()+N2();}
 
   };
@@ -1092,7 +1101,7 @@ namespace basis {
   // space
 
   class TwoBodySpaceLSJTN
-    : public BaseSpace<TwoBodySubspaceLSJTN>
+    : public BaseSpace<TwoBodySpaceLSJTN, TwoBodySubspaceLSJTN>
   {
 
     public:

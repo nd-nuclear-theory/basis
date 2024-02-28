@@ -2,7 +2,7 @@
   @file jt_operator.h
 
   Defines generic JT operator labels and templatized functions for manipulation
-  of JT operators.  These are generic to LSJT and JJTT schemes.
+  of JT operators.  These are generic to LSJT and JJJT schemes.
 
   Language: C++11
 

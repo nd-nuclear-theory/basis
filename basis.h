@@ -142,7 +142,47 @@
       differ.
     - Add additional template argument to BaseSectors so that custom sector type
       can be used, instead of default instantiation of BaseSector.
+  + 08/16/21 (pjf):
+    - Switch from storing shared_ptr<vector> to vector<shared_ptr> in BaseSpace.
+    - Add tDerivedSpaceType as template argument to BaseSpace for CRTP with
+      std::enable_shared_from_this.
+    - Replace raw pointers with shared_ptr in BaseSector.
+  + 08/17/21 (pjf):
+    - Revert to storing instances of sector in BaseSectors rather than just keys.
+    - Only copy space into BaseSectors if it is not managed by a shared_ptr.
+  + 08/18/21 (pjf): Add std::vector-like size management to BaseSubspace and
+    BaseSpace.
+  + 09/22/21 (pjf):
+    - Improve reserve() in BaseSubspace and BaseSpace.
+    - Add iterator support to BaseSubspace, BaseSpace, and BaseSectors.
+  + 09/24/21 (pjf):
+    - Fix use-after-move in BaseSectors::PushBack.
+    - Add indexing offsets for BaseSectors, and num_elements accessor to
+      both BaseSectors and BaseSector.
+    - Fix BaseSectors::DebugStr for size/dimension distinction.
+  + 09/30/21 (pjf): Add BaseSpace::full_size() accessor.
+  + 11/04/21 (pjf):
+    - Revert to shared pointer to vector in BaseSpace.
+    - Remove std::enable_shared_from_this.
+    - Add GetSubspacePtr() accessor to BaseSpace using shared_ptr aliasing.
+    - Make BaseSector take shared pointers instead of const references.
   + 02/03/22 (mac): Add alias StateType to BaseSubspace.
+  + 03/25/22 (pjf):
+    - Modify BaseSubspace to allow definition with `void` labels.
+  + 04/02/22 (pjf):
+    - Defer initialization of shared_ptr in BaseSpace until
+      PushSubspace/EmplaceSubspace/reserve.
+    - Make labels in BaseSubspace and BaseSpace non-const, to avoid deleting
+      copy and move constructors.
+  + 04/03/22 (pjf): Normalize all constructors so that fields get initialized
+    correctly.
+  + 04/12/22 (pjf): Allow BaseSectors between non-direct subspace of space.
+  + 02/03/23 (mac): Add alias StateType to BaseSubspace.
+  + 05/09/23 (pjf): Fix comparison of pointers in BaseSectors.
+  + 05/12/23 (pjf):
+    - Fix iterator types.
+    - Fix constness of member shared_ptr in BaseSector.
+    - Use std::addressof for comparison of objects in BaseSectors.
 ****************************************************************/
 
 #ifndef BASIS_BASIS_H_
@@ -150,9 +190,11 @@
 
 #include <cassert>
 #include <cstddef>
+#include <iterator>
 #include <limits>
 #include <memory>
 #include <tuple>
+#include <type_traits>
 #include <utility>
 #include <vector>
 
@@ -174,22 +216,6 @@
 #endif
 
 namespace basis {
-
-  ////////////////////////////////////////////////////////////////
-  // generic subspace mixin
-  ////////////////////////////////////////////////////////////////
-
-  /// BaseLabeling -- holds labeling and accessors for subspaces
-  ///
-  /// Users are not expected to directly inherit from this class; instead,
-  /// use BaseSubspace and BaseSpace
-  ///
-  /// Template arguments:
-  ///   tSubspaceLabelsType : tuple for subspace labels, e.g., std::tuple<int,int,int,int,int>
-  ///
-  /// Note: Even if only a single integer label is needed, we must use
-  /// tuple<int> (as opposed to plain int) to make the two forms of the
-  /// state constructor syntactically distinct.
 
   static constexpr std::size_t kNone = std::numeric_limits<std::size_t>::max();
   // Flag value for missing target in index lookups.
@@ -218,11 +244,19 @@ namespace basis {
   /// tuple<int> (as opposed to plain int) to make the two forms of the
   /// state constructor syntactically distinct.
 
+  // declare BaseSubspace template
   template <
       typename tDerivedSubspaceType, typename tSubspaceLabelsType,
       typename tStateType, typename tStateLabelsType
     >
-  class BaseSubspace
+  class BaseSubspace;
+
+  // specialize class for case with no labels
+  template <
+      typename tDerivedSubspaceType,
+      typename tStateType, typename tStateLabelsType
+    >
+  class BaseSubspace<tDerivedSubspaceType, void, tStateType, tStateLabelsType>
   {
 
     public:
@@ -231,8 +265,6 @@ namespace basis {
     //  common typedefs
     ////////////////////////////////////////////////////////////////
 
-    using LabelsType = tSubspaceLabelsType;
-    using SubspaceLabelsType = tSubspaceLabelsType;
     using StateLabelsType = tStateLabelsType;
     using StateType = tStateType;
 
@@ -244,37 +276,99 @@ namespace basis {
 
     /// default constructor
     //   Implicitly invoked by derived class.
-    BaseSubspace() : dimension_(0) {}
-
-    // pass-through constructor accepting labels
-    explicit BaseSubspace(const SubspaceLabelsType& labels)
-      : dimension_{0}, labels_{labels}
+    BaseSubspace()
+      : dimension_{}
     {}
 
     public:
 
     ////////////////////////////////////////////////////////////////
-    // retrieval
+    // iterators
     ////////////////////////////////////////////////////////////////
 
-    const SubspaceLabelsType& labels() const
-    /// Return the labels of the subspace itself.
+    struct iterator
     {
-      return labels_;
+      using iterator_category = std::input_iterator_tag;  // we don't satisfy the requirements of forward_iterator_tag because we return temporaries
+      using difference_type = std::make_signed_t<std::size_t>;
+      using value_type = tStateType;
+      using pointer = void*;
+      // using pointer = value_type*;  // n.b. we can't return a pointer to a temporary
+      using reference = value_type;  // n.b. this can't be a reference since value_type is always a temporary
+
+      iterator(const tDerivedSubspaceType* subspace_ptr, std::size_t index)
+        : subspace_ptr_{subspace_ptr}, index_{index}
+      {}
+
+      reference operator*() const { return subspace_ptr_->GetState(index_); }
+      reference operator[](std::size_t index) const { return subspace_ptr_->GetState(index_+index); }
+      iterator& operator++() { index_++; return *this; }
+      iterator operator++(int) { iterator tmp = *this; ++(*this); return tmp; }
+      iterator& operator--() { index_--; return *this; }
+      iterator operator--(int) { iterator tmp = *this; --(*this); return tmp; }
+      iterator& operator+=(difference_type n) { index_ += n; return *this; }
+      iterator& operator-=(difference_type n) { index_ -= n; return *this; }
+      friend iterator operator+(iterator it, difference_type n) { it += n; return it; }
+      friend iterator operator-(iterator it, difference_type n) { it -= n; return it; }
+      friend difference_type operator-(const iterator& lhs, const iterator& rhs)
+      {
+        return (lhs.index_ - rhs.index_);
+      }
+      friend bool operator==(const iterator& lhs, const iterator& rhs)
+      {
+        return (lhs.subspace_ptr_==rhs.subspace_ptr_) && (lhs.index_==rhs.index_);
+      }
+      friend bool operator!=(const iterator& lhs, const iterator& rhs)
+      {
+        return (lhs.subspace_ptr_!=rhs.subspace_ptr_) || (lhs.index_!=rhs.index_);
+      }
+      friend bool operator<(const iterator& lhs, const iterator& rhs)
+      {
+        return (lhs.index_<rhs.index_);
+      }
+      friend bool operator>(const iterator& lhs, const iterator& rhs)
+      {
+        return (lhs.index_>rhs.index_);
+      }
+      friend bool operator<=(const iterator& lhs, const iterator& rhs)
+      {
+        return (lhs.index_<=rhs.index_);
+      }
+      friend bool operator>=(const iterator& lhs, const iterator& rhs)
+      {
+        return (lhs.index_>=rhs.index_);
+      }
+
+      private:
+      const tDerivedSubspaceType* subspace_ptr_;
+      std::size_t index_;
+    };
+
+    using value_type = tStateType;
+    using const_reference = const tStateType&;
+    using const_iterator = iterator;
+    using difference_type = typename iterator::difference_type;
+    using size_type = std::make_unsigned_t<difference_type>;
+
+    iterator begin() const
+    {
+      return iterator{static_cast<const tDerivedSubspaceType*>(this), 0};
+    }
+    iterator end() const
+    {
+      return iterator{static_cast<const tDerivedSubspaceType*>(this), size()};
+    }
+    iterator cbegin() const
+    {
+      return iterator{static_cast<const tDerivedSubspaceType*>(this), 0};
+    }
+    iterator cend() const
+    {
+      return iterator{static_cast<const tDerivedSubspaceType*>(this), size()};
     }
 
-#ifdef BASIS_ALLOW_DEPRECATED
-    DEPRECATED("use labels() instead")
-    const SubspaceLabelsType& GetSubspaceLabels() const
-    /// Return the labels of the subspace itself.
-    ///
-    /// DEPRECATED in favor of labels().
-    ///
-    /// To fix: grep GetSubspaceLabels -R --include="*.cpp"
-    {
-      return labels_;
-    }
-#endif
+    ////////////////////////////////////////////////////////////////
+    // retrieval
+    ////////////////////////////////////////////////////////////////
 
     const StateLabelsType& GetStateLabels(std::size_t index) const
     /// Retrieve the labels of a state within the subspace, given its
@@ -315,13 +409,13 @@ namespace basis {
         return pos->second;
     };
 
-    tStateType GetState(std::size_t index) const;
+    StateType GetState(std::size_t index) const;
     /// Given the index for a state, construct the corresponding state object.
     ///
     /// Defined below, outside the definition of the class, so that
     /// instantiation is deferred until tStateType is a complete type.
 
-    tStateType GetState(const StateLabelsType& state_labels) const;
+    StateType GetState(const StateLabelsType& state_labels) const;
     /// Given the labels for a state, construct the corresponding state object.
     ///
     /// Defined below, outside the definition of the class, so that
@@ -346,6 +440,29 @@ namespace basis {
     protected:
 
     ////////////////////////////////////////////////////////////////
+    // state label storage management (for initial construction)
+    ////////////////////////////////////////////////////////////////
+
+    inline void reserve(std::size_t new_cap)
+    /// Reserve storage for labels.
+    {
+      state_table_.reserve(new_cap);
+      lookup_.reserve(new_cap);
+    }
+
+    inline std::size_t capacity() const noexcept
+    /// Get size of reserved storage for labels.
+    {
+      return state_table_.capacity();
+    }
+
+    inline void shrink_to_fit()
+    /// Shrink reserved storage for labels to fit contents.
+    {
+      state_table_.shrink_to_fit();
+    }
+
+    ////////////////////////////////////////////////////////////////
     // state label push (for initial construction)
     ////////////////////////////////////////////////////////////////
 
@@ -365,7 +482,6 @@ namespace basis {
     ////////////////////////////////////////////////////////////////
 
     // subspace properties
-    const SubspaceLabelsType labels_;
     std::size_t dimension_;
 
     // state labels (accessible by index)
@@ -385,10 +501,10 @@ namespace basis {
   // tStateType are complete types
 
   template <
-      typename tDerivedSubspaceType, typename tSubspaceLabelsType,
+      typename tDerivedSubspaceType,
       typename tStateType, typename tStateLabelsType
     >
-  tStateType BaseSubspace<tDerivedSubspaceType,tSubspaceLabelsType,tStateType,tStateLabelsType>::GetState(
+  tStateType BaseSubspace<tDerivedSubspaceType,void,tStateType,tStateLabelsType>::GetState(
       std::size_t index
     ) const
   {
@@ -396,15 +512,87 @@ namespace basis {
   }
 
   template <
-      typename tDerivedSubspaceType, typename tSubspaceLabelsType,
+      typename tDerivedSubspaceType,
       typename tStateType, typename tStateLabelsType
     >
-  tStateType BaseSubspace<tDerivedSubspaceType,tSubspaceLabelsType,tStateType,tStateLabelsType>::GetState(
+  tStateType BaseSubspace<tDerivedSubspaceType,void,tStateType,tStateLabelsType>::GetState(
       const tStateLabelsType& state_labels
     ) const
   {
     return tStateType{*static_cast<const tDerivedSubspaceType*>(this), state_labels};
   }
+
+  // inherit from BaseSubspace and add labels
+  template <
+      typename tDerivedSubspaceType, typename tSubspaceLabelsType,
+      typename tStateType, typename tStateLabelsType
+    >
+  class BaseSubspace : public BaseSubspace<tDerivedSubspaceType, void, tStateType, tStateLabelsType>
+  {
+
+    public:
+
+    ////////////////////////////////////////////////////////////////
+    //  common typedefs
+    ////////////////////////////////////////////////////////////////
+
+    using LabelsType = tSubspaceLabelsType;
+    using SubspaceLabelsType = tSubspaceLabelsType;
+
+    protected:
+
+    ////////////////////////////////////////////////////////////////
+    // general constructors
+    ////////////////////////////////////////////////////////////////
+
+    /// default constructor
+    //   Implicitly invoked by derived class.
+    BaseSubspace() = default;
+
+    // pass-through constructor accepting labels
+    template<
+        typename T = SubspaceLabelsType,
+        std::enable_if_t<std::is_constructible_v<SubspaceLabelsType, T>>* = nullptr
+      >
+    explicit BaseSubspace(T&& labels)
+      : BaseSubspace<tDerivedSubspaceType, void, tStateType, tStateLabelsType>{},
+        labels_{std::forward<T>(labels)}
+    {}
+
+    public:
+
+    ////////////////////////////////////////////////////////////////
+    // retrieval
+    ////////////////////////////////////////////////////////////////
+
+    const SubspaceLabelsType& labels() const
+    /// Return the labels of the subspace itself.
+    {
+      return labels_;
+    }
+
+#ifdef BASIS_ALLOW_DEPRECATED
+    DEPRECATED("use labels() instead")
+    const SubspaceLabelsType& GetSubspaceLabels() const
+    /// Return the labels of the subspace itself.
+    ///
+    /// DEPRECATED in favor of labels().
+    ///
+    /// To fix: grep GetSubspaceLabels -R --include="*.cpp"
+    {
+      return labels_;
+    }
+#endif
+
+    private:
+
+    ////////////////////////////////////////////////////////////////
+    // private storage
+    ////////////////////////////////////////////////////////////////
+
+    // subspace properties
+    SubspaceLabelsType labels_;
+  };
 
   ////////////////////////////////////////////////////////////////
   // generic state realized within subspace
@@ -595,12 +783,12 @@ namespace basis {
   ///   tSpaceLabelsType (typename, optional) : type for space labels
 
   // declare BaseSpace template
-  template <typename tSubspaceType, typename tSpaceLabelsType = void>
+  template <typename tDerivedSpaceType, typename tSubspaceType, typename tSpaceLabelsType = void>
     class BaseSpace;
 
   // specialize class for case with no labels
-  template <typename tSubspaceType>
-    class BaseSpace<tSubspaceType, void>
+  template <typename tDerivedSpaceType, typename tSubspaceType>
+    class BaseSpace<tDerivedSpaceType, tSubspaceType, void>
     {
       public:
 
@@ -618,19 +806,81 @@ namespace basis {
 
       BaseSpace()
         : dimension_{0}
-      {
-        subspaces_ = std::make_shared<std::vector<SubspaceType>>();
-#ifdef BASIS_HASH
-        lookup_ = std::make_shared<std::unordered_map<
-            typename SubspaceType::LabelsType,std::size_t,
-            boost::hash<typename SubspaceType::LabelsType>
-          >>();
-#else
-        lookup_ = std::make_shared<std::map<typename SubspaceType::LabelsType,std::size_t>>();
-#endif
-      }
+      {}
 
       public:
+
+      ////////////////////////////////////////////////////////////////
+      // iterators
+      ////////////////////////////////////////////////////////////////
+
+      struct iterator
+      {
+        using iterator_category = std::random_access_iterator_tag;
+        using difference_type = std::make_signed_t<std::size_t>;
+        using value_type = const SubspaceType;
+        using pointer = const SubspaceType*;
+        using reference = const SubspaceType&;
+
+        iterator(const tDerivedSpaceType* space_ptr, std::size_t index)
+          : space_ptr_{space_ptr}, index_{index}
+        {}
+
+        reference operator*() const { return space_ptr_->GetSubspace(index_); }
+        pointer operator->() const { return &(*this); }
+        reference operator[](std::size_t index) const { return space_ptr_->GetSubspace(index_+index); }
+        iterator& operator++() { index_++; return *this; }
+        iterator operator++(int) { iterator tmp = *this; ++(*this); return tmp; }
+        iterator& operator--() { index_--; return *this; }
+        iterator operator--(int) { iterator tmp = *this; --(*this); return tmp; }
+        iterator& operator+=(difference_type n) { index_ += n; return *this; }
+        iterator& operator-=(difference_type n) { index_ -= n; return *this; }
+        friend iterator operator+(iterator it, difference_type n) { it += n; return it; }
+        friend iterator operator-(iterator it, difference_type n) { it -= n; return it; }
+        friend difference_type operator-(const iterator& lhs, const iterator& rhs)
+        {
+          return (lhs.index_ - rhs.index_);
+        }
+        friend bool operator==(const iterator& lhs, const iterator& rhs)
+        {
+          return (lhs.space_ptr_==rhs.space_ptr_) && (lhs.index_==rhs.index_);
+        }
+        friend bool operator!=(const iterator& lhs, const iterator& rhs)
+        {
+          return (lhs.space_ptr_!=rhs.space_ptr_) || (lhs.index_!=rhs.index_);
+        }
+        friend bool operator<(const iterator& lhs, const iterator& rhs)
+        {
+          return (lhs.index_<rhs.index_);
+        }
+        friend bool operator>(const iterator& lhs, const iterator& rhs)
+        {
+          return (lhs.index_>rhs.index_);
+        }
+        friend bool operator<=(const iterator& lhs, const iterator& rhs)
+        {
+          return (lhs.index_<=rhs.index_);
+        }
+        friend bool operator>=(const iterator& lhs, const iterator& rhs)
+        {
+          return (lhs.index_>=rhs.index_);
+        }
+
+        private:
+        const tDerivedSpaceType* space_ptr_;
+        std::size_t index_;
+      };
+
+      using value_type = tSubspaceType;
+      using const_reference = const tSubspaceType&;
+      using const_iterator = iterator;
+      using difference_type = typename iterator::difference_type;
+      using size_type = std::make_unsigned_t<difference_type>;
+
+      iterator begin()  const { return iterator(static_cast<const tDerivedSpaceType*>(this), 0); }
+      iterator end()    const { return iterator(static_cast<const tDerivedSpaceType*>(this), size()); }
+      iterator cbegin() const { return iterator(static_cast<const tDerivedSpaceType*>(this), 0); }
+      iterator cend()   const { return iterator(static_cast<const tDerivedSpaceType*>(this), size()); }
 
       ////////////////////////////////////////////////////////////////
       // subspace lookup and retrieval
@@ -640,7 +890,7 @@ namespace basis {
       /// Given the labels for a subspace, returns whether or not the
       /// subspace is found within the space.
       {
-        return lookup_->count(subspace_labels);
+        return (subspaces_ptr_) && lookup_.count(subspace_labels);
       }
 
       std::size_t LookUpSubspaceIndex(
@@ -651,13 +901,16 @@ namespace basis {
       ///
       /// If no such labels are found, basis::kNone is returned.
       {
-
         // PREVIOUSLY: trap failed lookup with assert for easier debugging
         // assert(ContainsSubspace(subspace_labels));
         // return lookup_.at(subspace_labels);
 
-        auto pos = lookup_->find(subspace_labels);
-        if (pos==lookup_->end())
+        // short-circuit if subspaces_ptr_ is nullptr
+        if (!subspaces_ptr_)
+          return kNone;
+
+        auto pos = lookup_.find(subspace_labels);
+        if (pos==lookup_.end())
           return kNone;
         else
           return pos->second;
@@ -669,20 +922,34 @@ namespace basis {
       /// Given the labels for a subspace, retrieve a reference to the
       /// subspace.
       ///
-      /// If no such labels are found, an exception will result
-      /// (enforced by LookUpSubspaceIndex).
+      /// If no such labels are found, an exception will result.
       {
-
+        if (!subspaces_ptr_)
+          throw std::out_of_range("empty space");
         std::size_t subspace_index = LookUpSubspaceIndex(subspace_labels);
-        assert(subspace_index!=kNone);
-        return subspaces_->at(subspace_index);
+        if (subspace_index==kNone)
+          throw std::out_of_range("key not found");
+        return subspaces_ptr_->at(subspace_index);
       };
 
       const SubspaceType& GetSubspace(std::size_t i) const
       /// Given the index for a subspace, return a reference to the
       /// subspace.
       {
-        return subspaces_->at(i);
+        if (!subspaces_ptr_)
+          throw std::out_of_range("empty space");
+        return subspaces_ptr_->at(i);
+      };
+
+      std::shared_ptr<const SubspaceType> GetSubspacePtr(std::size_t i) const
+      /// Given the index for a subspace, return a shared pointer to the
+      /// subspace.
+      {
+        if (!subspaces_ptr_)
+          throw std::out_of_range("empty space");
+        return std::shared_ptr<const SubspaceType>(
+            subspaces_ptr_, &(subspaces_ptr_->at(i))
+          );
       };
 
       std::size_t GetSubspaceOffset(std::size_t i) const
@@ -699,8 +966,13 @@ namespace basis {
       std::size_t size() const
       /// Return the number of subspaces within the space.
       {
-        return subspaces_->size();
+        if (!subspaces_ptr_)
+          return 0;
+        return subspaces_ptr_->size();
       };
+
+      inline std::size_t full_size() const { return size(); }
+      /// Get the total number of subspaces, considering degeneracies.
 
       std::size_t dimension() const
       // Return the total dimension of all subspaces within the space.
@@ -722,18 +994,51 @@ namespace basis {
 
       protected:
 
+    ////////////////////////////////////////////////////////////////
+    // subspace storage management (for initial construction)
+    ////////////////////////////////////////////////////////////////
+
+    inline void reserve(std::size_t new_cap)
+    /// Reserve storage for subspaces and labels.
+    {
+      if (!subspaces_ptr_)
+        subspaces_ptr_ = std::make_shared<std::vector<SubspaceType>>();
+      subspaces_ptr_->reserve(new_cap);
+      subspace_offsets_.reserve(new_cap);
+      lookup_.reserve(new_cap);
+    }
+
+    inline std::size_t capacity() const noexcept
+    /// Get current storage reserved for subspaces.
+    {
+      if (!subspaces_ptr_)
+        return 0;
+      return subspaces_ptr_->capacity();
+    }
+
+    inline void shrink_to_fit()
+    /// Shrink reserved storage for labels and offsets to fit contents.
+    {
+      if (subspaces_ptr_)
+        subspaces_ptr_->shrink_to_fit();
+      subspace_offsets_.shrink_to_fit();
+    }
+
       ////////////////////////////////////////////////////////////////
       // subspace push (for initial construction)
       ////////////////////////////////////////////////////////////////
 
-      void PushSubspace(const SubspaceType& subspace)
+      template<typename T, typename std::enable_if_t<std::is_same_v<std::decay_t<T>, SubspaceType>>* = nullptr>
+      void PushSubspace(T&& subspace)
       /// Create indexing information (in both directions, index <->
       /// labels) for a subspace.
       {
+        if (!subspaces_ptr_)
+          subspaces_ptr_ = std::make_shared<std::vector<SubspaceType>>();
         subspace_offsets_.push_back(dimension_);
-        (*lookup_)[subspace.labels()] = subspaces_->size();  // index for lookup
-        subspaces_->push_back(subspace);  // save space
+        lookup_[subspace.labels()] = size();  // index for lookup
         dimension_ += subspace.dimension();
+        subspaces_ptr_->push_back(std::forward<T>(subspace));  // save subspace
       };
 
       template <class... Args>
@@ -741,43 +1046,45 @@ namespace basis {
       /// Create indexing information (in both directions, index <->
       /// labels) for a subspace.
       {
-        std::size_t index = subspaces_->size();  // index for lookup
+        if (!subspaces_ptr_)
+          subspaces_ptr_ = std::make_shared<std::vector<SubspaceType>>();
+        const std::size_t index = size();  // index for lookup
         subspace_offsets_.push_back(dimension_);
-        subspaces_->emplace_back(std::forward<Args>(args)...);
-        (*lookup_)[subspaces_->back().labels()] = index;
-        dimension_ += subspaces_->back().dimension();
+        subspaces_ptr_->emplace_back(std::forward<Args>(args)...);
+        const SubspaceType& subspace = subspaces_ptr_->back();
+        lookup_[subspace.labels()] = index;
+        dimension_ += subspace.dimension();
       }
 
       private:
 
       // allow BaseDegenerateSpace to access private members to override
       // PushSubspace and EmplaceSubspace
-      template<typename T, typename U> friend class BaseDegenerateSpace;
+      template<typename, typename, typename> friend class BaseDegenerateSpace;
 
       ////////////////////////////////////////////////////////////////
       // internal storage
       ////////////////////////////////////////////////////////////////
 
       /// subspaces (accessible by index)
-      std::shared_ptr<std::vector<SubspaceType>> subspaces_;  // the subspaces contained in this space
+      std::shared_ptr<std::vector<SubspaceType>> subspaces_ptr_;  // the subspaces contained in this space
       std::vector<std::size_t> subspace_offsets_;  // offset of the subspace in the full space indexing, i.e., number of states is subspaces so far
       std::size_t dimension_;  // total dimension (number of states in all subspaces)
 
       // subspace index lookup by labels
 #ifdef BASIS_HASH
-      std::shared_ptr<
       std::unordered_map<
           typename SubspaceType::LabelsType,std::size_t,
           boost::hash<typename SubspaceType::LabelsType>
-        >> lookup_;
+        > lookup_;
 #else
-      std::shared_ptr<std::map<typename SubspaceType::LabelsType,std::size_t>> lookup_;
+      std::map<typename SubspaceType::LabelsType,std::size_t> lookup_;
 #endif
     };
 
   // inherit from BaseSpace and add labels
-  template <typename tSubspaceType, typename tSpaceLabelsType>
-    class BaseSpace : public BaseSpace<tSubspaceType, void>
+  template <typename tDerivedSpaceType, typename tSubspaceType, typename tSpaceLabelsType>
+    class BaseSpace : public BaseSpace<tDerivedSpaceType, tSubspaceType, void>
     {
       public:
 
@@ -796,9 +1103,14 @@ namespace basis {
 
       BaseSpace() = default;
 
-      // pass-through constructor accepting labels
-      explicit BaseSpace(const SpaceLabelsType& labels)
-        : labels_{labels}
+     // pass-through constructor accepting labels
+      template<
+          typename T = SpaceLabelsType,
+          std::enable_if_t<std::is_constructible_v<SpaceLabelsType, T>>* = nullptr
+        >
+      explicit BaseSpace(T&& labels)
+        : BaseSpace<tDerivedSpaceType, tSubspaceType,void>{},
+          labels_{std::forward<T>(labels)}
       {}
 
       public:
@@ -820,7 +1132,7 @@ namespace basis {
       ////////////////////////////////////////////////////////////////
 
       /// space labels
-      const SpaceLabelsType labels_;
+      SpaceLabelsType labels_;
     };
 
   ////////////////////////////////////////////////////////////////
@@ -904,18 +1216,23 @@ namespace basis {
       // constructors
       ////////////////////////////////////////////////////////////////
 
+      BaseSector()
+        : bra_subspace_index_{}, ket_subspace_index_{}, multiplicity_index_{}
+      {}
+      // default constructor
+
       BaseSector(
           std::size_t bra_subspace_index, std::size_t ket_subspace_index,
-          const BraSubspaceType& bra_subspace, const KetSubspaceType& ket_subspace,
+          std::shared_ptr<const BraSubspaceType> bra_subspace_ptr,
+          std::shared_ptr<const KetSubspaceType> ket_subspace_ptr,
           std::size_t multiplicity_index=1
         )
-        : bra_subspace_index_(bra_subspace_index),
-          ket_subspace_index_(ket_subspace_index),
-          multiplicity_index_(multiplicity_index)
-      {
-        bra_subspace_ptr_ = &bra_subspace;
-        ket_subspace_ptr_ = &ket_subspace;
-      }
+        : bra_subspace_index_{bra_subspace_index},
+          ket_subspace_index_{ket_subspace_index},
+          multiplicity_index_{multiplicity_index},
+          bra_subspace_ptr_{std::move(bra_subspace_ptr)},
+          ket_subspace_ptr_{std::move(ket_subspace_ptr)}
+      {}
 
       ////////////////////////////////////////////////////////////////
       // accessors
@@ -936,6 +1253,16 @@ namespace basis {
       const KetSubspaceType& ket_subspace() const {return *ket_subspace_ptr_;}
       // Return reference to bra/ket subspace.
 
+      std::shared_ptr<const BraSubspaceType> bra_subspace_ptr() const
+      {
+        return bra_subspace_ptr_;
+      }
+      std::shared_ptr<const KetSubspaceType> ket_subspace_ptr() const
+      {
+        return ket_subspace_ptr_;
+      }
+      // Return shared pointer to bra/ket subspace.
+
       std::size_t multiplicity_index() const {return multiplicity_index_;}
       // Return multiplicity index of this sector.
 
@@ -951,11 +1278,16 @@ namespace basis {
         return (bra_subspace_index()<=ket_subspace_index());
       }
 
+      inline std::size_t num_elements() const
+      {
+        return (bra_subspace().dimension() * ket_subspace().dimension());
+      }
+
       private:
       std::size_t bra_subspace_index_, ket_subspace_index_;
-      const BraSubspaceType* bra_subspace_ptr_;
-      const KetSubspaceType* ket_subspace_ptr_;
       std::size_t multiplicity_index_;
+      std::shared_ptr<const BraSubspaceType> bra_subspace_ptr_;
+      std::shared_ptr<const KetSubspaceType> ket_subspace_ptr_;
     };
 
   // Here we specialize to the case where the bra and ket subspaces have the
@@ -977,14 +1309,18 @@ namespace basis {
       // constructors
       ////////////////////////////////////////////////////////////////
 
+      BaseSector() = default;
+
       inline BaseSector(
           std::size_t bra_subspace_index, std::size_t ket_subspace_index,
-          const SubspaceType& bra_subspace, const SubspaceType& ket_subspace,
+          std::shared_ptr<const SubspaceType> bra_subspace_ptr,
+          std::shared_ptr<const SubspaceType> ket_subspace_ptr,
           std::size_t multiplicity_index=1
         )
         : BaseSector<tSubspaceType, tSubspaceType, false>{
             bra_subspace_index, ket_subspace_index,
-            bra_subspace,ket_subspace, multiplicity_index
+            std::move(bra_subspace_ptr), std::move(ket_subspace_ptr),
+            multiplicity_index
         }
         {}
     };
@@ -1033,9 +1369,17 @@ namespace basis {
       using BraSpaceType = tBraSpaceType;
       using KetSpaceType = tKetSpaceType;
 
-      using BraSubspaceType = typename tBraSpaceType::SubspaceType;
-      using KetSubspaceType = typename tKetSpaceType::SubspaceType;
       using SectorType = tSectorType;
+      using BraSubspaceType = typename SectorType::BraSubspaceType;
+      static_assert(
+          is_subspace_v<BraSubspaceType,BraSpaceType>,
+          "BraSubspaceType must be subspace of BraSpaceType"
+        );
+      using KetSubspaceType = typename SectorType::KetSubspaceType;
+      static_assert(
+          is_subspace_v<KetSubspaceType,KetSpaceType>,
+          "KetSubspaceType must be subspace of KetSpaceType"
+        );
 
 
       protected:
@@ -1044,33 +1388,122 @@ namespace basis {
       // constructors
       ////////////////////////////////////////////////////////////////
 
-      BaseSectors() = default;
+      BaseSectors()
+        : num_elements_{}
+      {}
       // default constructor -- provided since required for certain
       // purposes by STL container classes (e.g., std::vector::resize)
 
-      BaseSectors(const BraSpaceType& bra_space, const KetSpaceType& ket_space)
-        : bra_space_(bra_space), ket_space_(ket_space)
+      BaseSectors(
+            const std::shared_ptr<const BraSpaceType>& bra_space_ptr,
+            const std::shared_ptr<const KetSpaceType>& ket_space_ptr
+          )
+          : bra_space_ptr_{bra_space_ptr},
+            ket_space_ptr_{ket_space_ptr},
+            num_elements_{}
       {}
 
+      BaseSectors(
+            std::shared_ptr<const BraSpaceType>&& bra_space_ptr,
+            std::shared_ptr<const KetSpaceType>&& ket_space_ptr
+          )
+          : bra_space_ptr_{std::move(bra_space_ptr)},
+            ket_space_ptr_{std::move(ket_space_ptr)},
+            num_elements_{}
+      {}
+
+      template<
+          typename T, typename U,
+          typename std::enable_if_t<std::is_same_v<std::decay_t<T>, BraSpaceType>>* = nullptr,
+          typename std::enable_if_t<std::is_same_v<std::decay_t<U>, KetSpaceType>>* = nullptr
+        >
+      BaseSectors(T&& bra_space, U&& ket_space)
+        // : bra_space_ptr_(bra_space.weak_from_this().lock()),
+        //   ket_space_ptr_(ket_space.weak_from_this().lock())
+        : num_elements_{}
+      {
+        // if bra_space or ket_space is not managed by a shared_ptr, make copy
+        // or move it to a locally-created shared_ptr.
+        //
+        // Note: this is probably safe, since the spaces themselves store
+        // vectors of shared_ptrs to subspaces, so a copy only involves copying
+        // those vectors and maps
+        // if (!bra_space_ptr_)
+          bra_space_ptr_
+            = std::make_shared<const BraSpaceType>(std::forward<T>(bra_space));
+        // if (!ket_space_ptr_)
+        {
+          // if bra and ket spaces are identical, we can share the new copy we
+          // just made for the bra_space_ptr_
+          //
+          // note: this also ensures that if bra_space and ket_space are the
+          // same object, then if we just moved from bra_space we don't try to
+          // move from it again (which would be UB)
+          if (std::addressof(ket_space) == std::addressof(bra_space))
+            ket_space_ptr_ = bra_space_ptr_;
+          else
+            ket_space_ptr_
+              = std::make_shared<const KetSpaceType>(std::forward<U>(ket_space));
+        }
+      }
+
       public:
+
+      ////////////////////////////////////////////////////////////////
+      // space accessors
+      ////////////////////////////////////////////////////////////////
+
+      const BraSpaceType& bra_space() const
+      {
+        return *bra_space_ptr_;
+      }
+
+      const KetSpaceType& ket_space() const
+      {
+        return *ket_space_ptr_;
+      }
+
+      std::shared_ptr<const BraSpaceType> bra_space_ptr() const
+      {
+        return bra_space_ptr_;
+      }
+
+      std::shared_ptr<const KetSpaceType> ket_space_ptr() const
+      {
+        return ket_space_ptr_;
+      }
+
+      ////////////////////////////////////////////////////////////////
+      // iterators
+      ////////////////////////////////////////////////////////////////
+
+      using value_type = SectorType;
+      using const_reference = const SectorType&;
+      using iterator = decltype(std::declval<const std::vector<SectorType>>().begin());
+      using const_iterator = decltype(std::declval<const std::vector<SectorType>>().cbegin());
+      using difference_type = typename iterator::difference_type;
+      using size_type = std::make_unsigned_t<difference_type>;
+
+      iterator begin()  const { return sectors_.begin(); }
+      iterator end()    const { return sectors_.end(); }
+      const_iterator cbegin() const { return sectors_.cbegin(); }
+      const_iterator cend()   const { return sectors_.cend(); }
 
       ////////////////////////////////////////////////////////////////
       // sector lookup and retrieval
       ////////////////////////////////////////////////////////////////
 
-      SectorType GetSector(std::size_t sector_index) const
-      // Given sector index, create corresponding sector object.
+      const SectorType& GetSector(std::size_t sector_index) const
+      // Given sector index, return reference to sector itself.
       {
-        const typename SectorType::KeyType& key = keys_.at(sector_index);
-        std::size_t bra_subspace_index, ket_subspace_index, multiplicity_index;
-        std::tie(bra_subspace_index, ket_subspace_index, multiplicity_index) = key;
-        const auto& bra_subspace = bra_space_.GetSubspace(bra_subspace_index);
-        const auto& ket_subspace = ket_space_.GetSubspace(ket_subspace_index);
-        return SectorType(
-            bra_subspace_index, ket_subspace_index,
-            bra_subspace, ket_subspace,
-            multiplicity_index
-          );
+        return sectors_.at(sector_index);
+      };
+
+      bool ContainsSector(typename SectorType::KeyType key) const
+      // Given the labels for a sector, returns whether or not the sector
+      // is found within the the sector set.
+      {
+        return lookup_.count(key);
       };
 
       bool ContainsSector(
@@ -1081,8 +1514,9 @@ namespace basis {
       // Given the labels for a sector, returns whether or not the sector
       // is found within the the sector set.
       {
-        typename SectorType::KeyType key(bra_subspace_index,ket_subspace_index,multiplicity_index);
-        return lookup_.count(key);
+        return ContainsSector(
+            typename SectorType::KeyType{bra_subspace_index,ket_subspace_index,multiplicity_index}
+          );
       };
 
       std::size_t LookUpSectorIndex(const typename SectorType::KeyType& key) const
@@ -1108,9 +1542,18 @@ namespace basis {
       //
       // If no such labels are found, basis::kNone is returned.
       {
-        const typename SectorType::KeyType key(bra_subspace_index,ket_subspace_index,multiplicity_index);
-        return LookUpSectorIndex(key);
+        return LookUpSectorIndex(
+            typename SectorType::KeyType{bra_subspace_index,ket_subspace_index,multiplicity_index}
+          );
       }
+
+      std::size_t GetSectorOffset(std::size_t i) const
+      /// Given the index for a sector, return the offset of the sector in
+      /// the full matrix indexing.
+      {
+        return sector_offsets_.at(i);
+      }
+
       ////////////////////////////////////////////////////////////////
       // size retrieval
       ////////////////////////////////////////////////////////////////
@@ -1118,7 +1561,13 @@ namespace basis {
       std::size_t size() const
       // Return number of sectors within sector set.
       {
-        return keys_.size();
+        return sectors_.size();
+      };
+
+      std::size_t num_elements() const
+      // Return number of matrix elements within sector set
+      {
+        return num_elements_;
       };
 
       ////////////////////////////////////////////////////////////////
@@ -1136,15 +1585,39 @@ namespace basis {
       // sector push (for initial construction)
       ////////////////////////////////////////////////////////////////
 
-      void PushSector(const typename SectorType::KeyType& key)
+      template<
+          typename T,
+          typename std::enable_if_t<std::is_same_v<std::decay_t<T>,SectorType>>* = nullptr
+        >
+      void PushSector(T&& sector)
       // Create indexing information (in both directions, index <->
-      // labels) for a sector, given key.
+      // labels) for a sector.
       {
-        lookup_[key] = keys_.size(); // index for lookup
-        keys_.push_back(key);  // save sector
+        sector_offsets_.push_back(num_elements());
+        lookup_[sector.Key()] = size(); // index for lookup
+        num_elements_ += sector.num_elements();
+        sectors_.push_back(std::forward<T>(sector));  // save sector
       };
 
-      void PushSector(
+      template<typename... Args>
+      void EmplaceSector(Args&&... args)
+      // Create indexing information (in both directions, index <->
+      // labels) for a sector.
+      {
+        const std::size_t index = sectors_.size();
+        sector_offsets_.push_back(num_elements());
+        sectors_.emplace_back(std::forward<Args>(args)...);  // save sector
+        const SectorType& sector = sectors_.back();
+        lookup_[sector.Key()] = index; // index for lookup
+        num_elements_ += sector.num_elements();
+      };
+
+      template<
+          typename T = SectorType,
+          std::enable_if_t<std::is_same_v<typename T::BraSubspaceType,typename BraSpaceType::SubspaceType>>* = nullptr,
+          std::enable_if_t<std::is_same_v<typename T::KetSubspaceType,typename KetSpaceType::SubspaceType>>* = nullptr
+        >
+      inline void PushSector(
           std::size_t bra_subspace_index,
           std::size_t ket_subspace_index,
           std::size_t multiplicity_index=1
@@ -1152,20 +1625,26 @@ namespace basis {
       // Create indexing information (in both directions, index <->
       // labels) for a sector, given indices.
       {
-        PushSector(typename SectorType::KeyType{bra_subspace_index, ket_subspace_index, multiplicity_index});
+        EmplaceSector(
+            bra_subspace_index, ket_subspace_index,
+            bra_space_ptr_->GetSubspacePtr(bra_subspace_index),
+            ket_space_ptr_->GetSubspacePtr(ket_subspace_index),
+            multiplicity_index
+          );  // save sector
       }
 
-      #ifdef BASIS_ALLOW_DEPRECATED
-      DEPRECATED("use index- or key-based PushSector() instead")
-      void PushSector(const SectorType& sector)
+      template<
+          typename T = SectorType,
+          std::enable_if_t<std::is_same_v<typename T::BraSubspaceType,typename BraSpaceType::SubspaceType>>* = nullptr,
+          std::enable_if_t<std::is_same_v<typename T::KetSubspaceType,typename KetSpaceType::SubspaceType>>* = nullptr
+        >
+      inline void PushSector(const typename SectorType::KeyType& key)
       // Create indexing information (in both directions, index <->
-      // labels) for a sector, given a sector.
-      //
-      // DEPRECATED -- use index- or key-based PushSector() instead
+      // labels) for a sector, given key.
       {
-        PushSector(sector.Key());
-      }
-      #endif
+        const auto& [bra_subspace_index,ket_subspace_index,multiplicity_index] = key;
+        PushSector(bra_subspace_index, ket_subspace_index, multiplicity_index);
+      };
 
       private:
       ////////////////////////////////////////////////////////////////
@@ -1173,11 +1652,11 @@ namespace basis {
       ////////////////////////////////////////////////////////////////
 
       // spaces
-      BraSpaceType bra_space_;
-      KetSpaceType ket_space_;
+      std::shared_ptr<const BraSpaceType> bra_space_ptr_;
+      std::shared_ptr<const KetSpaceType> ket_space_ptr_;
 
-      // sector keys (accessible by index)
-      std::vector<typename SectorType::KeyType> keys_;
+      // sectors (accessible by index)
+      std::vector<SectorType> sectors_;
 
       // sector index lookup by subspace indices
 #ifdef BASIS_HASH
@@ -1188,6 +1667,10 @@ namespace basis {
 #else
       std::map<typename SectorType::KeyType,std::size_t> lookup_;
 #endif
+
+      // indexing
+      std::vector<std::size_t> sector_offsets_;
+      std::size_t num_elements_;
 
     };
 
@@ -1205,7 +1688,17 @@ namespace basis {
       ////////////////////////////////////////////////////////////////
 
       using SpaceType = tSpaceType;
-      using SubspaceType = typename SpaceType::SubspaceType;
+      // TODO (pjf): Fix up template type here so that SubspaceType only
+      // gets defined if unambiguous
+      // template<
+      //     typename T = tSectorType,
+      //     std::enable_if_t<std::is_same_v<typename T::BraSubspaceType, typename T::KetSubspaceType>>* = nullptr
+      //   >
+      static_assert(
+          std::is_same_v<typename tSectorType::BraSubspaceType, typename tSectorType::KetSubspaceType>,
+          "same-Space BaseSectors currently allowed with same-Subspace BaseSector"
+        );
+      using SubspaceType = typename tSectorType::BraSubspaceType;
 
       protected:
 
@@ -1214,12 +1707,38 @@ namespace basis {
       ////////////////////////////////////////////////////////////////
 
       BaseSectors() = default;
-      inline explicit BaseSectors(const SpaceType& space)
-        : BaseSectors{space, space}
+
+      inline explicit BaseSectors(std::shared_ptr<const SpaceType> space_ptr)
+        : BaseSectors{space_ptr, std::move(space_ptr)}
+      {}
+      // construct from shared_ptr to space
+
+      inline explicit BaseSectors(
+          std::shared_ptr<const SpaceType> bra_space_ptr,
+          std::shared_ptr<const SpaceType> ket_space_ptr
+        )
+        : BaseSectors<tSpaceType, tSpaceType, tSectorType, false>{
+              std::move(bra_space_ptr), std::move(ket_space_ptr)
+            }
       {}
 
-      inline BaseSectors(const SpaceType& bra_space, const SpaceType& ket_space)
-        : BaseSectors<tSpaceType, tSpaceType, tSectorType, false>{bra_space, ket_space}
+      template<
+          typename T,
+          typename std::enable_if_t<std::is_same_v<std::decay_t<T>, SpaceType>>* = nullptr
+        >
+      inline explicit BaseSectors(T&& space)
+        : BaseSectors{std::forward<T>(space), std::forward<T>(space)}
+      {}
+
+      template<
+          typename T, typename U,
+          typename std::enable_if_t<std::is_same_v<std::decay_t<T>, SpaceType>>* = nullptr,
+          typename std::enable_if_t<std::is_same_v<std::decay_t<U>, SpaceType>>* = nullptr
+        >
+      BaseSectors(T&& bra_space, U&& ket_space)
+        : BaseSectors<tSpaceType, tSpaceType, tSectorType, false>{
+              std::forward<T>(bra_space), std::forward<U>(ket_space)
+            }
       {}
 
     };
@@ -1235,11 +1754,14 @@ namespace basis {
           os << "  sector " << sector_index
              << "  bra index " << sector.bra_subspace_index()
              << " labels " << sector.bra_subspace().LabelStr()
-             << " dim " << sector.bra_subspace().size()
+             << " size " << sector.bra_subspace().size()
+             << " dim " << sector.bra_subspace().dimension()
              << "  ket index " << sector.ket_subspace_index()
              << " labels " << sector.ket_subspace().LabelStr()
-             << " dim " << sector.ket_subspace().size()
+             << " size " << sector.ket_subspace().size()
+             << " dim " << sector.ket_subspace().dimension()
              << "  multiplicity index " << sector.multiplicity_index()
+             << "  elements " << sector.num_elements()
              << std::endl;
         }
       return os.str();

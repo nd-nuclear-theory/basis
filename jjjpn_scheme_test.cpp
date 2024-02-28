@@ -7,6 +7,7 @@
 ****************************************************************/
 
 #include <iostream>
+#include <iomanip>
 
 #include "jjjpn_scheme.h"
 #include "basis.h"
@@ -29,7 +30,6 @@ void TestNotation()
       << " " << basis::kTwoBodySpeciesPNCodeChar[int(two_body_species)];
   std::cout << std::endl;
 }
-
 
 void TestTwoBodyNmax()
 {
@@ -72,6 +72,38 @@ void TestTwoBodyNmax()
 
   std::cout << " J0 " << J0 << " g0 " << g0 << std::endl;
   std::cout << sectors.DebugStr() << std::endl;
+
+  int sector_index = 0;
+  for (const auto& sector : sectors)
+  {
+      std::size_t bra_subspace_index = sector.bra_subspace_index();
+      const auto& bra_subspace = sector.bra_subspace();
+      std::size_t ket_subspace_index = sector.ket_subspace_index();
+      const auto& ket_subspace = sector.ket_subspace();
+
+      std::cout
+        << " sector "
+        << std::setw(3) << sector_index++
+        << "     "
+        << " index "
+        << std::setw(3) << bra_subspace_index
+        << " sJg "
+        << std::setw(3) << int(bra_subspace.two_body_species())
+        << std::setw(3) << bra_subspace.J()
+        << std::setw(3) << bra_subspace.g()
+        << " dim "
+        << std::setw(3) << bra_subspace.size()
+        << "     "
+        << " index "
+        << std::setw(3) << ket_subspace_index
+        << " sJg "
+        << std::setw(3) << int(ket_subspace.two_body_species())
+        << std::setw(3) << ket_subspace.J()
+        << std::setw(3) << ket_subspace.g()
+        << " dim "
+        << std::setw(3) << ket_subspace.size()
+        << std::endl;
+  }
 
   // // old manual iteration
   // for (std::size_t sector_index=0; sector_index < sectors.size(); ++sector_index)

@@ -36,6 +36,21 @@
   + 07/03/21 (pjf): Update access specifiers.
   + 07/04/21 (pjf): Add additional template parameters to BaseDegenerateSubspace
     for pass-through to BaseSubspace.
+  + 08/16/21 (pjf): Add additional template parameter to BaseDegenerateSpace for
+    pass-through to BaseSpace.
+  + 09/24/21 (pjf):
+    - Create BaseDegenerateSector for sectors between subspaces in
+      a BaseDegenerateSpace.
+    - Make all degeneracy indices unsigned int.
+  + 09/30/21 (pjf): Add BaseDegenerateSpace::full_size() accessor.
+  + 11/04/21 (pjf): Update for basis.h shared pointer changes.
+  + 03/23/22 (pjf): Add offset accessors to BaseDegenerateSector.
+  + 03/25/22 (pjf): Fix constructor templates when using `void` label types.
+  + 04/02/22 (pjf): Defer initialization of shared_ptr in BaseSpace until
+    PushSubspace/EmplaceSubspace/reserve.
+  + 04/03/22 (pjf): Normalize all constructors so that fields get initialized
+    correctly.
+  + 05/14/23 (pjf): Fix push_back vs. emplace_back in EmplaceSubspace().
 ****************************************************************/
 
 #ifndef BASIS_DEGENERATE_H_
@@ -43,6 +58,8 @@
 
 #include <cassert>
 #include <cstddef>
+#include <memory>
+#include <type_traits>
 #include <utility>
 #include <vector>
 
@@ -95,7 +112,6 @@ namespace basis {
     // from BaseSubspace (they are not recognized as inherited types
     // below)
 
-    using SubspaceLabelsType = typename BaseSubspaceType::SubspaceLabelsType;
     using StateLabelsType = typename BaseSubspaceType::StateLabelsType;
 
     protected:
@@ -109,8 +125,11 @@ namespace basis {
     BaseDegenerateSubspace() : full_dimension_(0) {}
 
     // pass-through constructor accepting labels
-    explicit BaseDegenerateSubspace(const SubspaceLabelsType& labels)
-      : full_dimension_{0}, BaseSubspaceType{labels}
+    //   n.b. the dummy argument "BST" is SFINAE black magic
+    //   see: https://stackoverflow.com/a/13401982
+    template<typename BST = BaseSubspaceType, typename T = typename BST::SubspaceLabelsType>
+    explicit BaseDegenerateSubspace(T&& labels)
+      : BaseSubspaceType{std::forward<T>(labels)}, full_dimension_{0}
     {}
 
     public:
@@ -124,7 +143,7 @@ namespace basis {
       return state_offsets_;
     }
 
-    const std::vector<int>& state_degeneracies() const
+    const std::vector<unsigned int>& state_degeneracies() const
     {
       return state_degeneracies_;
     }
@@ -135,7 +154,7 @@ namespace basis {
       return state_offsets()[i]+(degeneracy_index-1);
     }
 
-    std::size_t GetStateDegeneracy(std::size_t i) const
+    unsigned int GetStateDegeneracy(std::size_t i) const
     {
       return state_degeneracies_.at(i);
     }
@@ -154,6 +173,29 @@ namespace basis {
 #endif
 
     protected:
+
+    ////////////////////////////////////////////////////////////////
+    // state label storage management (for initial construction)
+    ////////////////////////////////////////////////////////////////
+
+    inline void reserve(std::size_t new_cap)
+    /// Reserve storage for labels.
+    {
+      BaseSubspaceType::reserve(new_cap);
+      state_offsets_.reserve(new_cap);
+      state_degeneracies_.reserve(new_cap);
+    }
+
+    // inline std::size_t capacity() const noexcept;
+    //   inherited from BaseSpace
+
+    inline void shrink_to_fit()
+    /// Shrink reserved storage for labels to fit contents.
+    {
+      BaseSubspaceType::shrink_to_fit();
+      state_offsets_.shrink_to_fit();
+      state_degeneracies_.shrink_to_fit();
+    }
 
     ////////////////////////////////////////////////////////////////
     // state label push (for initial construction)
@@ -180,7 +222,7 @@ namespace basis {
 
     // degeneracy counting information
     std::vector<std::size_t> state_offsets_;  // offset to given state's starting substate
-    std::vector<int> state_degeneracies_;  // given state's number of substates
+    std::vector<unsigned int> state_degeneracies_;  // given state's number of substates
     std::size_t full_dimension_;  // total number of substates
 
   };
@@ -229,7 +271,7 @@ namespace basis {
     ////////////////////////////////////////////////////////////////
 
     // default constructor -- disabled
-    BaseDegenerateState();
+    BaseDegenerateState() = delete;
 
     // copy constructor -- synthesized
 
@@ -258,7 +300,7 @@ namespace basis {
       return BaseStateType::subspace().state_offsets()[BaseStateType::index()];
     }
 
-    int degeneracy() const
+    unsigned int degeneracy() const
     {
       return BaseStateType::subspace().state_degeneracies()[BaseStateType::index()];
     }
@@ -278,9 +320,9 @@ namespace basis {
   // Template arguments:
   //   tSubspaceType (typename) : type for subspace
 
-  template <typename tSubspaceType, typename tSpaceLabelsType = void>
+  template <typename tDerivedSpaceType, typename tSubspaceType, typename tSpaceLabelsType = void>
   class BaseDegenerateSpace
-    : public BaseSpace<tSubspaceType,tSpaceLabelsType>
+    : public BaseSpace<tDerivedSpaceType, tSubspaceType, tSpaceLabelsType>
   {
 
     private:
@@ -288,7 +330,7 @@ namespace basis {
     ////////////////////////////////////////////////////////////////
     // private (convenience) typedefs
     ////////////////////////////////////////////////////////////////
-    using BaseSpaceType = BaseSpace<tSubspaceType,tSpaceLabelsType>;
+    using BaseSpaceType = BaseSpace<tDerivedSpaceType, tSubspaceType,tSpaceLabelsType>;
 
     public:
 
@@ -297,7 +339,6 @@ namespace basis {
     ////////////////////////////////////////////////////////////////
 
     using SubspaceType = typename BaseSpaceType::SubspaceType;
-    using SpaceLabelsType = typename BaseSpaceType::SpaceLabelsType;
 
     protected:
 
@@ -307,13 +348,14 @@ namespace basis {
 
     // default constructor
     //   Implicitly invoked by derived class.
-    BaseDegenerateSpace() = default;
+    BaseDegenerateSpace() : full_size_{} {}
 
     // pass-through constructor accepting labels
-    //   n.b. this template here is SFINAE black magic
-    template<typename T = SpaceLabelsType>
-    explicit BaseDegenerateSpace(const T& labels)
-      : BaseSpaceType{labels}
+    //   n.b. the dummy argument "BST" is SFINAE black magic
+    //   see: https://stackoverflow.com/a/13401982
+    template<typename BST = BaseSpaceType, typename T = typename BST::SpaceLabelsType>
+    explicit BaseDegenerateSpace(T&& labels)
+      : BaseSpaceType{std::forward<T>(labels)}, full_size_{0}
     {}
 
     public:
@@ -339,7 +381,7 @@ namespace basis {
     // subspace lookup and retrieval
     ////////////////////////////////////////////////////////////////
 
-    int GetSubspaceDegeneracy(std::size_t i) const
+    unsigned int GetSubspaceDegeneracy(std::size_t i) const
     /// Given the index for a subspace, return the degeneracy of the
     /// subspace within the space.
     {
@@ -356,24 +398,53 @@ namespace basis {
         +(degeneracy_index-1)*this->GetSubspace(i).dimension());
     }
 
+    inline std::size_t full_size() const { return full_size_; }
+    /// Get the total number of subspaces, considering degeneracies.
+
     protected:
+
+    ////////////////////////////////////////////////////////////////
+    // subspace storage management (for initial construction)
+    ////////////////////////////////////////////////////////////////
+
+    inline void reserve(std::size_t new_cap)
+    /// Reserve storage for subspaces and labels.
+    {
+      BaseSpaceType::reserve(new_cap);
+      subspace_degeneracies_.reserve(new_cap);
+    }
+
+    // inline std::size_t capacity() const noexcept;
+    //   inherited from BaseSpace
+
+    inline void shrink_to_fit()
+    /// Shrink reserved storage for labels to fit contents.
+    {
+      BaseSpaceType::shrink_to_fit();
+      subspace_degeneracies_.shrink_to_fit();
+    }
 
     ////////////////////////////////////////////////////////////////
     // subspace push (for initial construction)
     ////////////////////////////////////////////////////////////////
 
-    void PushSubspace(const SubspaceType& subspace) = delete;
+    template<typename T, typename std::enable_if_t<std::is_same_v<std::decay_t<T>, SubspaceType>>* = nullptr>
+    void PushSubspace(T&& subspace) = delete;
     // Prevent use of PushSubspace without degeneracy.
 
-    void PushSubspace(const SubspaceType& subspace, int degeneracy)
+    template<typename T, typename std::enable_if_t<std::is_same_v<std::decay_t<T>, SubspaceType>>* = nullptr>
+    void PushSubspace(T&& subspace, int degeneracy)
     /// Create indexing information (in both directions, index <->
     /// labels) for a subspace.
     {
-      this->subspace_offsets_.push_back(this->dimension_);
-      (*(this->lookup_))[subspace.labels()] = this->subspaces_->size();  // index for lookup
-      this->subspaces_->push_back(subspace);  // save space
+      if (!this->subspaces_ptr_)
+        this->subspaces_ptr_ = std::make_shared<std::vector<SubspaceType>>();
+      this->subspace_offsets_.push_back(this->dimension_);  // save offset
+      (this->lookup_)[subspace.labels()] = BaseSpaceType::size();  // save index
       subspace_degeneracies_.push_back(degeneracy);  // save degeneracy
-      this->dimension_ += subspace.dimension()*degeneracy;
+      full_size_ += degeneracy;
+      this->dimension_ += subspace.dimension()*degeneracy;  // save dimension
+      this->subspaces_ptr_->push_back(std::forward<T>(subspace));  // save space
     };
 
     template <class... Args>
@@ -385,12 +456,16 @@ namespace basis {
     /// Create indexing information (in both directions, index <->
     /// labels) for a subspace.
     {
-      std::size_t index = this->subspaces_->size();  // index for lookup
-      this->subspace_offsets_.push_back(this->dimension_);
-      this->subspaces_->emplace_back(std::forward<Args>(args)...);
-      (*(this->lookup_))[this->subspaces_->back().labels()] = index;
+      if (!this->subspaces_ptr_)
+        this->subspaces_ptr_ = std::make_shared<std::vector<SubspaceType>>();
+      const std::size_t index = BaseSpaceType::size();  // index for lookup
+      this->subspace_offsets_.push_back(this->dimension_);  // save offset
+      this->subspaces_ptr_->emplace_back(std::forward<Args>(args)...);  // construct/emplace space
+      const SubspaceType& subspace = this->subspaces_ptr_->back();
+      (this->lookup_)[subspace.labels()] = index;  // save index for lookup
       subspace_degeneracies_.push_back(degeneracy);  // save degeneracy
-      this->dimension_ += this->subspaces_->back().dimension()*degeneracy;
+      full_size_ += degeneracy;
+      this->dimension_ += subspace.dimension()*degeneracy;  // save dimension
     }
 
   private:
@@ -400,7 +475,97 @@ namespace basis {
     ////////////////////////////////////////////////////////////////
 
     // degeneracy counting information
-    std::vector<int> subspace_degeneracies_;  // given subspace's number of sub-subspaces
+    std::vector<unsigned int> subspace_degeneracies_;  // given subspace's number of sub-subspaces
+    std::size_t full_size_;  // total number of sub-subspaces
+
+  };
+
+  ////////////////////////////////////////////////////////////////
+  // generic sector -- sector between subspaces which have both
+  //   an index and degeneracy, i.e. live within a BaseDegenerateSpace
+  ////////////////////////////////////////////////////////////////
+
+  // BaseDegenerateSector
+
+  template<typename tBraSubspaceType, typename tKetSubspaceType = tBraSubspaceType>
+  class BaseDegenerateSector
+    : public BaseSector<tBraSubspaceType, tKetSubspaceType>
+  {
+    private:
+
+    ////////////////////////////////////////////////////////////////
+    // private (convenience) typedefs
+    ////////////////////////////////////////////////////////////////
+    using BaseSectorType = BaseSector<tBraSubspaceType, tKetSubspaceType>;
+
+    public:
+
+    ////////////////////////////////////////////////////////////////
+    // common typedefs
+    ////////////////////////////////////////////////////////////////
+
+    using BraSubspaceType = typename BaseSectorType::BraSubspaceType;
+    using KetSubspaceType = typename BaseSectorType::KetSubspaceType;
+
+    ////////////////////////////////////////////////////////////////
+    // constructors
+    ////////////////////////////////////////////////////////////////
+
+    BaseDegenerateSector(
+        std::size_t bra_subspace_index, std::size_t ket_subspace_index,
+        unsigned int bra_subspace_degeneracy, unsigned int ket_subspace_degeneracy,
+        std::shared_ptr<const BraSubspaceType> bra_subspace_ptr,
+        std::shared_ptr<const KetSubspaceType> ket_subspace_ptr,
+        std::size_t multiplicity_index=1
+      )
+      : BaseSectorType{
+            bra_subspace_index, ket_subspace_index,
+            bra_subspace_ptr, ket_subspace_ptr,
+            multiplicity_index
+          },
+        bra_subspace_degeneracy_{bra_subspace_degeneracy},
+        ket_subspace_degeneracy_{ket_subspace_degeneracy}
+    {}
+
+    ////////////////////////////////////////////////////////////////
+    // accessors
+    ////////////////////////////////////////////////////////////////
+
+    inline unsigned int bra_subspace_degeneracy() const
+    {
+      return bra_subspace_degeneracy_;
+    }
+
+    inline unsigned int ket_subspace_degeneracy() const
+    {
+      return ket_subspace_degeneracy_;
+    }
+
+    inline unsigned int GetBlockOffset(
+        int bra_degeneracy_index, int ket_degeneracy_index
+      ) const
+    {
+      return
+        ((bra_degeneracy_index-1) * ket_subspace_degeneracy() + (ket_degeneracy_index-1))
+        * BaseSectorType::bra_subspace().dimension()
+        * BaseSectorType::ket_subspace().dimension();
+    }
+
+    inline std::size_t num_block_elements() const
+    {
+      return BaseSectorType::bra_subspace().dimension()
+        * BaseSectorType::ket_subspace().dimension();
+    }
+
+    inline std::size_t num_elements() const
+    {
+      return (bra_subspace_degeneracy_ * BaseSectorType::bra_subspace().dimension())
+        * (ket_subspace_degeneracy_ * BaseSectorType::ket_subspace().dimension());
+    }
+
+    private:
+
+    unsigned int bra_subspace_degeneracy_, ket_subspace_degeneracy_;
 
   };
 

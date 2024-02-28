@@ -71,6 +71,7 @@
     BaseSubspace.
   + 08/06/21 (pjf): Require BASIS_ALLOW_DEPRECATED macro for deprecated
     OrbitalSectorsLJPN constructors.
+  + 01/30/23 (pjf): Rename j0 -> J0.
 
 ****************************************************************/
 
@@ -82,10 +83,13 @@
 #include <cstddef>
 #include <array>
 #include <iosfwd>
+#include <memory>
 #include <string>
 #include <tuple>
+#include <utility>
 #include <vector>
 
+#include "am/am.h"
 #include "am/halfint.h"
 
 #include "basis.h"
@@ -382,7 +386,7 @@ namespace basis {
   // space
 
   class OrbitalSpacePN
-    : public BaseSpace<OrbitalSubspacePN>
+    : public BaseSpace<OrbitalSpacePN, OrbitalSubspacePN>
   {
 
     public:
@@ -605,7 +609,7 @@ namespace basis {
   // space
 
   class OrbitalSpaceLJPN
-    : public BaseSpace<OrbitalSubspaceLJPN>
+    : public BaseSpace<OrbitalSpaceLJPN, OrbitalSubspaceLJPN>
   {
 
     public:
@@ -681,14 +685,42 @@ namespace basis {
     // Sectors are enumerated in lexicographical order by (bra)(ket).
     #endif  // BASIS_ALLOW_DEPRECATED
 
+    template<typename T, typename U>
     OrbitalSectorsLJPN(
-      const OrbitalSpaceLJPN& bra_space, const OrbitalSpaceLJPN& ket_space,
-      int j0, int g0, int Tz0
-    );
+        T&& bra_space__, U&& ket_space__,
+        int J0, int g0, int Tz0
+      )
+        : BaseSectors(std::forward<T>(bra_space__), std::forward<U>(ket_space__)),
+          J0_(J0), g0_(g0), Tz0_(Tz0)
+      {
+        for (std::size_t bra_subspace_index=0; bra_subspace_index<bra_space().size(); ++bra_subspace_index) {
+          for (std::size_t ket_subspace_index=0; ket_subspace_index<ket_space().size(); ++ket_subspace_index) {
+
+            // retrieve subspaces
+            const auto& bra_subspace = bra_space().GetSubspace(bra_subspace_index);
+            const auto& ket_subspace = ket_space().GetSubspace(ket_subspace_index);
+
+            bool allowed = true;
+            allowed &= am::AllowedTriangle(ket_subspace.j(), J0, bra_subspace.j());
+            allowed &= ((ket_subspace.g()+g0+bra_subspace.g())%2 == 0);
+            allowed &= ((bra_subspace.Tz() - ket_subspace.Tz()) == Tz0);
+
+            // push sector
+            if (allowed) {
+              PushSector(bra_subspace_index,ket_subspace_index);
+            }
+          }
+        }
+      }
+
+
+    template<typename T>
     OrbitalSectorsLJPN(
-        const OrbitalSpaceLJPN& space,
-        int j0, int g0, int Tz0
-    ) : OrbitalSectorsLJPN(space, space, j0, g0, Tz0) {}
+        T&& space,
+        int J0, int g0, int Tz0
+      )
+        : OrbitalSectorsLJPN(std::forward<T>(space), std::forward<T>(space), J0, g0, Tz0)
+    {}
     // Enumerate sector pairs between two spaces connected by an operator of
     // given tensorial and parity character ("constrained" sector enumeration).
 
@@ -696,13 +728,20 @@ namespace basis {
     std::string DebugStr() const;
 
     // accessors
-    int j0()     const {return j0_;}
+    int J0()     const {return J0_;}
     int g0()     const {return g0_;}
     int Tz0()    const {return Tz0_;}
 
+    bool IsScalar() const {return (J0()==0 && g0()==0 && Tz0()==0);}
+
+    #ifdef BASIS_ALLOW_DEPRECATED
+    DEPRECATED("j0() accessor is deprecated; use J0() instead")
+    int j0()     const {return J0_;}
+    #endif  // BASIS_ALLOW_DEPRECATED
+
    private:
     // operator properties
-    int j0_, g0_, Tz0_;
+    int J0_, g0_, Tz0_;
   };
 
   ////////////////////////////////////////////////////////////////
