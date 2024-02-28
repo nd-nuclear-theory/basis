@@ -4,6 +4,10 @@
   Defines spatial (n,l) orbitals for three-dimensional harmonic oscillator.
 
   This is meant as an introductory example to indexing with the basis package.
+  However, it is maybe "too simple", in that the quantum numbers for the
+  subspace and for the state are each a single 0-based integer.  So looking up
+  the index from the quantum number tuple and vice versa are seemingly trivial
+  and superfluous operations.
 
   Language: C++11
 
