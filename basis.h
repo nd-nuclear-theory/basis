@@ -779,7 +779,7 @@ namespace basis {
   /// subspace labels
   ///
   /// Template arguments:
-  ///   tDerivedSpaceType (typename) : TODO 02/28/24 (mac): document
+  ///   tDerivedSpaceType (typename) : type of the derived space class (for CRTP)
   ///   tSubspaceType (typename) : type for subspace
   ///   tSpaceLabelsType (typename, optional) : type for space labels
 
