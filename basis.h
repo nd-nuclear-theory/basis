@@ -183,6 +183,7 @@
     - Fix iterator types.
     - Fix constness of member shared_ptr in BaseSector.
     - Use std::addressof for comparison of objects in BaseSectors.
+  + 03/05/24 (mac): Add alias LabelsType to BaseState.
 ****************************************************************/
 
 #ifndef BASIS_BASIS_H_
@@ -621,6 +622,7 @@ namespace basis {
       ////////////////////////////////////////////////////////////////
 
       using SubspaceType = tSubspaceType;
+      using LabelsType = typename SubspaceType::StateLabelsType;
       using StateLabelsType = typename SubspaceType::StateLabelsType;
 
       protected:
