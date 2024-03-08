@@ -167,7 +167,7 @@ namespace basis {
   // canonical ("upper triangle") indices.
   //
   // This is a customized wrapper for basis::CanonicalizeIndices (see
-  // operator.h), for use with RelativeJT operators.
+  // operator.h), for use with JT-coupled (e.g., RelativeJT) operators.
   //
   // Template parameters:
   //   tJTSpace: type for the JT space from which the subspaces are
@@ -175,7 +175,7 @@ namespace basis {
   //      accessor)
   //
   // Arguments:
-  //   relative_space (basis::RelativeSpaceJT): space, for retrieving
+  //   space (tJTSpace): space, for retrieving
   //     subspace quantum numbers to calculate canonicalization factor
   //   J0, T0, g0 (int): operator tensorial properties
   //   symmetry_phase_mode (basis::SymmetryPhaseMode): operator

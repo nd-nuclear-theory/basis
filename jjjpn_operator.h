@@ -16,6 +16,7 @@
   + 9/27/17 (mac): Fix AS/NAS conversion factors in WriteTwoBodyOperatorJJJPN.
   + 05/09/19 (pjf): Use std::size_t for indices and sizes, to prevent
     integer overflow.
+  + 03/07/23 (mac): Add canonicalization routines (refactored from xpn2h2).
 
 ****************************************************************/
 
@@ -31,13 +32,91 @@
 namespace basis {
 
   ////////////////////////////////////////////////////////////////
+  // two-body jjJpn state lookup (with canonicalization) 
+  ////////////////////////////////////////////////////////////////
+
+  std::tuple<std::size_t,std::size_t,std::size_t,std::size_t,double> CanonicalizeTwoBodyOrbitalIndicesJJJPN(
+      const OrbitalSpacePN& space,
+      int J,
+      std::size_t subspace_index1, std::size_t subspace_index2,
+      std::size_t state_index1, std::size_t state_index2
+    );
+  // Convert subspace (proton-neutron) and state (orbital) indices for a JJJPN
+  // two-particle state to canonical indices for state look-up.
+  //
+  // Canonicalization of orbitals is lexicographical by (subspace,state), so (1)
+  // np state will be swapped to pn, then (2) like-species orbitals will be
+  // swapped to numerical order.
+  //
+  // The canonicalization factor for swapping orbitals is -(-)^(J-j1-j2).  See,
+  // e.g., equation (C3) of csbasis
+  // [http://dx.doi.org/10.1103/PhysRevC.86.034312].
+  //
+  // Arguments:
+  //
+  //   space (basis::OrbitalSpacePN): space, for retrieving
+  //     orbital quantum numbers to calculate canonicalization factor
+  //   J (int): two-particle state J, to calculate canonicalization factor
+  //   subspace_index1, subspace_index2 (std::size_t):
+  //     orbital subspace indices, possibly to be swapped (if np state given)
+  //     (may be implicitly cast as int from basis::OrbitalSpeciesPN)
+  //   state_index1, state_index2 (std::size_t):
+  //     naive orbital indices, possibly to be swapped if sector
+  //     is diagonal sector
+  //
+  // Returns:
+  //   canonicalized indices and swap flag and phase as:
+  //
+  //        subspace_index1, subspace_index2,
+  //        state_index1, state_index2,
+  //        canonicalization_factor
+
+  ////////////////////////////////////////////////////////////////
+  // two-body jjJpn RME lookup (with canonicalization) 
+  ////////////////////////////////////////////////////////////////
+  
+  std::tuple<std::size_t,std::size_t,std::size_t,std::size_t,double> CanonicalizeIndicesJJJPN(
+      const TwoBodySpaceJJJPN& space,
+      int J0, int g0,
+      std::size_t subspace_index_bra, std::size_t subspace_index_ket,
+      std::size_t state_index_bra, std::size_t state_index_ket
+    );
+  // Convert subspace and state indices for a matrix element to
+  // canonical ("upper triangle") indices.
+  //
+  // It is assumed that the operator is a standard hermitian self-adjoint
+  // spherical tensor operator.
+  //
+  // This is a customized wrapper for basis::CanonicalizeIndices (see
+  // operator.h), for use with JJJPN operators.
+  //
+  // Arguments:
+  //   space (basis::TwoBodySpaceJJJPN): space, for retrieving
+  //     subspace quantum numbers to calculate canonicalization factor
+  //   J0, g0 (int): operator tensorial properties
+  //   bra_subspace_index, ket_subspace_index (std::size_t):
+  //     naive sector bra and ket subspace indices, possibly to be swapped
+  //   bra_state_index, ket_state_index (std::size_t):
+  //     naive bra and ket state indices, possibly to be swapped if sector
+  //     is diagonal sector
+  //
+  // Returns:
+  //   canonicalized indices and swap flag and phase as:
+  //
+  //        subspace_index_bra, subspace_index_ket,
+  //        state_index_bra, state_index_ket,
+  //        swapped_subspaces,
+  //        canonicalization_factor
+
+  
+  ////////////////////////////////////////////////////////////////
   // two-body jjJpn operator output
   ////////////////////////////////////////////////////////////////
 
   // Note that the primary intention of this output for two-body
   // operators in JJJPN scheme is for diagnostic purposes.  It is
   // based on the preliminary specification for the text version of
-  // the MFDn Version 15 h2 format.
+  // the MFDn Version 15 h2 format, i.e., h2v0.
   //
   // Data lines are of the form:
   //
