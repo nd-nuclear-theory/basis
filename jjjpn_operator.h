@@ -1,4 +1,4 @@
-/************************************************************//**
+/****************************************************************
   @file jjjpn_operator.h
 
   Defines functions for I/O and manipulation of two-body operator
@@ -41,8 +41,9 @@ namespace basis {
       std::size_t subspace_index1, std::size_t subspace_index2,
       std::size_t state_index1, std::size_t state_index2
     );
-  // Convert subspace (proton-neutron) and state (orbital) indices for a JJJPN
-  // two-particle state to canonical indices for state look-up.
+  // Convert pair of orbitals (each given as an orbital subspace index and state
+  // index) to canonical form for use as labels for looking up a JJJPN
+  // two-particle state.
   //
   // Canonicalization of orbitals is lexicographical by (subspace,state), so (1)
   // np state will be swapped to pn, then (2) like-species orbitals will be
@@ -81,6 +82,11 @@ namespace basis {
       std::size_t subspace_index_bra, std::size_t subspace_index_ket,
       std::size_t state_index_bra, std::size_t state_index_ket
     );
+  // Convert pair of two-body JJJPN-coupled states (each given as a two-body
+  // subspace index and state index) to canonical form for use as labels for
+  // looking up a JJJPN two-particle matrix element (i.e., sector and row-column
+  // pair within sector).
+  //
   // Convert subspace and state indices for a matrix element to
   // canonical ("upper triangle") indices.
   //

@@ -16,10 +16,43 @@
 #include "operator.h"
 
 
+void CanonicaliationTest(const std::string& filename)
+{
+  ////////////////////////////////////////////////////////////////
+  // set up operator storage
+  ////////////////////////////////////////////////////////////////
+
+  int J0 = 0;
+  int g0 = 0;
+  int Tz0 = 0;
+  const basis::TwoBodySpaceJJJPN two_body_space(
+      orbital_space,
+      weight_max,
+      shell::kH2SpaceOrdering.at(run_parameters.output_format)
+    );
+  const basis::TwoBodySectorsJJJPN two_body_sectors(
+      two_body_space,
+      J0, g0, Tz0
+    );
+  basis::OperatorBlocks<double> two_body_matrices;
+  basis::SetOperatorToZero(two_body_sectors, two_body_matrices);
+
+  ////////////////////////////////////////////////////////////////
+  // test lookups
+  ////////////////////////////////////////////////////////////////
+
+  // lookup tests
+  LookUpStateFromXPNLabels(orbital_space, two_body_space, 1, 1, 0);
+  LookUpStateFromXPNLabels(orbital_space, two_body_space, 2, 1, 0);
+  LookUpStateFromXPNLabels(orbital_space, two_body_space, 1, 29, 0);
+  // LookUpStateFromXPNLabels(orbital_space, two_body_space, 29, 1, 0);  // FAILS -- ILLEGAL
+}
+
+
 void WriteTest(const std::string& filename)
 {
   ////////////////////////////////////////////////////////////////
-  // defining operator
+  // define operator
   ////////////////////////////////////////////////////////////////
 
   // since we set the operator to a "naive identity" operator, the
@@ -49,7 +82,7 @@ void WriteTest(const std::string& filename)
   basis::SetOperatorToIdentity(sectors,matrices);
 
   ////////////////////////////////////////////////////////////////
-  // write test
+  // test write
   ////////////////////////////////////////////////////////////////
 
   // set up stream for output
@@ -75,6 +108,8 @@ void WriteTest(const std::string& filename)
 int main(int argc, char **argv)
 {
 
+  CanonicalizationTest(filename);
+  
   std::string filename("test/jjjpnorb_operator_test_identity_Nmax02_NAS.dat");
   WriteTest(filename);
 
