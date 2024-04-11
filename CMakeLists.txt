@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.20)
+cmake_minimum_required(VERSION 3.23)
 
 # Determine if basis is built as a subproject (using add_subdirectory) or if it
 # is the master project.
@@ -74,13 +74,13 @@ list(TRANSFORM basis_SOURCES APPEND .cpp)
 
 # define basis library and add source/header files
 add_library(basis ${basis_SOURCES})
+target_sources(
+  basis PUBLIC
+  FILE_SET HEADERS
+  TYPE HEADERS
+  FILES ${basis_HEADERS}
+)
 add_library(basis::basis ALIAS basis)
-foreach(header IN LISTS basis_HEADERS)
-  target_sources(
-    basis INTERFACE $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/${header}>
-                    $<INSTALL_INTERFACE:include/basis/${header}>
-  )
-endforeach()
 
 # ##############################################################################
 # configure optional features
@@ -103,29 +103,22 @@ if(BASIS_ENABLE_HASH)
 endif()
 
 # ##############################################################################
-# define include directory
-# ##############################################################################
-cmake_path(GET basis_SOURCE_DIR PARENT_PATH basis_PARENT_DIR)
-target_include_directories(
-  basis INTERFACE $<BUILD_INTERFACE:${basis_PARENT_DIR}>
-                  $<INSTALL_INTERFACE:include>
-)
-
-# ##############################################################################
 # define installation rules
 # ##############################################################################
+include(GNUInstallDirs)
+
 install(
   TARGETS basis
-  DESTINATION lib
+  DESTINATION ${CMAKE_INSTALL_LIBDIR}
   EXPORT basisTargets
+  FILE_SET HEADERS DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/basis
 )
-install(FILES ${basis_HEADERS} DESTINATION include/basis)
 
 install(
   EXPORT basisTargets
   NAMESPACE basis::
   FILE basisTargets.cmake
-  DESTINATION lib/cmake/basis
+  DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/basis
 )
 
 include(CMakePackageConfigHelpers)
@@ -133,7 +126,7 @@ include(CMakePackageConfigHelpers)
 configure_package_config_file(
   ${CMAKE_CURRENT_SOURCE_DIR}/Config.cmake.in
   "${CMAKE_CURRENT_BINARY_DIR}/basisConfig.cmake"
-  INSTALL_DESTINATION "lib/cmake/basis"
+  INSTALL_DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/basis"
   NO_SET_AND_CHECK_MACRO NO_CHECK_REQUIRED_COMPONENTS_MACRO
 )
 # generate the version file for the config file
@@ -146,7 +139,7 @@ write_basic_package_version_file(
 # install the configuration file
 install(FILES ${CMAKE_CURRENT_BINARY_DIR}/basisConfig.cmake
               ${CMAKE_CURRENT_BINARY_DIR}/basisConfigVersion.cmake
-        DESTINATION lib/cmake/basis
+        DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/basis
 )
 
 export(
