@@ -526,28 +526,28 @@ namespace basis {
   template <typename tBraSpaceType, typename tOperatorSpaceType, typename tKetSpaceType, typename tHypersectorType>
     std::string BaseHypersectors<tBraSpaceType, tOperatorSpaceType, tKetSpaceType, tHypersectorType, false>::DebugStr() const
     {
-      std::string debug_str;
+      std::ostringstream os;
       for (std::size_t hypersector_index=0; hypersector_index<BaseSectorsType::size(); ++hypersector_index)
         {
           const HypersectorType& hypersector = GetHypersector(hypersector_index);
 
-          debug_str+="-------------------------------\n";
-          debug_str+=fmt::format("  hypersector {}\n\n",hypersector_index);
-          debug_str+=fmt::format("  bra index {}\n",hypersector.bra_subspace_index());
-          debug_str+=fmt::format("  labels {}\n",hypersector.bra_subspace().labels());
-          debug_str+=fmt::format("  size {}\n",hypersector.bra_subspace().size());
-          debug_str+=fmt::format("  dim {}\n\n",hypersector.bra_subspace().dimension());
-          debug_str+=fmt::format("  ket index {}\n",hypersector.ket_subspace_index());
-          debug_str+=fmt::format("  labels {}\n",hypersector.ket_subspace().labels());
-          debug_str+=fmt::format("  size {}\n",hypersector.ket_subspace().size());
-          debug_str+=fmt::format("  dim {}\n\n",hypersector.ket_subspace().dimension());
-          debug_str+=fmt::format("  operator index {}\n",hypersector.operator_subspace_index());
-          debug_str+=fmt::format("  labels {}\n",hypersector.operator_subspace().labels());
-          debug_str+=fmt::format("  size {}\n",hypersector.operator_subspace().size());
-          debug_str+=fmt::format("  dim {}\n",hypersector.operator_subspace().dimension());
-          debug_str+=fmt::format("  multiplicity index {}\n\n",hypersector.multiplicity_index());
+          os << "  hypersector " << hypersector_index
+             << "  bra index " << hypersector.bra_subspace_index()
+             << " labels " << hypersector.bra_subspace().LabelStr()
+             << " size " << hypersector.bra_subspace().size()
+             << " dim " << hypersector.bra_subspace().dimension()
+             << "  ket index " << hypersector.ket_subspace_index()
+             << " labels " << hypersector.ket_subspace().LabelStr()
+             << " size " << hypersector.ket_subspace().size()
+             << " dim " << hypersector.ket_subspace().dimension()
+             << "  operator index " << hypersector.operator_subspace_index()
+             << " labels " << hypersector.operator_subspace().LabelStr()
+             << " size " << hypersector.operator_subspace().size()
+             << " dim " << hypersector.operator_subspace().dimension()
+             << "  multiplicity index " << hypersector.multiplicity_index()
+             << std::endl;
         }
-      return debug_str;
+      return os.str();
     }
 
   ////////////////////////////////////////////////////////////////
