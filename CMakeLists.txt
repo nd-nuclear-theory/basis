@@ -47,12 +47,12 @@ if(BASIS_ENABLE_HASH)
 endif()
 
 # ##############################################################################
-# define basis headers and sources
+# define headers and sources
 # ##############################################################################
 
 # define units
-set(basis_UNITS_H basis degenerate hypersector operator jt_operator)
-set(basis_UNITS_H_CPP
+set(${PROJECT_NAME}_UNITS_H basis degenerate hypersector operator jt_operator)
+set(${PROJECT_NAME}_UNITS_H_CPP
     many_body
     proton_neutron
     lsjt_scheme
@@ -67,39 +67,41 @@ set(basis_UNITS_H_CPP
 )
 
 # construct lists of headers and sources
-set(basis_HEADERS ${basis_UNITS_H} ${basis_UNITS_H_CPP})
-list(TRANSFORM basis_HEADERS APPEND .h)
-set(basis_SOURCES ${basis_UNITS_H_CPP})
-list(TRANSFORM basis_SOURCES APPEND .cpp)
+set(${PROJECT_NAME}_HEADERS ${${PROJECT_NAME}_UNITS_H} ${${PROJECT_NAME}_UNITS_H_CPP})
+list(TRANSFORM ${PROJECT_NAME}_HEADERS APPEND .h)
+set(${PROJECT_NAME}_SOURCES ${${PROJECT_NAME}_UNITS_H_CPP})
+list(TRANSFORM ${PROJECT_NAME}_SOURCES APPEND .cpp)
+cmake_path(GET CMAKE_CURRENT_SOURCE_DIR PARENT_PATH parent_path)
 
 # define basis library and add source/header files
-add_library(basis ${basis_SOURCES})
+add_library(${PROJECT_NAME} ${${PROJECT_NAME}_SOURCES})
 target_sources(
-  basis PUBLIC
+  ${PROJECT_NAME} PUBLIC
   FILE_SET HEADERS
   TYPE HEADERS
-  FILES ${basis_HEADERS}
+  BASE_DIRS "${parent_dir}"
+  FILES ${${PROJECT_NAME}_HEADERS}
 )
-add_library(basis::basis ALIAS basis)
+add_library(${PROJECT_NAME}::${PROJECT_NAME} ALIAS ${PROJECT_NAME})
 
 # ##############################################################################
 # configure optional features
 # ##############################################################################
 
 if(BASIS_ENABLE_HASH)
-  target_compile_definitions(basis PUBLIC BASIS_HASH)
+  target_compile_definitions(${PROJECT_NAME} PUBLIC BASIS_HASH)
 endif()
 if(BASIS_ENABLE_DEPRECATED)
-  target_compile_definitions(basis PUBLIC BASIS_ALLOW_DEPRECATED)
+  target_compile_definitions(${PROJECT_NAME} PUBLIC BASIS_ALLOW_DEPRECATED)
 endif()
 
 # ##############################################################################
 # link dependencies
 # ##############################################################################
 
-target_link_libraries(basis PUBLIC m am::am Eigen3::Eigen mcutils::mcutils)
+target_link_libraries(${PROJECT_NAME} PUBLIC m am::am Eigen3::Eigen mcutils::mcutils)
 if(BASIS_ENABLE_HASH)
-  target_link_libraries(basis PUBLIC Boost::headers)
+  target_link_libraries(${PROJECT_NAME} PUBLIC Boost::headers)
 endif()
 
 # ##############################################################################
@@ -108,51 +110,50 @@ endif()
 include(GNUInstallDirs)
 
 install(
-  TARGETS basis
-  DESTINATION ${CMAKE_INSTALL_LIBDIR}
-  EXPORT basisTargets
-  FILE_SET HEADERS DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/basis
+  TARGETS ${PROJECT_NAME}
+  EXPORT ${PROJECT_NAME}Targets
+  FILE_SET HEADERS
 )
 
 install(
-  EXPORT basisTargets
-  NAMESPACE basis::
-  FILE basisTargets.cmake
-  DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/basis
+  EXPORT ${PROJECT_NAME}Targets
+  NAMESPACE ${PROJECT_NAME}::
+  FILE ${PROJECT_NAME}Targets.cmake
+  DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}
 )
 
 include(CMakePackageConfigHelpers)
 # generate the config file that is includes the exports
 configure_package_config_file(
   ${CMAKE_CURRENT_SOURCE_DIR}/Config.cmake.in
-  "${CMAKE_CURRENT_BINARY_DIR}/basisConfig.cmake"
-  INSTALL_DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/basis"
+  "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config.cmake"
+  INSTALL_DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}"
   NO_SET_AND_CHECK_MACRO NO_CHECK_REQUIRED_COMPONENTS_MACRO
 )
 # generate the version file for the config file
 write_basic_package_version_file(
-  "${CMAKE_CURRENT_BINARY_DIR}/basisConfigVersion.cmake"
-  VERSION "${basis_VERSION_MAJOR}.${basis_VERSION_MINOR}"
+  "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake"
+  VERSION "${${PROJECT_NAME}_VERSION_MAJOR}.${${PROJECT_NAME}_VERSION_MINOR}"
   COMPATIBILITY AnyNewerVersion
 )
 
 # install the configuration file
-install(FILES ${CMAKE_CURRENT_BINARY_DIR}/basisConfig.cmake
-              ${CMAKE_CURRENT_BINARY_DIR}/basisConfigVersion.cmake
-        DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/basis
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config.cmake
+              ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake
+        DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}
 )
 
 export(
-  EXPORT basisTargets
-  NAMESPACE basis::
-  FILE "${CMAKE_CURRENT_BINARY_DIR}/basisTargets.cmake"
+  EXPORT ${PROJECT_NAME}Targets
+  NAMESPACE ${PROJECT_NAME}::
+  FILE "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Targets.cmake"
 )
 
 # ##############################################################################
 # define tests
 # ##############################################################################
 
-set(basis_UNITS_TEST
+set(${PROJECT_NAME}_UNITS_TEST
     degenerate_test
     hypersector_test
     lsjt_scheme_test
@@ -164,14 +165,14 @@ set(basis_UNITS_TEST
     nlj_orbital_test
 )
 
-add_custom_target(basis_tests)
-foreach(test_name IN LISTS basis_UNITS_TEST)
+add_custom_target(${PROJECT_NAME}_tests)
+foreach(test_name IN LISTS ${PROJECT_NAME}_UNITS_TEST)
   add_executable(${test_name} EXCLUDE_FROM_ALL ${test_name}.cpp)
-  target_link_libraries(${test_name} basis::basis)
-  add_dependencies(basis_tests ${test_name})
+  target_link_libraries(${test_name} ${PROJECT_NAME}::${PROJECT_NAME})
+  add_dependencies(${PROJECT_NAME}_tests ${test_name})
 endforeach()
 
 if(BASIS_MASTER_PROJECT)
   add_custom_target(tests)
-  add_dependencies(tests basis_tests)
+  add_dependencies(tests ${PROJECT_NAME}_tests)
 endif()
