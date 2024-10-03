@@ -46,6 +46,7 @@ namespace impl {
   /// subspace labels
   ///
   /// Template arguments:
+  ///   tDerivedSpaceType (typename) : type of the derived space class (for CRTP)
   ///   tSubspaceType (typename) : type for subspace
   ///   tSpaceLabelsType (typename, optional) : type for space labels
 
@@ -339,9 +340,9 @@ namespace impl {
       ////////////////////////////////////////////////////////////////
 
       /// subspaces (accessible by index)
-      std::shared_ptr<std::vector<SubspaceType>> subspaces_ptr_;
-      std::vector<std::size_t> subspace_offsets_;
-      std::size_t dimension_;
+      std::shared_ptr<std::vector<SubspaceType>> subspaces_ptr_;  // the subspaces contained in this space
+      std::vector<std::size_t> subspace_offsets_;  // offset of the subspace in the full space indexing, i.e., number of states is subspaces so far
+      std::size_t dimension_;  // total dimension (number of states in all subspaces)
 
       // subspace index lookup by labels
       basis::map<typename SubspaceType::LabelsType,std::size_t> lookup_;

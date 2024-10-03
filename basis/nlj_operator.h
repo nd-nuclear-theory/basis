@@ -109,4 +109,4 @@ namespace basis {
   ////////////////////////////////////////////////////////////////
 }  // namespace basis
 
-#endif  // BASIS_NLJ_ORBITAL_H_
+#endif  // BASIS_NLJ_OPERATOR_H_

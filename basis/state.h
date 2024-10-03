@@ -61,6 +61,7 @@ namespace impl {
       ////////////////////////////////////////////////////////////////
 
       using SubspaceType = tSubspaceType;
+      using LabelsType = typename SubspaceType::StateLabelsType;
       using StateLabelsType = typename SubspaceType::StateLabelsType;
 
       protected:

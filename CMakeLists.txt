@@ -66,11 +66,14 @@ set(${PROJECT_NAME}_UNITS_H_CPP
     lsjt_operator
     jjjt_scheme
     jjjt_operator
+    jjjttz_scheme
+    jjjttz_operator
     jjjpn_scheme
     jjjpn_operator
     nlj_orbital
     nlj_operator
     m_scheme
+    oscillator_orbital
 )
 
 # construct lists of headers and sources
@@ -172,10 +175,13 @@ set(${PROJECT_NAME}_UNITS_TEST
     lsjt_scheme_test
     lsjt_operator_test
     jjjt_scheme_test
+    jjjttz_scheme_test
+    jjjttz_operator_test
     jjjpn_scheme_test
     jjjpn_operator_test
     m_scheme_test
     nlj_orbital_test
+    oscillator_orbital_test
 )
 
 add_custom_target(${PROJECT_NAME}_tests)

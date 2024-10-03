@@ -184,6 +184,7 @@
     - Fix iterator types.
     - Fix constness of member shared_ptr in BaseSector.
     - Use std::addressof for comparison of objects in BaseSectors.
+  + 03/05/24 (mac): Add alias LabelsType to BaseState.
   + 09/25/24 (pjf):
     - Split basis.h into separate headers.
     - Add BASIS_BOOST_HASH and BASIS_STD_HASH directives.

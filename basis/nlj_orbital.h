@@ -250,14 +250,20 @@ namespace basis {
   /// ## Subspaces ##
   ///
   /// Within the full space, subspaces are ordered by:
-  ///    * enumerated species
+  ///
+  ///  * enumerated species
   ///
   ////////////////////////////////////////////////////////////////
   ///
   /// ## States ##
   ///
-  /// Within a subspace, the states are ordered by:
-  ///   * lexicographically increasing (n,l,j)
+  /// Within a subspace, the ordering of states is determined by the
+  /// constructor:
+  ///
+  ///  * For Nmax truncation, states are ordered lexicographically by (N,j).
+  ///
+  ///  * For construction from a list of orbitals, the ordering (within each
+  ///   subspace) preserves the ordering in the global listing of orbitals.
   ///
   ////////////////////////////////////////////////////////////////
   /// @{
@@ -472,21 +478,28 @@ namespace basis {
   /// n and l quantum numbers, as an integer, to be used only when the
   /// orbitals are known to be oscillator orbitals:
   ///
-  ///   *N (int): oscillator quanta (N=2n+l)
+  ///   * N (int): oscillator quanta (N=2n+l)
   ///
   ////////////////////////////////////////////////////////////////
   ///
   /// ## Subspaces ##
   ///
   /// Within the full space, subspaces are ordered by:
+  ///
   ///    * lexicographically increasing (species,l,j)
   ///
   ////////////////////////////////////////////////////////////////
   ///
   /// ## States ##
   ///
-  /// Within a subspace, the states are ordered by:
-  ///   * increasing n
+  /// Within a subspace, the ordering of states is determined by the
+  /// constructor:
+  ///
+  ///  * For Nmax truncation, states are ordered by increasing N (or,
+  ///    equivalently, in this context, increasing n).
+  ///
+  ///  * For construction from a list of orbitals, the ordering (within each
+  ///    subspace) preserves the ordering in the global listing of orbitals.
   ///
   ////////////////////////////////////////////////////////////////
   /// @{

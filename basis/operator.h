@@ -509,11 +509,10 @@ namespace basis {
     // Convert subspace and state indices for a matrix element to
     // canonical ("upper triangle") indices.
     //
-    // Note: For specific indexing schemes, it might be more convenient
-    // to define a customized "canonicalizaton" function, which, rather
-    // than simply flagging the swaps through boolean variable, actually
-    // calculates any necessary phase an dimension factors arising from
-    // the swaps.
+    // Note: For specific indexing schemes, it might be more convenient to
+    // define a customized "canonicalizaton" function, which, rather than simply
+    // flagging the swaps through a boolean variable, actually calculates any
+    // necessary phase and dimension factors arising from the swaps.
     //
     // Arguments:
     //   subspace_index_bra, subspace_index_ket (input):
