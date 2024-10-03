@@ -167,6 +167,7 @@ export(
 
 set(${PROJECT_NAME}_UNITS_TEST
     degenerate_test
+    product_test
     hypersector_test
     lsjt_scheme_test
     lsjt_operator_test
