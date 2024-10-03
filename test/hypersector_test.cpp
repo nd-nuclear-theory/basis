@@ -58,6 +58,7 @@ namespace basis {
       const RelativeSpaceLSJT& operator_space,
       basis::SectorDirection sector_direction
     )
+    : BaseHypersectors{space, space, operator_space}
   {
     for (int bra_subspace_index=0; bra_subspace_index<space.size(); ++bra_subspace_index)
       for (int ket_subspace_index=0; ket_subspace_index<space.size(); ++ket_subspace_index)

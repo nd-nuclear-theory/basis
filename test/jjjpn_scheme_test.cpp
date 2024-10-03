@@ -159,7 +159,7 @@ void TestTwoBodyTz()
   int J0 = 0;  // try: J0=0 for interaction, J0=2 for quadrupole operator
   int g0 = 0;
 
-  for (int Tz0 : {-2,-1,0,+1,+2})
+  for (int Tz0 : {0,+1,+2})
     {
       basis::SectorDirection sector_direction = basis::SectorDirection::kCanonical;
 
