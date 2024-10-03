@@ -21,7 +21,8 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 set(CMAKE_CXX_EXTENSIONS False)
 
-option(BASIS_ENABLE_HASH "use Boost hash for unordered_map" ON)
+option(BASIS_ENABLE_HASH "use unordered_map for lookup tables" ON)
+option(BASIS_ENABLE_BOOST_HASH "use Boost hash for unordered_map" ON)
 option(BASIS_ENABLE_DEPRECATED "enable deprecated basis APIs" OFF)
 
 # ##############################################################################
@@ -41,9 +42,11 @@ if(NOT TARGET am::am)
 endif()
 
 if(BASIS_ENABLE_HASH)
-  if(NOT TARGET Boost::headers)
+  if(BASIS_ENABLE_BOOST_HASH AND NOT TARGET Boost::headers)
     find_package(Boost REQUIRED COMPONENTS headers)
   endif()
+elseif(BASIS_ENABLE_BOOST_HASH)
+  message(WARNING "BASIS_ENABLE_BOOST_HASH without BASIS_ENABLE_HASH does nothing.")
 endif()
 
 # ##############################################################################
@@ -51,7 +54,11 @@ endif()
 # ##############################################################################
 
 # define units
-set(${PROJECT_NAME}_UNITS_H basis degenerate hypersector operator jt_operator)
+set(${PROJECT_NAME}_UNITS_H
+    basis type_traits map subspace state space sector
+    degenerate hypersector operator
+    jt_operator
+)
 set(${PROJECT_NAME}_UNITS_H_CPP
     many_body
     proton_neutron
@@ -90,6 +97,11 @@ add_library(${PROJECT_NAME}::${PROJECT_NAME} ALIAS ${PROJECT_NAME})
 
 if(BASIS_ENABLE_HASH)
   target_compile_definitions(${PROJECT_NAME} PUBLIC BASIS_HASH)
+  if(BASIS_ENABLE_BOOST_HASH)
+    target_compile_definitions(${PROJECT_NAME} PUBLIC BASIS_BOOST_HASH)
+  else()
+    target_compile_definitions(${PROJECT_NAME} PUBLIC BASIS_STD_HASH)
+  endif()
 endif()
 if(BASIS_ENABLE_DEPRECATED)
   target_compile_definitions(${PROJECT_NAME} PUBLIC BASIS_ALLOW_DEPRECATED)

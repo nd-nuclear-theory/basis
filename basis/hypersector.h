@@ -15,6 +15,8 @@
   + 05/09/19 (pjf): Use std::size_t for indices and sizes, to prevent
     integer overflow.
   + 08/04/21 (pjf): Fix use of size() vs. dimension().
+  + 09/27/24: Move implementations into impl namespace to hide template
+    parameters which should be invisible to library users.
 ****************************************************************/
 
 #ifndef BASIS_HYPERSECTOR_H_
@@ -30,14 +32,24 @@
 #include "basis.h"
 #include "operator.h"
 
-// #ifdef BASIS_HASH
-//#include <unordered_map>
-//#include <boost/container_hash/hash.hpp>
-//#else
-//#include <map>
-//#endif
-
 namespace basis {
+
+  ////////////////////////////////////////////////////////////////
+  // operator storage by hyperblock
+  ////////////////////////////////////////////////////////////////
+
+
+  // typedef for operator hyperblocks
+  //
+  // EX:
+  //   basis::OperatorHyperblocks<double> matrices;  // matrices for all operator planes of all hypersectors
+  //   ...
+  //   matrix_element = matrices[hypersector_index][operator_index](bra_index,ket_index);  // operator_index is within given hypersector's operator subspace
+
+  template <typename tFloat>
+    using OperatorHyperblocks = std::vector<std::vector<OperatorBlock<tFloat>>>;
+
+namespace impl {
 
   ////////////////////////////////////////////////////////////////
   // hypersector indexing
@@ -550,20 +562,38 @@ namespace basis {
       return os.str();
     }
 
+}  // namespace impl
+
   ////////////////////////////////////////////////////////////////
-  // operator storage by hyperblock
+  // template alias definitions (in basis:: namespace)
   ////////////////////////////////////////////////////////////////
 
+  template <
+      typename tBraSubspaceType,
+      typename tOperatorSubspaceType,
+      typename tKetSubspaceType = tBraSubspaceType
+    >
+    using BaseHypersector = impl::BaseHypersector<
+        tBraSubspaceType, tOperatorSubspaceType, tKetSubspaceType,
+        std::is_same_v<tBraSubspaceType, tKetSubspaceType>
+      >;
 
-  // typedef for operator hyperblocks
-  //
-  // EX:
-  //   basis::OperatorHyperblocks<double> matrices;  // matrices for all operator planes of all hypersectors
-  //   ...
-  //   matrix_element = matrices[hypersector_index][operator_index](bra_index,ket_index);  // operator_index is within given hypersector's operator subspace
+  template <
+      typename tBraSpaceType,
+      typename tOperatorSpaceType,
+      typename tKetSpaceType = tBraSpaceType,
+      typename tHypersectorType
+        = BaseHypersector<
+          typename tBraSpaceType::SubspaceType,
+          typename tOperatorSpaceType::SubspaceType,
+          typename tKetSpaceType::SubspaceType
+        >
+    >
+    using BaseHypersectors = impl::BaseHypersectors<
+        tBraSpaceType, tOperatorSpaceType, tKetSpaceType, tHypersectorType,
+        std::is_same_v<tBraSpaceType, tKetSpaceType>
+      >;
 
-  template <typename tFloat>
-    using OperatorHyperblocks = std::vector<std::vector<OperatorBlock<tFloat>>>;
 
   ////////////////////////////////////////////////////////////////
   // zero operator
@@ -644,9 +674,8 @@ namespace basis {
 
   ////////////////////////////////////////////////////////////////
 
-
   ////////////////////////////////////////////////////////////////
   ////////////////////////////////////////////////////////////////
-} // namespace basis
+}  // namespace basis
 
 #endif

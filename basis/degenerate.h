@@ -51,6 +51,8 @@
   + 04/03/22 (pjf): Normalize all constructors so that fields get initialized
     correctly.
   + 05/14/23 (pjf): Fix push_back vs. emplace_back in EmplaceSubspace().
+  + 09/27/24: Move implementations into impl namespace to hide template
+    parameters which should be invisible to library users.
 ****************************************************************/
 
 #ifndef BASIS_DEGENERATE_H_
@@ -67,6 +69,7 @@
 
 namespace basis {
 
+namespace impl {
 
   ////////////////////////////////////////////////////////////////
   // generic subspace
@@ -286,8 +289,8 @@ namespace basis {
     BaseDegenerateState(const SubspaceType& subspace, const StateLabelsType& state_labels)
       // Construct state, by reverse lookup on labels within subspace.
       : BaseStateType(subspace,state_labels)
-      {
-      }
+    {
+    }
 
     public:
 
@@ -295,16 +298,15 @@ namespace basis {
     // retrieval of substate information
     ////////////////////////////////////////////////////////////////
 
-    std::size_t offset() const
+    std::size_t offset(int degeneracy_index=1) const
     {
-      return BaseStateType::subspace().state_offsets()[BaseStateType::index()];
+      return BaseStateType::subspace().GetStateOffset(BaseStateType::index(), degeneracy_index);
     }
 
     unsigned int degeneracy() const
     {
-      return BaseStateType::subspace().state_degeneracies()[BaseStateType::index()];
+      return BaseStateType::subspace().GetStateDegeneracy(BaseStateType::index());
     }
-
 
   };
 
@@ -571,6 +573,29 @@ namespace basis {
 
   ////////////////////////////////////////////////////////////////
   ////////////////////////////////////////////////////////////////
+}  // namespace impl
+
+template <
+    typename tDerivedSubspaceType, typename tSubspaceLabelsType,
+    typename tStateType, typename tStateLabelsType
+  >
+using BaseDegenerateSubspace = impl::BaseDegenerateSubspace<
+    tDerivedSubspaceType, tSubspaceLabelsType, tStateType, tStateLabelsType
+  >;
+
+template <typename tSubspaceType>
+using BaseDegenerateState = impl::BaseDegenerateState<tSubspaceType>;
+
+
+template <typename tDerivedSpaceType, typename tSubspaceType, typename tSpaceLabelsType = void>
+using BaseDegenerateSpace = impl::BaseDegenerateSpace<
+    tDerivedSpaceType, tSubspaceType, tSpaceLabelsType
+  >;
+
+  template<typename tBraSubspaceType, typename tKetSubspaceType = tBraSubspaceType>
+  using BaseDegenerateSector = impl::BaseDegenerateSector<tBraSubspaceType, tKetSubspaceType>;
+
+
 }  // namespace basis
 
 #endif  // BASIS_DEGENERATE_H_
