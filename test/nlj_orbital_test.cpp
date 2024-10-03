@@ -9,7 +9,7 @@
 #include <fstream>
 #include <iostream>
 
-#include "nlj_orbital.h"
+#include "basis/nlj_orbital.h"
 
 ////////////////////////////////////////////////////////////////
 // test code

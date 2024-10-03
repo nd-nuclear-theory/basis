@@ -15,8 +15,8 @@
 #include <string>
 #include <tuple>
 
-#include "basis.h"
-#include "degenerate.h"
+#include "basis/basis.h"
+#include "basis/degenerate.h"
 
 #include "am/am.h"
 

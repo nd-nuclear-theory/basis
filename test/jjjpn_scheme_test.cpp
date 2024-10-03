@@ -9,11 +9,11 @@
 #include <iostream>
 #include <iomanip>
 
-#include "jjjpn_scheme.h"
-#include "basis.h"
-#include "many_body.h"
-#include "nlj_orbital.h"
-#include "proton_neutron.h"
+#include "basis/jjjpn_scheme.h"
+#include "basis/basis.h"
+#include "basis/many_body.h"
+#include "basis/nlj_orbital.h"
+#include "basis/proton_neutron.h"
 
 ////////////////////////////////////////////////////////////////
 // test code

@@ -9,11 +9,11 @@
 #include <fstream>
 #include <string>
 
-#include "jjjpn_operator.h"
-#include "jjjpn_scheme.h"
-#include "many_body.h"
-#include "nlj_orbital.h"
-#include "operator.h"
+#include "basis/jjjpn_operator.h"
+#include "basis/jjjpn_scheme.h"
+#include "basis/many_body.h"
+#include "basis/nlj_orbital.h"
+#include "basis/operator.h"
 
 
 void WriteTest(const std::string& filename)
@@ -75,7 +75,7 @@ void WriteTest(const std::string& filename)
 int main(int argc, char **argv)
 {
 
-  std::string filename("test/jjjpnorb_operator_test_identity_Nmax02_NAS.dat");
+  std::string filename("jjjpnorb_operator_test_identity_Nmax02_NAS.dat");
   WriteTest(filename);
 
   // termination

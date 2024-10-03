@@ -9,11 +9,11 @@
 #include <fstream>
 #include <iostream>
 
-#include "lsjt_operator.h"
-#include "jt_operator.h"
-#include "lsjt_scheme.h"
-#include "many_body.h"
-#include "operator.h"
+#include "basis/lsjt_operator.h"
+#include "basis/jt_operator.h"
+#include "basis/lsjt_scheme.h"
+#include "basis/many_body.h"
+#include "basis/operator.h"
 
 ////////////////////////////////////////////////////////////////
 // test parts
@@ -104,7 +104,7 @@ void WriteTestRelative(const std::string& filename)
 // Actual contents of binary write:
 //
 //     % od -t x1 lsjt_operator_test_relative_identity_Nmax02.bin
-//     
+//
 //     0000000 01 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
 //     0000020 02 00 00 00 00 00 00 00 02 00 00 00 03 00 00 00
 //     0000040 00 00 00 00 00 00 f0 3f 00 00 00 00 00 00 00 00
@@ -116,10 +116,10 @@ void WriteTestRelative(const std::string& filename)
 //     0000240 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
 //     *
 //     0000440
-//     
-//     
+//
+//
 //     % od -t u4 lsjt_operator_test_relative_identity_Nmax02.bin
-//     
+//
 //     0000000          1          0          0          0
 //     0000020          2          0          2          3
 //     0000040          0 1072693248          0          0
@@ -131,10 +131,10 @@ void WriteTestRelative(const std::string& filename)
 //     0000240          0          0          0          0
 //     *
 //     0000440
-//     
-//     
+//
+//
 //     % od -t fD lsjt_operator_test_relative_identity_Nmax02.bin
-//     
+//
 //     0000000                   5e-324                        0
 //     0000020                   1e-323         6.365987374e-314
 //     0000040                        1                        0

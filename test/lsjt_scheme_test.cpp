@@ -9,9 +9,9 @@
 #include <iomanip>
 #include <iostream>
 
-#include "lsjt_scheme.h"
-#include "basis.h"
-#include "many_body.h"
+#include "basis/lsjt_scheme.h"
+#include "basis/basis.h"
+#include "basis/many_body.h"
 
 ////////////////////////////////////////////////////////////////
 // test code

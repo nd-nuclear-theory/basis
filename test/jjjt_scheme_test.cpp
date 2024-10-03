@@ -10,9 +10,9 @@
 #include <iostream>
 
 
-#include "jjjt_scheme.h"
-#include "basis.h"
-#include "many_body.h"
+#include "basis/jjjt_scheme.h"
+#include "basis/basis.h"
+#include "basis/many_body.h"
 
 
 ////////////////////////////////////////////////////////////////

@@ -10,11 +10,11 @@
 #include <algorithm>
 #include <iostream>
 
-#include "hypersector.h"
+#include "basis/hypersector.h"
 
 #include "am/am.h"
-#include "basis.h"
-#include "lsjt_scheme.h"
+#include "basis/basis.h"
+#include "basis/lsjt_scheme.h"
 
 
 ////////////////////////////////////////////////////////////////

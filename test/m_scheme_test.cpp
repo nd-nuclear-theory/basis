@@ -8,8 +8,8 @@
 
 #include <iostream>
 
-#include "m_scheme.h"
-#include "nlj_orbital.h"
+#include "basis/m_scheme.h"
+#include "basis/nlj_orbital.h"
 
 ////////////////////////////////////////////////////////////////
 // test code
