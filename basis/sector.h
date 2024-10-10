@@ -329,21 +329,27 @@ namespace impl {
         // vectors of shared_ptrs to subspaces, so a copy only involves copying
         // those vectors and maps
         // if (!bra_space_ptr_)
-          bra_space_ptr_
-            = std::make_shared<const BraSpaceType>(std::forward<T>(bra_space));
-        // if (!ket_space_ptr_)
+        bra_space_ptr_
+          = std::make_shared<const BraSpaceType>(std::forward<T>(bra_space));
+
+        // if bra and ket spaces are identical, we can share the new copy we
+        // just made for the bra_space_ptr_
+        //
+        // note: this also ensures that if bra_space and ket_space are the
+        // same object, then if we just moved from bra_space we don't try to
+        // move from it again (which would be UB)
+        if constexpr (std::is_same_v<BraSpaceType,KetSpaceType>)
         {
-          // if bra and ket spaces are identical, we can share the new copy we
-          // just made for the bra_space_ptr_
-          //
-          // note: this also ensures that if bra_space and ket_space are the
-          // same object, then if we just moved from bra_space we don't try to
-          // move from it again (which would be UB)
           if (std::addressof(ket_space) == std::addressof(bra_space))
             ket_space_ptr_ = bra_space_ptr_;
           else
             ket_space_ptr_
               = std::make_shared<const KetSpaceType>(std::forward<U>(ket_space));
+        }
+        else
+        {
+          ket_space_ptr_
+            = std::make_shared<const KetSpaceType>(std::forward<U>(ket_space));
         }
       }
 
