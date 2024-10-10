@@ -155,6 +155,7 @@ namespace basis {
     int Jmax() const {return Jmax_;}
 
     // diagnostic string
+    std::string LabelStr() const;
     std::string DebugStr(bool show_subspaces=false) const;
 
     private:
@@ -336,6 +337,21 @@ namespace basis {
               }
           }
       }
+  }
+
+
+  std::string RelativeDegenerateSpaceLSJT::LabelStr() const
+  {
+    std::ostringstream os;
+
+    const int width = 0;  // for now, no fixed width
+
+    os << "["
+       << " " << std::setw(width) << std::get<0>(labels())
+       << " " << std::setw(width) << std::get<1>(labels())
+       << " " << "]";
+
+    return os.str();
   }
 
   std::string RelativeDegenerateSpaceLSJT::DebugStr(bool show_subspaces) const

@@ -652,8 +652,8 @@ namespace impl {
                     && !std::is_void_v<typename KetSpaceType::LabelsType>)
       {
         os << "sectors"
-           << "  bra space " << bra_space().labels()
-           << "  ket space " << ket_space().labels()
+           << "  bra space " << bra_space().LabelStr()
+           << "  ket space " << ket_space().LabelStr()
            << std::endl;
       }
       for (std::size_t sector_index=0; sector_index<size(); ++sector_index)
