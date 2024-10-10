@@ -445,16 +445,13 @@ class BaseProductState
 
   BaseProductState(const SubspaceType& subspace, const StateMultiIndexType& indices)
     // Construct state, given index within subspace.
-    : BaseStateType(subspace,indices)
-  {
-  }
+    : BaseStateType(subspace,subspace.MultiIndexToIndex(indices)), multiindex_{indices}
+  {}
 
   BaseProductState(const SubspaceType& subspace, std::size_t index)
     // Construct state, given index within subspace.
-    : BaseStateType(subspace,index)
-  {
-    multiindex_ = BaseStateType::subspace().IndexToMultiIndex(index);
-  }
+    : BaseStateType(subspace,index), multiindex_{subspace.IndexToMultiIndex(index)}
+  {}
 
   BaseProductState(const SubspaceType& subspace, const StateLabelsType& state_labels)
     // Construct state, by reverse lookup on labels within subspace.
