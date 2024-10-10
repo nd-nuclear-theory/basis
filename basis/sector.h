@@ -172,12 +172,33 @@ namespace impl {
         return (bra_subspace().dimension() * ket_subspace().dimension());
       }
 
+      // strings
+      std::string DebugStr() const;
+
       private:
       std::size_t bra_subspace_index_, ket_subspace_index_;
       std::size_t multiplicity_index_;
       std::shared_ptr<const BraSubspaceType> bra_subspace_ptr_;
       std::shared_ptr<const KetSubspaceType> ket_subspace_ptr_;
     };
+
+  template <typename tBraSubspaceType, typename tKetSubspaceType>
+    std::string BaseSector<tBraSubspaceType, tKetSubspaceType, false>::DebugStr() const
+    {
+      std::ostringstream os;
+        os << "  bra index " << bra_subspace_index()
+            << " labels " << bra_subspace().LabelStr()
+            << " size " << bra_subspace().size()
+            << " dim " << bra_subspace().dimension()
+            << "  ket index " << ket_subspace_index()
+            << " labels " << ket_subspace().LabelStr()
+            << " size " << ket_subspace().size()
+            << " dim " << ket_subspace().dimension()
+            << "  multiplicity index " << multiplicity_index()
+            << "  elements " << num_elements()
+            << std::endl;
+      return os.str();
+    }
 
   // Here we specialize to the case where the bra and ket subspaces have the
   // same type. We inherit all the functionality from the case where they
@@ -621,23 +642,22 @@ namespace impl {
     std::string BaseSectors<tBraSpaceType, tKetSpaceType, tSectorType, false>::DebugStr() const
     {
       std::ostringstream os;
+      if constexpr (!std::is_void_v<typename BraSpaceType::LabelsType>
+                    && !std::is_void_v<typename KetSpaceType::LabelsType>)
+      {
+        os << "sectors"
+           << "  bra space " << bra_space().labels()
+           << "  ket space " << ket_space().labels()
+           << std::endl;
+      }
       for (std::size_t sector_index=0; sector_index<size(); ++sector_index)
         {
           const SectorType& sector = GetSector(sector_index);
 
           os << "  sector " << sector_index
-             << "  bra index " << sector.bra_subspace_index()
-             << " labels " << sector.bra_subspace().LabelStr()
-             << " size " << sector.bra_subspace().size()
-             << " dim " << sector.bra_subspace().dimension()
-             << "  ket index " << sector.ket_subspace_index()
-             << " labels " << sector.ket_subspace().LabelStr()
-             << " size " << sector.ket_subspace().size()
-             << " dim " << sector.ket_subspace().dimension()
-             << "  multiplicity index " << sector.multiplicity_index()
-             << "  elements " << sector.num_elements()
-             << std::endl;
+             << sector.DebugStr();
         }
+      os << "size: " << size() << "  elements: " << num_elements() << std::endl;
       return os.str();
     }
 
