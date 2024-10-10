@@ -368,6 +368,14 @@ namespace impl {
       const_iterator cbegin() const { return sectors_.cbegin(); }
       const_iterator cend()   const { return sectors_.cend(); }
 
+#if (__cpp_lib_ranges >= 201911L) && !defined(NDEBUG)
+      static_assert(std::input_iterator<iterator>, "invalid input iterator");
+      static_assert(std::forward_iterator<iterator>, "invalid forward iterator");
+      static_assert(std::input_iterator<iterator>, "invalid input iterator");
+      static_assert(std::bidirectional_iterator<iterator>, "invalid bidirectional iterator");
+      static_assert(std::random_access_iterator<iterator>, "invalid random access iterator");
+#endif  // NDEBUG
+
       ////////////////////////////////////////////////////////////////
       // sector lookup and retrieval
       ////////////////////////////////////////////////////////////////

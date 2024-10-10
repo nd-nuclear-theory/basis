@@ -87,10 +87,13 @@ namespace impl {
       struct iterator
       {
         using iterator_category = std::random_access_iterator_tag;
+        using iterator_concept = std::random_access_iterator_tag;  // C++20 iterators have weaker requirements
         using difference_type = std::make_signed_t<std::size_t>;
         using value_type = const SubspaceType;
         using pointer = const SubspaceType*;
         using reference = const SubspaceType&;
+
+        iterator() = default;
 
         iterator(const tDerivedSpaceType* space_ptr, std::size_t index)
           : space_ptr_{space_ptr}, index_{index}
@@ -106,6 +109,7 @@ namespace impl {
         iterator& operator+=(difference_type n) { index_ += n; return *this; }
         iterator& operator-=(difference_type n) { index_ -= n; return *this; }
         friend iterator operator+(iterator it, difference_type n) { it += n; return it; }
+        friend iterator operator+(difference_type n, iterator it) { it += n; return it; }
         friend iterator operator-(iterator it, difference_type n) { it -= n; return it; }
         friend difference_type operator-(const iterator& lhs, const iterator& rhs)
         {
@@ -151,6 +155,14 @@ namespace impl {
       iterator end()    const { return iterator(static_cast<const tDerivedSpaceType*>(this), size()); }
       iterator cbegin() const { return iterator(static_cast<const tDerivedSpaceType*>(this), 0); }
       iterator cend()   const { return iterator(static_cast<const tDerivedSpaceType*>(this), size()); }
+
+#if (__cpp_lib_ranges >= 201911L) && !defined(NDEBUG)
+      static_assert(std::input_iterator<iterator>, "invalid input iterator");
+      static_assert(std::forward_iterator<iterator>, "invalid forward iterator");
+      static_assert(std::input_iterator<iterator>, "invalid input iterator");
+      static_assert(std::bidirectional_iterator<iterator>, "invalid bidirectional iterator");
+      static_assert(std::random_access_iterator<iterator>, "invalid random access iterator");
+#endif  // NDEBUG
 
       ////////////////////////////////////////////////////////////////
       // subspace lookup and retrieval

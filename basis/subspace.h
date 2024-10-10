@@ -108,12 +108,15 @@ namespace impl {
 
     struct iterator
     {
-      using iterator_category = std::input_iterator_tag;  // we don't satisfy the requirements of forward_iterator_tag because we return temporaries
+      using iterator_category = std::input_iterator_tag;  // we don't satisfy the requirements of LegacyForwardIterator because we return temporaries
+      using iterator_concept = std::random_access_iterator_tag;  // C++20 iterators have weaker requirements
       using difference_type = std::make_signed_t<std::size_t>;
       using value_type = tStateType;
       using pointer = void*;
       // using pointer = value_type*;  // n.b. we can't return a pointer to a temporary
       using reference = value_type;  // n.b. this can't be a reference since value_type is always a temporary
+
+      iterator() = default;
 
       iterator(const tDerivedSubspaceType* subspace_ptr, std::size_t index)
         : subspace_ptr_{subspace_ptr}, index_{index}
@@ -128,6 +131,7 @@ namespace impl {
       iterator& operator+=(difference_type n) { index_ += n; return *this; }
       iterator& operator-=(difference_type n) { index_ -= n; return *this; }
       friend iterator operator+(iterator it, difference_type n) { it += n; return it; }
+      friend iterator operator+(difference_type n, iterator it) { it += n; return it; }
       friend iterator operator-(iterator it, difference_type n) { it -= n; return it; }
       friend difference_type operator-(const iterator& lhs, const iterator& rhs)
       {

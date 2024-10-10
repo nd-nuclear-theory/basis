@@ -116,7 +116,8 @@ class BaseProductSubspace<tDerivedSubspaceType, tStateType, false, tFactorSubspa
 
   struct iterator
   {
-    using iterator_category = std::input_iterator_tag;  // we don't satisfy the requirements of forward_iterator_tag because we return temporaries
+    using iterator_category = std::input_iterator_tag;  // we don't satisfy the requirements of LegacyForwardIterator because we return temporaries
+    using iterator_concept = std::random_access_iterator_tag;  // C++20 iterators have weaker requirements
     using difference_type = std::make_signed_t<std::size_t>;
     using value_type = tStateType;
     using pointer = void*;
@@ -136,6 +137,7 @@ class BaseProductSubspace<tDerivedSubspaceType, tStateType, false, tFactorSubspa
     iterator& operator+=(difference_type n) { index_ += n; return *this; }
     iterator& operator-=(difference_type n) { index_ -= n; return *this; }
     friend iterator operator+(iterator it, difference_type n) { it += n; return it; }
+    friend iterator operator+(difference_type n, iterator it) { it += n; return it; }
     friend iterator operator-(iterator it, difference_type n) { it -= n; return it; }
     friend difference_type operator-(const iterator& lhs, const iterator& rhs)
     {
