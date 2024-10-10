@@ -17,7 +17,7 @@ if(BASIS_MASTER_PROJECT AND NOT CMAKE_BUILD_TYPE)
 endif()
 
 # specify the C++ standard
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 set(CMAKE_CXX_EXTENSIONS False)
 
@@ -56,7 +56,7 @@ endif()
 # define units
 set(${PROJECT_NAME}_UNITS_H
     basis type_traits map subspace state space sector
-    degenerate hypersector operator
+    degenerate hypersector operator product
     jt_operator
 )
 set(${PROJECT_NAME}_UNITS_H_CPP

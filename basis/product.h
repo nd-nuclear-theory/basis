@@ -3,7 +3,7 @@
   Define template base classes for indexing quantum mechanical product
   states arranged into subspaces.
 
-  Language: C++17
+  Language: C++20
 
   Patrick J. Fasano
   Argonne National Laboratory
@@ -14,6 +14,10 @@
 
 #ifndef BASIS_PRODUCT_H_
 #define BASIS_PRODUCT_H_
+
+#if !defined(__cpp_generic_lambdas) || (__cpp_generic_lambdas < 201707L)
+#error "C++20 generic lambdas are required"
+#endif
 
 #include <memory>
 #include <tuple>
