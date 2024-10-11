@@ -345,7 +345,7 @@ namespace impl {
       // allow BaseDegenerateSpace to access private members to override
       // PushSubspace and EmplaceSubspace
       template<typename, typename, typename> friend class BaseDegenerateSpace;
-      template<typename, typename, bool, typename...> friend class BaseProductSpace;
+      template<typename, typename, bool, typename, typename...> friend class BaseProductSpace;
 
       ////////////////////////////////////////////////////////////////
       // internal storage

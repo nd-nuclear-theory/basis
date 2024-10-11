@@ -15,10 +15,6 @@
 #ifndef BASIS_PRODUCT_H_
 #define BASIS_PRODUCT_H_
 
-#if !defined(__cpp_generic_lambdas) || (__cpp_generic_lambdas < 201707L)
-#error "C++20 generic lambdas are required"
-#endif
-
 #include <memory>
 #include <tuple>
 #include <utility>
@@ -60,15 +56,15 @@ constexpr auto sub2ind(std::array<std::size_t, sizeof...(Ts)> index, Ts... s)
 
 template<
     typename tDerivedSubspaceType, typename tStateType, bool bWithLabels,
-    typename... tFactorSubspaceTypes
+    typename tSequence, typename... tFactorSubspaceTypes
   >
 class BaseProductSubspace;
 
 template<
     typename tDerivedSubspaceType, typename tStateType,
-    typename... tFactorSubspaceTypes
+    std::size_t... Is, typename... tFactorSubspaceTypes
   >
-class BaseProductSubspace<tDerivedSubspaceType, tStateType, false, tFactorSubspaceTypes...>
+class BaseProductSubspace<tDerivedSubspaceType, tStateType, false, std::index_sequence<Is...>, tFactorSubspaceTypes...>
   // : public BaseSubspace<
   //     tDerivedSubspaceType,
   //     std::tuple<typename tFactorSubspaceTypes::SubspaceLabelsType...>,
@@ -218,32 +214,26 @@ class BaseProductSubspace<tDerivedSubspaceType, tStateType, false, tFactorSubspa
 
   StateMultiIndexType IndexToMultiIndex(std::size_t index) const
   {
-    return [&]<std::size_t... Is>(std::index_sequence<Is...>) {
-        return (
-            (index != kNone)
-            ? ind2sub(index, GetFactorSubspace<Is>().size()...)
-            : StateMultiIndexType{((void)Is, kNone)...}  // (void) to suppress unused warning
-          );
-      }(std::index_sequence_for<tFactorSubspaceTypes...>{});
+    return (
+        (index != kNone)
+        ? ind2sub(index, GetFactorSubspace<Is>().size()...)
+        : StateMultiIndexType{((void)Is, kNone)...}  // (void) to suppress unused warning
+      );
   }
 
   std::size_t MultiIndexToIndex(const StateMultiIndexType& indices) const
   {
-    return [&]<std::size_t... Is>(std::index_sequence<Is...>) {
-        return (
-            ((std::get<Is>(indices) != kNone) && ...)
-            ? sub2ind(indices, GetFactorSubspace<Is>().size()...)
-            : kNone
-          );
-      }(std::index_sequence_for<tFactorSubspaceTypes...>{});
+    return (
+        ((std::get<Is>(indices) != kNone) && ...)
+        ? sub2ind(indices, GetFactorSubspace<Is>().size()...)
+        : kNone
+      );
   }
 
   StateLabelsRef GetStateLabels(const StateMultiIndexType& indices) const
   {
     // construct tuple from state labels
-    return [&]<std::size_t... Is>(std::index_sequence<Is...>) {
-        return std::forward_as_tuple(GetFactorSubspace<Is>().GetStateLabels(indices[Is])...);
-      }(std::index_sequence_for<tFactorSubspaceTypes...>{});
+    return std::forward_as_tuple(GetFactorSubspace<Is>().GetStateLabels(indices[Is])...);
   }
 
   StateLabelsRef GetStateLabels(std::size_t index) const
@@ -255,9 +245,7 @@ class BaseProductSubspace<tDerivedSubspaceType, tStateType, false, tFactorSubspa
   /// Given the labels for a state, returns whether or not the state
   /// is found within the subspace.
   {
-    return [&]<std::size_t... Is>(std::index_sequence<Is...>) {
-        return (GetFactorSubspace<Is>().ContainsState(std::get<Is>(state_labels)) && ...);
-      }(std::index_sequence_for<tFactorSubspaceTypes...>{});
+    return (GetFactorSubspace<Is>().ContainsState(std::get<Is>(state_labels)) && ...);
   }
 
   StateMultiIndexType LookUpStateMultiIndex(const StateLabelsType& state_labels) const
@@ -266,11 +254,9 @@ class BaseProductSubspace<tDerivedSubspaceType, tStateType, false, tFactorSubspa
   ///
   /// If no such labels are found, basis::kNone is returned.
   {
-    return [&]<std::size_t... Is>(std::index_sequence<Is...>) {
-        return StateMultiIndexType{
-            GetFactorSubspace<Is>().LookUpStateIndex(std::get<Is>(state_labels))...
-          };
-      }(std::index_sequence_for<tFactorSubspaceTypes...>{});
+    return StateMultiIndexType{
+        GetFactorSubspace<Is>().LookUpStateIndex(std::get<Is>(state_labels))...
+      };
   }
 
   std::size_t LookUpStateIndex(const StateLabelsType& state_labels) const
@@ -306,17 +292,13 @@ class BaseProductSubspace<tDerivedSubspaceType, tStateType, false, tFactorSubspa
   std::size_t size() const
   {
     // fold size over multiplication
-    return [&]<std::size_t... Is>(std::index_sequence<Is...>) {
-        return (GetFactorSubspace<Is>().size() * ...);
-      }(std::index_sequence_for<tFactorSubspaceTypes...>{});
+    return (GetFactorSubspace<Is>().size() * ...);
   }
 
   std::size_t dimension() const
   {
     // fold dimension over multiplication
-    return [&]<std::size_t... Is>(std::index_sequence<Is...>) {
-        return (GetFactorSubspace<Is>().dimension() * ...);
-      }(std::index_sequence_for<tFactorSubspaceTypes...>{});
+    return (GetFactorSubspace<Is>().dimension() * ...);
   }
 
  private:
@@ -329,10 +311,10 @@ class BaseProductSubspace<tDerivedSubspaceType, tStateType, false, tFactorSubspa
 
 template<
     typename tDerivedSubspaceType, typename tStateType,
-    typename... tFactorSubspaceTypes
+    std::size_t... Is, typename... tFactorSubspaceTypes
   >
 tStateType
-BaseProductSubspace<tDerivedSubspaceType,tStateType,false,tFactorSubspaceTypes...>::GetState(
+BaseProductSubspace<tDerivedSubspaceType,tStateType,false,std::index_sequence<Is...>,tFactorSubspaceTypes...>::GetState(
     std::size_t index
   ) const
 {
@@ -341,10 +323,10 @@ BaseProductSubspace<tDerivedSubspaceType,tStateType,false,tFactorSubspaceTypes..
 
 template<
     typename tDerivedSubspaceType, typename tStateType,
-    typename... tFactorSubspaceTypes
+    std::size_t... Is, typename... tFactorSubspaceTypes
   >
 tStateType
-BaseProductSubspace<tDerivedSubspaceType,tStateType, false,tFactorSubspaceTypes...>::GetState(
+BaseProductSubspace<tDerivedSubspaceType,tStateType,false,std::index_sequence<Is...>,tFactorSubspaceTypes...>::GetState(
     const StateMultiIndexType& indices
   ) const
 {
@@ -353,10 +335,10 @@ BaseProductSubspace<tDerivedSubspaceType,tStateType, false,tFactorSubspaceTypes.
 
 template<
     typename tDerivedSubspaceType, typename tStateType,
-    typename... tFactorSubspaceTypes
+    std::size_t... Is, typename... tFactorSubspaceTypes
   >
 tStateType
-BaseProductSubspace<tDerivedSubspaceType,tStateType,false,tFactorSubspaceTypes...>::GetState(
+BaseProductSubspace<tDerivedSubspaceType,tStateType,false,std::index_sequence<Is...>,tFactorSubspaceTypes...>::GetState(
     const StateLabelsType& state_labels
   ) const
 {
@@ -367,10 +349,10 @@ BaseProductSubspace<tDerivedSubspaceType,tStateType,false,tFactorSubspaceTypes..
 // inherit from BaseSubspace and add labels
 template<
     typename tDerivedSubspaceType, typename tStateType,
-    typename... tFactorSubspaceTypes
+    std::size_t... Is, typename... tFactorSubspaceTypes
   >
-class BaseProductSubspace<tDerivedSubspaceType, tStateType, true, tFactorSubspaceTypes...>
-  : public BaseProductSubspace<tDerivedSubspaceType, tStateType, false, tFactorSubspaceTypes...>
+class BaseProductSubspace<tDerivedSubspaceType, tStateType, true, std::index_sequence<Is...>, tFactorSubspaceTypes...>
+  : public BaseProductSubspace<tDerivedSubspaceType, tStateType, false, std::index_sequence<Is...>, tFactorSubspaceTypes...>
 {
  public:
   ////////////////////////////////////////////////////////////////
@@ -394,7 +376,7 @@ class BaseProductSubspace<tDerivedSubspaceType, tStateType, true, tFactorSubspac
 
   // inherit constructors
   using BaseProductSubspace<
-      tDerivedSubspaceType, tStateType, false, tFactorSubspaceTypes...
+      tDerivedSubspaceType, tStateType, false, std::index_sequence<Is...>, tFactorSubspaceTypes...
     >::BaseProductSubspace;
 
   ////////////////////////////////////////////////////////////////
@@ -405,9 +387,7 @@ class BaseProductSubspace<tDerivedSubspaceType, tStateType, true, tFactorSubspac
   /// Return the labels of the subspace itself.
   {
     // fold size over multiplication
-    return [&]<std::size_t... Is>(std::index_sequence<Is...>) {
-        return std::forward_as_tuple(BaseProductSubspace::template GetFactorSubspace<Is>().labels()...);
-      }(std::index_sequence_for<tFactorSubspaceTypes...>{});
+    return std::forward_as_tuple(BaseProductSubspace::template GetFactorSubspace<Is>().labels()...);
   }
 };
 
@@ -537,13 +517,13 @@ struct NestedLoop<Depth,Depth>
 // declare BaseSpace template
 template <
   typename tDerivedSpaceType, typename tSubspaceType, bool bWithLabels,
-  typename... tFactorSpaceTypes
+  typename tSequence, typename... tFactorSpaceTypes
   >
 class BaseProductSpace;
 
 // specialize class for case with no labels
-template <typename tDerivedSpaceType, typename tSubspaceType, typename... tFactorSpaceTypes>
-class BaseProductSpace<tDerivedSpaceType, tSubspaceType, false, tFactorSpaceTypes...>
+template <typename tDerivedSpaceType, typename tSubspaceType, std::size_t... Is, typename... tFactorSpaceTypes>
+class BaseProductSpace<tDerivedSpaceType, tSubspaceType, false, std::index_sequence<Is...>, tFactorSpaceTypes...>
   : public BaseSpace<tDerivedSpaceType, tSubspaceType, void>
 {
  public:
@@ -567,18 +547,16 @@ class BaseProductSpace<tDerivedSpaceType, tSubspaceType, false, tFactorSpaceType
   explicit BaseProductSpace(std::shared_ptr<const tFactorSpaceTypes>... factor_spaces)
     : factor_space_ptrs_{std::move(factor_spaces)...}
   {
-    [&]<std::size_t... Is>(std::index_sequence<Is...>) {
-        auto bounds = std::array<std::size_t,sizeof...(Is)>{this->GetFactorSpace<Is>().size()...};
-        NestedLoop<sizeof...(tFactorSpaceTypes)>{}(
-            [&,this](auto... indices) {
-                this->subspace_offsets_.push_back(this->dimension_);
-                this->dimension_ += (this->GetFactorSpace<Is>().GetSubspace(indices).dimension() * ...);
-              },
-              bounds
-          );
-      if ((GetFactorSpace<Is>().dimension() * ...) != this->dimension_)
-        throw std::logic_error("dimension mismatch");
-    }(std::index_sequence_for<tFactorSpaceTypes...>{});
+    auto bounds = std::array<std::size_t,sizeof...(Is)>{this->GetFactorSpace<Is>().size()...};
+    NestedLoop<sizeof...(tFactorSpaceTypes)>{}(
+        [&,this](auto... indices) {
+            this->subspace_offsets_.push_back(this->dimension_);
+            this->dimension_ += (this->GetFactorSpace<Is>().GetSubspace(indices).dimension() * ...);
+          },
+          bounds
+      );
+    if ((GetFactorSpace<Is>().dimension() * ...) != this->dimension_)
+      throw std::logic_error("dimension mismatch");
   }
 
  public:
@@ -600,33 +578,27 @@ class BaseProductSpace<tDerivedSpaceType, tSubspaceType, false, tFactorSpaceType
 
   SubspaceMultiIndexType IndexToMultiIndex(std::size_t index) const
   {
-    return [&]<std::size_t... Is>(std::index_sequence<Is...>) {
-        return (
-            (index != kNone)
-            ? ind2sub(index, GetFactorSpace<Is>().size()...)
-            : SubspaceMultiIndexType{((void)Is, kNone)...}  // (void) to suppress unused warning
-          );
-      }(std::index_sequence_for<tFactorSpaceTypes...>{});
+    return (
+        (index != kNone)
+        ? ind2sub(index, GetFactorSpace<Is>().size()...)
+        : SubspaceMultiIndexType{((void)Is, kNone)...}  // (void) to suppress unused warning
+      );
   }
 
   std::size_t MultiIndexToIndex(const SubspaceMultiIndexType& indices) const
   {
-    return [&]<std::size_t... Is>(std::index_sequence<Is...>) {
-        return (
-            ((std::get<Is>(indices) != kNone) && ...)
-            ? sub2ind(indices, GetFactorSpace<Is>().size()...)
-            : kNone
-          );
-      }(std::index_sequence_for<tFactorSpaceTypes...>{});
+    return (
+        ((std::get<Is>(indices) != kNone) && ...)
+        ? sub2ind(indices, GetFactorSpace<Is>().size()...)
+        : kNone
+      );
   }
 
   bool ContainsSubspace(const SubspaceLabelsType& subspace_labels) const
   /// Given the labels for a state, returns whether or not the state
   /// is found within the subspace.
   {
-    return [&]<std::size_t... Is>(std::index_sequence<Is...>) {
-        return (GetFactorSpace<Is>().ContainsSubspace(std::get<Is>(subspace_labels)) && ...);
-      }(std::index_sequence_for<tFactorSpaceTypes...>{});
+    return (GetFactorSpace<Is>().ContainsSubspace(std::get<Is>(subspace_labels)) && ...);
   }
 
   SubspaceMultiIndexType LookUpSubspaceMultiIndex(const SubspaceLabelsType& subspace_labels) const
@@ -635,11 +607,9 @@ class BaseProductSpace<tDerivedSpaceType, tSubspaceType, false, tFactorSpaceType
   ///
   /// If no such labels are found, basis::kNone is returned.
   {
-    return [&]<std::size_t... Is>(std::index_sequence<Is...>)->decltype(auto) {
-        return SubspaceMultiIndexType{
-            GetFactorSpace<Is>().LookUpSubspaceIndex(std::get<Is>(subspace_labels))...
-          };
-      }(std::index_sequence_for<tFactorSpaceTypes...>{});
+    return SubspaceMultiIndexType{
+        GetFactorSpace<Is>().LookUpSubspaceIndex(std::get<Is>(subspace_labels))...
+      };
   }
 
   std::size_t LookUpSubspaceIndex(const SubspaceLabelsType& subspace_labels) const
@@ -685,48 +655,46 @@ class BaseProductSpace<tDerivedSpaceType, tSubspaceType, false, tFactorSpaceType
 // declaration to delay instantiation until tDerivedSubspaceType and
 // tStateType are complete types
 
-template <typename tDerivedSpaceType, typename tSubspaceType, typename... tFactorSpaceTypes>
-tSubspaceType BaseProductSpace<tDerivedSpaceType,tSubspaceType,false,tFactorSpaceTypes...>::GetSubspace(
+template <typename tDerivedSpaceType, typename tSubspaceType, std::size_t... Is, typename... tFactorSpaceTypes>
+tSubspaceType BaseProductSpace<tDerivedSpaceType,tSubspaceType,false,std::index_sequence<Is...>, tFactorSpaceTypes...>::GetSubspace(
     const SubspaceMultiIndexType& indices
   ) const
 {
-    return [&]<std::size_t... Is>(std::index_sequence<Is...>) -> decltype(auto) {
-        return tSubspaceType{
-              GetFactorSpace<Is>().GetSubspacePtr(std::get<Is>(indices))...
-            };
-      }(std::index_sequence_for<tFactorSpaceTypes...>{});
+  return tSubspaceType{
+        GetFactorSpace<Is>().GetSubspacePtr(std::get<Is>(indices))...
+      };
 }
 
-template <typename tDerivedSpaceType, typename tSubspaceType, typename... tFactorSpaceTypes>
-tSubspaceType BaseProductSpace<tDerivedSpaceType,tSubspaceType,false,tFactorSpaceTypes...>::GetSubspace(
+template <typename tDerivedSpaceType, typename tSubspaceType, std::size_t... Is, typename... tFactorSpaceTypes>
+tSubspaceType BaseProductSpace<tDerivedSpaceType,tSubspaceType,false,std::index_sequence<Is...>, tFactorSpaceTypes...>::GetSubspace(
     std::size_t index
   ) const
 {
-    auto indices = IndexToMultiIndex(index);
-    return GetSubspace(indices);
+  auto indices = IndexToMultiIndex(index);
+  return GetSubspace(indices);
 }
 
-template <typename tDerivedSpaceType, typename tSubspaceType, typename... tFactorSpaceTypes>
-tSubspaceType BaseProductSpace<tDerivedSpaceType,tSubspaceType,false,tFactorSpaceTypes...>::LookUpSubspace(
+template <typename tDerivedSpaceType, typename tSubspaceType, std::size_t... Is, typename... tFactorSpaceTypes>
+tSubspaceType BaseProductSpace<tDerivedSpaceType,tSubspaceType,false,std::index_sequence<Is...>, tFactorSpaceTypes...>::LookUpSubspace(
     const SubspaceLabelsType& subspace_labels
   ) const
 {
-    auto indices = LookUpSubspaceMultiIndex(subspace_labels);
-    return GetSubspace(indices);
+  auto indices = LookUpSubspaceMultiIndex(subspace_labels);
+  return GetSubspace(indices);
 }
 
 
 // inherit from BaseSpace and add labels
-template <typename tDerivedSpaceType, typename tSubspaceType, typename... tFactorSpaceTypes>
-class BaseProductSpace<tDerivedSpaceType, tSubspaceType, true, tFactorSpaceTypes...>
-  : public BaseProductSpace<tDerivedSpaceType, tSubspaceType, false, tFactorSpaceTypes...>
+template <typename tDerivedSpaceType, typename tSubspaceType, std::size_t... Is, typename... tFactorSpaceTypes>
+class BaseProductSpace<tDerivedSpaceType, tSubspaceType, true, std::index_sequence<Is...>, tFactorSpaceTypes...>
+  : public BaseProductSpace<tDerivedSpaceType, tSubspaceType, false, std::index_sequence<Is...>, tFactorSpaceTypes...>
 {
  private:
 
   ////////////////////////////////////////////////////////////////
   // private (convenience) typedefs
   ////////////////////////////////////////////////////////////////
-  using BaseProductSpaceType = BaseProductSpace<tDerivedSpaceType, tSubspaceType, false, tFactorSpaceTypes...>;
+  using BaseProductSpaceType = BaseProductSpace<tDerivedSpaceType, tSubspaceType, false, std::index_sequence<Is...>, tFactorSpaceTypes...>;
 
  public:
 
@@ -756,9 +724,7 @@ class BaseProductSpace<tDerivedSpaceType, tSubspaceType, true, tFactorSpaceTypes
   LabelsRef labels() const
   /// Return the labels of the subspace itself.
   {
-    return [&]<std::size_t... Is>(std::index_sequence<Is...>) {
-        return std::forward_as_tuple(BaseProductSpace::template GetFactorSpace<Is>().labels()...);
-      }(std::index_sequence_for<tFactorSpaceTypes...>{});
+    return std::forward_as_tuple(BaseProductSpace::template GetFactorSpace<Is>().labels()...);
   }
 };
 
@@ -772,6 +738,7 @@ using BaseProductSubspace
   = impl::BaseProductSubspace<
       tDerivedSubspaceType, tStateType,
       !(std::is_void_v<typename tFactorSubspaceTypes::LabelsType> || ...),
+      std::index_sequence_for<tFactorSubspaceTypes...>,
       tFactorSubspaceTypes...
     >;
 
@@ -786,6 +753,7 @@ using BaseProductSpace
   = impl::BaseProductSpace<
       tDerivedSpaceType, tSubspaceType,
       !(std::is_void_v<typename tFactorSpaceTypes::LabelsType> || ...),
+      std::index_sequence_for<tFactorSpaceTypes...>,
       tFactorSpaceTypes...
     >;
 }  // namespace basis

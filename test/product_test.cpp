@@ -53,11 +53,11 @@ class TestProductSubspace
 };
 
 class TestProductSpace
-  : public basis::impl::BaseProductSpace<TestProductSpace, TestProductSubspace, false, basis::OrbitalSpacePN, basis::OrbitalSpacePN>
+  : public basis::BaseProductSpace<TestProductSpace, TestProductSubspace, basis::OrbitalSpacePN, basis::OrbitalSpacePN>
 {
  public:
-  using BaseProductSpaceType = basis::impl::BaseProductSpace<
-      TestProductSpace, TestProductSubspace, false, basis::OrbitalSpacePN, basis::OrbitalSpacePN
+  using BaseProductSpaceType = basis::BaseProductSpace<
+      TestProductSpace, TestProductSubspace, basis::OrbitalSpacePN, basis::OrbitalSpacePN
     >;
 
   TestProductSpace() = default;
