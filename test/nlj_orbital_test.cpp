@@ -1,5 +1,5 @@
 /****************************************************************
-  jjjpnorb_scheme_test.cpp
+  nlj_orbital_test.cpp
 
   Mark A. Caprio
   University of Notre Dame
@@ -184,10 +184,10 @@ void TestLJSectors() {
 int main(int argc, char **argv)
 {
 
-  std::string filename("test/jjjpnorb_scheme_test_orbitals_Nmax04.dat");
+  std::string filename("test/nlj_orbital_test_orbitals_Nmax04.dat");
   TestOrbitalsNmax(filename);
   TestOrbitalsRead(filename);
-  std::string filename2("test/ljpn_scheme_test_orbitals_Nmax04.dat");
+  std::string filename2("test/nlj_orbital_test_ljorbitals_Nmax04.dat");
   TestLJOrbitalsNmax(filename2);
   TestLJOrbitalsRead(filename2);
 
