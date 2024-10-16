@@ -461,6 +461,28 @@ namespace impl {
           );
       }
 
+      const SectorType& LookUpSector(const typename SectorType::KeyType& key) const
+      {
+        std::size_t sector_index = LookUpSectorIndex(key);
+        if (sector_index==kNone)
+          throw std::out_of_range("key not found");
+        return GetSector(sector_index);
+      }
+
+      const SectorType& LookUpSector(
+          std::size_t bra_subspace_index,
+          std::size_t ket_subspace_index,
+          std::size_t multiplicity_index=1
+        ) const
+      {
+        std::size_t sector_index = LookUpSectorIndex(
+            bra_subspace_index, ket_subspace_index, multiplicity_index
+          );
+        if (sector_index==kNone)
+          throw std::out_of_range("key not found");
+        return GetSector(sector_index);
+      }
+
       std::size_t GetSectorOffset(std::size_t i) const
       /// Given the index for a sector, return the offset of the sector in
       /// the full matrix indexing.
