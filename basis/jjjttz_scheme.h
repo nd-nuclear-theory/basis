@@ -1,46 +1,15 @@
 /************************************************************//**
   @file jjjttz_scheme.h
 
-  Defines two-body state indexing in jjJT coupling scheme.
-  Written for use in Moshinsky transformation.
-
-  Indexing is in each case broken into a *subspace* (described by JTg
-  labels and an Nmax trunction) and then indexed states within the
-  subspace.
-
-  Variant indexing schemes where the subspaces are further broken down
-  by the number of oscillator quanta N are then provided, so that the
-  Moshinsky transformation implementation can be more easily broken
-  down by N blocks.
-
-  See notes "Moshinsky xform for operators" (2015) for derivation
-  of indexing scheme.
+  Defines two-body state indexing in jjJTTz coupling scheme.
 
   Language: C++11
 
   Mark A. Caprio
   University of Notre Dame
 
-  + 11/26/15 (mac): Created, following analogous code for LSJT
-    scheme in indexing_lsjt.
-  + 7/6/16 (mac): Overhaul to new basis module conventions.
-  + 7/7/16 (mac): Add fixed-N subspaces in two-body basis.
-  + 7/9/16 (mac): Add default constructors.
-  + 7/16/16 (mac):
-    - Add debug strings.
-    - Move N to least significant subspace label in NLSJT basis.
-  + 7/17/16 (mac):
-    - Rename NJJJTTz to JJJTTzN.
-    - Remove unnecessary complication of matching subspace Nmax
-      to g.
-    - Add one-body (square) truncation on two-body bases.
-  + 7/19/16 (mac): Use enum Rank for truncation rank.
-  + 05/09/19 (pjf): Use std::size_t for indices and sizes, to prevent
-    integer overflow.
-  + 05/27/19 (pjf): Update to initialize BaseSectors with spaces.
-  + 07/03/21 (pjf): Call base class constructor for initializing labels.
-  + 07/04/21 (pjf): Pass derived subspace class as template argument to
-    BaseSubspace.
+  + Created by zz from jjjt_scheme ~12/17/23.
+  + 01/28/25 (mac): Add accessors for operator properties.
 
 ****************************************************************/
 
@@ -56,11 +25,10 @@
 #include "basis/basis.h"
 #include "basis/many_body.h"
 
-
 namespace basis {
 
   ////////////////////////////////////////////////////////////////
-  // two-body states in jjJT scheme
+  // two-body states in jjJTTz scheme
   ////////////////////////////////////////////////////////////////
 
   ////////////////////////////////////////////////////////////////
@@ -291,6 +259,15 @@ namespace basis {
     // tensorial and parity character ("constrained" sector
     // enumeration).
 
+    // accessors
+    int J0() const {return J0_;};
+    int g0() const {return g0_;};
+    int Tz0() const {return Tz0_;};
+
+    private:
+
+    // operator properties
+    int J0_, g0_, Tz0_;
   };
   ////////////////////////////////////////////////////////////////
   ////////////////////////////////////////////////////////////////

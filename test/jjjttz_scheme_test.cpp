@@ -57,7 +57,7 @@ void TestTwoBody()
   int Tz0 = 0;
   basis::TwoBodySectorsJJJTTz sectors(space,J0,g0,Tz0);
 
-  std::cout << " J0 " << J0 << " g0 " << g0 << " Tz0 " << Tz0 << std::endl;
+  std::cout << " J0 " << sectors.J0() << " g0 " << sectors.g0() << " Tz0 " << sectors.Tz0() << std::endl;
   for (std::size_t sector_index=0; sector_index < sectors.size(); ++sector_index)
     {
       std::size_t bra_subspace_index = sectors.GetSector(sector_index).bra_subspace_index();

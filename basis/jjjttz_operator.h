@@ -1,19 +1,15 @@
 /************************************************************//**
-  @file jjjt_operator.h
+  @file jjjtz_operator.h
 
   Defines functions for I/O and manipulation of two-body operator
-  matrices in jjJT coupling scheme.  Written for use in Moshinsky
-  transformation.
+  matrices in jjJTTz coupling scheme.
 
   Language: C++11
 
   Mark A. Caprio
   University of Notre Dame
 
-  + 07/13/16 (mac): Created, adapting code from lsjt_operator.
-  + 11/04/16 (mac): Remove dependency on Eigen/Core.
-  + 05/09/19 (pjf): Use std::size_t for indices and sizes, to prevent
-    integer overflow.
+  + Created by zz from jjjt_operator ~12/17/23.
 
 ****************************************************************/
 

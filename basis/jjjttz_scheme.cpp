@@ -199,7 +199,7 @@ namespace basis {
       int J0, int g0, int Tz0,
       basis::SectorDirection sector_direction
     )
-    : BaseSectors(space)
+    : BaseSectors(space), J0_(J0), g0_(g0), Tz0_(Tz0)
   {
     for (std::size_t bra_subspace_index=0; bra_subspace_index<space.size(); ++bra_subspace_index)
       for (std::size_t ket_subspace_index=0; ket_subspace_index<space.size(); ++ket_subspace_index)
