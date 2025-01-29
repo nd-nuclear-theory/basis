@@ -35,7 +35,7 @@ namespace basis {
   //
   // Labeling
   //
-  // subspace labels: (J,T,Tz,g)    P=(-)^g
+  // subspace labels: (J,T,g,Tz)    P=(-)^g
   //
   //   J (int): total angular momentum
   //   T (int): isospin
