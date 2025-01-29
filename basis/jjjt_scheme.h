@@ -41,6 +41,7 @@
   + 07/03/21 (pjf): Call base class constructor for initializing labels.
   + 07/04/21 (pjf): Pass derived subspace class as template argument to
     BaseSubspace.
+  + 01/29/25 (mac): Add accessors for operator properties.
 
 ****************************************************************/
 
@@ -523,6 +524,16 @@ namespace basis {
     // tensorial and parity character ("constrained" sector
     // enumeration).
 
+    // accessors
+    int J0() const {return J0_;};
+    int g0() const {return g0_;};
+    int T0() const {return T0_;};
+
+    private:
+
+    // operator properties
+    int J0_, g0_, T0_;
+    
   };
 
 
