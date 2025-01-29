@@ -287,6 +287,16 @@ namespace basis {
     // tensorial and parity character ("constrained" sector
     // enumeration).
 
+    // accessors
+    int J0() const {return J0_;};
+    int T0() const {return T0_;};
+    int g0() const {return g0_;};
+
+    private:
+
+    // operator properties
+    int J0_, T0_, g0_;
+
   };
 
   ////////////////////////////////////////////////////////////////
@@ -526,13 +536,13 @@ namespace basis {
 
     // accessors
     int J0() const {return J0_;};
-    int g0() const {return g0_;};
     int T0() const {return T0_;};
+    int g0() const {return g0_;};
 
     private:
 
     // operator properties
-    int J0_, g0_, T0_;
+    int J0_, T0_, g0_;
     
   };
 
