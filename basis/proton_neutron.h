@@ -57,7 +57,8 @@ namespace basis {
   // Example:
   //   std::string orbital_species_code = "p";
   //   ...
-  //   os << basis::kTzOrbitalSpeciesPNCode[orbital_species_code];
+  //   // os << basis::kCharCodeOrbitalSpeciesPN[orbital_species_code];  // <- this gives error since unordered_map::operator[] is not const
+  //   basis::OrbitalSpeciesPN orbital_species = basis::kCharCodeOrbitalSpeciesPN.at(orbital_species_code);
   //
   // Note: Tz uses "up quark is positive" convention.
   extern const std::unordered_map<HalfInt, OrbitalSpeciesPN> kTzCodeOrbitalSpeciesPN;
@@ -108,12 +109,7 @@ namespace basis {
   // Use of these arrays requires conversion of the OperatorTypePN to int.
   extern const std::array<const char*,3> kOperatorTypePNCodeChar;  // {"p","n","total"}
 
-  // notational reverse definitions for proton-neutron operator types
-  //
-  // Example:
-  //   std::string operator_species_code = "p";
-  //   ...
-  //   os << kCharCodeOperatorTypePN[operator_species_code];
+  // reverse lookups for proton-neutron operator types
   extern const std::unordered_map<std::string,OperatorTypePN> kCharCodeOperatorTypePN;
 
 
