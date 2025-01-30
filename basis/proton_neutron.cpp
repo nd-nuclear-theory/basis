@@ -19,6 +19,7 @@ namespace basis {
   const std::array<int,2> kOrbitalSpeciesPNCodeDecimal({1,2});
   const std::array<const char*,2> kOrbitalSpeciesPNCodeChar({"p","n"});
 
+  // reverse lookups for orbital species
   const std::unordered_map<HalfInt, OrbitalSpeciesPN> kTzCodeOrbitalSpeciesPN({
       {HalfInt(+1,2),OrbitalSpeciesPN::kP},
       {HalfInt(-1,2),OrbitalSpeciesPN::kN}
@@ -32,8 +33,8 @@ namespace basis {
       {2,OrbitalSpeciesPN::kN}
     });
   const std::unordered_map<std::string, OrbitalSpeciesPN> kCharCodeOrbitalSpeciesPN({
-    {"p",OrbitalSpeciesPN::kP},
-    {"n",OrbitalSpeciesPN::kN}
+      {"p",OrbitalSpeciesPN::kP},
+      {"n",OrbitalSpeciesPN::kN}
     });
 
   ////////////////////////////////////////////////////////////////
@@ -45,6 +46,28 @@ namespace basis {
   const std::array<int,3> kTwoBodySpeciesPNCodeDecimal({11,22,12});
   const std::array<const char*,3> kTwoBodySpeciesPNCodeChar({"pp","nn","pn"});
 
+  // reverse lookups for two-body species
+  const std::unordered_map<int, TwoBodySpeciesPN> kTzCodeTwoBodySpeciesPN({
+      {+1,TwoBodySpeciesPN::kPP},
+      {-1,TwoBodySpeciesPN::kNN},
+      {0,TwoBodySpeciesPN::kPN}
+    });
+  const std::unordered_map<int, TwoBodySpeciesPN> kIndexCodeTwoBodySpeciesPN({
+      {0,TwoBodySpeciesPN::kPP},
+      {1,TwoBodySpeciesPN::kNN},
+      {2,TwoBodySpeciesPN::kPN},
+    });
+  const std::unordered_map<int, TwoBodySpeciesPN> kDecimalCodeTwoBodySpeciesPN({
+      {11,TwoBodySpeciesPN::kPP},
+      {22,TwoBodySpeciesPN::kNN},
+      {12,TwoBodySpeciesPN::kPN}
+    });
+  const std::unordered_map<std::string, TwoBodySpeciesPN> kCharCodeTwoBodySpeciesPN({
+      {"pp",TwoBodySpeciesPN::kPP},
+      {"nn",TwoBodySpeciesPN::kNN},
+      {"pn",TwoBodySpeciesPN::kPN}
+    });
+  
   ////////////////////////////////////////////////////////////////
   // proton-neutron operator types
   ////////////////////////////////////////////////////////////////

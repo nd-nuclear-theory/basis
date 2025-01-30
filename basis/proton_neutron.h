@@ -12,6 +12,7 @@
   + 10/19/17 (mac): Define OperatorTypePN.
   + 02/27/19 (pjf): Add reverse lookups for OrbitalSpeciesPN.
   + 08/14/19 (pjf): Add reverse lookup for OperatorTypePN.
+  + 01/29/25 (mac): Add reverse lookup for TwoBodySpeciesPN.
 
 ****************************************************************/
 
@@ -51,7 +52,7 @@ namespace basis {
   extern const std::array<int, 2> kOrbitalSpeciesPNCodeDecimal;
   extern const std::array<const char*, 2> kOrbitalSpeciesPNCodeChar;
 
-  // notational reverse definitions for orbital species
+  // reverse lookups for orbital species
   //
   // Example:
   //   std::string orbital_species_code = "p";
@@ -87,7 +88,13 @@ namespace basis {
   extern const std::array<int,3> kTwoBodySpeciesPNCodeDecimal;  // {11,22,12} -- used by MFDn
   extern const std::array<const char*,3> kTwoBodySpeciesPNCodeChar;  // {"pp","nn","pn"}
 
-
+  // reverse lookups for two-body species
+  // Note: Tz uses "up quark is positive" convention.
+  extern const std::unordered_map<int, TwoBodySpeciesPN> kTzCodeTwoBodySpeciesPN;
+  extern const std::unordered_map<int, TwoBodySpeciesPN> kIndexCodeTwoBodySpeciesPN;
+  extern const std::unordered_map<int, TwoBodySpeciesPN> kDecimalCodeTwoBodySpeciesPN;
+  extern const std::unordered_map<std::string, TwoBodySpeciesPN> kCharCodeTwoBodySpeciesPN;
+  
   ////////////////////////////////////////////////////////////////
   // proton-neutron operator types
   ////////////////////////////////////////////////////////////////
