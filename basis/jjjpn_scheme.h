@@ -45,7 +45,8 @@
   + 07/03/21 (pjf): Call base class constructor for initializing labels.
   + 07/04/21 (pjf): Pass derived subspace class as template argument to
     BaseSubspace.
-  + 02/03/25 (mac): Add orbital_space() accessor.
+  + 02/03/25 (mac): Add pointer to orbital_space from space (currently 
+    disabled due to undiagnosed exception).
 ****************************************************************/
 
 #ifndef BASIS_JJJPN_SCHEME_H_
@@ -250,7 +251,7 @@ namespace basis {
     // accessors
     const WeightMax& weight_max() const {return weight_max_;}
     const TwoBodySpaceJJJPNOrdering& space_ordering() const {return space_ordering_;}
-    const OrbitalSpacePN& orbital_space() const {return *orbital_space_ptr_;}
+    //const OrbitalSpacePN& orbital_space() const {return *orbital_space_ptr_;}
 
     // diagnostic string
     std::string DebugStr() const;
@@ -262,7 +263,8 @@ namespace basis {
     TwoBodySpaceJJJPNOrdering space_ordering_;
 
     // direct access to orbital space
-    const OrbitalSpacePN* orbital_space_ptr_;
+    // 02/03/25 (mac): Reverted after inducing std::bad_alloc, even when accessor never called.
+    //const OrbitalSpacePN* orbital_space_ptr_;
     
   };
 

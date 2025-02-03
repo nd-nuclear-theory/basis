@@ -191,8 +191,10 @@ namespace basis {
       const WeightMax& weight_max,
       basis::TwoBodySpaceJJJPNOrdering ordering
     )
-    : weight_max_(weight_max), space_ordering_(ordering), orbital_space_ptr_(&orbital_space)
+    : weight_max_(weight_max), space_ordering_(ordering)  // , orbital_space_ptr_(&orbital_space)
   {
+
+    // orbital_space_ptr_ = std::addressof(orbital_space);
 
     // find putative Jmax from maximal j among orbitals
     HalfInt jmax=HalfInt(1,2);
