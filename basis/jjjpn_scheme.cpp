@@ -191,7 +191,7 @@ namespace basis {
       const WeightMax& weight_max,
       basis::TwoBodySpaceJJJPNOrdering ordering
     )
-    : weight_max_(weight_max), space_ordering_(ordering) // orbital_space_(orbital_space)
+    : weight_max_(weight_max), space_ordering_(ordering), orbital_space_ptr_(&orbital_space)
   {
 
     // find putative Jmax from maximal j among orbitals

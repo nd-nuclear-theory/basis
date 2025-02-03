@@ -45,6 +45,7 @@
   + 07/03/21 (pjf): Call base class constructor for initializing labels.
   + 07/04/21 (pjf): Pass derived subspace class as template argument to
     BaseSubspace.
+  + 02/03/25 (mac): Add orbital_space() accessor.
 ****************************************************************/
 
 #ifndef BASIS_JJJPN_SCHEME_H_
@@ -247,26 +248,22 @@ namespace basis {
     // Enumerate subspaces.
 
     // accessors
-    // const OrbitalSpacePN& orbital_space() {return orbital_space_;}
     const WeightMax& weight_max() const {return weight_max_;}
     const TwoBodySpaceJJJPNOrdering& space_ordering() const {return space_ordering_;}
+    const OrbitalSpacePN& orbital_space() {return *orbital_space_ptr_;}
 
     // diagnostic string
     std::string DebugStr() const;
 
     private:
 
-    // convenience reference to underlying orbitals
-    //
-    // Caveat: Any reference member interferes with defining a default
-    // constructor, since references must be explicitly initialized.
-
-    // const OrbitalSpacePN& orbital_space_;
-
     // truncation
     WeightMax weight_max_;
     TwoBodySpaceJJJPNOrdering space_ordering_;
 
+    // direct access to orbital space
+    const OrbitalSpacePN* orbital_space_ptr_;
+    
   };
 
   // sectors
