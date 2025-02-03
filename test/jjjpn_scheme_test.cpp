@@ -61,7 +61,7 @@ void TestTwoBodyNmax()
       basis::WeightMax(basis::Rank::kTwoBody,2)
     );
   std::cout << space.DebugStr();
-  std::cout << space.orbital_space().DebugStr();
+  // std::cout << space.orbital_space().DebugStr();
 
   // set up allowed sectors
   std::cout << "Two-body operator sectors" << std::endl;
