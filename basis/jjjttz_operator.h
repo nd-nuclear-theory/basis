@@ -10,6 +10,8 @@
   University of Notre Dame
 
   + Created by zz from jjjt_operator ~12/17/23.
+  + 02/04/25 (mac): Gracefully handle lookups of matrix elements involving
+    empty subspaces.
 
 ****************************************************************/
 
