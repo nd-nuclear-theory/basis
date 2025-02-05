@@ -146,18 +146,35 @@ namespace basis {
     // bool swap_braket=false;
     std::size_t bra_subspace_index=space.LookUpSubspaceIndex(subspace_labels_bra);
     std::size_t ket_subspace_index=space.LookUpSubspaceIndex(subspace_labels_ket);
+    if ((bra_subspace_index==kNone)||(ket_subspace_index==kNone))
+      // gracefully handle lookup of forbidden subspace
+      //
+      // E.g., in ob-2 truncation, J=5, T=1, sector does not exist, since
+      // (d5/2)^2 cannot couple to J+T even, but me2j I/O loop naively includes
+      // this matrix element.
+      if (matrix_element!=0) {
+        std::cerr << "ERROR: Attempting to set nonzero value for matrix element in nonexistent sector" << std::endl;
+        exit(EXIT_FAILURE);
+        // return;
+      } else {
+        // std::cout << "0" << std::endl;
+        return;
+      }
     std::size_t sector_index=sectors.LookUpSectorIndex(bra_subspace_index,ket_subspace_index);
     // if (sector_index==kNone) {
     //   sector_index=sectors.LookUpSectorIndex(ket_subspace_index,bra_subspace_index);
     //   swap_braket=true;
     // }
     basis::TwoBodySectorsJJJTTz::SectorType sector=sectors.GetSector(sector_index);
+    
+    // look up matrix element
     const basis::TwoBodySubspaceJJJTTz& bra_subspace=sector.bra_subspace();
     const basis::TwoBodySubspaceJJJTTz& ket_subspace=sector.ket_subspace();
     std::size_t bra_state_index=bra_subspace.LookUpStateIndex(state_labels_bra);
     std::size_t ket_state_index=ket_subspace.LookUpStateIndex(state_labels_ket);
     // assert((bra_state_index!=kNone)&&(ket_state_index!=kNone));
     if ((bra_state_index==kNone)||(ket_state_index==kNone)) {
+      // gracefully handle lookup of forbidden state
       if (matrix_element!=0) {
         // std::cout << "matrix_element!=0" << std::endl;
         // std::cout << "space debug string " << std::endl << space.DebugStr() << std::endl;
@@ -172,7 +189,7 @@ namespace basis {
         // std::cout << "bra state index " << bra_state_index << std::endl;
         // std::cout << "ket state index " << ket_state_index << std::endl;
         // std::cout << "matrix element " << matrix_element << std::endl;
-        std::cout << "Can't find indexes for a non-zero matrix element." << std::endl;
+        std::cerr << "ERROR: Can't find indexes for a non-zero matrix element." << std::endl;
         exit(EXIT_FAILURE);
         // return;
       } else {
@@ -193,17 +210,21 @@ namespace basis {
       const OperatorBlocks<double>& matrices
     )
   {
-    // bool swap_braket=false;
-    // std::cout << "space debug string " << std::endl << space.DebugStr() << std::endl;
-    // std::cout << "sectors debug string " << std::endl << sectors.DebugStr() << std::endl;
+
+    // look up sector
     std::size_t bra_subspace_index=space.LookUpSubspaceIndex(subspace_labels_bra);
     std::size_t ket_subspace_index=space.LookUpSubspaceIndex(subspace_labels_ket);
+    if ((bra_subspace_index==kNone)||(ket_subspace_index==kNone))
+      // gracefully handle lookup of forbidden subspace
+      //
+      // E.g., in ob-2 truncation, J=5, T=1, sector does not exist, since
+      // (d5/2)^2 cannot couple to J+T even, but me2j I/O loop naively includes
+      // this matrix element.
+      return 0;
     std::size_t sector_index=sectors.LookUpSectorIndex(bra_subspace_index,ket_subspace_index);
-    // if (sector_index==kNone) {
-    //   sector_index=sectors.LookUpSectorIndex(ket_subspace_index,bra_subspace_index);
-    //   swap_braket=true;
-    // }
-    // std::cout << "sector index " << sector_index << std::endl;
+    assert(sector_index!=kNone);
+
+    // look up matrix element
     basis::TwoBodySectorsJJJTTz::SectorType sector=sectors.GetSector(sector_index);
     const basis::TwoBodySubspaceJJJTTz& bra_subspace=sector.bra_subspace();
     const basis::TwoBodySubspaceJJJTTz& ket_subspace=sector.ket_subspace();
@@ -216,6 +237,7 @@ namespace basis {
     // std::cout << "bra state index " << bra_state_index << std::endl;
     // std::cout << "ket state index " << ket_state_index << std::endl;
     if ((bra_state_index==kNone)||(ket_state_index==kNone)) {
+      // gracefully handle lookup of forbidden state
       return 0;
     }
     return matrices[sector_index](bra_state_index,ket_state_index);
