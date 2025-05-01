@@ -205,6 +205,7 @@ namespace basis {
     TwoBodySpeciesPN two_body_species() const {return subspace().two_body_species();}
     int J() const {return subspace().J();}
     int g() const {return subspace().g();}
+    int Tz() const {return basis::kTwoBodySpeciesPNCodeTz[int(two_body_species())];}
     const OrbitalSubspacePN& orbital_subspace1() const {return subspace().orbital_subspace1();}
     const OrbitalSubspacePN& orbital_subspace2() const {return subspace().orbital_subspace2();}
 
